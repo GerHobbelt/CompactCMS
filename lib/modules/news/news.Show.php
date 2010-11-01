@@ -33,6 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
+
 // Load news preferences
 $pageID	= getGETparam4Filename('page');
 $do	= getGETparam4IdOrNumber('do');
@@ -41,11 +42,12 @@ $id = getGETparam4IdOrNumber('id');
 $numCfg = 0;
 if(!empty($pageID)) 
 {
-	$rsCfg	= $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgnews` WHERE pageID='$pageID'");
+	$rsCfg	= $db->SelectSingleRow($cfg['db_prefix']."cfgnews", array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
 	$numCfg	= $db->RowCount();
 }
 $locale 	= ($numCfg>0?$rsCfg->showLocale:$cfg['locale']);
-$newspages	= $db->QueryArray("SELECT urlpage FROM `".$cfg['db_prefix']."pages` WHERE module='news'");
+// we only need to check if the given page is a valid news page...
+$news_in_page = $db->SelectSingleValue($cfg['db_prefix']."pages", array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
 if ($db->Error()) $db->Kill();
 
 // Set front-end language
@@ -55,22 +57,28 @@ SetUpLanguageAndLocale($locale);
 $special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
 
 // Do actions for overview
-if(!isset($_GET['id'])||empty($_GET['id'])) {
-	if(in_array($pageID, $newspages[0])) {
+if(empty($id)) 
+{
+	if($news_in_page) 
+	{
 		// Load recordset for all news on specific news page
-		$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished>'0' AND pageID='$pageID' ORDER BY newsModified DESC");
-	} elseif(!in_array($pageID, $newspages[0])) {
+		$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT) . " ORDER BY newsModified DESC");
+	} 
+	else 
+	{
 		// Load recordset for all news on any page
-		$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished>'0' ORDER BY newsModified DESC");
+		$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' ORDER BY newsModified DESC");
 	}
 } 
-// Do actions for specific news
-elseif(isset($_GET['id'])&&!empty($_GET['id'])) {
+else 
+{
+	// Do actions for specific news
+	
 	// Define requested news item
-	$newsID = explode("-",$_GET['id']);
+	$newsID = explode("-", $id, 2);
 	
 	// Load recordset for newsID
-	$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsID=".$newsID[0]." AND newsPublished>'0' AND pageID='$pageID'");
+	$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsID=".MySQL::SQLValue($newsID[0], MySQL::SQLVALUE_NUMBER)." AND newsPublished<>'0' AND pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
 }
 
 ?>
@@ -81,8 +89,8 @@ elseif(isset($_GET['id'])&&!empty($_GET['id'])) {
 
 <?php 
 // Start switch for news, select all the right details
-if($db->HasRecords()) {
-
+if($db->HasRecords()) 
+{
 	if(empty($do)) 
 	{
 		if($numCfg>0) 
@@ -99,46 +107,88 @@ if($db->HasRecords()) {
 			$showAuthor	= 1;
 			$showDate	= 1;
 		}
-		for ($i=0; $i<$listMax; $i++) { 
+		for ($i=0; $i<$listMax; $i++) 
+		{ 
 		    $rsNews = $db->Row();
-?>
-<div>
-	<?php if($showDate==1) { ?>
-		<strong class="date"><?php echo htmlentities(strftime('%B',strtotime($rsNews->newsModified))); ?><span><?php echo date('j',strtotime($rsNews->newsModified)); ?></span></strong>
-	<?php } ?>
-	
-	<?php if(!isset($_GET['id'])||empty($_GET['id'])) { 
-		// Filter spaces, non-file characters and account for UTF-8
-		$newsTitle = @htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
-  		$newsTitle = str_replace($special_chars, "", $newsTitle); 
-		$newsTitle = str_replace(' ','-',$newsTitle);
+			?>
+			<div>
+				<?php 
+				if($showDate==1) 
+				{ 
+				?>
+					<strong class="date"><?php echo htmlentities(strftime('%B',strtotime($rsNews->newsModified))); ?><span><?php echo date('j',strtotime($rsNews->newsModified)); ?></span></strong>
+				<?php 
+				} 
+				?>
 		
-		?>
-		<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
-		<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
-		<?php if($showTeaser==0) { ?><p><?php echo $rsNews->newsContent; ?></p><?php } ?>
-		
-		<?php if($showAuthor==1||$showDate==1) { ?>
-			<p style="text-align:right;">
-				<?php if($showAuthor==1) { echo '<strong>&ndash; '.$rsNews->userFirst.' '.$rsNews->userLast.'</strong>'; } ?>
-			</p>
-		<?php } ?>
-	<?php } elseif(isset($_GET['id'])&&!empty($_GET['id'])) { ?>
-		<h1><?php echo $rsNews->newsTitle; ?></h1>
-		<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
-		<p><?php echo $rsNews->newsContent; ?></p>
-		
-		<?php if($showAuthor==1||$showDate==1) { ?>
-		<p style="text-align:right;">
-			<?php if($showAuthor==1) { echo '<strong>&ndash; '.$rsNews->userFirst.' '.$rsNews->userLast.'</strong>'; } ?>
-		</p>
-		<?php } ?>
-		<p>&laquo; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a> | <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html"><?php echo $db->QuerySingleValue("SELECT `pagetitle` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = '".$rsNews->pageID."'"); ?></a></p>
-	<?php } ?>
-	
-</div>
-<hr style="clear:both;"/>
-<?php
+				<?php 
+				if(empty($id)) 
+				{ 
+					// Filter spaces, non-file characters and account for UTF-8
+					$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
+					$newsTitle = str_replace($special_chars, "", $newsTitle); 
+					$newsTitle = str_replace(' ','-',$newsTitle);
+					
+					?>
+					<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
+					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
+					<?php 
+					if($showTeaser==0) 
+					{ 
+					?>
+						<p><?php echo $rsNews->newsContent; ?></p>
+					<?php 
+					} 
+					?>
+					
+					<?php 
+					if($showAuthor==1||$showDate==1) 
+					{ 
+					?>
+						<p style="text-align:right;">
+							<?php 
+							if($showAuthor==1) 
+							{ 
+								echo '<strong>&ndash; '.$rsNews->userFirst.' '.$rsNews->userLast.'</strong>'; 
+							} 
+							?>
+						</p>
+					<?php 
+					} 
+					?>
+				<?php 
+				} 
+				else
+				{ 
+				?>
+					<h1><?php echo $rsNews->newsTitle; ?></h1>
+					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
+					<p><?php echo $rsNews->newsContent; ?></p>
+					
+					<?php 
+					if($showAuthor==1||$showDate==1) 
+					{ 
+					?>
+						<p style="text-align:right;">
+							<?php 
+							if($showAuthor==1) 
+							{ 
+								echo '<strong>&ndash; '.$rsNews->userFirst.' '.$rsNews->userLast.'</strong>'; 
+							} 
+							?>
+						</p>
+					<?php 
+					} 
+					?>
+					<p>&laquo; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a> | <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html"><?php 
+						echo $db->QuerySingleValue("SELECT `pagetitle` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = ".MySQL::SQLValue($rsNews->pageID, MySQL::SQLVALUE_TEXT)); ?></a></p>
+				<?php 
+				} 
+				?>
+				
+			</div>
+			<hr style="clear:both;"/>
+		<?php
 		}
 		if(empty($id) && $db->RowCount() > $rsCfg->showMessage) 
 		{ 
@@ -150,13 +200,15 @@ if($db->HasRecords()) {
 	
 	if($do == "all") 
 	{
-		for ($i=0; $i<$db->RowCount(); $i++) { 
+		for ($i=0; $i<$db->RowCount(); $i++) 
+		{ 
 	    	$rsNews = $db->Row();
 	    	
 	    	// Filter spaces, non-file characters and account for UTF-8
-			$newsTitle = @htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
+			$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
   			$newsTitle = str_replace($special_chars, "", $newsTitle); 
-			$newsTitle = str_replace(' ','-',$newsTitle); ?>
+			$newsTitle = str_replace(' ','-',$newsTitle); 
+			?>
 	    	
 			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
 			<span style="font-size:0.8em;font-style:italic;"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></span>
@@ -164,5 +216,7 @@ if($db->HasRecords()) {
 		<?php
 		}
 	}
-} else echo $ccms['lang']['system']['noresults'];
+} 
+else 
+	echo $ccms['lang']['system']['noresults'];
 ?>

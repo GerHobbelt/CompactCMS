@@ -63,23 +63,37 @@ if (!defined('BASE_PATH'))
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
- /**
+/**
  *
  * Either INSERT or UPDATE preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth()) {
-	
+if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth()) 
+{
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>='4') {
-		
+	if($_SESSION['ccms_userLevel']>=4) 
+	{
 		// Execute either INSERT or UPDATE
-		if($db->UpdateRows($cfg['db_prefix']."cfgpermissions", $_POST)) {
-			header("Location: permissions.Manage.php?status=notice&msg=".$ccms['lang']['backend']['settingssaved']);
+		$values = array(); // [i_a] make sure $values is an empty array to start with here
+		foreach ($_POST as $key => $value)
+		{
+			$key = filterParam4IdOrNumber($key);
+			$setting = filterParam4Number($value);
+			if (empty($key) || (empty($setting) && $value !== "0"))
+				die($ccms['lang']['system']['error_forged']); 
+			$values[$key] = MySQL::SQLValue($setting, MySQL::SQLVALUE_NUMBER);
+		}
+		if($db->UpdateRows($cfg['db_prefix']."cfgpermissions", $values)) 
+		{
+			header("Location: permissions.Manage.php?status=notice&msg=".rawurlencode($ccms['lang']['backend']['settingssaved']));
 			exit();
-		} else $db->Kill();
-		
-	} else die($ccms['lang']['auth']['featnotallowed']);
-	
-} else die("No external access to file");
+		} 
+		else 
+			$db->Kill();
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
+} 
+else 
+	die("No external access to file");
 ?>

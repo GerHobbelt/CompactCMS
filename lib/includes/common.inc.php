@@ -10,6 +10,11 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 
+if (defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+{
+	/* always flush cached data at the start of each invocation -- which always passes through here, at least. */
+	clearstatcache();
+}
 
 
 
@@ -466,13 +471,13 @@ function DetermineTemplateName($name = null, $printing = 'N')
 	
 	if (!empty($name))
 	{
-		$name = $name . ($printing == 'N' ? '' : '.print');
+		$name = $name . ($printing == 'N' ? '' : '/print');
 		
 		// Set the template variable for current page
 		$templatefile = BASE_PATH . '/lib/templates/' . $name . '.tpl.html';
 	
 		// Check whether template exists, specify default or throw "no templates" error.
-		if(file_exists($templatefile)) 
+		if(is_file($templatefile)) 
 		{
 			return $name;
 		}
@@ -481,13 +486,13 @@ function DetermineTemplateName($name = null, $printing = 'N')
 	if(is_array($ccms['template_collection']) && count($ccms['template_collection']) > 0) 
 	{
 		// pick default template
-		$name = $ccms['template_collection'][0] . ($printing == 'N' ? '' : '.print');
+		$name = $ccms['template_collection'][0] . ($printing == 'N' ? '' : '/print');
 		
 		// Set the template variable for current page
 		$templatefile = BASE_PATH . '/lib/templates/' . $name . '.tpl.html';
 	
 		// Check whether template exists, specify default or throw "no templates" error.
-		if(file_exists($templatefile)) 
+		if(is_file($templatefile)) 
 		{
 			return $name;
 		}
@@ -496,7 +501,7 @@ function DetermineTemplateName($name = null, $printing = 'N')
 	// for printing ONLY, see if the 'ccms' template exists anyway.
 	if ($printing != 'N')
 	{
-		$name = 'ccms.print';
+		$name = 'ccms/print';
 		
 		// Set the template variable for current page
 		$templatefile = BASE_PATH . '/lib/templates/' . $name . '.tpl.html';
@@ -668,6 +673,9 @@ function SetAuthSafety()
 {
 	$_SESSION['host'] = md5($_SERVER['HTTP_HOST']);
 	$_SESSION['id']	= md5(session_id());
+	
+	unset($_SESSION['rc1']);
+	unset($_SESSION['rc2']);
 }
 
 

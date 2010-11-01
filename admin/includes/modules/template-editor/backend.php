@@ -61,7 +61,7 @@ if(!empty($do) && $do=="backup" && $_POST['btn_backup']=="dobackup" && isset($_S
 // Set the default template
 $dir_temp = "../../../../lib/templates/";
 $get_temp = (isset($_GET['template'])?htmlentities($_GET['template']):$template[0].'.tpl.html');
-$chstatus = (substr(sprintf('%o', fileperms($dir_temp.$get_temp)), -4)>='0666'?1:0);
+$chstatus = ((fileperms($dir_temp.$get_temp) & octdec('0777')) >= octdec('0666')?1:0);
 	
 // Check for filename	
 if(!empty($get_temp)) {
@@ -90,8 +90,38 @@ if(checkAuth() && $_SESSION['ccms_userLevel']>=$perm['manageTemplate'])
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
 		
 		<script type="text/javascript" src="../../edit_area/edit_area_compressor.php"></script>
-		<script type="text/javascript">editAreaLoader.init({id:"content",allow_resize:'both',allow_toggle:false,word_wrap:true,start_highlight:true,<?php echo 'language:"'.$cfg['language'].'",'; ?>syntax:"html"});</script>
-		<script type="text/javascript">function confirmation(){var answer=confirm(<?php echo"'".$ccms['lang']['editor']['confirmclose']."'";?>);if(answer){try{parent.MochaUI.closeWindow(parent.$('sys-tmp_ccms'));}catch(e){}}else{return false;}}</script>
+		<script type="text/javascript">
+editAreaLoader.init(
+	{
+		id:"content",
+		allow_resize:'both',
+		allow_toggle:false,
+		word_wrap:true,
+		start_highlight:true,
+		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
+		syntax:"html"
+	});
+</script>
+		<script type="text/javascript">
+function confirmation()
+{
+	var answer=confirm(<?php echo"'".$ccms['lang']['editor']['confirmclose']."'";?>);
+	if(answer)
+	{
+		try
+		{
+			parent.MochaUI.closeWindow(parent.$('sys-tmp_ccms'));
+		}
+		catch(e)
+		{
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+</script>
 	</head>
 <body>
 	<div class="module">

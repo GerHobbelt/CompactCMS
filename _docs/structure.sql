@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS `ccms_pages` (
   `toplevel` smallint(5) DEFAULT NULL,
   `sublevel` smallint(5) DEFAULT NULL,
   `menu_id` smallint(5) DEFAULT '1' COMMENT 'The menu this will appear in; one of define(MENU_TARGET_COUNT)',
+  `placing` smallint(5) NOT NULL DEFAULT '0' COMMENT 'Where the content should be displayed; 0 ~ the default spot: content; {1..N} ~ alternate target spot (when supported by template); -N ~ inline in the menu, max. number of chars + link if content surpasses this count',
   `variant` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'ccms' COMMENT 'The template ID which will be used in conjuction with this page when rendering',
   `pagetitle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `subheader` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
@@ -190,9 +191,9 @@ CREATE TABLE IF NOT EXISTS `ccms_pages` (
 -- Dumping data for table `ccms_pages`
 --
 
-INSERT INTO `ccms_pages` (`page_id`, `user_ids`, `urlpage`, `module`, `toplevel`, `sublevel`, `menu_id`, `variant`, `pagetitle`, `subheader`, `description`, `keywords`, `srcfile`, `printable`, `islink`, `iscoding`, `published`) VALUES
-(00001, '0', 'home', 'editor', 1, 0, 1, 'ccms', 'Home', 'The CompactCMS demo homepage', 'The CompactCMS demo homepage', 'compactcms, light-weight cms', 'home.php', 'Y', 'Y', 'N', 'Y'),
-(00002, '0', 'contact', 'editor', 2, 0, 1, 'sweatbee', 'Contact form', 'A basic contact form using Ajax', 'This is an example of a basic contact form based using Ajax', 'compactcms, light-weight cms', 'contact.php', 'Y', 'Y', 'Y', 'Y');
+INSERT INTO `ccms_pages` (`page_id`, `user_ids`, `urlpage`, `module`, `toplevel`, `sublevel`, `menu_id`, `placing`, `variant`, `pagetitle`, `subheader`, `description`, `keywords`, `srcfile`, `printable`, `islink`, `iscoding`, `published`) VALUES
+(00001, '0', 'home', 'editor', 1, 0, 1, 0, 'ccms', 'Home', 'The CompactCMS demo homepage', 'The CompactCMS demo homepage', 'compactcms, light-weight cms', 'home.php', 'Y', 'Y', 'N', 'Y'),
+(00002, '0', 'contact', 'editor', 2, 0, 1, 0, 'sweatbee', 'Contact form', 'A basic contact form using Ajax', 'This is an example of a basic contact form based using Ajax', 'compactcms, light-weight cms', 'contact.php', 'Y', 'Y', 'Y', 'Y');
 
 -- --------------------------------------------------------
 

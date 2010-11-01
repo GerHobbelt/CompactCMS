@@ -35,10 +35,10 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 //
 
 // Standard configuration
-$cfg['sitename']	= "CompactCMS";	// Your site name - this will show in the front-end.
+$cfg['sitename'] = 'Robhundman.lan'; 
 $cfg['language']	= "en"; 		// Select the language of your (front-end) website - en, nl, de, es.
-$cfg['rootdir']		= "/";			// The root directory where CCMS is installed under, must include trailing slash ('/').
-$cfg['authcode']	= "12345";		// Add ?preview=X (where X is your authcode) to your address bar to preview unpublished items.
+$cfg['rootdir']		= "/c/";			// The root directory where CCMS is installed under, must include trailing slash ('/').
+$cfg['authcode'] = '15683';		// Add ?preview=X (where X is your authcode) to your address bar to preview unpublished items. 
 
 // Detailed configuration. By default shouldn't need adjusting.
 $cfg['version']		= true;			// Check for the latest CompactCMS version [true/false]
@@ -51,13 +51,14 @@ $cfg['protect']		= true;			// Password protect your administration [true/false]
 // Database settings (case sensitive)
 $cfg['db_host']		= "localhost"; 	// MySQL setting - your database host.
 $cfg['db_user']		= "root";		// MySQL setting - your database username.
-$cfg['db_pass']		= ""; 			// MySQL setting - your database password.
+$cfg['db_pass'] = 'Noppes'; 
 $cfg['db_name']		= "compactcms";	// MySQL setting - your database name.
 $cfg['db_prefix']	= "ccms_";		// MySQL setting - the table prefix.
 
 // Restrict for editing with the editor. Use the filenames without extension.
 $cfg['restrict']	= array("foo","bar");
 $cfg['default_template'] = 'ccms'; 
+$cfg['enable_gravatar'] = false; 
 
 
 define('CCMS_DEVELOPMENT_ENVIRONMENT', true); // comment out or remove this line for any release install (where you are not developing on a local & very safe machine)
