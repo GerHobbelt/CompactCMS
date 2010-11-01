@@ -29,41 +29,21 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../sitemap.php');
 
-
-if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{
-	die("No external access to file");
-}
-
-
-
-$do	= getGETparam4IdOrNumber('do');
-$pageID		= (isset($_GET['file'])?htmlspecialchars($_GET['file']):null);
+$canarycage	= md5(session_id());
+$currenthost= md5($_SERVER['HTTP_HOST']);
+$do 		= (isset($_GET['do'])?$_GET['do']:null);
+$pageID		= (isset($_GET['file'])?$_GET['file']:null);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
 
 
+if(checkAuth($canarycage,$currenthost) && isset($_SESSION['rc1']) && !empty($_SESSION['rc2'])) 
+{ 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -77,7 +57,7 @@ $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissi
 	<div class="module">
 		
 		<div class="center <?php echo (isset($_GET['status'])?$_GET['status']:null); ?>">
-			<?php if(isset($_GET['msg'])&&strlen($_GET['msg'])>2) { echo $_GET['msg']; } ?>
+			<? if(isset($_GET['msg'])&&strlen($_GET['msg'])>'2') { echo $_GET['msg']; } ?>
 		</div>
 		
 		<div class="span-16 colborder">
@@ -103,7 +83,7 @@ $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissi
 			    	$rsNews = $db->Row();
 					
 			    	// Alternate rows
-						if($i%2 != 1) {
+			    	if($i%2 != '1') {
 						echo '<tr style="background-color: #E6F2D9;">';
 					} else { 
 						echo '<tr>';

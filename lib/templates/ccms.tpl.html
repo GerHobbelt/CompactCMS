@@ -23,10 +23,6 @@
 
 See below for a simple example that uses all of the tags listed above.
 */
-
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
-
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{%lang%}">
@@ -53,7 +49,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
 	<div id="left" class="span-4 colborder">
 		<p style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
-			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="Back to the administration">{%lang:login:login%}</a>
+			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="Back to the administration">Back to the admin</a>.
 		</p>
 		
 	</div>
@@ -62,7 +58,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 		<div id="printable" class="span-18 last" style="text-align: right;">
 			{%breadcrumb%}
 			{%IF printable (eq Y)%}
-				<br/><a href="{%rootdir%}{%urlpage%}.print">{%lang:template:print%}</a>
+				<br/><a href="{%rootdir%}{%urlpage%}.print">Print</a>
 			{%/IF printable%}
 		</div>
 		

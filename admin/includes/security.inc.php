@@ -29,23 +29,8 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
 // Include general configuration
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(__FILE__))));
-	define('BASE_PATH', $base);
-}
-
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/lib/sitemap.php');
 
 // Disable common hacking functions
 ini_set('base64_decode', 'Off');
@@ -54,7 +39,10 @@ ini_set('allow_url_fopen', 'Off');
 ini_set('allow_url_include', 'Off');
 
 // Set appropriate auth.inc.php file location
-$loc = $cfg['rootdir'] . "lib/includes/auth.inc.php";
+$loc = "";
+if(is_file('../lib/includes/auth.inc.php')) 			{ $loc = "../lib/includes/auth.inc.php"; } 
+elseif(is_file('../../lib/includes/auth.inc.php'))		{ $loc = "../../lib/includes/auth.inc.php"; }
+elseif(is_file('../../../lib/includes/auth.inc.php'))	{ $loc = "../../../lib/includes/auth.inc.php"; }
 
 	// Check whether current user has running session
 	if(empty($_SESSION['ccms_userID']) && $cfg['protect']==true){

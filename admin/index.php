@@ -34,38 +34,12 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're rendering the admin page here, no need to load the user/viewer page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
 // Compress all output and coding
 header('Content-type: text/html; charset=UTF-8');
 
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(__FILE__)));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-// /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');   [i_a] loaded by process.inc.php anyway
-/*MARKER*/require_once(BASE_PATH . '/admin/includes/process.inc.php');
-
-
-/* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth()) 
-{
-	// this situation should've caught inside process.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']); 
-}
-
-
+require_once('../lib/sitemap.php');
+require_once('./includes/process.inc.php');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
@@ -126,7 +100,7 @@ if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !Chec
 	<fieldset>
 		<legend><span class="ss_sprite ss_add">&#160;</span><a class="toggle" rel="form_wrapper" href="#"><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
 		<div id="form_wrapper">
-		<form method="post" id="addForm" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+		<form method="post" id="addForm" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 				<p><?php echo $ccms['lang']['backend']['createtip']; ?></p>
 				<div id="fields">
 				<label for="urlpage"><?php echo $ccms['lang']['forms']['filename']; ?></label> 

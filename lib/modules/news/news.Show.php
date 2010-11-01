@@ -29,27 +29,20 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
-
+// Load previously defined variables
+global $db,$cfg,$ccms;
 
 // Load news preferences
-$pageID	= getGETparam4Filename('page');
-$do	= getGETparam4IdOrNumber('do');
-$id = getGETparam4IdOrNumber('id');
-
-$numCfg = 0;
-if(!empty($pageID)) 
-{
+$pageID	= (isset($_GET['page'])?$_GET['page']:null);
+if(isset($pageID)&&$pageID>0) {
 	$rsCfg	= $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgnews` WHERE pageID='$pageID'");
 	$numCfg	= $db->RowCount();
 }
-$locale 	= ($numCfg>0?$rsCfg->showLocale:$cfg['locale']);
+$locale 	= (isset($numCfg)&&$numCfg>0?$rsCfg->showLocale:'eng');
 $newspages	= $db->QueryArray("SELECT urlpage FROM `".$cfg['db_prefix']."pages` WHERE module='news'");
-if ($db->Error()) $db->Kill();
 
 // Set front-end language
-SetUpLanguageAndLocale($locale);
+setlocale(LC_ALL, $locale);
 
 // Limited characters
 $special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
@@ -81,25 +74,26 @@ elseif(isset($_GET['id'])&&!empty($_GET['id'])) {
 
 <?php 
 // Start switch for news, select all the right details
-if($db->HasRecords()) {
-
-	if(empty($do)) 
+if($db->HasRecords()) 
+{
+	if(!isset($_GET['do'])) 
 	{
-		if($numCfg>0) 
+		if(isset($numCfg)&&$numCfg>0) 
 		{
-			$listMax 	= ($rsCfg->showMessage > $db->RowCount() ? $db->RowCount() : $rsCfg->showMessage);
-			$showTeaser	= intval($rsCfg->showTeaser);
-			$showAuthor	= intval($rsCfg->showAuthor);
-			$showDate	= intval($rsCfg->showDate);
+			$listMax 	= ($rsCfg->showMessage>$db->RowCount()?$db->RowCount():$rsCfg->showMessage);
+			$showTeaser	= $rsCfg->showTeaser;
+			$showAuthor	= $rsCfg->showAuthor;
+			$showDate	= $rsCfg->showDate;
 		} 
 		else 
 		{
 			$listMax = $db->RowCount();
-			$showTeaser	= 1;
-			$showAuthor	= 1;
-			$showDate	= 1;
+			$showTeaser	= '1';
+			$showAuthor	= '1';
+			$showDate	= '1';
 		}
-		for ($i=0; $i<$listMax; $i++) { 
+		for ($i=0; $i<$listMax; $i++) 
+		{ 
 		    $rsNews = $db->Row();
 ?>
 <div>
@@ -140,20 +134,20 @@ if($db->HasRecords()) {
 <hr style="clear:both;"/>
 <?php
 		}
-		if(empty($id) && $db->RowCount() > $rsCfg->showMessage) 
+		if(!isset($_GET['id'])||empty($_GET['id'])&&$db->RowCount()>$rsCfg->showMessage) 
 		{ 
 		?>
 			<hr/><p style="text-align:center;"><a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a></p>
 		<?php 
 		}
 	}
-	
-	if($do == "all") 
+	if(isset($_GET['do'])&&$_GET['do']=="all") 
 	{
-		for ($i=0; $i<$db->RowCount(); $i++) { 
-	    	$rsNews = $db->Row();
+		for ($i=0; $i<$db->RowCount(); $i++) 
+		{ 
+		    	$rsNews = $db->Row();
 	    	
-	    	// Filter spaces, non-file characters and account for UTF-8
+		    	// Filter spaces, non-file characters and account for UTF-8
 			$newsTitle = @htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
   			$newsTitle = str_replace($special_chars, "", $newsTitle); 
 			$newsTitle = str_replace(' ','-',$newsTitle); ?>

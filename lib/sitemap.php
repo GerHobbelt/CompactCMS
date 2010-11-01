@@ -34,153 +34,69 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
-
 // Start session
 session_start();
 
 // Define default location
-if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
+$base = str_replace('\\','/',dirname(dirname(__FILE__)));
+@define('BASE_PATH',$base);
 
 // Load basic configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
+require_once(BASE_PATH . '/lib/config.inc.php');
 
 // Load MySQL Class and initiate connection
-/*MARKER*/require_once(BASE_PATH . '/lib/class/mysql.class.php');
+require_once(BASE_PATH . '/lib/class/mysql.class.php');
 $db = new MySQL();
 
-// Load generic functions
-/*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
-
-
 // LANGUAGE ==
-
-/*
-You may specify a 2-char language code OR a 3-char 'locale' code
-to set up the proper language files and settings.
-*/
-function SetUpLanguageAndLocale($language)
+// Either select the specified file ($cfg['language']) or fall back to English
+$langfile = BASE_PATH . '/lib/languages/'.$cfg['language'].'.inc.php';
+if(file_exists($langfile)) 
 {
-	global $cfg;
-	global $ccms; // <-- this one will be augmented by the (probably) loaded language file(s).
-	
-	// Translate 2 character code to setlocale compliant code
-	//
-	// ALSO fix the 2-char language code if it is unknown (security + consistancy measure)!
-	switch ($language) 
-	{
-	default:
-	case 'en':
-	case 'eng':
-		$language = 'en'; $locale = 'eng';break;
-	case 'de':
-	case 'deu':
-		$language = 'de'; $locale = 'deu';break;
-	case 'it':
-	case 'ita':
-		$language = 'it'; $locale = 'ita';break;
-	case 'nl':
-	case 'nld':
-		$language = 'nl'; $locale = 'nld';break;
-	case 'ru':
-	case 'rus':
-		$language = 'ru'; $locale = 'rus';break;
-	case 'sv':
-	case 'sve':
-		$language = 'sv'; $locale = 'sve';break;
-	case 'fr':
-	case 'fra':
-		$language = 'fr'; $locale = 'fra';break;
-	case 'es':
-	case 'esp':
-		$language = 'es'; $locale = 'esp';break;
-	case 'pr':
-	case 'por':
-		$language = 'pr'; $locale = 'por';break;
-	case 'tr':
-	case 'tur':
-		$language = 'tr'; $locale = 'tur';break;
-	case 'ch':
-	case 'chs':
-		$language = 'ch'; $locale = 'chs';break;
-	}
-
-	// Either select the specified language file or fall back to English
-	$langfile = BASE_PATH . '/lib/languages/'.$language.'.inc.php';
-	if(is_file($langfile))
-	{
-		// only load language files when the current language has not been loaded just before.
-		if ($language !== $cfg['language'])
-		{
-			/*MARKER*/require($langfile);
-		}
-	} 
-	else 
-	{
-		$language = 'en';
-		$locale = 'eng';
-		// only load language files when the current language has not been loaded just before.
-		if ($language !== $cfg['language'])
-		{
-			/*MARKER*/require(BASE_PATH . '/lib/languages/en.inc.php');
-		}
-	}
-
-	// Set local for time, currency, etc
-	setlocale(LC_ALL, $locale);
-
-	
-	$mce_langfile = BASE_PATH . '/admin/includes/tiny_mce/langs/'.$language.'.js';
-	if (is_file($mce_langfile))
-	{
-		$cfg['tinymce_language'] = $language;
-	}
-	else
-	{
-		$cfg['tinymce_language'] = 'en';
-	}
-
-	$editarea_langfile = BASE_PATH . '/admin/includes/edit_area/langs/'.$language.'.js';
-	if (is_file($editarea_langfile))
-	{
-		$cfg['editarea_language'] = $language;
-	}
-	else
-	{
-		$cfg['editarea_language'] = 'en';
-	}
-	
-	$cfg['language'] = $language;
-	$cfg['locale'] = $locale;
-	
-	return $language;
-}
-
-// multilingual support per page through language cfg override:
-$language = getGETparam4IdOrNumber('lang');
-if (empty($language))
+	require_once($langfile); 
+} 
+else 
 {
-	$language = $cfg['language'];
+	require_once(BASE_PATH . '/lib/languages/en.inc.php');
 }
-// blow away $cfg['language'] to ensure the language file(s) are loaded this time - it's our first anyhow.
-unset($cfg['language']);
-$language = SetUpLanguageAndLocale($language);
-
-
+// Translate 2 character code to setlocale compliant code
+switch ($cfg['language']) 
+{
+	case 'en':$locale = 'eng';break;
+	case 'de':$locale = 'deu';break;
+	case 'it':$locale = 'ita';break;
+	case 'nl':$locale = 'nld';break;
+	case 'ru':$locale = 'rus';break;
+	case 'sv':$locale = 'sve';break;
+	case 'fr':$locale = 'fra';break;
+	case 'es':$locale = 'esp';break;
+	case 'pr':$locale = 'por';break;
+	case 'tr':$locale = 'tur';break;	
+	case 'ch':$locale = 'chs';break;	
+	default:$locale = 'eng';break;
+}
+// Set local for time, currency, etc
+setlocale(LC_ALL, $locale);
 
 // SECURITY ==
 // Include security file only for administration directory
 $location = explode("/", $_SERVER['PHP_SELF']);
 if(in_array("admin",$location)) 
 {
-	/*MARKER*/require_once(BASE_PATH . '/admin/includes/security.inc.php');
+	require_once(BASE_PATH . '/admin/includes/security.inc.php');
 }
 
 
-// CheckAuth() has been moved to common.inc.php
-
-
+// Check for authentic request ($cage=md5(SESSION_ID),$host=md5(CURRENT_HOST))
+function checkAuth($cage, $host) 
+{
+	if(md5(session_id())==$cage && md5($_SERVER['HTTP_HOST']) == $host) 
+	{
+		return true;
+	} 
+	else 
+		return false;
+}
 
 // DATABASE ==
 // All set! Now this statement will connect to the database
@@ -201,29 +117,16 @@ $v = "1.4.1";
 if ($handle = @opendir(BASE_PATH . '/lib/templates/')) 
 {
 	$template = array();
-
-	while (false !== ($file = readdir($handle))) 
-	{
-		if ($file != "." && $file != ".." && strpos($file, ".tpl.html")) 
-		{
-			// Add the templates to an array for use through-out CCMS, while removing the extension .tpl.html (=9)
-			$template_name = substr($file,0,-9);
-			if ($template_name != $cfg['default_template'])
-			{
-				$template[] = substr($file,0,-9);
-			}
-		}
-	}
-	closedir($handle);
-
-	// sort the order of the templates; also make sure that the 'default' template is placed at index [0] so that 404 pages and others pick that one.
-	sort($template, SORT_LOCALE_STRING);
-	if (!empty($cfg['default_template']))
-	{
-		array_unshift($template, $cfg['default_template']);
-	}
-	$ccms['template_collection'] = $template;
 	
+    while (false !== ($file = readdir($handle))) 
+    {
+        if ($file != "." && $file != ".." && strpos($file, ".tpl.html")) 
+	{
+			// Add the templates to an array for use through-out CCMS, while removing the extension .tpl.html (=9)
+        	$template[] = substr($file,0,-9);
+        }
+    }
+    closedir($handle);
 } 
 else 
 {
@@ -231,35 +134,44 @@ else
 }
 
 // GENERAL FUNCTIONS ==
-// [i_a] moved to common.inc.php
-
-
-
-
-// only execute the remainder of this file's code if we aren't running a 'minimal' run...
-if (!defined('CCMS_PERFORM_MINIMAL_INIT'))
+// Register filter regex for URL detection in description
+function regexUrl($data) 
 {
-
+	$regex = "((https?|ftp)\:\/\/)?"; // SCHEME 
+	$regex .= "([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?"; // User and Pass 
+	$regex .= "([a-z0-9-.]*)\.([a-z]{2,3})"; // Host or IP 
+	$regex .= "(\:[0-9]{2,5})?"; // Port 
+	$regex .= "(\/([a-z0-9+\$_-]\.?)+)*\/?"; // Path 
+	$regex .= "(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?"; // GET Query 
+	$regex .= "(#[a-z_.-][a-z0-9+\$_.-]*)?"; // Anchor 
+	
+	if(preg_match("/^$regex/i", $data)) 
+	{
+		return true;
+	}
+}
 
 // OPERATION MODE ==
 // 1) Start normal operation mode (if sitemap.php is not requested directly).
 // This will fill all variables based on the requested page, or throw a 403/404 error when applicable.
 $pagereq = (isset($_GET['page'])&&!empty($_GET['page']))?htmlspecialchars($_GET['page']):null;
-if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitemap") {
-	
+if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitemap") 
+{
 	// Parse contents function
-	function ccmsContent($page,$published) {
+	function ccmsContent($page,$published) 
+	{
 		global $ccms, $cfg;
 		$msg = explode(' ::', $ccms['lang']['hints']['published']); 
 		ob_start();
 			// Check for preview variable
-			$preview = getGETparam4IdOrNumber('preview');
+			$preview = (isset($_GET['preview'])?$_GET['preview']:null);
 			// Warning message when page is disabled and authcode is correct
 			echo ($preview==$cfg['authcode']&&$ccms['published']=='N')?"<p style=\"clear:both;padding:.8em;margin-bottom:1em;background:#FBE3E4;color:#8a1f11;border:2px solid #FBC2C4;\">".$msg['0'].": <strong>".strtolower($ccms['lang']['backend']['disabled'])."</strong></p>":null;
 			
 			// Parse content for active or preview mode
-			if($published=='Y' || $preview==$cfg['authcode']) {
-				/*MARKER*/require_once(BASE_PATH. "/content/".$page.".php");
+			if($published=='Y' || $preview==$cfg['authcode']) 
+			{
+				include_once(BASE_PATH. "/content/".$page.".php");
 			}
 			// Parse 403 contents (disabled and no preview token)
 			elseif($published=='N') {
@@ -453,10 +365,5 @@ elseif($current == "sitemap.php" || $current == "sitemap.xml") {
 		}
 	}
 	echo "</urlset>";
-}
-
-
-} // if (!defined('CCMS_PERFORM_MINIMAL_INIT'))
-
-
+} 
 ?>

@@ -34,31 +34,15 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
 // Compress all output and coding
 header('Content-type: text/html; charset=UTF-8');
 
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../../../lib/sitemap.php');
 
 // Security functions
-
-
+$canarycage		= md5(session_id());
+$currenthost	= md5($_SERVER['HTTP_HOST']);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
@@ -68,7 +52,7 @@ $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissi
  * Either INSERT or UPDATE preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth()) {
+if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth($canarycage,$currenthost)) {
 	
 	// (!) Only administrators can change these values
 	if($_SESSION['ccms_userLevel']>='4') {

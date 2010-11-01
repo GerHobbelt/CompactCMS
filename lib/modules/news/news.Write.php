@@ -29,58 +29,36 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../sitemap.php');
 
-
-
-
-$do	= getGETparam4IdOrNumber('do');
+$canarycage	= md5(session_id());
+$currenthost= md5($_SERVER['HTTP_HOST']);
+$do 		= (isset($_GET['do'])?$_GET['do']:null);
 
 // Open recordset for specified user
-$newsID = getGETparam4Number('newsID');
-$pageID = getGETparam4IdOrNumber('pageID');
+$newsID = (isset($_GET['newsID']) && is_numeric($_GET['newsID'])?$_GET['newsID']:null);
+$pageID = (isset($_GET['pageID'])?$_GET['pageID']:null);
 
-if($newsID != null) 
+if($newsID!=null) 
 {
-	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID=u.userID WHERE newsID = " . MySQL::SQLValue($newsID, MySQL::SQLVALUE_NUMBER) . " AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
-	if (!$news) $db->Kill();
+	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID=u.userID WHERE newsID = $newsID AND pageID='$pageID'");
 }
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
 
-if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModNews'])) 
-{
-	die("No external access to file");
-}
 
-
-
+if(checkAuth($canarycage,$currenthost)&&$_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+{ 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
-<head>
-	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>News module</title>
-	
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>News module</title>
+		
 		<!-- File uploader styles -->
 		<link rel="stylesheet" media="all" type="text/css" href="../../../admin/includes/fancyupload/Assets/manager.css" />
 	

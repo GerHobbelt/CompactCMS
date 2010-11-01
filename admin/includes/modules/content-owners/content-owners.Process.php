@@ -34,31 +34,15 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
 // Compress all output and coding
 header('Content-type: text/html; charset=UTF-8');
 
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../../../lib/sitemap.php');
 
 // Security functions
-
-
+$canarycage		= md5(session_id());
+$currenthost	= md5($_SERVER['HTTP_HOST']);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
@@ -68,13 +52,12 @@ $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissi
  * Either INSERT or UPDATE preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
+if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) {
 	
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageOwners']) {
 		
 		// Set all values back to zero
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
 		$values["user_ids"] = 0;
 		if($db->UpdateRows($cfg['db_prefix']."pages", $values)) {
 			
@@ -91,10 +74,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
 				$explode = explode("||",$value);
 			
 				// Set variables
-				$pageID = filterParam4Number($explode[1]);
+				$pageID = (isset($explode['1'])&&is_numeric($explode['1'])?$explode['1']:null);
 				$current = $db->QuerySingleValue("SELECT user_ids FROM ".$cfg['db_prefix']."pages WHERE page_id='".$pageID."'");
-				$users = $current.$explode[0].'||';
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$users = $current.$explode['0'].'||';
 				$values["user_ids"] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
 			
 				if($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => "\"$pageID\""))) {

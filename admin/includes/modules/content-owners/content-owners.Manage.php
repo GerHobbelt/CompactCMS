@@ -29,29 +29,12 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../../../lib/sitemap.php');
 
-
-
-$do = getGETparam4IdOrNumber('do');
-$status = getGETparam4IdOrNumber('status');
+$canarycage	= md5(session_id());
+$currenthost= md5($_SERVER['HTTP_HOST']);
+$do 		= (isset($_GET['do'])?$_GET['do']:null);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
@@ -63,10 +46,9 @@ $pages = $db->QueryArray("SELECT page_id,urlpage,user_ids FROM ".$cfg['db_prefix
 $users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,userLevel FROM ".$cfg['db_prefix']."users");
 
 
-if(checkAuth() && !empty($_SESSION['rc1']) && !empty($_SESSION['rc2'])) 
+if(checkAuth($canarycage,$currenthost) && isset($_SESSION['rc1']) && !empty($_SESSION['rc2'])) 
 { 
 ?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 	<head>
@@ -82,8 +64,8 @@ if(checkAuth() && !empty($_SESSION['rc1']) && !empty($_SESSION['rc2']))
 <body>
 	<div class="module">
 
-	<div class="center <?php echo $status; ?>">
-		<?php if(isset($_GET['action'])) { echo '<span class="ss_sprite ss_confirm">'.$_GET['action'].'</span>'; } ?>
+	<div class="center <?php echo (isset($_GET['status'])?$_GET['status']:null); ?>">
+		<? if(isset($_GET['action'])) { echo '<span class="ss_sprite ss_confirm">'.$_GET['action'].'</span>'; } ?>
 	</div>
 	
 	<div>

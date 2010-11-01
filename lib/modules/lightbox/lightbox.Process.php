@@ -34,47 +34,29 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
 // Compress all output and coding
 header('Content-type: text/html; charset=UTF-8');
 
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../sitemap.php');
 
 // Some security functions
-if (!checkAuth())
-{
-	die($ccms['lang']['auth']['featnotallowed']);
-}
+$canarycage		= md5(session_id());
+$currenthost	= md5($_SERVER['HTTP_HOST']);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
 // Set default variables
-$album_name	= getPOSTparam4Filename('album');
-$do_action	= getGETparam4IdOrNumber('action');
+$album_name	= (isset($_POST['album'])&&!empty($_POST['album'])?$_POST['album']:null);
+$do_action	= (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:null);
 
  /**
  *
  * Create a new album
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album") 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
@@ -105,7 +87,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
  * Delete a current album (including all of its files)
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album") 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
@@ -154,13 +136,13 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
  * Delete a single image
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image") 
+if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
 
-		$album = getGETparam4Filename('album');
-		$image = getGETparam4Filename('image');
+		$album = (isset($_GET['album'])&&!empty($_GET['album'])?$_GET['album']:null);
+		$image = (isset($_GET['image'])&&!empty($_GET['image'])?$_GET['image']:null);
 		
 		if(!empty($album)&&!empty($image)) {
 			$file	= BASE_PATH.'/media/albums/'.$album.'/'.$image;
@@ -183,15 +165,15 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image")
  * Apply album to page
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album") 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
 		
 		if($album_name!=null) {
 			// Posted variables
-			$topage = getPOSTparam4Filename('albumtopage');
-			$description = (!empty($_POST['description'])?trim(htmlspecialchars($_POST['description'])):trim(' '));
+			$topage = (!empty($_POST['albumtopage'])?$_POST['albumtopage']:' ');
+			$description = (!empty($_POST['description'])?trim($_POST['description']):trim(' '));
 			$infofile = BASE_PATH."/media/albums/$album_name/info.txt";
 			
 			if ($handle = fopen($infofile, 'w+')) {
@@ -215,14 +197,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album")
  * Process and save image plus thumbnail
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files") 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files" && checkAuth($canarycage,$currenthost)) 
 {
 	$dest = BASE_PATH.'/media/albums/'.$album_name;
 	if(!is_dir($dest)) {
 		header("Location: lightbox.Manage.php?status=error&msg=writeerr");
 		exit();
 	} 
-	// else ...    [i_a] dangling else removed
+	else
 	
 	// Validation
 	$error 		= false;

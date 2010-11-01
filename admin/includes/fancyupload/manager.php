@@ -34,29 +34,7 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
-	define('BASE_PATH', $base);
-}
-
-// Load basic configuration
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
-
-
-
-/*MARKER*/include('./Backend/FileManager.php');
+include('./Backend/FileManager.php');
 
 // Please add your own authentication here
 function UploadIsAuthenticated($get){
@@ -70,5 +48,5 @@ $browser = new FileManager(array(
 	'maxUploadSize' => 1024 * 1024 * 5,
 ));
 
-$browser->fireEvent(getGETparam4IdOrNumber('event'));
+$browser->fireEvent(!empty($_GET['event']) ? $_GET['event'] : null);
 ?>

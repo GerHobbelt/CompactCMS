@@ -29,13 +29,9 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
-
-
 // Read SQL info & execute
 $mod_structure = "../../lib/modules/".strtolower($post_module)."/mod_structure.sql";
-if(is_file($mod_structure)) {
+if(file_exists($mod_structure)) {
 	$mod_query 	= file_get_contents($mod_structure);
 	$tok 		= strtok($mod_query, ";");
 	while ($tok !== false) {

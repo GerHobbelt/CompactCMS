@@ -1,8 +1,4 @@
 <?php
-
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
-
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:	CompactCMS - v 1.4.1
@@ -28,11 +24,11 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 
 class ccmsParser {
   # Do NOT call variables from the outside ! (Use the public methods instead.)
-  protected $params = array();
-  protected $paramObject;
-  protected $template;
-  protected $output;
-  protected $includePath;
+  var $params = array();
+  var $paramObject;
+  var $template;
+  var $output;
+  var $includePath;
 
   ########################################################
   ################## Internal Functions ##################
@@ -48,14 +44,14 @@ class ccmsParser {
   #  le = lower or equal (Numbers only)
   #  eq = equal (Number or string)
   #  ne = not equal (Number or string)
-  #  lk = exists in string (String only, functions like the 
+  #  lk = existis in string (String only, functions like the 
   #       SQL LIKE '%string%'
   #
   # $value = value to check condition against
   #
   
-  protected function checkCondition($value, $condition) {
-    preg_match("/([^ ]+) +([^ ].+)/",$condition,$cond);
+  function checkCondition($value, $condition) {
+    preg_match("/([^ ]+) (.+)/",$condition,$cond);
     $chh = $cond[1];
     $wert = $cond[2];
     $wert = preg_replace("( ['|\"] )","",$wert);
@@ -73,19 +69,19 @@ class ccmsParser {
   ## Enables changing Colors f.e. in table rows
   ## initiating an array with the color values
   ## as given by the template in form
-  ## {%ATTR COLOR1,COLOR2,COLOR3...%} 
+  ## <#ATTR COLOR1,COLOR2,COLOR3...%} 
   ## 
   #
-  protected function colorSet($colorstring)  {
+  function colorSet($colorstring)  {
     $colorstring = preg_replace("( + )","",$colorstring);
-    $this->colors = explode(',', $colorstring);
+    $this->colors = split(",", $colorstring);
     $this->colorindex = 0;
     }
   
   ## colorChange()
   ## prints out the current value of array  $this->colors 
   ## Steps to next index or 0 if end is reached
-  protected function colorChange()  {
+  function colorChange()  {
     $currentColor = $this->colors[$this->colorindex];
     $this->colorindex = ($this->colorindex == (count($this->colors) - 1)) ? 0 : $this->colorindex + 1;
     return $currentColor;
@@ -96,7 +92,7 @@ class ccmsParser {
   # - Only text
   # - an HTML comment
   # - exactly one parser tag
-  protected function splitTemplate($str) {
+  function splitTemplate($str) {
     $sicherheitscounter = 0;
     $this->template = array();
     while ($str != '') {
@@ -120,18 +116,13 @@ class ccmsParser {
   }
   
   # loads an Include file and returns its contents
-  protected function loadInclude($name) {
+  function loadInclude($name) {
     $path = $this->includePath.$name;
     return file_get_contents($path);
   }
 
   # calls a variable or constant
-  #
-  # supports nested references to, for example, fetch values from a multidimensional variable array,
-  # by delimiting the subsequent indices with a ':' colon like
-  #
-  # {%lang:backend:gethelp%}
-  protected function getvar(&$vars, $var) {
+  function getvar(&$vars, $var) {
     if ($var == "ATTR")
       return $this->colorChange();
     elseif (array_key_exists($var, $vars))
@@ -141,17 +132,10 @@ class ccmsParser {
     elseif (preg_match('/^G_/', $var) && defined($var))
       return constant($var);
     else
-	{
-	  $v = explode(':', $var, 2);
-	  if (is_array($v) && count($v) == 2 && array_key_exists($v[0], $vars))
-	  {
-		return $this->getvar($vars[$v[0]], $v[1]);
-	  }
       return '';
-	}
   }
   
-  protected function findEndOfIF($j, $to, $var, $tag) {
+  function findEndOfIF($j, $to, $var, $tag) {
     $nest = 1;
     while ($j < $to) {
       if (preg_match("|^{%IF |", $this->template[$j])) {
@@ -176,11 +160,11 @@ class ccmsParser {
   # works its way through the entries $this->template[$from] until $this->template[$to-1]
   # using the parameters $vars and appends the result to $this->output
   # $enable: Output mode: 0=disabled; 1=active; -1=disabled, to be enabled with ELSE 
-  protected function process($from, $to, $vars, $enable = 1) {
+  function process($from, $to, $vars, $enable = 1) {
     for ($i = $from; $i < $to; $i++) {
       $p = $this->template[$i];
       if ($enable != 1) {
-        # only look for ELSE and nested IFs
+        # nur nach ELSE und geschachtelten IFs suchen
         if ($p == "{%ELSE%}") {
           $enable = -$enable;
         } elseif (preg_match('/^{%IF (!?)(.*)?%}/', $p, $matches)) {
@@ -203,7 +187,7 @@ class ccmsParser {
         $value = $this->getvar($vars, $var);
         $j = ++$i;
         while ($j < $to && $this->template[$j] != "{%/FOR $var%}") ++$j;
-        if ($j >= $to) die("Lacking a closing tag for $p");
+        if ($j >= $to) die("Schließendes Tag für $p fehlt");
         
         # call process() recursively for each line
         if (is_array($value)) foreach ($value as $row) {
@@ -237,21 +221,20 @@ class ccmsParser {
       } elseif ($p == "{%ELSE%}") {
         $enable = -$enable;
       } elseif (preg_match("/^{%(.*)%}/", $p, $matches)) {
-        # print variable value
+        # Variablen-Wert ausgeben
         $this->append($this->getvar($vars, $matches[1]));
-      } else { # Regular text
+      } else { # Normaler Text
         $this->append($p);
       }
     }
   }
 
   ## Prints PHP code to the output page
-  protected function CheckPHP($text) {
-    eval('?>'.$text.'<?php'); 
-    //echo $text;
+  function CheckPHP($text) {
+  eval('?>'.$text.'<?'); 
   }
   
-  protected function append($text) {
+  function append($text) {
     if (is_array($this->output))
       $this->output[] = $text;
     else
@@ -263,46 +246,39 @@ class ccmsParser {
   ########################################################
   
   # constructor
-  public function __construct() {
+  function ccmsParser() {
     global $ADM_SESS;
     if(isset($ADM_SESS['PERM_USERNAME'])) $this->params['ADMIN_USERNAME'] = $ADM_SESS['PERM_USERNAME'];
   }
   
   # Returns all set parameters
-  public function getParams() {
+  function getParams() {
     return $this->params;
   }
   
   # Returns ONE set parameter
-  public function getParam($name) {
+  function getParam($name) {
     return $this->params[$name];
   }
 
   # Sets one parameter
-  public function setParam($name, $value) {
+  function setParam($name, $value) {
     $this->params[$name] = $value;
   }
   
   # sets several parameters at once
   # accepts an array or an object that supports the method getVar($name)
-  public function setParams(&$params) {
+  function setParams(&$params) {
     if (is_array($params))
-	{
       $this->params = $params + $this->params;
-	  return true;
-	}
-    elseif (is_object($params) && method_exists($params, 'getVar'))
-	{
+    elseif (is_object($params))
       $this->paramObject = $params;
-	  return true;
-	}
-	return false;
   }
   
   # Deletes all parameters (no argument)
   # or a list of parameters from an array
   # (the parameters can be keys or values)
-  public function clearParams($array = 'all') {
+  function clearParams($array = 'all') {
     if ($array == 'all') {
       $this->params = array();
       $this->paramObject = null;
@@ -315,12 +291,12 @@ class ccmsParser {
   }
   
   # Deletes one parameter
-  public function clearParam($name) {
+  function clearParam($name) {
     unset($this->params[$name]);
   }
   
   # Assembles a template from a frame document and fragments
-  public function assemble($frame, $frags) {
+  function assemble($frame, $frags) {
     $tmpl = file_get_contents($frame);
     
     foreach ($frags AS $fragname => $fragpath) {
@@ -329,54 +305,53 @@ class ccmsParser {
   	    $tmpl = preg_replace($cmd, file_get_contents($fragpath), $tmpl);
       }
     }
-    
     $this->splitTemplate($tmpl);
   }
   
   # Load a monolithic template
-  public function setTemplate($tmpl, $leadin = '', $leadout = '') {
+  function setTemplate($tmpl) {
     if (!is_file($tmpl))
       die("Template not found: $tmpl");
     $idx = strrpos($tmpl, '/');
     if (!isset($this->includePath))
       $this->includePath = substr($tmpl, 0, $idx === false ? 0 : $idx+1);
-    $this->splitTemplate($leadin . file_get_contents($tmpl) . $leadout);
+    $this->splitTemplate(file_get_contents($tmpl));
   }
   
   # Sets the template content directly (not through a file)
-  public function setTemplateText($text) {
+  function setTemplateText($text) {
     $this->splitTemplate($text);
   }
   
   # Parse template and return the contents
-  public function parseAndReturn() {
+  function parseAndReturn() {
     $this->output = array();
     $this->process(0, count($this->template), $this->params);
     return @join('', $this->output);
   }
   
   # Parse template and ECHO the result
-  public function parseAndEcho() {
+  function parseAndEcho() {
     $this->output = null;
     $this->process(0, count($this->template), $this->params);
   }
   
   # Parse template and ECHO the result;
-  # Eval inline PHP code
-  public function parseAndEchoPHP() {
+  # Eval One-line PHP code
+  function parseAndEchoPHP() {
     $this->CheckPHP($this->parseAndReturn());
   }
   
   # Parse template and save the result to the file $file
-  public function parseAndSave($file) {
+  function parseAndSave($file) {
     $outf = fopen($file, "w");
     fputs($outf, $this->parseAndReturn());
     fclose($outf);
   }
   
   # Set include path (only 1 directory possible)
-  # Call this before setTemplate!
-  public function setIncludePath($path) {
+  # Cal this before setTemplate!
+  function setIncludePath($path) {
     $this->includePath = $path;
     if (substr($path, -1, 1) != '/') $this->includePath .= '/';
   }
@@ -386,7 +361,7 @@ class ccmsParser {
   ########################################################
   
   # Does everything at once: assemble, setParams and parseAndEcho
-  public static function assembleAndEcho($frame, $frags, $params) {
+  function assembleAndEcho($frame, $frags, $params) {
     $parser = new ccmsParser;
     $parser->assemble($frame, $frags);
     $parser->setParams($params);
@@ -394,7 +369,7 @@ class ccmsParser {
   }
   
   # Does everything at once: setTemplate, setParams and parseAndEcho
-  public static function setTemplateAndEcho($tmpl, $params) {
+  function setTemplateAndEcho($tmpl, $params) {
     $parser = new ccmsParser;
     $parser->setTemplate($tmpl);
     $parser->setParams($params);
@@ -405,7 +380,7 @@ class ccmsParser {
 
 # a parser that uses [ ] instead of {% %}
 class AlternativeParser extends ccmsParser {
-  public function splitTemplate($str) {
+  function splitTemplate($str) {
     $str = preg_replace('/\[(.*?)\]/e', "'{%'.strtolower('\\1').'%}'", $str);
     parent::splitTemplate($str);
   }

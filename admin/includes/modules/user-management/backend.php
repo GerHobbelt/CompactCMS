@@ -29,35 +29,19 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../../../lib/sitemap.php');
 
 // Set default variables
-
-
-$do	= getGETparam4IdOrNumber('do');
+$canarycage	= md5(session_id());
+$currenthost= md5($_SERVER['HTTP_HOST']);
+$do 		= (isset($_GET['do'])?$_GET['do']:null);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
 
-if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth()) 
+if(md5(session_id())==$canarycage && isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && md5($_SERVER['HTTP_HOST']) == $currenthost) 
 { 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -69,7 +53,37 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
 		<script type="text/javascript" charset="utf-8">function confirmation(){var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');if(answer){try{return true;}catch(e){}}else{return false;}}</script>
 		<script type="text/javascript" charset="utf-8">window.addEvent('domready',function(){new FormValidator($('addUser'),{onFormValidate:function(passed,form,event){if(passed)form.submit();}});});</script>
-		<script type="text/javascript" src="passwordcheck.js" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+function passwordStrength(password)
+{
+	var score=0;
+	if(password.length>5)
+		score++;
+	if((password.match(/[a-z]/))&&(password.match(/[A-Z]/)))
+		score++;
+	if(password.match(/\d+/))
+		score++;
+	if(password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/))
+		score++;
+	if(password.length>12)
+		score++;
+	document.getElementById("passwordStrength").className="strength"+score;
+}
+		</script>
+		<script type="text/javascript" charset="utf-8">
+function randomPassword(length)
+{
+	chars="abcdefghijkmNPQRSTUVWXYZ123456789!@#$%";
+	pass="";
+	for(x=0;x<length;x++)
+	{
+		i=Math.floor(Math.random()*38);
+		pass+=chars.charAt(i);
+	}
+	passwordStrength(pass);
+	return document.getElementById("userPass").value=pass;
+}
+		</script>
 	</head>
 <body>
 	<div class="module">
@@ -97,8 +111,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			// Get previously opened DB stream
 			$i=0;
 			// Open recordset for all users with levels <= to own
-					if (!$db->Query("SELECT * FROM `".$cfg['db_prefix']."users` ORDER BY userID ASC"))
-						$db->Kill();
+			$db->Query("SELECT * FROM `".$cfg['db_prefix']."users` ORDER BY userID ASC");
 			$db->MoveFirst();
 			
 			// Loop through results
@@ -142,7 +155,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			<?php if($_SESSION['ccms_userLevel']>=$perm['manageUsers']) { ?>
 			<form action="../../process.inc.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">
 				<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label><input type="text" class="minLength:3 text" name="user" value="" id="userName" />
-				<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/><a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a></label><input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="userPass" value="" id="userPass" />
+				<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/><a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a></label><input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="pass" value="" id="userPass" />
 				<div class="clear center">
 					<div id="passwordStrength" class="strength0"></div><br/>
 				</div>

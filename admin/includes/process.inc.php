@@ -34,47 +34,25 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
 // Compress all output and coding
 header('Content-type: text/html; charset=UTF-8');
 
 // Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(__FILE__))));
-	define('BASE_PATH', $base);
-}
+$base = str_replace('\\','/',dirname(dirname(dirname(__FILE__))));
+@define('BASE_PATH',$base);
 
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once(BASE_PATH.'/lib/sitemap.php');
 
 // Some security functions
-
-
-/* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth()) 
-{
-	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']); 
-}
-
+$canarycage		= md5(session_id());
+$currenthost	= md5($_SERVER['HTTP_HOST']);
 
 if(!isset($_SESSION['rc1']) || !isset($_SESSION['rc2'])) 
 {
-	$_SESSION['rc1'] = mt_rand('12345', '98765'); 
-	$_SESSION['rc2'] = mt_rand('1234', '9876');
+	$_SESSION['rc1'] = rand('12345', '98765'); 
+	$_SESSION['rc2'] = rand('1234', '9876');
 }
-
-// Prevent PHP warning by setting default (null) values
-$do_action = getGETparam4IdOrNumber('action');
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
@@ -91,16 +69,18 @@ if($db->HasRecords()) {
 // Set the pointer to the first row
 $db->MoveFirst();
 
+// Prevent PHP warning by setting default (null) values
+$do_action = (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:null);
 
 // Set the target for PHP processing
-	$target_form = getPOSTparam4IdOrNumber('form');
+$target_form = (!empty($_POST['form'])?$_POST['form']:null);
 
  /**
  *
  * Render the dynamic list with files
  *
  */
-if($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) 
+if($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth($canarycage,$currenthost)) 
 {
 	$i = 0;
 	
@@ -125,7 +105,7 @@ if($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()
 		}
 		
 		// Define $isEven for alternate table coloring
-		if($i%2 != 1) {
+		if($i%2 != '1') {
 			if($row->published === "N") {
 				echo '<tr style="background-color: #F2D9DE;">';
 			} else echo '<tr style="background-color: #E6F2D9;">';
@@ -176,7 +156,7 @@ if($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()
 				</td>
 			<?php } ?>
 		</tr>
-		<?php if($i%2 != 1) {
+		<?php if($i%2 != '1') {
 			if($row->published === "N") {
 				echo "<tr style=\"background-color: #F2D9DE;\">";
 			} else echo "<tr style=\"background-color: #E6F2D9;\">";
@@ -211,7 +191,8 @@ if($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()
  * Render the entire menu list
  *
  */
-if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) {
+if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	if(isset($_SESSION['ccms_userLevel'])&&$_SESSION['ccms_userLevel']>=$perm['manageMenu']) {
 		echo "<table class=\"span-15\" cellpadding=\"0\" cellspacing=\"0\">";
 		$i = 0;
@@ -286,14 +267,18 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
  * Process the request for new page creation
  *
  */
-if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Remove all none system friendly characters
-	$post_urlpage = filterParam4Filename($_POST['urlpage']); 
-	$post_urlpage = strtolower(str_replace(' ','-',$post_urlpage));
+	$special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
+	
+	// Filter spaces, non-file characters and account for UTF-8
+	$post_urlpage = @htmlentities($_POST['urlpage'],ENT_COMPAT,'UTF-8');
+  	$post_urlpage = str_replace($special_chars, "", $post_urlpage); 
+	$post_urlpage = str_replace(' ','-',$post_urlpage);
 	
 	// Check for non-empty module variable
-	$post_module = strtolower(filterParam4Filename($_POST['module'], "editor"));
+	$post_module = (isset($_POST['module'])&&!empty($_POST['module'])?strtolower($_POST['module']):"editor");
 	
 	// Filter $_GET for bad hack coding
 	isset($_GET['page']) ? mysql_real_escape_string($_GET['page']) : null;
@@ -340,22 +325,22 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
     		$description = htmlspecialchars($_POST['description']);
     	}
     	
-		// Check radio button values
-		$printable_pref = getPOSTparam4boolYN('printable', 'Y');
-		$published_pref = getPOSTparam4boolYN('published', 'Y');
-		$iscoding_pref	= getPOSTparam4boolYN('iscoding', 'N');
-		
+    	// Check radio button values
+    	$printable_pref = (isset($_POST['printable'])&&!empty($_POST['printable'])?$_POST['printable']:'Y');
+    	$published_pref = (isset($_POST['published'])&&!empty($_POST['published'])?$_POST['published']:'Y');
+    	$iscoding_pref	= (isset($_POST['iscoding'])&&!empty($_POST['iscoding'])?$_POST['iscoding']:'N');
+    	
 		// Insert new page into database
 		// $arrayVariable["column name"] = formatted SQL value
-		$values['urlpage']		= MySQL::SQLValue($post_urlpage,MySQL::SQLVALUE_TEXT);
-		$values['module']		= MySQL::SQLValue($post_module,MySQL::SQLVALUE_TEXT);
+		$values['urlpage']		= MySQL::SQLValue(strtolower($post_urlpage),MySQL::SQLVALUE_TEXT);
+		$values['module']		= MySQL::SQLValue(strtolower($post_module),MySQL::SQLVALUE_TEXT);
 		$values['toplevel']		= MySQL::SQLValue('1',MySQL::SQLVALUE_NUMBER);
 		$values['sublevel']		= MySQL::SQLValue('0',MySQL::SQLVALUE_NUMBER);
 		$values['menu_id']		= MySQL::SQLValue('5',MySQL::SQLVALUE_NUMBER);
 		$values['pagetitle']	= MySQL::SQLValue($pagetitle,MySQL::SQLVALUE_TEXT);
 		$values['subheader']	= MySQL::SQLValue($subheader,MySQL::SQLVALUE_TEXT);
 		$values['description']	= MySQL::SQLValue($description,MySQL::SQLVALUE_TEXT);
-		$values['srcfile']		= MySQL::SQLValue($post_urlpage.".php",MySQL::SQLVALUE_TEXT);
+		$values['srcfile']		= MySQL::SQLValue(strtolower($post_urlpage).".php",MySQL::SQLVALUE_TEXT);
 		$values['printable']	= MySQL::SQLValue($printable_pref,MySQL::SQLVALUE_Y_N);
 		$values['published']	= MySQL::SQLValue($published_pref,MySQL::SQLVALUE_Y_N);
 		$values['iscoding']		= MySQL::SQLValue($iscoding_pref,MySQL::SQLVALUE_Y_N);
@@ -367,19 +352,17 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		if($result) {
 			
 			// Create the actual file
-			$filehandle = fopen("../../content/".$post_urlpage.".php", 'w');
-			if(!$filehandle) 
-			{
+			$filehandle = fopen("../../content/".strtolower($post_urlpage).".php", 'w');
+			if(!$filehandle) {
 				$db->TransactionRollback();
 				$errors[] = $ccms['lang']['system']['error_write'];
 			} else {
 				// Write default contents to newly created file
-				if($post_module==="editor") 
-				{
+				if(strtolower($post_module)==="editor") {
 					fwrite($filehandle, "<p>".$ccms['lang']['backend']['newfiledone']."</p>");
 				} 
 				// Write include_once tag to file (modname.Show.php)
-				elseif($post_module!=="editor") {
+				elseif(strtolower($post_module)!=="editor") {
 					fwrite($filehandle, "<?php include_once('./lib/modules/$post_module/$post_module.Show.php'); ?>");
 				} else die("[ERR048] ".$ccms['lang']['system']['error_general']);
 			}
@@ -398,28 +381,26 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
  * Process the request for page deletion
  *
  */
-if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-
+if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	if(!empty($_POST['page_id'])) {
 	echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['statusdelete'].'</p>';
 	
 		// Loop through all submitted page ids
 		foreach ($_POST['page_id'] as $index) {
 		$value = explode($_SESSION['rc2'], $index);
-			if(is_numeric($value[1])) {	
+			if(is_numeric($value['1'])) {	
 				// Select file name and module with given page_id
-				$correct_filename = $db->QuerySingleValue("SELECT `urlpage` FROM `".$cfg['db_prefix']."pages` WHERE `page_id` = ".$value[1]);
-				$module = $db->QuerySingleValue("SELECT `module` FROM `".$cfg['db_prefix']."pages` WHERE `page_id` = ".$value[1]);
+				$correct_filename = $db->QuerySingleValue("SELECT `urlpage` FROM `".$cfg['db_prefix']."pages` WHERE `page_id` = ".$value['1']);
+				$module = $db->QuerySingleValue("SELECT `module` FROM `".$cfg['db_prefix']."pages` WHERE `page_id` = ".$value['1']);
 				
 				// Delete details from the database
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values["page_id"] = MySQL::SQLValue($value[1],MySQL::SQLVALUE_NUMBER);
+				$values["page_id"] = MySQL::SQLValue($value['1'],MySQL::SQLVALUE_NUMBER);
 				$result = $db->DeleteRows($cfg['db_prefix']."pages", $values);
 				
 				// Delete linked rows from module tables
 				if($module!="editor") 
 				{
-					$filter = array(); // [i_a] make sure $filter is an empty array to start with here
 					$filter["pageID"] = MySQL::SQLValue($correct_filename,MySQL::SQLVALUE_TEXT);
 					$delmod = $db->DeleteRows($cfg['db_prefix']."mod".$module, $filter);
 					$delcfg = $db->DeleteRows($cfg['db_prefix']."cfg".$module, $filter);
@@ -441,28 +422,21 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
  * Save the menu order, individual templating & menu allocation preferences
  *
  */
-if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-
+if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	$error = null;
 	
-	foreach ($_POST['pageid'] as $key => $page_id) 
+	foreach ($_POST['pageid'] as $key => $pageid) 
 	{
-		$page_id = filterParam4Number($page_id);
-		if (!$page_id)
-		{
-			$error = true;
-			break;
-		}
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values["toplevel"]	= MySQL::SQLValue($_POST['toplevel'][$page_id], MySQL::SQLVALUE_NUMBER);
-		$values["sublevel"]	= MySQL::SQLValue($_POST['sublevel'][$page_id], MySQL::SQLVALUE_NUMBER);
-		$values["variant"]	= MySQL::SQLValue(filterParam4Filename($_POST['template'][$page_id]), MySQL::SQLVALUE_TEXT);
-		$values["menu_id"]	= MySQL::SQLValue($_POST['menuid'][$page_id], MySQL::SQLVALUE_NUMBER);
+		$values["toplevel"]	= MySQL::SQLValue($_POST['toplevel'][$pageid], MySQL::SQLVALUE_NUMBER);
+		$values["sublevel"]	= MySQL::SQLValue($_POST['sublevel'][$pageid], MySQL::SQLVALUE_NUMBER);
+		$values["variant"]	= MySQL::SQLValue($_POST['template'][$pageid], MySQL::SQLVALUE_TEXT);
+		$values["menu_id"]	= MySQL::SQLValue($_POST['menuid'][$pageid], MySQL::SQLVALUE_NUMBER);
 		
 		// Execute the update
-		if(!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+		if(!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => $pageid))) 
 		{
-			$error = true; // alas, we exit here and now anyway
+			$error = "1";
 			$db->Kill();
 		}
 	}
@@ -477,17 +451,17 @@ if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
  * Set actual hyperlink behind menu item to true/false
  *
  */
-if($do_action == "islink" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	$page_id = getPOSTparam4Number('id');
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
+if($do_action == "islink" && $_SERVER['REQUEST_METHOD'] == "POST" && md5(session_id()) == $canarycage && md5($_SERVER['HTTP_HOST']) == $currenthost) 
+{
+	$page_id = (!empty($_POST['id'])?$_POST['id']:null);
 	$values["islink"] = MySQL::SQLValue($_POST['cvalue'], MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => $page_id))) 
 	{
 		if($values["islink"] == "Y") { echo $ccms['lang']['backend']['yes']; } else echo $ccms['lang']['backend']['no'];
 	} 
 	else 
-		$db->Kill();
+		die($db->Error($ccms['lang']['system']['error_general']));
 }
 
  /**
@@ -495,20 +469,20 @@ if($do_action == "islink" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()
  * Edit print, publish or iscoding preference
  *
  */
-if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) {
-	
+if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth($canarycage,$currenthost))
+{
 	// Explode variable with all necessary information
 	$page_id = explode("-", $_GET['id']);
 	
 	// Set the action for this call
-	if($page_id[0] == "printable" || $page_id[0] == "published" || $page_id[0] == "iscoding") {
-		$action	 = $page_id[0];
+	if($page_id['0'] == "printable" || $page_id['0'] == "published" || $page_id['0'] == "iscoding") {
+		$action	 = $page_id['0'];
 	} else die($ccms['lang']['system']['error_forged']);
 	if($_GET['s'] == "Y") { $new = "N"; } elseif($_GET['s'] == "N") { $new = "Y"; }
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values["$action"] = MySQL::SQLValue($new,MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => $page_id[1]))) {
+	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => $page_id['1']))) 
+	{
 		if($new == "Y") { echo $ccms['lang']['backend']['yes']; } else echo $ccms['lang']['backend']['no'];
 	} else die($db->Error($ccms['lang']['system']['error_general']));
 }
@@ -530,8 +504,8 @@ if(version_compare($version_recent, $v) != '1') {
  * Edit-in-place update action
  *
  */
-if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	if(!empty($_POST['content']) && strlen($_POST['content'])>=3 && strlen($_POST['content'])<=240) {
 		if (!get_magic_quotes_gpc()) {
     		$content = htmlspecialchars(addslashes($_POST['content']), ENT_COMPAT, 'UTF-8');
@@ -542,9 +516,8 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	} else die($ccms['lang']['system']['error_value']);
 	
 	// Continue with content update
-	$page_id		= getPOSTparam4Number('id');
-	$dest			= getGETparam4IdOrNumber('part');
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
+	$page_id		= $_POST['id'];
+	$dest			= $_GET['part'];
 	$values["$dest"]= MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
 	
 	if (!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => $page_id))) $db->Kill();
@@ -561,8 +534,8 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
  * Save the edited template and check for authority
  *
  */
-if($do_action == "save-template" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "save-template" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageTemplate']) {
 	
@@ -594,14 +567,14 @@ if($do_action == "save-template" && $_SERVER['REQUEST_METHOD'] == "POST" && chec
  * Create a new user as posted by an authorized user
  *
  */
-if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']) {
 	
 		$i=0;
 		foreach ($_POST as $key => $value) {
-			$count[] = (strlen($value)>0?$i++:null);
+			$count[] = (strlen($value)>'0'?$i++:null);
 		}
 		if($i<=6) {
 			header("Location: ./modules/user-management/backend.php?status=error&action=".$ccms['lang']['system']['error_tooshort']);
@@ -609,15 +582,14 @@ if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		}
 			
 		// Set variables
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
 		$values['userName']		= MySQL::SQLValue(strtolower($_POST['user']),MySQL::SQLVALUE_TEXT);
-		$values['userPass']		= MySQL::SQLValue(md5($_POST['userPass'].$cfg['authcode']),MySQL::SQLVALUE_TEXT);
+		$values['userPass']		= MySQL::SQLValue(md5($_POST['pass'].$cfg['authcode']),MySQL::SQLVALUE_TEXT);
 		$values['userFirst']	= MySQL::SQLValue($_POST['userFirstname'],MySQL::SQLVALUE_TEXT);
 		$values['userLast']		= MySQL::SQLValue($_POST['userLastname'],MySQL::SQLVALUE_TEXT);
 		$values['userEmail']	= MySQL::SQLValue($_POST['userEmail'],MySQL::SQLVALUE_TEXT);
-		$values['userActive']	= MySQL::SQLValue($_POST['userActive'],MySQL::SQLVALUE_BOOLEAN);
+		$values['userActive']	= MySQL::SQLValue($_POST['userActive'],MySQL::SQLVALUE_NUMBER);
 		$values['userLevel']	= MySQL::SQLValue($_POST['userLevel'],MySQL::SQLVALUE_NUMBER);
-		$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
+		$values['userToken']	= MySQL::SQLValue(rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
 		
 		// Execute the insert
 		$result = $db->InsertRow($cfg['db_prefix']."users", $values);
@@ -635,23 +607,23 @@ if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
  * Edit user details as posted by an authorized user
  *
  */
-if($do_action == "edit-user-details" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "edit-user-details" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']||$_SESSION['ccms_userID']==$_POST['userID']) {
-	
+	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']||$_SESSION['ccms_userID']==$_POST['userID']) 
+	{
 		// Check length of values
-		if(strlen($_POST['first'])>2&&strlen($_POST['last'])>2&&strlen($_POST['email'])>6) {
-		
-			$userID = getPOSTparam4Number('userID');
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
+		if(strlen($_POST['first'])>'2'&&strlen($_POST['last'])>'2'&&strlen($_POST['email'])>'6') 
+		{
+			$userID = (isset($_POST['userID'])&&is_numeric($_POST['userID'])?$_POST['userID']:null);
 			$values["userFirst"]= MySQL::SQLValue($_POST['first'],MySQL::SQLVALUE_TEXT);
 			$values["userLast"]	= MySQL::SQLValue($_POST['last'],MySQL::SQLVALUE_TEXT);
 			$values["userEmail"]= MySQL::SQLValue($_POST['email'],MySQL::SQLVALUE_TEXT);
 			
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => "\"$userID\""))) {
-				
-				if($userID==$_SESSION['ccms_userID']) {
+			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => "\"$userID\""))) 
+			{
+				if($userID==$_SESSION['ccms_userID']) 
+				{
 					$_SESSION['ccms_userFirst']	= htmlspecialchars($_POST['first']);
 					$_SESSION['ccms_userLast']	= htmlspecialchars($_POST['last']);
 				}
@@ -659,49 +631,52 @@ if($do_action == "edit-user-details" && $_SERVER['REQUEST_METHOD'] == "POST" && 
 				header("Location: ./modules/user-management/backend.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
 				exit();
 			}
-			else
-				$db->Kill();
 		} 
 		else 
 		{
 			header("Location: ./modules/user-management/backend.php?status=error&action=".$ccms['lang']['system']['error_tooshort']);
 			exit();
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
  
- /**
+/**
  *
  * Edit users' password as posted by an authorized user
  *
  */
  
-if($do_action == "edit-user-password" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "edit-user-password" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']||$_SESSION['ccms_userID']==$_POST['userID']) {
-	
-		if(strlen($_POST['userPass'])>6&&md5($_POST['userPass'])===md5($_POST['cpass'])) {
-		
-			$userID = getPOSTparam4Number('userID');
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values["userPass"] = MySQL::SQLValue(md5($_POST['userPass'].$cfg['authcode']),MySQL::SQLVALUE_TEXT);
+	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']||$_SESSION['ccms_userID']==$_POST['userID']) 
+	{
+		if(strlen($_POST['pass'])>'6'&&md5($_POST['pass'])===md5($_POST['cpass'])) 
+		{
+			$userID = (isset($_POST['userID'])&&is_numeric($_POST['userID'])?$_POST['userID']:null);
+			$values["userPass"] = MySQL::SQLValue(md5($_POST['pass'].$cfg['authcode']),MySQL::SQLVALUE_TEXT);
 			
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => "\"$userID\""))) 
 			{
 				header("Location: ./modules/user-management/backend.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
 				exit();
 			}
-			else
-				$db->Kill();
-		} elseif(strlen($_POST['userPass'])<=6) {
+		} 
+		elseif(strlen($_POST['pass'])<='6') 
+		{
 			header("Location: ./modules/user-management/user.Edit.php?userID=".$_POST['userID']."&status=error&action=".$ccms['lang']['system']['error_passshort']);
 			exit();
-		} elseif(md5($_POST['userPass'])!==md5($_POST['cpass'])) {
+		} 
+		elseif(md5($_POST['pass'])!==md5($_POST['cpass'])) 
+		{
 			header("Location: ./modules/user-management/user.Edit.php?userID=".$_POST['userID']."&status=error&action=".$ccms['lang']['system']['error_passnequal']);
 			exit();
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 
  /**
@@ -710,34 +685,25 @@ if($do_action == "edit-user-password" && $_SERVER['REQUEST_METHOD'] == "POST" &&
  *
  */
  
-if($do_action == "edit-user-level" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "edit-user-level" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']) {
-		
-		$userID = getPOSTparam4Number('userID');
-		$userLevel = getPOSTparam4Number('userLevel');
-		if (is_integer($userLevel))
+	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	{
+		$userID = (isset($_POST['userID'])&&is_numeric($_POST['userID'])?$_POST['userID']:null);
+		$values["userLevel"] = MySQL::SQLValue($_POST['userLevel'],MySQL::SQLVALUE_NUMBER);
+		$values["userActive"] = MySQL::SQLValue($_POST['userActive'],MySQL::SQLVALUE_NUMBER);
+			
+		if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => "\"$userID\""))) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values["userLevel"] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-			$values["userActive"] = MySQL::SQLValue($_POST['userActive'],MySQL::SQLVALUE_BOOLEAN);
-				
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if($userID==$_SESSION['ccms_userID']) 
 			{
-				if($userID==$_SESSION['ccms_userID']) 
-				{
-					$_SESSION['ccms_userLevel'] = $userLevel;
-				}
-				
-				header("Location: ./modules/user-management/backend.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
-				exit();
+				$_SESSION['ccms_userLevel']	= (is_numeric($_POST['userLevel'])?$_POST['userLevel']:$_SESSION['ccms_userLevel']);
 			}
-			else
-				$db->Kill();
+				
+			header("Location: ./modules/user-management/backend.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
+			exit();
 		}
-		else 
-			die($ccms['lang']['system']['error_forged']);
 	} 
 	else 
 		die($ccms['lang']['auth']['featnotallowed']);
@@ -748,8 +714,8 @@ if($do_action == "edit-user-level" && $_SERVER['REQUEST_METHOD'] == "POST" && ch
  * Delete a user as posted by an authorized user
  *
  */
-if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) {
-	
+if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost))
+{
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageUsers']) {
 		
@@ -764,7 +730,6 @@ if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 		$i=0;
 		foreach ($_POST['userID'] as $value) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
 			$values['userID'] = MySQL::SQLValue($value,MySQL::SQLVALUE_NUMBER);
 			$result = $db->DeleteRows($cfg['db_prefix']."users", $values);
 			$i++;
@@ -782,17 +747,18 @@ if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
  * Generate the WYSIWYG or code editor for editing purposes (prev. editor.php)
  *
  */
-if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) {
-	
+if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth($canarycage,$currenthost)) 
+{
 	// Set the necessary variables
-	$name 		= getGETparam4Filename('file');
-	$iscoding	= getGETparam4boolYN('restrict', 'N');
-	$active		= getGETparam4boolYN('active', 'N');
-	$filename	= "../../content/".$name.".php";
+	$name 		= htmlentities($_GET['file']);
+	$iscoding	= $_GET['restrict'];
+	$active		= $_GET['active'];
+	$filename	= "../../content/".htmlentities($_GET['file']).".php";
 	
 	// Check for editor.css in template directory
-	$template	= $db->QuerySingleValue("SELECT `variant` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = ".MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT));
-	if (is_file('../../lib/templates/'.$template.'/editor.css')) {
+	$template	= $db->QuerySingleValue("SELECT `variant` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = '$name'");
+	if (is_file('../../lib/templates/'.$template.'/editor.css')) 
+	{
 	    $css = '../../lib/templates/'.$template.'/editor.css';
 	}
 	
@@ -889,8 +855,8 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) 
  * Processing save page (prev. handler.inc.php)
  *
  */
-if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth()) {
-
+if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth($canarycage,$currenthost)) 
+{
 	// Strip slashes for certain servers (DEPRECIATED for PHP6)
 	if (get_magic_quotes_gpc()) {
 	    function stripslashes_deep($value) {
@@ -906,8 +872,8 @@ if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth())
 	    $_GET = array_map('stripslashes_deep', $_GET);
 	}
 
-	$name 		= getGETparam4Filename('page');
-	$active		= getGETparam4boolYN('active', 'N');
+	$name 		= htmlentities($_GET['page']);
+	$active		= (isset($_GET['active'])&&$_GET['active']=="Y"?"Y":"N");
 	$type		= (isset($_POST['code'])&&$_POST['code']>0?"code":"text");
 	$content	= $_POST['content'];
 	$filename	= "../../content/$name.php";
@@ -926,10 +892,9 @@ if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth())
 	}
 	    
 	// Save keywords to database
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values["keywords"]= MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
+	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("urlpage" => "\"$name\""))) 
 	{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -943,7 +908,7 @@ if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth())
 		<div id="handler-wrapper" class="module">
 			
 			<?php if($active=="N") {?>
-			<p class="notice"><?php $msg = explode('::', $ccms['lang']['hints']['published']); echo $msg[0].": <strong>".strtolower($ccms['lang']['backend']['disabled'])."</strong>"; ?></p>
+			<p class="notice"><?php $msg = explode('::', $ccms['lang']['hints']['published']); echo $msg['0'].": <strong>".strtolower($ccms['lang']['backend']['disabled'])."</strong>"; ?></p>
 			<?php } ?>
 			<p class="success"><?php echo $ccms['lang']['editor']['savesuccess']; ?><em><?php echo $name; ?>.html</em>.</p>
 			<hr/>

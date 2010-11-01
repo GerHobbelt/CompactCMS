@@ -29,36 +29,18 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
-if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
-
-/*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
-define('CCMS_PERFORM_MINIMAL_INIT', true);
-
-
-// Define default location
-if (!defined('BASE_PATH'))
-{
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-	define('BASE_PATH', $base);
-}
-
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+require_once('../../../../lib/sitemap.php');
 
-
-
-$do	= getGETparam4IdOrNumber('do');
-$status = getGETparam4IdOrNumber('status');
+$canarycage	= md5(session_id());
+$currenthost= md5($_SERVER['HTTP_HOST']);
+$do 		= (isset($_GET['do'])?$_GET['do']:null);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
 
-
-if(checkAuth() && isset($_SESSION['rc1']) && !empty($_SESSION['rc2'])) 
+if(checkAuth($canarycage,$currenthost) && isset($_SESSION['rc1']) && !empty($_SESSION['rc2'])) 
 { 
 ?>
 
@@ -77,7 +59,7 @@ if(checkAuth() && isset($_SESSION['rc1']) && !empty($_SESSION['rc2']))
 <body>
 	<div class="module">
 
-	<div class="center <?php echo $status; ?>">
+	<div class="center <?php echo (isset($_GET['status'])?$_GET['status']:null); ?>">
 		<?php if(isset($_GET['msg'])) { echo '<span class="ss_sprite ss_confirm">'.$_GET['msg'].'</span>'; } ?>
 	</div>
 
@@ -110,7 +92,7 @@ if(checkAuth() && isset($_SESSION['rc1']) && !empty($_SESSION['rc2']))
 				} else { 
 					echo '<tr>';
 				}  ?>
-		<th><?php echo (!empty($comments) ? "<abbr title=\"$comments\">$columnName</abbr>" : $columnName); ?></th>
+    	<th><?php echo ($comments!=""?"<abbr title=\"$comments\">$columnName</abbr>":$columnName); ?></th>
 		<td class="center">
 			<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName=='0'?"checked":null); ?> value="0" id="<?php echo $columnName; ?>">
 		</td>
