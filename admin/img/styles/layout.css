@@ -207,6 +207,30 @@ optgroup option {padding-left: 10px;}
 	height: 35px;
 }
 
+/* === 1. CORE === */
+/* === FILTER in PAGE === */
+.livefilter {
+}
+.livefilter_add {
+	background-position: 0 -780px;
+	padding: 0 0 0 16px;
+}
+.livefilter_add:hover {
+	cursor: pointer;
+	background-position: 0 -700px;
+	padding: 0 0 0 16px;
+}
+.livefilter_active {
+	background-position: 0 -720px;
+	padding: 0 0 0 16px;
+}
+.livefilter_delete,  .livefilter_active:hover {
+	background-position: 0 -740px;
+	padding: 0 0 0 16px;
+}
+.livefilter_remove {
+	background-position: 0 -760px;
+	padding: 0 0 0 16px;
 }
 .textarea {
 	background: #ECC6CD;

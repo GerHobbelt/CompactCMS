@@ -84,10 +84,67 @@ $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissi
 
 
 
-$do_update_or_livefilter = ($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST");
+$do_update_or_livefilter = (($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST") || ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST"));
 
+$filter_pages_name = '';
+$filter_pages_title = '';
+$filter_pages_subheader = '';
 
 $page_selectquery_restriction = '';
+
+if ($do_update_or_livefilter)
+{
+	$filter_pages_name = (!empty($_SESSION['filter_pages_name']) ? $_SESSION['filter_pages_name'] : '');
+	$filter_pages_title = (!empty($_SESSION['filter_pages_title']) ? $_SESSION['filter_pages_title'] : '');
+	$filter_pages_subheader = (!empty($_SESSION['filter_pages_subheader']) ? $_SESSION['filter_pages_subheader'] : '');
+
+	if ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) 
+	{
+		switch (getPOSTparam4IdOrNumber('part'))
+		{
+		default:
+			die("Invalid input");
+			
+		case 'filter_pages_name':
+			$filter_pages_name = (!empty($_POST['content']) ? htmlspecialchars($_POST['content']) : '');
+			break;
+			
+		case 'filter_pages_title':
+			$filter_pages_title = (!empty($_POST['content']) ? htmlspecialchars($_POST['content']) : '');
+			break;
+			
+		case 'filter_pages_subheader':
+			$filter_pages_subheader = (!empty($_POST['content']) ? htmlspecialchars($_POST['content']) : '');
+			break;
+		}
+		$_SESSION['filter_pages_name'] = $filter_pages_name;
+		$_SESSION['filter_pages_title'] = $filter_pages_title;
+		$_SESSION['filter_pages_subheader'] = $filter_pages_subheader;
+	}
+
+
+	// construct the WHERE clause for the page list now:
+	if (!empty($filter_pages_name) || !empty($filter_pages_title) || !empty($filter_pages_subheader))
+	{
+		if (!empty($filter_pages_name))
+		{
+			$page_selectquery_restriction = "urlpage LIKE '%" . MySQL::SQLFix($filter_pages_name) . "%'";
+		}
+		if (!empty($filter_pages_title))
+		{
+			$page_selectquery_restriction .= (strlen($page_selectquery_restriction) > 0 ? ' AND ' : '');
+			$page_selectquery_restriction .= "pagetitle LIKE '%" . MySQL::SQLFix($filter_pages_title) . "%'";
+		}
+		if (!empty($filter_pages_subheader))
+		{
+			$page_selectquery_restriction .= (strlen($page_selectquery_restriction) > 0 ? ' AND ' : '');
+			$page_selectquery_restriction .= "subheader LIKE '%" . MySQL::SQLFix($filter_pages_subheader) . "%'";
+		}
+		
+		$page_selectquery_restriction = 'WHERE ' . $page_selectquery_restriction;
+	}
+}
+
 
 // Open recordset for sites' pages
 $db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` " . $page_selectquery_restriction . " ORDER BY `published`, `menu_id`, `toplevel`, `sublevel` ASC");
