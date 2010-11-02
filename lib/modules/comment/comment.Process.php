@@ -127,7 +127,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && checkAu
 		echo $ccms['lang']['guestbook']['noposts'];
 }
 
- /**
+/**
  *
  * Delete comment
  *
@@ -148,7 +148,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="del-comment" && checkAuth
 		die($ccms['lang']['auth']['featnotallowed']);
 }
 
- /**
+/**
  *
  * Add comment
  *
@@ -179,9 +179,12 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="save-cfg" && checkAuth($
 	$values['showLocale'] = MySQL::SQLValue($_POST['locale'], MySQL::SQLVALUE_TEXT);
 
 	// Insert or update configuration
-	if($db->AutoInsertUpdate($cfg['db_prefix']."cfgcomment", $values, array("cfgID" => $cfgID))) {
+	if($db->AutoInsertUpdate($cfg['db_prefix']."cfgcomment", $values, array("cfgID" => $cfgID))) 
+	{
 		header("Location: comment.Manage.php?file=$pageID&status=notice&msg=".$ccms['lang']['backend']['settingssaved']);
 		exit();
-	} else $db->Kill();
+	} 
+	else 
+		$db->Kill();
 }
 ?>

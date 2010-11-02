@@ -116,7 +116,9 @@ if($db->HasRecords())
 						echo '<tr style="background-color: #F2D9DE;">';
 					} 
 					else 
+					{
 						echo '<tr style="background-color: #E6F2D9;">';
+					}
 				} 
 				else 
 				{ 
@@ -125,7 +127,9 @@ if($db->HasRecords())
 						echo '<tr style="background-color: #EBC6CD;">';
 					} 
 					else 
+					{
 						echo '<tr>'; 
+					}
 				} 
 				?>
 				<td style="padding-left:2px;" class="span-1">
@@ -155,12 +159,14 @@ if($db->HasRecords())
 				</td>
 				<td class="span-2" style="text-align: center;">
 					<a href="#" id="printable-<?php echo $row->page_id; ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
-						if($row->printable == "Y") 
+						if($row->printable == "Y")
 						{ 
 							echo $ccms['lang']['backend']['yes']; 
 						} 
 						else 
+						{
 							echo $ccms['lang']['backend']['no']; 
+						}
 						?></a>
 				</td>
 				<td class="span-2" style="text-align: center;">
@@ -174,7 +180,9 @@ if($db->HasRecords())
 								echo $ccms['lang']['backend']['yes']; 
 							} 
 							else 
+							{
 								echo $ccms['lang']['backend']['no']; 
+							}
 							?></a>
 					<?php 
 					} 
@@ -259,7 +267,9 @@ if($db->HasRecords())
 						echo "<span class=\"ss_sprite ss_information\"><strong>".ucfirst($row->module)."</strong></span> ".strtolower($ccms['lang']['forms']['module']);
 					} 
 					else 
+					{
 						echo "<em>".$ccms['lang']['backend']['notinmenu']."</em>"; 
+					}
 					?>
 				</td>
 				</tr>
@@ -667,7 +677,9 @@ if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] != "POST" && checkA
 			echo $ccms['lang']['backend']['yes']; 
 		} 
 		else 
+		{
 			echo $ccms['lang']['backend']['no'];
+		}
 	} 
 	else 
 		die($db->Error($ccms['lang']['system']['error_general']));
@@ -697,12 +709,15 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 {
 	if(!empty($_POST['content']) && strlen($_POST['content'])>=3 && strlen($_POST['content'])<=240) 
 	{
-		if (!get_magic_quotes_gpc()) {
-    		$content = htmlspecialchars(addslashes($_POST['content']), ENT_COMPAT, 'UTF-8');
-    		$content = str_replace("'", "&#039;", $content); 
-		} else {
-    		$content = htmlspecialchars($_POST['content'], ENT_COMPAT, 'UTF-8');
-    	}
+		if (!get_magic_quotes_gpc()) 
+		{
+	    		$content = htmlspecialchars(addslashes($_POST['content']), ENT_COMPAT, 'UTF-8');
+	    		$content = str_replace("'", "&#039;", $content); 
+		} 
+		else 
+		{
+    			$content = htmlspecialchars($_POST['content'], ENT_COMPAT, 'UTF-8');
+	    	}
 	} 
 	else 
 		die($ccms['lang']['system']['error_value']);
@@ -713,7 +728,9 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	$values["$dest"]= MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
 	
 	if (!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => $page_id))) 
+	{
 		$db->Kill();
+	}
 	if (!get_magic_quotes_gpc()) 
 	{
     		echo stripslashes($content);
@@ -722,7 +739,6 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	{
 		echo $content;
 	}
-    }
 }
 
 /**
@@ -1029,7 +1045,8 @@ function confirmation()
 	// Load TinyMCE (compressed for faster loading) 
 	if($cfg['wysiwyg']===true && $iscoding=="N") 
 	{ 
-		$cfg['language'] = (file_exists('./tiny_mce/langs/'.$cfg['language'].'.js'))?$cfg['language']:'en';?>
+		$cfg['language'] = (file_exists('./tiny_mce/langs/'.$cfg['language'].'.js'))?$cfg['language']:'en';
+		?>
 		
 		<!-- File uploader styles -->
 		<link rel="stylesheet" media="all" type="text/css" href="./fancyupload/Assets/manager.css" />

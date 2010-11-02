@@ -211,7 +211,9 @@ window.addEvent('domready',function()
 	<?php 
 	} 
 	else 
+	{
 		echo '<div id="createnew"><span class="toggle"></span><div id="form_wrapper"><form id="addForm" action=""></form></div></div>'; 
+	}
 		
 	// Manage menu depths & languages 
 	
@@ -251,7 +253,9 @@ window.addEvent('domready',function()
 	<?php 
 	} 
 	else 
+	{
 		echo '<div id="menu_wrapper"><span class="toggle"></span><div id="menuFields"><form id="menuForm" action=""></form></div></div>'; 
+	}
 	
 
 		

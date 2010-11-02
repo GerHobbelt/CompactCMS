@@ -201,7 +201,7 @@ function confirmation()
 						<option value="sve" <?php echo ($db->HasRecords()&&$rsCfg->showLocale=='sve'?"selected":null); ?>>svenska</option>
 						<option value="ind" <?php echo ($db->HasRecords()&&$rsCfg->showLocale=='ind'?"selected":null); ?>>Bahasa Indonesia</option>
 					</select>
-				
+					
 					<label><?php echo $ccms['lang']['news']['showauthor']; ?></label>
 						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
 						<label style="display:inline;" for="show_author1"><?php echo $ccms['lang']['backend']['yes']; ?></label>

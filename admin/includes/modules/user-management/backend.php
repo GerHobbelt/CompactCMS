@@ -174,7 +174,9 @@ function randomPassword(length)
 							<?php 
 							} 
 							else 
+							{
 								echo "&#160;"; 
+							}
 							?>
 							</td>
 							<td>
@@ -186,7 +188,9 @@ function randomPassword(length)
 							<?php 
 							} 
 							else 
+							{
 								echo $row->userName; 
+							}
 							?>
 							</td>
 							<td><?php echo substr($row->userFirst,0,1); ?>. <?php echo $row->userLast; ?></td>

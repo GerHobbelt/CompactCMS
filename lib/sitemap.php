@@ -289,11 +289,13 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ct = $db->QuerySingleRow("SELECT COUNT(`page_id`) AS num, MIN(`toplevel`) AS mtl FROM `".$cfg['db_prefix']."pages` WHERE `published`='Y' AND `menu_id`='$i' GROUP BY `menu_id`");
 		
 		// Loop through menu generator for all items
-		if(!empty($ct->num)) {
+		if(!empty($ct->num)) 
+		{
 			// Start menu parent item
 			$ccms['structure'.$i] = "<ul>";
 			
-			for ($index=1; $index<=$ct->num; $index++) { 
+			for ($index=1; $index<=$ct->num; $index++) 
+			{ 
 				// Select all items for given menu and process hierarchy
 				$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` WHERE `published`='Y' AND `menu_id`='$i' AND `toplevel`='".$ct->mtl."' ORDER BY `toplevel` ASC, `sublevel` ASC");
 				
@@ -301,46 +303,51 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 				$ct->mtl++;
 				
 				// Check whether the recordset is not empty
-				if($db->HasRecords()) {
-					
+				if($db->HasRecords()) 
+				{
 					// Set the pointer to the first row
 					$db->MoveFirst();
 					
 					// Go through all rows found for the current toplevel
-					while (!$db->EndOfSeek()) {
-		    			$row = $db->Row();
+					while (!$db->EndOfSeek()) 
+					{
+			    			$row = $db->Row();
 		    			
-		    			// Specify special link attributes if applicable
-		    			$current_class 	= ($row->urlpage==$curr_page)?'class="current"':null;
-		    			$current_link	= ($row->islink=="N"?'#':null);
-		    			$current_link 	= (empty($current_link)&&regexUrl($row->description)?$row->description:$current_link);
-		    			$current_link	= (empty($current_link)&&$row->urlpage=="home"?$cfg['rootdir']:$current_link);
-		    			$current_link	= (empty($current_link)?$cfg['rootdir'].$row->urlpage.'.html':$current_link);
+			    			// Specify special link attributes if applicable
+			    			$current_class 	= ($row->urlpage==$curr_page)?'class="current"':null;
+			    			$current_link	= ($row->islink=="N"?'#':null);
+			    			$current_link 	= (empty($current_link)&&regexUrl($row->description)?$row->description:$current_link);
+			    			$current_link	= (empty($current_link)&&$row->urlpage=="home"?$cfg['rootdir']:$current_link);
+			    			$current_link	= (empty($current_link)?$cfg['rootdir'].$row->urlpage.'.html':$current_link);
 		    			
-		    			// What text to show for the links
-		    			$link_text		= ucfirst($row->pagetitle);
+			    			// What text to show for the links
+			    			$link_text		= ucfirst($row->pagetitle);
 						
-		    			// Specifying the position of the current item in the menu
-		    			if($row->sublevel==0 && $db->RowCount()==1) {
-		    				$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a></li>';
-		    			}
-		    			if($row->sublevel==0 && $db->RowCount()>1) {
-				    		$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a>';
-				    		$ccms['structure'.$i] .= '<ul class="sublevel">';
-				    	}
-				    	if($row->sublevel>0 && $db->SeekPosition()!=$db->RowCount()) {
-				    		$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a></li>';
-				    	}
-				    	if($row->sublevel>0 && $db->SeekPosition()==$db->RowCount()) {
-				    		$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a></li>';
-				    		$ccms['structure'.$i] .= '</ul></li>';
-				    	}
+			    			// Specifying the position of the current item in the menu
+			    			if($row->sublevel==0 && $db->RowCount()==1) 
+						{
+			    				$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a></li>';
+			    			}
+			    			if($row->sublevel==0 && $db->RowCount()>1) 
+						{
+					    		$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a>';
+					    		$ccms['structure'.$i] .= '<ul class="sublevel">';
+					    	}
+					    	if($row->sublevel>0 && $db->SeekPosition()!=$db->RowCount()) 
+						{
+					    		$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a></li>';
+					    	}
+					    	if($row->sublevel>0 && $db->SeekPosition()==$db->RowCount()) 
+						{
+					    		$ccms['structure'.$i] .= '<li><a '.$current_class.' href="'.$current_link.'" title="'.ucfirst($row->subheader).'">'.$link_text.'</a></li>';
+					    		$ccms['structure'.$i] .= '</ul></li>';
+					    	}
 					}
 				}
 			}
 			$ccms['structure'.$i] .= "</ul>";
 		}
-	} 	
+	}
 }
 
 // OPERATION MODE ==
@@ -352,6 +359,7 @@ elseif($current == "sitemap.php" || $current == "sitemap.xml")
 	
 	// Start generating sitemap
 	header ("content-type: text/xml");
+
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	?>
 	<urlset
@@ -361,23 +369,29 @@ elseif($current == "sitemap.php" || $current == "sitemap.xml")
 			http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 	<?php
 	// Select all published pages
-	if (!$db->Query("SELECT `urlpage`,`description` FROM `".$cfg['db_prefix']."pages` WHERE `published` = 'Y'")) $db->Kill();
+	if (!$db->Query("SELECT `urlpage`,`description` FROM `".$cfg['db_prefix']."pages` WHERE `published` = 'Y'")) 
+		$db->Kill();
 
 	$db->MoveFirst();
-	while (!$db->EndOfSeek()) {
+	while (!$db->EndOfSeek()) 
+	{
 		$row = $db->Row();
-		
+
 		// Do not include external links in sitemap
-		if(!regexUrl($row->description)) {
+		if(!regexUrl($row->description)) 
+		{
 			echo "<url>\n";
-				if($row->urlpage == "home") { 
+				if($row->urlpage == "home") 
+				{
 					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."</loc>\n";
 					echo "<priority>0.80</priority>\n";
-				} else {
+				} 
+				else 
+				{
 					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."".$row->urlpage.".html</loc>\n";
 					echo "<priority>0.50</priority>\n";
 				}
-			echo "<changefreq>weekly</changefreq>\n";
+				echo "<changefreq>weekly</changefreq>\n";
 			echo "</url>\n";
 		}
 	}

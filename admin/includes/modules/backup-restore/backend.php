@@ -220,7 +220,9 @@ if($perm['manageModBackup']>0&&checkAuth($canarycage,$currenthost))
 					echo $ccms['lang']['system']['noresults'];
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed'];
+			}
 			?>
 			</form>
 		</div>

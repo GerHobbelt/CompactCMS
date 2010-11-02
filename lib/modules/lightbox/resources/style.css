@@ -20,6 +20,7 @@
 	border-radius: 5px;
 	behavior: url('../../../../admin/img/styles/PIE.php');
 }
+	
 .imagezoom .loading {
 	width: 46px;
 	height: 11px;
@@ -90,6 +91,7 @@
 	cursor: pointer;
 	background-image: url(./prev.png) !important;
 }
+
 .imagezoom .caption .next {
 	left: auto;
 	right: 18px;
@@ -97,6 +99,7 @@
 }
 
 /** Borders **/
+
 .imagezoom .s_tl, .imagezoom .s_tr, .imagezoom .s_bl, .imagezoom .s_br {
 	width: 13px;
 	height: 18px;
@@ -108,6 +111,7 @@
 	position: absolute;
 	left: -1px;
 }
+
 .imagezoom .s_left, .imagezoom .s_right {
 	width: 13px;
 	height: 100%;

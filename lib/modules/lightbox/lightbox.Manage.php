@@ -296,6 +296,7 @@ function confirmation()
 			</form>
 		<?php 
 		} 
+		
 		if(count($albums)>0) 
 		{ 
 		?>

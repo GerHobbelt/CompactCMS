@@ -166,8 +166,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album" && checkAut
 if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
-
+	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	{
 		$album = (isset($_GET['album'])&&!empty($_GET['album'])?$_GET['album']:null);
 		$image = (isset($_GET['image'])&&!empty($_GET['image'])?$_GET['image']:null);
 		
@@ -213,11 +213,11 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album" && checkA
 			
 			if ($handle = fopen($infofile, 'w+')) 
 			{
-			    if (fwrite($handle, $topage)&&fwrite($handle,"\r\n".$description)) 
-			    {
+				if (fwrite($handle, $topage)&&fwrite($handle,"\r\n".$description)) 
+				{
 					header("Location: lightbox.Manage.php?album=$album_name&status=notice&msg=".$ccms['lang']['backend']['settingssaved']);
 					exit();
-			    }
+				}
 			} 
 			else 
 			{

@@ -216,7 +216,7 @@ function confirmation()
 }
 	</script>	
 </head>
-<body >
+<body>
 	<div class="module">
 		<div id="status">
 			<!-- spinner -->
