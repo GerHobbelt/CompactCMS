@@ -12,7 +12,9 @@ if($action_type=='send' && !empty($_POST))
 	{
 		echo "<p class=\"success center\">Your message has been sent. Thanks!</p>";
 		exit();
-	} else die("<p class=\"error center\">Error while processing your e-mail</p>");
+	} 
+	else 
+		die("<p class=\"error center\">Error while processing your e-mail</p>");
 }
 else 
 {

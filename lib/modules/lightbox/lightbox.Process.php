@@ -51,7 +51,7 @@ $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissi
 $album_name	= (isset($_POST['album'])&&!empty($_POST['album'])?$_POST['album']:null);
 $do_action	= (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:null);
 
- /**
+/**
  *
  * Create a new album
  *
@@ -59,30 +59,43 @@ $do_action	= (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:nu
 if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
-	
-		if($album_name!=null) {
+	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	{
+		if($album_name!=null) 
+		{
 			$dest = BASE_PATH.'/media/albums/'.$album_name;
-			if(!is_dir($dest)) {
-				if(mkdir($dest)&&mkdir($dest.'/_thumbs')&&fopen($dest.'/info.txt', "w")) {
+			if(!is_dir($dest)) 
+			{
+				if(mkdir($dest)&&mkdir($dest.'/_thumbs')&&fopen($dest.'/info.txt', "w")) 
+				{
 					header("Location: lightbox.Manage.php?status=notice&msg=".$ccms['lang']['backend']['itemcreated']."&album=$album_name");
 					exit();
-				} else {
+				} 
+				else 
+				{
 					header("Location: lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_dirwrite']);
 					exit();
 				}
-			} else {
+			} 
+			else 
+			{
 				header("Location: lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_exists']);
 				exit();
 			}
-		} else {
+		} 
+		else 
+		{
 			header("Location: lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_tooshort']);
 			exit();
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
+	} 
+	else 
+	{
+		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
- /**
+/**
  *
  * Delete a current album (including all of its files)
  *
@@ -90,48 +103,62 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album" && check
 if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
-
-		if(empty($_POST['albumID'])) {
+	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	{
+		if(empty($_POST['albumID'])) 
+		{
 			header("Location: lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_selection']);
 			exit();
-		} else {
-
-			function rrmdir($dir) {
-				if (is_dir($dir)) {
+		} 
+		else 
+		{
+			function rrmdir($dir) 
+			{
+				if (is_dir($dir)) 
+				{
 					$objects = scandir($dir);
 					
-					foreach ($objects as $object) {
-						if ($object != "." && $object != "..") {
+					foreach ($objects as $object) 
+					{
+						if ($object != "." && $object != "..") 
+						{
 							if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object); else unlink($dir."/".$object);
 						}
 					}
 					reset($objects);
 					rmdir($dir);
-				} return true;
+				} 
+				return true;
 		 	}
 		
 			$total 	= count($_POST['albumID']);
 			$i		= 0;
-			foreach ($_POST['albumID'] as $key => $value) {
-				if(!empty($key)&&!empty($value)) {
+			foreach ($_POST['albumID'] as $key => $value) 
+			{
+				if(!empty($key)&&!empty($value)) 
+				{
 					$dest = BASE_PATH.'/media/albums/'.$value;
-					if(is_dir($dest)) {
-						if(rrmdir($dest)) {
+					if(is_dir($dest)) 
+					{
+						if(rrmdir($dest)) 
+						{
 							$i++;
 						}
 					}
 				}
 			}
-			if($total==$i) {
+			if($total==$i) 
+			{
 				header("Location: lightbox.Manage.php?status=notice&msg=".$ccms['lang']['backend']['fullremoved']);
 				exit();
 			}
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 
- /**
+/**
  *
  * Delete a single image
  *
@@ -144,23 +171,30 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image" && checkAuth
 		$album = (isset($_GET['album'])&&!empty($_GET['album'])?$_GET['album']:null);
 		$image = (isset($_GET['image'])&&!empty($_GET['image'])?$_GET['image']:null);
 		
-		if(!empty($album)&&!empty($image)) {
+		if(!empty($album)&&!empty($image)) 
+		{
 			$file	= BASE_PATH.'/media/albums/'.$album.'/'.$image;
 			$thumb	= BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$image;
-			if(is_file($file)) {
-				if(unlink($file)&&unlink($thumb)) {
+			if(is_file($file)) 
+			{
+				if(unlink($file)&&unlink($thumb)) 
+				{
 					header("Location:lightbox.Manage.php?status=notice&msg=".$ccms['lang']['backend']['fullremoved']."&album=$album");
 					exit();
-				} else {
+				} 
+				else 
+				{
 					header("Location:lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_delete']."&album=$album");
 					exit();
 				}
 			}
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 
- /**
+/**
  *
  * Apply album to page
  *
@@ -168,31 +202,40 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image" && checkAuth
 if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {
-		
-		if($album_name!=null) {
+	if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	{
+		if($album_name!=null) 
+		{
 			// Posted variables
 			$topage = (!empty($_POST['albumtopage'])?$_POST['albumtopage']:' ');
 			$description = (!empty($_POST['description'])?trim($_POST['description']):trim(' '));
 			$infofile = BASE_PATH."/media/albums/$album_name/info.txt";
 			
-			if ($handle = fopen($infofile, 'w+')) {
-			    if (fwrite($handle, $topage)&&fwrite($handle,"\r\n".$description)) {
+			if ($handle = fopen($infofile, 'w+')) 
+			{
+			    if (fwrite($handle, $topage)&&fwrite($handle,"\r\n".$description)) 
+			    {
 					header("Location: lightbox.Manage.php?album=$album_name&status=notice&msg=".$ccms['lang']['backend']['settingssaved']);
 					exit();
 			    }
-			} else {
+			} 
+			else 
+			{
 				header("Location: lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_write']);
 				exit();
 			}
-		} else {
+		} 
+		else 
+		{
 			header("Location: lightbox.Manage.php?status=error&msg=".$ccms['lang']['system']['error_tooshort']);
 			exit();
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 
- /**
+/**
  *
  * Process and save image plus thumbnail
  *
@@ -200,7 +243,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album" && checkA
 if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files" && checkAuth($canarycage,$currenthost)) 
 {
 	$dest = BASE_PATH.'/media/albums/'.$album_name;
-	if(!is_dir($dest)) {
+	if(!is_dir($dest)) 
+	{
 		header("Location: lightbox.Manage.php?status=error&msg=writeerr");
 		exit();
 	} 
@@ -209,19 +253,23 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files" && checkAu
 	// Validation
 	$error 		= false;
 
-	if (!isset($_FILES['Filedata']) || !is_uploaded_file($_FILES['Filedata']['tmp_name'])) {
+	if (!isset($_FILES['Filedata']) || !is_uploaded_file($_FILES['Filedata']['tmp_name'])) 
+	{
 		$error = 'Invalid Upload';
 	}
 	
-	if (!$error && !($size = @getimagesize($_FILES['Filedata']['tmp_name']) ) ) {
+	if (!$error && !($size = @getimagesize($_FILES['Filedata']['tmp_name']) ) ) 
+	{
 		$error = 'Please upload only images, no other files are supported.';
 	}
 	
-	if (!$error && !in_array($size[2], array(1, 2, 3, 7, 8) ) ) {
+	if (!$error && !in_array($size[2], array(1, 2, 3, 7, 8) ) ) 
+	{
 		$error = 'Please upload only images of type JPEG, GIF or PNG.';
 	}
 	
-	if (!$error && ($size[0] < 50) || ($size[1] < 50)) {
+	if (!$error && ($size[0] < 50) || ($size[1] < 50)) 
+	{
 		$error = 'Please upload an image bigger than 50px.';
 	}
 	
@@ -230,11 +278,16 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files" && checkAu
 	$extension		= strtolower(substr($_FILES['Filedata']['name'], strrpos($_FILES['Filedata']['name'], '.') + 1));
 	
 	// Do resize
-	if($extension=="jpg" || $extension=="jpeg" ) {
+	if($extension=="jpg" || $extension=="jpeg" ) 
+	{
 		$src = imagecreatefromjpeg($uploadedfile);
-	} elseif($extension=="png") {
+	} 
+	elseif($extension=="png") 
+	{
 		$src = imagecreatefrompng($uploadedfile);
-	} else {
+	} 
+	else 
+	{
 		$src = imagecreatefromgif($uploadedfile);
 	}
 		 
@@ -256,25 +309,33 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files" && checkAu
 	$thumbnail	= $dest.'/_thumbs/'. $_FILES['Filedata']['name'];
 	$original	= $dest.'/'.$_FILES['Filedata']['name'];
 	
-	if($extension=="jpg" || $extension=="jpeg" ) {
+	if($extension=="jpg" || $extension=="jpeg" ) 
+	{
 		imagejpeg($tmp, $original, 100);
 		imagejpeg($tmp_t, $thumbnail, 100);
-	} elseif($extension=="png") {
+	} 
+	elseif($extension=="png") 
+	{
 		imagepng($tmp, $original, 7);
 		imagepng($tmp_t, $thumbnail, 7);
-	} else {
+	} 
+	else 
+	{
 		imagegif($tmp, $original, 100);
 		imagegif($tmp_t, $thumbnail, 100);
 	}
 	
 
 	// Check for errors
-	if ($error) {
+	if ($error) 
+	{
 		$return = array(
 			'status' => '0',
 			'error' => $error
 		);
-	} else {
+	} 
+	else 
+	{
 		$return = array(
 			'status' => '1',
 			'name' => $_FILES['Filedata']['name'],
@@ -284,16 +345,20 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files" && checkAu
 		$return['hash'] = md5_file($return['src']);
 		$info = @getimagesize($return['src']);
 		
-		if ($info) {
+		if ($info) 
+		{
 			$return['width'] = $info[0];
 			$return['height'] = $info[1];
 			$return['mime'] = $info['mime'];
 		}
 	}
 
-	if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'xml') {
+	if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'xml') 
+	{
 		/* do nothing */
-	} else {
+	} 
+	else 
+	{
 		// header('Content-type: application/json');
 		echo json_encode($return);
 	}

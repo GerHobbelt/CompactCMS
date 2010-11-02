@@ -44,39 +44,45 @@ if(is_file('../lib/includes/auth.inc.php')) 			{ $loc = "../lib/includes/auth.in
 elseif(is_file('../../lib/includes/auth.inc.php'))		{ $loc = "../../lib/includes/auth.inc.php"; }
 elseif(is_file('../../../lib/includes/auth.inc.php'))	{ $loc = "../../../lib/includes/auth.inc.php"; }
 
-	// Check whether current user has running session
-	if(empty($_SESSION['ccms_userID']) && $cfg['protect']==true){
+// Check whether current user has running session
+if(empty($_SESSION['ccms_userID']) && $cfg['protect']==true)
+{
+	header('Location: '.$loc);
+	exit();
+}
+
+// Do log-out (kill sessions) and redirect
+if(isset($_GET['do'])&&$_GET['do']=="logout") 
+{
+	// Unset all of the session variables.
+	$_SESSION = array();
+	
+	// Destroy session
+	if (ini_get("session.use_cookies")) 
+	{
+		$params = session_get_cookie_params();
+		setcookie(session_name(), '', time() - 42000,
+			$params["ccms_userID"], $params["domain"],
+			$params["secure"], $params["httponly"]
+		);
+	}
+	
+	// Generate a new session_id
+	session_regenerate_id();
+	
+	// Finally, destroy the session.
+	if(session_destroy()) 
+	{
 		header('Location: '.$loc);
 		exit();
 	}
 	
-	// Do log-out (kill sessions) and redirect
-	if(isset($_GET['do'])&&$_GET['do']=="logout") {
-		// Unset all of the session variables.
-		$_SESSION = array();
-		
-		// Destroy session
-		if (ini_get("session.use_cookies")) {
-		    $params = session_get_cookie_params();
-		    setcookie(session_name(), '', time() - 42000,
-		        $params["ccms_userID"], $params["domain"],
-		        $params["secure"], $params["httponly"]
-		    );
-		}
-		
-		// Generate a new session_id
-		session_regenerate_id();
-		
-		// Finally, destroy the session.
-		if(session_destroy()) {
-			header('Location: '.$loc);
-			exit();
-		}
-		
-		if(empty($_SESSION['ccms_userID'])) {
-			header('Location: '.$loc);
-			exit();
-		}
+	if(empty($_SESSION['ccms_userID'])) 
+	{
+		header('Location: '.$loc);
+		exit();
 	}
+}
+
 	
 ?>

@@ -47,23 +47,28 @@ $currenthost	= md5($_SERVER['HTTP_HOST']);
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
- /**
+/**
  *
  * Either INSERT or UPDATE preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth($canarycage,$currenthost)) {
-	
+if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth($canarycage,$currenthost)) 
+{
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>='4') {
-		
+	if($_SESSION['ccms_userLevel']>='4')
+	{
 		// Execute either INSERT or UPDATE
-		if($db->UpdateRows($cfg['db_prefix']."cfgpermissions", $_POST)) {
+		if($db->UpdateRows($cfg['db_prefix']."cfgpermissions", $_POST)) 
+		{
 			header("Location: permissions.Manage.php?status=notice&msg=".$ccms['lang']['backend']['settingssaved']);
 			exit();
-		} else $db->Kill();
-		
-	} else die($ccms['lang']['auth']['featnotallowed']);
-	
-} else die("No external access to file");
+		} 
+		else 
+			$db->Kill();
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
+} 
+else 
+	die("No external access to file");
 ?>

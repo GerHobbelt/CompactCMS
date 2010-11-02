@@ -53,7 +53,7 @@ $pageID		= (isset($_POST['pageID'])&&!empty($_POST['pageID'])?$_POST['pageID']:'
 $cfgID		= (isset($_POST['cfgID'])&&!empty($_POST['cfgID'])?$_POST['cfgID']:'0');
 $do_action 	= (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:null);
 
- /**
+/**
  *
  * Either INSERT or UPDATE news article
  *
@@ -61,8 +61,8 @@ $do_action 	= (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:n
 if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModNews']) {
-	
+	if($_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+	{
 		// Published
 		$newsPublished = (!isset($_POST['newsPublished'])&&empty($_POST['newsPublished'])?"0":"1");
 		
@@ -76,14 +76,19 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkA
 		$values["newsPublished"]  = MySQL::SQLValue($newsPublished);
 	
 		// Execute either INSERT or UPDATE based on $newsID
-		if($db->AutoInsertUpdate($cfg['db_prefix']."modnews", $values, array("newsID" => $newsID))) {
+		if($db->AutoInsertUpdate($cfg['db_prefix']."modnews", $values, array("newsID" => $newsID))) 
+		{
 			header("Location: news.Manage.php?file=$pageID&status=notice&msg=".$ccms['lang']['backend']['itemcreated']);
 			exit();
-		} else $db->Kill();
-	} else die($ccms['lang']['auth']['featnotallowed']);
+		} 
+		else 
+			$db->Kill();
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 
- /**
+/**
  *
  * Delete current news item
  *
@@ -91,13 +96,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkA
 if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth($canarycage,$currenthost)) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModNews']) {
-		
+	if($_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+	{
 		// Number of selected items
 		$total = count($_POST['newsID']);
 		
 		// If nothing selected, throw error
-		if($total==0) {
+		if($total==0) 
+		{
 			header("Location: news.Manage.php?file=$pageID&status=error&msg=".$ccms['lang']['system']['error_selection']);
 			exit();
 		}
@@ -112,14 +118,19 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth($
 		}
 	
 		// Check for errors
-		if($result&&$i==$total) {
+		if($result&&$i==$total) 
+		{
 			header("Location: news.Manage.php?file=$pageID&status=notice&msg=".$ccms['lang']['backend']['fullremoved']);
 			exit();
-		} else $db->Kill();
-	} else die($ccms['lang']['auth']['featnotallowed']);
+		} 
+		else 
+			$db->Kill();
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 
- /**
+/**
  *
  * Save configuration preferences
  *
@@ -137,10 +148,15 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="cfg-news" && checkAuth($
 		$values["showTeaser"] 	= MySQL::SQLValue($_POST['show_teaser']);
 
 		// Execute the insert or update for current page
-		if($db->AutoInsertUpdate($cfg['db_prefix']."cfgnews", $values, array("cfgID" => $cfgID))) {
+		if($db->AutoInsertUpdate($cfg['db_prefix']."cfgnews", $values, array("cfgID" => $cfgID))) 
+		{
 			header("Location: news.Manage.php?file=$pageID&status=notice&msg=".$ccms['lang']['backend']['settingssaved']);
 			exit();
-		} else $db->Kill();
-	} else die($ccms['lang']['auth']['featnotallowed']);
+		} 
+		else 
+			$db->Kill();
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
 }
 ?>

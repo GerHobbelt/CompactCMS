@@ -165,41 +165,65 @@ if($perm['manageModBackup']>0&&checkAuth($canarycage,$currenthost))
 			<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
 				<table border="0" cellspacing="5" cellpadding="5">
 					<tr>
-						<?php if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) { ?><th class="span-1">&#160;</th><?php } ?>
+						<?php 
+						if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+						{ 
+						?>
+							<th class="span-1">&#160;</th>
+						<?php 
+						} 
+						?>
 						<th class="span-10"><?php echo $ccms['lang']['backup']['timestamp'];?></th>
 						<th>&#160;</th>
 					</tr>
 					<?php 
-					if ($handle = opendir('../../../../media/files/')) {
+					if ($handle = opendir('../../../../media/files/')) 
+					{
 						$i=0;
-						while (false !== ($file = readdir($handle))) {
-					        if ($file != "." && $file != ".." && strpos($file, ".zip")) {
-						        // Alternate rows
-			    				if($i%2 != '1') {
+						while (false !== ($file = readdir($handle))) 
+						{
+						        if ($file != "." && $file != ".." && strpos($file, ".zip")) 
+							{
+							        // Alternate rows
+				    				if($i%2 != '1')
+								{
 									echo '<tr style="background-color: #E6F2D9;">';
-								} else { 
+								} 
+								else 
+								{ 
 									echo '<tr>';
 								} 
-						        if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) {
-						        	echo '<td><input type="checkbox" name="file[]" value="'.$file.'" id="'.$i.'"></td>';
-						        }
-						        echo '<td>'.$file.'</td>';
-						        echo '<td><span class="ss_sprite ss_package_green"><a href="../../../../media/files/'.$file.'" title="'.ucfirst($file).'">'.$ccms['lang']['backup']['download'].'</a></span></td>';
-						        echo '</tr>';
-					        $i++;} 
+							        if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+								{
+							        	echo '<td><input type="checkbox" name="file[]" value="'.$file.'" id="'.$i.'"></td>';
+							        }
+							        echo '<td>'.$file.'</td>';
+							        echo '<td><span class="ss_sprite ss_package_green"><a href="../../../../media/files/'.$file.'" title="'.ucfirst($file).'">'.$ccms['lang']['backup']['download'].'</a></span></td>';
+							        echo '</tr>';
+								$i++;
+							} 
 					    }
 					    closedir($handle);
 					}
 					?>
 				</table>
-			<?php if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) {
-					if($i>0) { ?>
-				<p><button type="submit" onclick="return confirmation();" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
-			<?php 	} else echo $ccms['lang']['system']['noresults'];
-				} else echo $ccms['lang']['auth']['featnotallowed'];?>
+			<?php 
+			if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+			{
+				if($i>0) 
+				{ 
+				?>
+					<p><button type="submit" onclick="return confirmation();" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
+				<?php 	
+				} 
+				else 
+					echo $ccms['lang']['system']['noresults'];
+			} 
+			else 
+				echo $ccms['lang']['auth']['featnotallowed'];
+			?>
 			</form>
 		</div>
-
 	</div>
 </body>
 </html>
