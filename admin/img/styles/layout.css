@@ -232,17 +232,7 @@ optgroup option {padding-left: 10px;}
 	background-position: 0 -760px;
 	padding: 0 0 0 16px;
 }
-.textarea {
-	background: #ECC6CD;
-	padding: 0 4px;
-	border: #D37A8A 2px solid;	
-	font-size: 90%;
-	font-family: "Palatino Linotype", Palatino, Baskerville, "Book Antiqua", Georgia, serif;
-	width: 85%;
-	height: 35px;
-}
 
-/* === 1. CORE === */
 /* === CODING PRE-TAG === */
 pre {
 	font-size: 12px;
