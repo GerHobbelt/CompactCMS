@@ -777,7 +777,9 @@ if($do_action == "save-template" && $_SERVER['REQUEST_METHOD'] == "POST" && chec
 		} 
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**

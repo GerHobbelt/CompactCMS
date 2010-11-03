@@ -75,7 +75,12 @@ function confirmation()
 	<div class="module">
 		
 		<div class="center <?php echo (isset($_GET['status'])?$_GET['status']:null); ?>">
-			<? if(isset($_GET['msg'])&&strlen($_GET['msg'])>'2') { echo $_GET['msg']; } ?>
+			<? 
+			if(isset($_GET['msg'])&&strlen($_GET['msg'])>'2') 
+			{ 
+				echo $_GET['msg']; 
+			} 
+			?>
 		</div>
 			
 		<div class="span-16 colborder">

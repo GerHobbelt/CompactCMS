@@ -40,9 +40,12 @@ $do 		= (isset($_GET['do'])?$_GET['do']:null);
 // Open recordset for specified user
 $userID = (isset($_GET['userID']) && is_numeric($_GET['userID'])?$_GET['userID']:null);
 
-if($userID!=null) {
+if($userID!=null) 
+{
 	$row = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."users` WHERE userID = $userID");
-} else die($ccms['lang']['system']['error_general']);
+} 
+else 
+	die($ccms['lang']['system']['error_general']);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");

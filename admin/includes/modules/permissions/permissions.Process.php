@@ -64,10 +64,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth($canaryca
 			exit();
 		} 
 		else 
+		{
 			$db->Kill();
+		}
 	} 
-	else 
+	else     
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 } 
 else 
 	die("No external access to file");

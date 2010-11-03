@@ -36,8 +36,8 @@ $canarycage	= md5(session_id());
 $currenthost= md5($_SERVER['HTTP_HOST']);
 $do 		= (isset($_GET['do'])?$_GET['do']:null);
 
-if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && md5(session_id())==$canarycage && isset($_SESSION['rc1']) && md5($_SERVER['HTTP_HOST'])==$currenthost) {
-	
+if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && md5(session_id())==$canarycage && isset($_SESSION['rc1']) && md5($_SERVER['HTTP_HOST'])==$currenthost) 
+{
 	// Include back-up functions
 	include_once('functions.php');
 }
@@ -111,9 +111,14 @@ function confirmation()
 <body>
 	<div class="module">
 
-		<?php if(!strpos($_SERVER['SERVER_SOFTWARE'], "Win") && $chstatus==0) { ?>
+		<?php 
+		if(!strpos($_SERVER['SERVER_SOFTWARE'], "Win") && $chstatus==0) 
+		{ 
+		?>
 			<p class="error center"><?php echo $ccms['lang']['template']['nowrite']; ?></p>
-		<?php } ?>	
+		<?php 
+		} 
+		?>	
 		<div class="span-13">
 			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
 		</div>
@@ -124,33 +129,50 @@ function confirmation()
 				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
 					<?php
 					$x = 0; 
-					while($x<count($template)) { ?>
+					while($x<count($template)) 
+					{ 
+					?>
 						<optgroup label="<?php echo ucfirst($template[$x]); ?>">
 							<option <?php echo ($get_temp==$template[$x].".tpl.html") ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>.tpl.html"><?php echo ucfirst($template[$x]).': '.strtolower($ccms['lang']['backend']['template']); ?></option>
 							<?php 
 							
 							// Get CSS files
-							if ($handle = opendir($dir_temp.$template[$x].'/')) {
-								while (false !== ($file = readdir($handle))) {
-							        if ($file != "." && $file != ".." && strtolower(substr($file, strrpos($file, '.') + 1))=='css') {
+							if ($handle = opendir($dir_temp.$template[$x].'/')) 
+							{
+								while (false !== ($file = readdir($handle))) 
+								{
+							        if ($file != "." && $file != ".." && strtolower(substr($file, strrpos($file, '.') + 1))=='css') 
+								{
 							            $cssfiles[$x][] = $file;
 							        }
 							    }
 							    closedir($handle);
 							}
-							foreach ($cssfiles[$x] as $css) { ?>
+							foreach ($cssfiles[$x] as $css) 
+							{ 
+							?>
 								<option <?php echo ($get_temp==$template[$x].'/'.$css) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x].'/'.$css; ?>"><?php echo ucfirst($template[$x]).': '.$css; ?></option>
-							<?php } ?>
+							<?php 
+							} 
+							?>
 						</optgroup>
-					<?php $x++; } ?>
+					<?php 
+					$x++; 
+				} 
+				?>
 				</select>
 			</form>
 		</div>
 		<hr class="space"/>
 		
-		<?php if(isset($_GET['status'])) { ?>
+		<?php 
+		if(isset($_GET['status'])) 
+		{ 
+		?>
 			<div class="notice center"><span class="ss_sprite ss_confirm"><?php echo $ccms['lang']['backend']['settingssaved'];?></span></div>
-		<?php } ?>
+		<?php 
+		} 
+		?>
 		
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
 		
@@ -158,9 +180,14 @@ function confirmation()
 			
 			<p>
 				<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
-				<?php if(strpos($_SERVER['SERVER_SOFTWARE'], "Win") || $chstatus>0) { ?>
+				<?php 
+				if(strpos($_SERVER['SERVER_SOFTWARE'], "Win") || $chstatus>0) 
+				{ 
+				?>
 					<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
-				<?php }  ?>
+				<?php 
+				}  
+				?>
 				<span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span>
 			</p>
 			
