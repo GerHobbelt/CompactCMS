@@ -293,7 +293,7 @@ if($db->HasRecords())
 				</td>
 				<?php 
 				// Check for restrictions
-				if(!in_array($row->urlpage, $cfg['restrict'])||!in_array($row->page_id, $owners)) 
+				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // [i_a] bugfix
 				{ 
 				?>
 					<td class="span-5" style="text-align: right;">
