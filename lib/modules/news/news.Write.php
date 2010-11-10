@@ -252,12 +252,12 @@ function confirmation()
 					<label for="newsAuthor"><?php echo $ccms['lang']['news']['author']; ?></label>
 					<select name="newsAuthor" class="required text" id="newsAuthor" size="1">
 						<?php 
-							$db->Query("SELECT * FROM `".$cfg['db_prefix']."users`");
+							if (!$db->SelectRows($cfg['db_prefix'].'users')) $db->Kill();
 							while (! $db->EndOfSeek()) 
 							{
 		    						$user = $db->Row(); 
 								?>
-								<option value="<?php echo $user->userID;?>" <?php echo (isset($news)&&$user->userID==$news->userID?'selected="selected"':null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
+								<option value="<?php echo rm0lead($user->userID);?>" <?php echo (isset($news)&&$user->userID==$news->userID?'selected="selected"':null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
 							<?php 
 							} 
 							?>

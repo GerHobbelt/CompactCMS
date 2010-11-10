@@ -56,6 +56,30 @@ function strmatch_tail($a, $b)
 
 
 /**
+Remove leading zeroes from the given string.
+
+When the string is ALL ZEROES, keep the last one.
+
+When the string is empty, return the string "0" instead.
+Hence this function acts like a string->integer->string comverter, as 
+empty strings equal zero as well as "0" strings do.
+
+@remark This function is used, among other things, in various spots to provide backwards compatibility 
+        with older CCMS releases which had 'zerofill'ed numeric columns in 
+		the database.
+*/
+function rm0lead($str)
+{
+	$rv = ltrim(strval($str), '0');
+	if (empty($rv))
+		return '0';
+	return $rv;
+}
+
+
+
+
+/**
 Convert any string input to a US-ASCII limited character set with a few common conversions included.
 
 Use this function for filtering any input which doesn't need the full UTF8 range. Most useful as a preprocessor for further 
@@ -437,6 +461,7 @@ function filterParam4Number($value, $def = null)
 		return $def;
 	
 	// see if the value is a valid integer (plus or minus)
+	$value = rm0lead($value);
 	$numval = intval($value);
 	if (strval($numval) !== $value)
 	{

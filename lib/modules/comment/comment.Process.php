@@ -246,7 +246,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-comment" && $_POST['
 		$values['commentName']	= MySQL::SQLValue($commentName, MySQL::SQLVALUE_TEXT);
 		$values['commentEmail']	= MySQL::SQLValue($commentEmail, MySQL::SQLVALUE_TEXT);
 		$values['commentUrl']	= MySQL::SQLValue($commentUrl, MySQL::SQLVALUE_TEXT);
-		$values['commentRate']	= MySQL::SQLValue($commentRating, MySQL::SQLVALUE_NUMBER); // 'note the 'tricky' comment in the MySQL::SQLValue() member: we MUST have quotes around this number as mySQL enums are quoted :-(
+		$values['commentRate']	= MySQL::SQLValue($commentRating, MySQL::SQLVALUE_ENUMERATE); // 'note the 'tricky' comment in the MySQL::SQLValue() member: we MUST have quotes around this number as mySQL enums are quoted :-(
 		$values['commentContent'] = MySQL::SQLValue($commentContent, MySQL::SQLVALUE_TEXT);
 		$values['commentHost']	= MySQL::SQLValue($commentHost, MySQL::SQLVALUE_TEXT);
 		
@@ -291,7 +291,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="save-cfg" && checkAuth()
 		$values['showLocale'] = MySQL::SQLValue($showLocale, MySQL::SQLVALUE_TEXT);
 
 		// Insert or update configuration
-		if($db->AutoInsertUpdate($cfg['db_prefix']."cfgcomment", $values, array("cfgID" => MySQL::BuildSQLValue($cfgID)))) 
+		if($db->AutoInsertUpdate($cfg['db_prefix'].'cfgcomment', $values, array('cfgID' => MySQL::BuildSQLValue($cfgID)))) 
 		{
 			header('Location: ' . makeAbsoluteURI('comment.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 			exit();

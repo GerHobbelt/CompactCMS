@@ -129,7 +129,7 @@ if($db->HasRecords())
 					$newsTitle = str_replace(' ','-',$newsTitle);
 					
 					?>
-					<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
+					<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
 					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
 					<?php 
 					if($showTeaser==0) 
@@ -207,7 +207,7 @@ if($db->HasRecords())
 			$newsTitle = str_replace(' ','-',$newsTitle); 
 			?>
 	    	
-			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
+			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
 			<span style="font-size:0.8em;font-style:italic;"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></span>
 	    	<p><?php echo $rsNews->newsTeaser; ?></p>
 		<?php

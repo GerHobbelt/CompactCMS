@@ -100,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkA
 		$values["newsPublished"] = MySQL::SQLValue($newsPublished, MySQL::SQLVALUE_BOOLEAN);
 	
 		// Execute either INSERT or UPDATE based on $newsID
-		if($db->AutoInsertUpdate($cfg['db_prefix']."modnews", $values, array("newsID" => MySQL::BuildSQLValue($newsID)))) 
+		if($db->AutoInsertUpdate($cfg['db_prefix'].'modnews', $values, array('newsID' => MySQL::BuildSQLValue($newsID)))) 
 		{
 			header('Location: ' . makeAbsoluteURI('news.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
 			exit();
@@ -127,7 +127,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth()
 	if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 	{
 		// Number of selected items
-		$total = (!empty($_POST['newsID']) ? count($_POST['newsID']) : 0);
+		$total = (!empty($_POST['newsID']) && is_array($_POST['newsID']) ? count($_POST['newsID']) : 0);
 		
 		// If nothing selected, throw error
 		if($total==0) 
@@ -190,7 +190,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="cfg-news" && checkAuth()
 		$values["showTeaser"] 	= MySQL::SQLValue($showTeaser, MySQL::SQLVALUE_BOOLEAN);
 
 		// Execute the insert or update for current page
-		if($db->AutoInsertUpdate($cfg['db_prefix']."cfgnews", $values, array("cfgID" => MySQL::BuildSQLValue($cfgID)))) 
+		if($db->AutoInsertUpdate($cfg['db_prefix'].'cfgnews', $values, array('cfgID' => MySQL::BuildSQLValue($cfgID)))) 
 		{
 			header('Location: ' . makeAbsoluteURI('news.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 			exit();

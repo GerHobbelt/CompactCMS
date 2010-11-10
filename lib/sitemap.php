@@ -440,7 +440,7 @@ if (0)
 	{
 		$menu_in_set .= ',' . $i;
 	}
-	$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` WHERE `published`='Y' AND `menu_id` IN ($menu_in_set) ORDER BY `menu_id` ASC, `toplevel` ASC, `sublevel` ASC, `page_id` ASC");
+	$db->SelectRows($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, array('menu_id', 'toplevel', 'sublevel', 'page_id'));
 
 	if($db->HasRecords()) 
 	{

@@ -155,7 +155,7 @@ $target_form = getPOSTparam4IdOrNumber('form');
 
 
 // Open recordset for sites' pages
-$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` " . $page_selectquery_restriction . " ORDER BY `published`, `menu_id`, `toplevel`, `sublevel` ASC");
+$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, array('published', 'menu_id', 'toplevel', 'sublevel'));
 
 // Check whether the recordset is not empty
 if($db->HasRecords()) 
@@ -180,7 +180,7 @@ if($db->HasRecords())
 				
 			// Check whether current user is owner, or no owners at all
 			$owner = @explode('||', $row->user_ids);
-			if($row->user_ids==0||$perm['manageOwners']==0||$_SESSION['ccms_userLevel']>=4||in_array($_SESSION['ccms_userID'], $owner)) 
+			if(empty($row->user_ids) || $perm['manageOwners']==0 || $_SESSION['ccms_userLevel']>=4 || in_array($_SESSION['ccms_userID'], $owner)) 
 			{
 				// Determine file specific variables
 				if($row->module=="editor") 
@@ -227,7 +227,7 @@ if($db->HasRecords())
 				else 
 				{ 
 				?>
-					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].$row->page_id; ?>" />
+					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].rm0lead($row->page_id); ?>" />
 				<?php 
 				} 
 				?>
@@ -236,13 +236,13 @@ if($db->HasRecords())
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
 				</td>
 				<td class="span-4">
-					<span id="<?php echo $row->page_id; ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
+					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
 				<td class="span-6">
-					<span id="<?php echo $row->page_id; ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
+					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
 				<td class="span-2" style="text-align: center;">
-					<a href="#" id="printable-<?php echo $row->page_id; ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+					<a href="#" id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 						if($row->printable == "Y")
 						{ 
 							echo $ccms['lang']['backend']['yes']; 
@@ -258,7 +258,7 @@ if($db->HasRecords())
 					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
 					{ 
 					?>
-						<a href="#" id="published-<?php echo $row->page_id; ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+						<a href="#" id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 							if($row->published == "Y") 
 							{ 
 								echo $ccms['lang']['backend']['yes']; 
@@ -281,7 +281,7 @@ if($db->HasRecords())
 						if($row->module=="editor") 
 						{ 
 						?>
-							<a href="#" id="iscoding-<?php echo $row->page_id; ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php if($row->iscoding == "Y") { echo "<span style=\"color:#8F0000;font-weight:bold;\">".$ccms['lang']['backend']['yes']."</span>"; } else echo $ccms['lang']['backend']['no']; ?></a>
+							<a href="#" id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php if($row->iscoding == "Y") { echo "<span style=\"color:#8F0000;font-weight:bold;\">".$ccms['lang']['backend']['yes']."</span>"; } else echo $ccms['lang']['backend']['no']; ?></a>
 						<?php 
 						} 
 						else 
@@ -345,7 +345,7 @@ if($db->HasRecords())
 					$description = ucfirst($description);
 				}
 				?>
-				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo $row->page_id; ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
+				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" style="text-align: right; padding-right:5px;">
 					<?php 
 					if($row->module=="editor" && !empty($row->toplevel)) 
@@ -431,9 +431,10 @@ if($db->HasRecords())
 				{ 
 					echo "<tr>"; 
 				} 
+				$pageIdAsStr = rm0lead($row->page_id); // empty cannot be; rm0lead() makes sure zero is actually "0"
 				?>
 					<td class="span-2">
-						<select class="span-2" name="menuid[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="menuid[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Menu">
 								<?php 
 								$y = 1; 
@@ -449,7 +450,7 @@ if($db->HasRecords())
 						</select>
 					</td>
 					<td class="span-2">
-						<select class="span-2" name="template[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="template[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
 								<?php 
 								$x = 0; 
@@ -465,7 +466,7 @@ if($db->HasRecords())
 						</select>
 					</td>
 					<td class="span-2">&#160;
-						<select class="span-2" name="toplevel[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="toplevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Toplevel">
 								<?php 
 								$z = 1; 
@@ -481,7 +482,7 @@ if($db->HasRecords())
 						</select>
 					</td>
 					<td class="span-2">
-						<select class="span-2" name="sublevel[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="sublevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Sublevel">
 								<?php 
 								$y = 0; 
@@ -496,7 +497,7 @@ if($db->HasRecords())
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-1-1" id="td-islink-<?php echo $row->page_id; ?>">
+					<td class="span-1-1" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php 
 						if($row->urlpage == "home") 
 						{ 
@@ -507,14 +508,14 @@ if($db->HasRecords())
 						else 
 						{ 
 						?>
-							<input type="checkbox" name="islink" id="<?php echo $row->page_id; ?>" class="islink" <?php echo($row->islink==="Y")?'checked="checked"':null;?> />
+							<input type="checkbox" name="islink" id="<?php echo $pageIdAsStr; ?>" class="islink" <?php echo($row->islink==="Y")?'checked="checked"':null;?> />
 						<?php 
 						} 
 						?>
 					</td>
 					<td class="span-4">
 						<?php echo $row->urlpage; ?><em>(.html)</em>
-						<input type="hidden" name="pageid[]" value="<?php echo $row->page_id; ?>" id="pageid"/>
+						<input type="hidden" name="pageid[]" value="<?php echo $pageIdAsStr; ?>" id="pageid"/>
 					</td>
 				</tr>
 				<?php 
@@ -1081,7 +1082,7 @@ if($do_action == "edit-user-password" && $_SERVER['REQUEST_METHOD'] == "POST" &&
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
 			$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
 			
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();
@@ -1126,13 +1127,13 @@ if($do_action == "edit-user-level" && $_SERVER['REQUEST_METHOD'] == "POST" && ch
 			$values["userLevel"] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
 			$values["userActive"] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
 				
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				if($userID==$_SESSION['ccms_userID']) 
 				{
 					$_SESSION['ccms_userLevel'] = $userLevel;
 				}
-				
+			
 				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();
 			}
@@ -1178,7 +1179,7 @@ if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 			
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
 			$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
-			$result = $db->DeleteRows($cfg['db_prefix']."users", $values);
+			$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
 			$i++;
 		}
 		// Check for errors
