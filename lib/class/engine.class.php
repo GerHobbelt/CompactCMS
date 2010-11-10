@@ -55,7 +55,7 @@ class ccmsParser {
   #
   
   protected function checkCondition($value, $condition) {
-    preg_match("/([^ ]+) +([^ ].+)/",$condition,$cond);
+    preg_match("/([^ ]+) +([^ ].*)/",$condition,$cond);
     $chh = $cond[1];
     $wert = $cond[2];
     $wert = preg_replace("( ['|\"] )","",$wert);
@@ -247,7 +247,7 @@ class ccmsParser {
 
   ## Prints PHP code to the output page
   protected function CheckPHP($text) {
-    eval('?>'.$text.'<?php'); 
+    eval('?>'.$text.'<?php '); 
     //echo $text;
   }
   

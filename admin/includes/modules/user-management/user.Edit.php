@@ -35,7 +35,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Define default location
@@ -52,16 +52,26 @@ if (!defined('BASE_PATH'))
 
 
 $do	= getGETparam4IdOrNumber('do');
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 // Open recordset for specified user
 $userID = getGETparam4Number('userID');
 
-if($userID!=null) {
+if($userID > 0) 
+{
 	$row = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."users` WHERE userID = $userID");
-} else die($ccms['lang']['system']['error_general']);
+	if (!$row) $db->Kill($ccms['lang']['system']['error_general']);
+} 
+else
+{ 
+	die($ccms['lang']['system']['error_general']);
+}
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
+if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+
 
 
 if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth()) 
@@ -88,13 +98,14 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 
 <body>
 	<div class="module">
-		<?php if(isset($_GET['status'])&&isset($_GET['action'])) 
-		{ 
-		?>
-			<div class="<?php echo htmlspecialchars($_GET['status']);?> center"><strong><?php echo ucfirst(htmlspecialchars($_GET['action']));?></strong></div>
-		<?php 
-		} 
-		?>
+		<div class="center <?php echo $status; ?>">
+			<?php 
+			if(!empty($status_message)) 
+			{ 
+				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+			} 
+			?>
+		</div>
 		
 		<p class="clear right"><span class="ss_sprite ss_arrow_undo"><a href="backend.php"><?php echo $ccms['lang']['backend']['tooverview']; ?></a></span></p>
 		

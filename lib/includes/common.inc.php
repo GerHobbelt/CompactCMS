@@ -27,6 +27,33 @@ if (!defined('BASE_PATH'))
 }
 
 
+/*MARKER*/require_once(BASE_PATH . '/lib/class/exception_ajax.php');
+
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/email-validator/EmailAddressValidator.php');
+
+
+
+
+
+/**
+Return TRUE when one string matches the 'tail' of the other string
+*/
+function strmatch_tail($a, $b)
+{
+	if (strlen($a) < strlen($b))
+	{
+		$tmp = $a;
+		$a = $b;
+		$b = $tmp;
+	}
+	
+	$idx = strpos($a, $b);
+	if ($idx === false)
+		return false;
+	return ($idx + strlen($b) == strlen($a));
+}
+
+
 
 /**
 Convert any string input to a US-ASCII limited character set with a few common conversions included.
@@ -83,8 +110,12 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	$src = preg_replace('/(?:[^\-A-Za-z0-9_' . $extra_accept_set . ']|_)+/', '_', $src);
 	// reduce series of underscores to a single one:
 	$src = preg_replace('/_+/', '_', $src);
+	
 	// remove leading and trailing underscores (which may have been whitespace or other stuff before)
-	$src = trim($src, '_');
+	// except... we have directories which start with an underscore. So I guess a single
+	// leading underscore should be okay. And so would a trailing underscore...
+	//$src = trim($src, '_');
+	
 	// We NEVER tolerate a leading dot:
 	$src = preg_replace('/^\.+/', '', $src);
 	if (!$accept_leading_minus)
@@ -116,7 +147,7 @@ function getGETparam4IdOrNumber($name, $def = null)
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4IdOrNumber($_GET[$name], $def);
+	return filterParam4IdOrNumber(rawurldecode($_GET[$name]), $def);
 }
 	
 function getPOSTparam4IdOrNumber($name, $def = null) 
@@ -153,7 +184,7 @@ function getGETparam4Filename($name, $def = null)
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4Filename($_GET[$name], $def);
+	return filterParam4Filename(rawurldecode($_GET[$name]), $def);
 }
 
 function getPOSTparam4Filename($name, $def = null) 
@@ -187,7 +218,15 @@ function getGETparam4CommaSeppedFilenames($name, $def = null)
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4CommaSeppedFilenames($_GET[$name], $def);
+	return filterParam4CommaSeppedFilenames(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4CommaSeppedFilenames($name, $def = null) 
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4CommaSeppedFilenames($_POST[$name], $def);
 }
 
 /**
@@ -213,18 +252,41 @@ function filterParam4CommaSeppedFilenames($value, $def = null)
 
 
 
-function getGETparam4FullFilePath($name, $def = null) 
+
+function getGETparam4FullFilePath($name, $def = null, $accept_parent_dotdot = false) 
 {
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4FullFilePath($_GET[$name], $def);
+	return filterParam4FullFilePath(rawurldecode($_GET[$name]), $def, $accept_parent_dotdot);
+}
+
+function getPOSTparam4FullFilePath($name, $def = null, $accept_parent_dotdot = false) 
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4FullFilePath($_POST[$name], $def, $accept_parent_dotdot);
 }
 
 /**
 As filterParam4Filename(), but also accepts '/' directory separators
+
+When $accept_parent_dotdot is TRUE, only then does this filter 
+accept '../' directory parts anywhere in the path.
+
+WARNING: setting $accept_parent_dotdot = TRUE can be VERY DANGEROUS
+         without further checking the result whether it's trying to
+		 go places we don't them to go! 
+		 
+		 Be vewey vewey caweful!
+		 
+		 Just to give you an idea:
+		     ../../../../../../../../../../../../etc/passwords
+		 would be LEGAL *AND* VERY DANGEROUS if the accepted path is not
+		 validated further upon return from this function!
 */
-function filterParam4FullFilePath($value, $def = null)
+function filterParam4FullFilePath($value, $def = null, $accept_parent_dotdot = false)
 {
 	if (!isset($value))
 		return $def;
@@ -241,6 +303,10 @@ function filterParam4FullFilePath($value, $def = null)
 		{
 			return $def; // illegal path specified!
 		}
+		if ($fns[$i] == ".." && !$accept_parent_dotdot)
+		{
+			return $def; // illegal path specified!
+		}
 	}
 	
 	return implode('/', $fns);
@@ -254,7 +320,7 @@ function getGETparam4boolYN($name, $def = null)
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4boolYN($_GET[$name], $def);
+	return filterParam4boolYN(rawurldecode($_GET[$name]), $def);
 }
 
 function getPOSTparam4boolYN($name, $def = null)
@@ -270,35 +336,14 @@ Accepts any boolean value: as any number, T[rue]/F[alse] or Y[es]/N[o]
 */
 function filterParam4boolYN($value, $def = null)
 {
-	if (!isset($value))
-		return $def;
-
-	$value = trim(strval($value)); // force cast to string before we do anything
-	if (empty($value))
-		return $def;
-	
-	// see if the value is a valid integer (plus or minus)
-	$numval = intval($value);
-	if (strval($numval) !== $value)
+	$rv = filterParam4boolean($value, null);
+	if ($rv === true)
 	{
-		// no full match for the integer check, so this is a string hence we must check the text-based boolean values here:
-		switch (strtoupper(substr($value, 0, 1)))
-		{
-		case 'T':
-		case 'Y':
-			return 'Y';
-			
-		case 'F':
-		case 'N':
-			return 'N';
-			
-		default:
-			return $def;
-		}
+		return 'Y';
 	}
-	else
+	else if ($rv === false)
 	{
-		return ($numval != 0 ? 'Y' : 'N');
+		return 'N';
 	}
 	return $def;
 }
@@ -311,7 +356,7 @@ function getGETparam4boolean($name, $def = null)
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4boolean($_GET[$name], $def);
+	return filterParam4boolean(rawurldecode($_GET[$name]), $def);
 }
 
 function getPOSTparam4boolean($name, $def = null)
@@ -368,7 +413,7 @@ function getGETparam4Number($name, $def = null)
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4Number($_GET[$name], $def);
+	return filterParam4Number(rawurldecode($_GET[$name]), $def);
 }
 
 function getPOSTparam4Number($name, $def = null)
@@ -408,10 +453,305 @@ function filterParam4Number($value, $def = null)
 
 
 
+function getGETparam4DisplayHTML($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4DisplayHTML(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4DisplayHTML($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4DisplayHTML($_POST[$name], $def);
+}
+
+/*
+Accepts any non-aggressive HTML
+*/
+function filterParam4DisplayHTML($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	// TODO: use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
+	
+	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
+	$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+	
+	return $value;
+}
 
 
 
 
+
+
+
+
+
+function getGETparam4Email($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4Email(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4Email($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4Email($_POST[$name], $def);
+}
+
+/*
+Accepts any valid email address.
+
+Uses the email validator from:
+
+    http://code.google.com/p/php-email-address-validation/
+	
+
+*/
+function filterParam4Email($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	$validator = new EmailAddressValidator;
+	if ($validator->check_email_address($value))
+	{
+		// Email address is technically valid
+		return $value;
+	}
+	return $numval;
+}
+
+
+
+
+
+
+
+
+
+function getGETparam4HumanName($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4HumanName(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4HumanName($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4HumanName($_POST[$name], $def);
+}
+
+/*
+Accepts any text
+*/
+function filterParam4HumanName($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	return htmlentities($value, ENT_NOQUOTES, "UTF-8");
+}
+
+
+
+
+
+
+
+
+
+function getGETparam4EmailSubjectLine($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4EmailSubjectLine(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4EmailSubjectLine($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4EmailSubjectLine($_POST[$name], $def);
+}
+
+/*
+Accepts any text except HTML specials cf. RFC2047
+
+Is NOT suitable for direct display within a HTML context (i.e. on a page showing some
+sort of feedback after you've entered a mail through a form, etc.); apply
+	htmlspecialchars()
+before you do so!
+*/
+function filterParam4EmailSubjectLine($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	// TODO: real RFC2047 filter.
+	$value = str2USASCII($value);
+	$value = str_replace('=', '~', $value);
+	
+	return $value;
+}
+
+
+
+
+function getGETparam4EmailBody($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4EmailBody(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4EmailBody($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4EmailBody($_POST[$name], $def);
+}
+
+/*
+Accepts any text; ready it for HTML display ~ HTML email
+*/
+function filterParam4EmailBody($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+
+	// TODO: real email message body filter?
+	return htmlspecialchars($value);
+}
+
+
+
+
+
+
+
+
+
+
+
+function getGETparam4URL($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4URL(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4URL($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4URL($_POST[$name], $def);
+}
+
+/*
+Accepts any 'fully qualified' URL, i.e. proper domain name, etc.
+*/
+function filterParam4URL($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	if (!regexUrl($value, true)) // the ENTIRE string must be a URL, nothing else allowed 'at the tail end'!
+		return $def;
+
+	return $value;
+}
+
+
+
+
+
+function getGETparam4DateTime($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4DateTime(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4DateTime($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4DateTime($_POST[$name], $def);
+}
+
+/*
+Accepts a date/time stamp
+*/
+function filterParam4DateTime($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+
+	$dt = strtotime($value);
+	/* 
+	time == 0 ~ 1970-01-01T00:00:00 is considered an INVALID date here, 
+	because it can easily result from parsing arbitrary input representing 
+	the date eqv. of zero(0)... 
+	
+	time == -1 was the old error signaling return code (pre-PHP 5.1.0)
+	*/
+	if (!is_int($dt) || $dt <= 0)
+	{
+		return $def;
+	} 
+	return $dt;
+}
 
 
 
@@ -448,7 +788,8 @@ function filterParam4Number($value, $def = null)
 
  This is used to see if there's a URL specified in the page description.
 */
-function regexUrl($data) {
+function regexUrl($data, $match_entire_string = false) 
+{
 	$regex = "((https?|ftp)\:\/\/)?"; // SCHEME 
 	$regex .= "([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?"; // User and Pass 
 	$regex .= "([a-z0-9-.]*)\.([a-z]{2,3})"; // Host or IP 
@@ -457,7 +798,8 @@ function regexUrl($data) {
 	$regex .= "(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?"; // GET Query 
 	$regex .= "(#[a-z_.-][a-z0-9+\$_.-]*)?"; // Anchor 
 	
-	if(preg_match("/^$regex/i", $data)) {
+	if(preg_match('/^' . $regex . ($match_entire_string ? '$' : '') . '/i', $data)) 
+	{
 		return true;
 	}
 	return false;
@@ -471,7 +813,7 @@ function DetermineTemplateName($name = null, $printing = 'N')
 	
 	if (!empty($name))
 	{
-		$name = $name . ($printing == 'N' ? '' : '/print');
+		$name = $name . ($printing != 'Y' ? '' : '/print');
 		
 		// Set the template variable for current page
 		$templatefile = BASE_PATH . '/lib/templates/' . $name . '.tpl.html';
@@ -486,7 +828,7 @@ function DetermineTemplateName($name = null, $printing = 'N')
 	if(is_array($ccms['template_collection']) && count($ccms['template_collection']) > 0) 
 	{
 		// pick default template
-		$name = $ccms['template_collection'][0] . ($printing == 'N' ? '' : '/print');
+		$name = $ccms['template_collection'][0] . ($printing != 'Y' ? '' : '/print');
 		
 		// Set the template variable for current page
 		$templatefile = BASE_PATH . '/lib/templates/' . $name . '.tpl.html';
@@ -499,7 +841,7 @@ function DetermineTemplateName($name = null, $printing = 'N')
 	}
 	
 	// for printing ONLY, see if the 'ccms' template exists anyway.
-	if ($printing != 'N')
+	if ($printing == 'Y')
 	{
 		$name = 'ccms/print';
 		
@@ -591,7 +933,7 @@ function send_response_status_header($response_code)
 		break;
 		
 	case 'server':
-		header('HTTP/1.0 ' . $response_code . ' ' . get_response_code_string($reponse_code), true, $response_code);
+		header('HTTP/1.0 ' . $response_code . ' ' . get_response_code_string($response_code), true, $response_code);
 		break;
 	}
 }
@@ -600,7 +942,7 @@ function send_response_status_header($response_code)
 /**
 Return the HTTP response code string for the given response code
 */
-function get_response_code_string($reponse_code)
+function get_response_code_string($response_code)
 {
 	switch (intval($response_code))
 	{
@@ -650,6 +992,184 @@ function get_response_code_string($reponse_code)
 
 
 
+/*
+http://nadeausoftware.com/node/79
+*/
+function path_remove_dot_segments($path)
+{
+    // multi-byte character explode
+    $inSegs  = preg_split( '!/!u', $path);
+    $outSegs = array();
+    foreach ($inSegs as $seg)
+    {
+        if ($seg == '' || $seg == '.')
+            continue;
+        if ($seg == '..')
+            array_pop($outSegs);
+        else
+            array_push($outSegs, $seg);
+    }
+    $outPath = implode('/', $outSegs);
+    if ($path[0] == '/')
+        $outPath = '/' . $outPath;
+    // // compare last multi-byte character against '/'
+    // if ($outPath != '/' && (mb_strlen($path)-1) == mb_strrpos($path, '/', 'UTF-8'))
+    //     $outPath .= '/';
+    return $outPath;
+}
+
+
+			  
+/*
+Convert any path (absolute or relative) to a fully qualified URL
+*/			  
+function makeAbsoluteURI($path)
+{
+	$reqpage = filterParam4FullFilePath($_SERVER["PHP_SELF"]);
+	
+	$page = array();
+	if (strpos($path, '://'))
+	{
+		if (strpos($path, '?') === false || strpos($path, '://') < strpos($path, '?'))
+		{
+			/*
+			parse_url can only parse URLs, not relative paths. 
+			
+			http://bugs.php.net/report.php?manpage=function.parse-url#Notes
+			*/
+			$page = parse_url($path);
+			if (isset($page[PHP_URL_SCHEME]))
+				return $path;
+
+			/*
+			We do NOT accept 'URL's like
+			
+			   www.example.com/path.ext
+			   
+			as input: we treat the entire string as a path (and a relative one at that)!
+			*/
+		}
+	}
+
+	/*
+	Expect input which is a subset of
+	
+	   /path/file.exe?query#fragment
+	
+	with either absolute or relative path/file.ext as the mandatory part.
+	*/   
+	$idx = strpos($path, '?');
+	if ($idx !== false)
+	{
+		$page[PHP_URL_PATH] = substr($path, 0, $idx);
+		
+		$path = substr($path, $idx + 1);
+		$idx = strpos($path, '#');
+		if ($idx !== false)
+		{
+			$page[PHP_URL_QUERY] = substr($path, 0, $idx);
+			$page[PHP_URL_FRAGMENT] = substr($path, $idx + 1);
+		}
+		else
+		{
+			$page[PHP_URL_QUERY] = $path;
+		}
+	}
+	else
+	{
+		$page[PHP_URL_PATH] = $path;
+	}
+	$path = $page[PHP_URL_PATH];
+
+	if (strpos($path, '/') === 0)
+	{
+		//already absolute
+	} 
+	else 
+	{
+		/*
+		Convert relative path to absolute by prepending the current request path 
+		(which is absolute) and a '../' basedir-similar. 
+		
+		This way also provides for relative paths which don't start with './' but
+		simply say something like
+		  relpath/file.ext
+		which will produce a dotted absolute path like this:
+		  /current_request_path/reqfile.php/../relpath/file.ext
+		which is fine: the ../ will remove the reqfile.php component and we're left 
+		with a neatly formatted absolute path!
+		*/
+		$page[PHP_URL_PATH] = $_SERVER['PHP_SELF'] . '/../' . $path;
+	}
+	$page[PHP_URL_PATH] = path_remove_dot_segments($page[PHP_URL_PATH]);
+	
+	// fill in the holes... assume defaults from the current request.
+	if (empty($page[PHP_URL_SCHEME]))
+	{
+		if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+			|| strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === 0
+			|| intval($_SERVER["SERVER_PORT"]) == 443)
+		{
+			$page[PHP_URL_SCHEME] = 'https';
+		}
+		else
+		{
+			$page[PHP_URL_SCHEME] = 'http';
+		}
+	}
+	if (empty($page[PHP_URL_HOST]))
+	{
+		$page[PHP_URL_HOST] = $_SERVER["SERVER_NAME"];
+	}
+	if (empty($page[PHP_URL_PORT]))
+	{
+		/*
+		Only set the port number when it is non-standard:
+		*/
+		$portno = intval($_SERVER["SERVER_PORT"]);
+		if ($portno != 0
+			&& ($page[PHP_URL_SCHEME] == 'http' && $portno == 80)
+			&& ($page[PHP_URL_SCHEME] == 'https' && $portno == 443))
+		{
+			$page[PHP_URL_PORT] = $portno;
+		}
+	}
+	
+	$url = '';
+	if(!empty($page[PHP_URL_SCHEME]))
+	{
+		$url = $page[PHP_URL_SCHEME] . '://';
+	}
+	if(!empty($page[PHP_URL_USER]))
+	{
+		$url .= $page[PHP_URL_USER];
+		if(!empty($page[PHP_URL_PASS]))
+		{
+			$url .= ':' . $page[PHP_URL_PASS];
+		}
+		$url .= '@';
+	}
+	if(!empty($page[PHP_URL_HOST]))
+	{
+		$url .= $page[PHP_URL_HOST];
+	}
+	$url .= $page[PHP_URL_PATH];
+	if (!empty($page[PHP_URL_QUERY]))
+	{
+		$url .= '?' . $page[PHP_URL_QUERY];
+	}
+	if (!empty($page[PHP_URL_FRAGMENT]))
+	{
+		$url .= '#' . $page[PHP_URL_FRAGMENT];
+	}
+	return $url;
+}
+
+
+
+
+
+
 /**
  Check for authentic request ($cage=md5(SESSION_ID),$host=md5(CURRENT_HOST)) v.s. 'id' and 'host' session variable values.
  
@@ -662,7 +1182,8 @@ function checkAuth()
 	$currenthost = md5($_SERVER['HTTP_HOST']);
 	
 	//if(md5(session_id())==$cage && md5($_SERVER['HTTP_HOST']) == $host) {   // [i_a] bugfix
-	if ($canarycage == $_SESSION['id'] && $currenthost == $_SESSION['host']) 
+	if (!empty($_SESSION['id']) && $canarycage == $_SESSION['id'] 
+		&& !empty($_SESSION['host']) && $currenthost == $_SESSION['host']) 
 	{
 		return true;
 	} 
@@ -677,6 +1198,7 @@ function SetAuthSafety()
 	unset($_SESSION['rc1']);
 	unset($_SESSION['rc2']);
 }
+
 
 
 ?>

@@ -40,7 +40,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Compress all output and coding
@@ -63,7 +63,8 @@ if (!checkAuth())
 }
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
+if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Set default variables
 $album_name	= getPOSTparam4Filename('album');
@@ -86,24 +87,24 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
 			{
 				if(@mkdir($dest)&&@mkdir($dest.'/_thumbs')&&@fopen($dest.'/info.txt', "w")) 
 				{
-					header("Location: lightbox.Manage.php?status=notice&msg=".rawurlencode($ccms['lang']['backend']['itemcreated'])."&album=$album_name");
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
 					exit();
 				} 
 				else 
 				{
-					header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_dirwrite']));
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_dirwrite'])));
 					exit();
 				}
 			} 
 			else 
 			{
-				header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_exists']));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_exists'])));
 				exit();
 			}
 		} 
 		else 
 		{
-			header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_tooshort']));
+			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
 			exit();
 		}
 	} 
@@ -125,7 +126,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 	{
 		if(empty($_POST['albumID'])) 
 		{
-			header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_selection']));
+			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_selection'])));
 			exit();
 		} 
 		else 
@@ -153,6 +154,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 			$i		= 0;
 			foreach ($_POST['albumID'] as $key => $value) 
 			{
+				$key = filterParam4Number($key);
+				$value = filterParam4Filename($value);
+				
 				if(!empty($key)&&!empty($value)) 
 				{
 					$dest = BASE_PATH.'/media/albums/'.$value;
@@ -167,7 +171,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 			}
 			if($total==$i) 
 			{
-				header("Location: lightbox.Manage.php?status=notice&msg=".rawurlencode($ccms['lang']['backend']['fullremoved']));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
 				exit();
 			}
 		}
@@ -197,24 +201,24 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image")
 			{
 				if(@unlink($file)&&@unlink($thumb)) 
 				{
-					header("Location:lightbox.Manage.php?status=notice&msg=".rawurlencode($ccms['lang']['backend']['fullremoved'])."&album=$album");
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved']).'&album='.$album));
 					exit();
 				} 
 				else 
 				{
-					header("Location:lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_delete'])."&album=$album");
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_delete']).'&album='.$album));
 					exit();
 				}
 			}
 			else 
 			{
-				header("Location:lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_delete'])."&album=$album");
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_delete']).'&album='.$album));
 				exit();
 			}
 		}
 		else 
 		{
-			header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_tooshort'])."&album=$album");
+			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort']).'&album='.$album));
 			exit();
 		}
 	} 
@@ -236,26 +240,26 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album")
 		{
 			// Posted variables
 			$topage = getPOSTparam4Filename('albumtopage');
-			$description = (!empty($_POST['description'])?trim(htmlspecialchars($_POST['description'])):'');
-			$infofile = BASE_PATH."/media/albums/$album_name/info.txt";
+			$description = getPOSTparam4DisplayHTML('description');
+			$infofile = BASE_PATH.'/media/albums/'.$album_name.'/info.txt';
 			
 			if ($handle = fopen($infofile, 'w+')) 
 			{
 			    if (fwrite($handle, $topage."\r\n".$description)) 
 				{
-					header("Location: lightbox.Manage.php?album=$album_name&status=notice&msg=".rawurlencode($ccms['lang']['backend']['settingssaved']));
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?album='.$album_name.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 					exit();
 			    }
 			} 
 			else 
 			{
-				header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_write']));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_write'])));
 				exit();
 			}
 		} 
 		else 
 		{
-			header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_tooshort']));
+			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
 			exit();
 		}
 	} 
@@ -296,7 +300,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	$dest = BASE_PATH.'/media/albums/'.$album_name;
 	if(!is_dir($dest)) 
 	{
-		header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_write']));
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_write'])));
 		exit();
 	} 
 	// else ...    [i_a] dangling else removed
@@ -461,26 +465,26 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 	// Only if current user has the rights
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 	{
-		$album = (isset($_GET['album'])&&!empty($_GET['album'])?htmlspecialchars($_GET['album']):null);
+		$album = getGETparam4Filename('album');
 		
 		if(!empty($album)) 
 		{
 			$dest = BASE_PATH.'/media/albums/'.$album;
 			if(!is_dir($dest)) 
 			{
-				header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_dirwrite']));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_dirwrite'])));
 				exit();
 			} 
 			if(!is_dir($dest.'/_thumbs')) 
 			{
 				if(@mkdir($dest.'/_thumbs')) 
 				{
-					header("Location: lightbox.Manage.php?status=notice&msg=".rawurlencode($ccms['lang']['backend']['itemcreated'])."&album=$album_name");
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
 					exit();
 				} 
 				else 
 				{
-					header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_dirwrite']));
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_dirwrite'])));
 					exit();
 				}
 			} 
@@ -582,12 +586,12 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 				}
 			}
 
-			header("Location:lightbox.Manage.php?status=notice&msg=".rawurlencode($ccms['lang']['backend']['fullregenerated'])."&album=$album");
+			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullregenerated']).'&album='.$album));
 			exit();
 		}
 		else
 		{
-			header("Location: lightbox.Manage.php?status=error&msg=".rawurlencode($ccms['lang']['system']['error_tooshort']));
+			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
 			exit();
 		}
 	} 

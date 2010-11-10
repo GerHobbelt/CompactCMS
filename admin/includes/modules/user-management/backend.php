@@ -35,7 +35,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Define default location
@@ -48,17 +48,25 @@ if (!defined('BASE_PATH'))
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
+// security check done ASAP
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
+{ 
+	die("No external access to file");
+}
+
+
 // Set default variables
 
 
 $do	= getGETparam4IdOrNumber('do');
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
+if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
-if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth()) 
-{ 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -104,15 +112,14 @@ window.addEvent('domready',function()
 </head>
 <body>
 	<div class="module">
-	
-		<?php 
-		if(isset($_GET['status'])&&isset($_GET['action'])) 
-		{ 
-		?>
-			<div class="<?php echo htmlspecialchars($_GET['status']);?> center"><strong><?php echo ucfirst(htmlspecialchars($_GET['action']));?></strong></div>
-		<?php 
-		} 
-		?>
+		<div class="center <?php echo $status; ?>">
+			<?php 
+			if(!empty($status_message)) 
+			{ 
+				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+			} 
+			?>
+		</div>
 		
 		<div class="span-16 colborder">
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
@@ -262,8 +269,3 @@ window.addEvent('domready',function()
 	</div>	
 </body>
 </html>
-<?php 
-} 
-else 
-	die("No external access to file");
-?>

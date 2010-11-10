@@ -40,7 +40,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're rendering the admin page here, no need to load the user/viewer page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Compress all output and coding
@@ -89,12 +89,21 @@ window.addEvent('domready',function()
 			new FormValidator($('addForm')); 
 		}
 	});
+	
+function set_filter_msgs(el)
+{
+	/* add language dependent texts to the relevant elements: */
+	el.msg_edit = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['edit_remove']))."'"; ?>;
+	el.msg_showing = <?php echo "'".str_replace("'", "\\'", $ccms['lang']['forms']['filter_showing'])."'"; ?>;
+	el.msg_add = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['add']))."'"; ?>;
+}
+
 </script>
 </head>
 
-<body id="desktop">	
+<body id="desktop">
+<div id='pageWrapper'><?php /* <-- required to ensure there are proper scrollbars in the MochaUI 'desktop' */ ?>
 <div class="container">
-
 	<?php // Top bar including status block ?>
 	<div id="logo" class="sprite logo span-5 colborder">
 		<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
@@ -151,7 +160,7 @@ window.addEvent('domready',function()
 					<li><span class="ss_sprite ss_group"><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></span></li>
 				<?php 
 				} 
-				if($perm['manageModBackup']>0) 
+				if($perm['manageModBackup']>0 /* && $_SESSION['ccms_userLevel']>=$perm['manageModBackup'] */ ) 
 				{ 
 				?>
 					<li><span class="ss_sprite ss_drive_disk"><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><?php echo $ccms['lang']['backup']['createhd'];?></a></span></li>
@@ -327,11 +336,11 @@ window.addEvent('domready',function()
 		
 		if (!empty($name) && !empty($_SESSION[$name]))
 		{
-			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['add_remove']) . ' ' . $title . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
+			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
 		}
 		else
 		{
-			echo '<span class="sprite livefilter livefilter_add" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['add_remove']) . ' ' . $title . '">&#160;</span>';
+			echo '<span class="sprite livefilter livefilter_add" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['add']) . ' ' . strtolower($title) . '">&#160;</span>';
 		}
 	}
 
@@ -345,9 +354,9 @@ window.addEvent('domready',function()
 		<table id="table_manage">
 			<tr>
 				<th style="padding-left: 5px;" class="span-1"></th>
-				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', 'name filter'); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['filename']; ?>">&#160;</span></th>
-				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', 'title filter');  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle']; ?>">&#160;</span></th>
-				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', 'subheader filter'); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['subheader']; ?>">&#160;</span></th>
+				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
 				<th class="center span-2-1"><?php echo $ccms['lang']['forms']['printable']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
 				<th class="center span-2">
 					<?php 
@@ -403,6 +412,8 @@ window.addEvent('domready',function()
 	</fieldset>
 	</div>
 
+	<div id='debugMsg' class="span-25" style="visibility: visible; opacity: 1;" >&#160;</div>
+
 	<?php // Footer block ?>
 	<div id="footer" class="span-25">
 		<div class="prepend-11 span-11 colborder">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl">CompactCMS.nl</a>. <?php echo $ccms['lang']['system']['message_rights']; ?>.<br/><em><?php echo $ccms['lang']['backend']['gethelp']; ?></em></div>
@@ -415,6 +426,7 @@ window.addEvent('domready',function()
 			<span class="sprite safari" title="<?php echo $ccms['lang']['system']['message_compatible']; ?> Safari"></span>
 		</div>
 	</div>
+</div>
 </div>
 	
 	<?php // Dock block ?>

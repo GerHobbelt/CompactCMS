@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:   CompactCMS - v 1.4.1
 	
 This file is part of CompactCMS.
 
@@ -35,7 +35,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Compress all output and coding
@@ -54,7 +54,8 @@ if (!defined('BASE_PATH'))
 $do = getGETparam4IdOrNumber('do');
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
+if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 if ($perm['manageModBackup'] <= 0 || !checkAuth()) 
 {
@@ -99,7 +100,8 @@ function confirmation()
  * Create requested backup archive
  *
  */
-if(!empty($do) && $do=="backup" && isset($_POST['btn_backup']) && $_POST['btn_backup']=="dobackup" && checkAuth()) 
+$btn_backup = getPOSTparam4IdOrNumber('btn_backup');
+if($do=="backup" && $btn_backup=="dobackup" && checkAuth()) 
 {
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');
@@ -159,8 +161,9 @@ if(!empty($do) && $do=="backup" && isset($_POST['btn_backup']) && $_POST['btn_ba
 	
 	// Get all current tables in database
 	$tables = $db->GetTables();
-	foreach ($tables as $table) {
-    	$backup->tables[] = $table;
+	foreach ($tables as $table) 
+	{
+		$backup->tables[] = $table;
 	}
 	
 	$backup->backup_dir = $configBackupDir;
@@ -180,7 +183,8 @@ if(!empty($do) && $do=="backup" && isset($_POST['btn_backup']) && $_POST['btn_ba
  * Delete current backup archives
  *
  */
-if($do=="delete" && $_POST['btn_delete']=="dodelete" && checkAuth()) 
+$btn_delete = getPOSTparam4IdOrNumber('btn_delete');
+if($do=="delete" && $btn_delete=="dodelete" && checkAuth()) 
 {
 	if (!empty($_POST['file']))
 	{
@@ -188,9 +192,9 @@ if($do=="delete" && $_POST['btn_delete']=="dodelete" && checkAuth())
 		if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
 		{
 			echo "<div class=\"module notice center\">";
-			foreach ($_POST['file'] as $key => $value) 
+			foreach ($_POST['file'] as $value) 
 			{
-				$value = filterParam4Filename($value);
+				$value = filterParam4Filename($value); // strips any slashes as well, so attacks like '../../../../../../../../../etc/passwords' won't pass
 				if (!empty($value))
 				{
 					unlink('../../../../media/files/'.$value);
@@ -282,7 +286,7 @@ if($do=="delete" && $_POST['btn_delete']=="dodelete" && checkAuth())
 				{ 
 				?>
 					<p><button type="submit" onclick="return confirmation();" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
-				<?php 	
+				<?php   
 				} 
 				else 
 					echo $ccms['lang']['system']['noresults'];

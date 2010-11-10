@@ -35,7 +35,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Define default location
@@ -46,7 +46,7 @@ if (!defined('BASE_PATH'))
 }
 
 // Include general configuration
-/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+/*MARKER*/require_once(BASE_PATH . '/admin/includes/security.inc.php'); // when session expires or is overridden, the login page won't show if we don't include this one, but a cryptic error will be printed.
 
 
 if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
@@ -57,10 +57,14 @@ if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 
 
 $do	= getGETparam4IdOrNumber('do');
-$pageID		= (isset($_GET['file'])?htmlspecialchars($_GET['file']):null);
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
+$pageID	= getGETparam4Filename('file');
+
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
+if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
@@ -94,11 +98,11 @@ function confirmation()
 </head>
 <body>
 	<div class="module">
-		<div class="center <?php echo (isset($_GET['status'])?htmlspecialchars($_GET['status']):null); ?>">
+		<div class="center <?php echo $status; ?>">
 			<?php 
-			if(!empty($_GET['msg'])) 
+			if(!empty($status_message)) 
 			{ 
-				echo htmlspecialchars(rawurldecode($_GET['msg'])); 
+				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
 			} 
 			?>
 		</div>

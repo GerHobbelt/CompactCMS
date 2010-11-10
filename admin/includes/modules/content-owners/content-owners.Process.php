@@ -40,7 +40,7 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
-define('CCMS_PERFORM_MINIMAL_INIT', true);
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
 // Compress all output and coding
@@ -61,7 +61,8 @@ if (!defined('BASE_PATH'))
 
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
+if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
  /**
  *
@@ -93,8 +94,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth())
 		*/
 		
 		// If all empty, we're done here
-		if(empty($_POST['owner'])) {
-			header("Location: ./content-owners.Manage.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
+		if(empty($_POST['owner'])) 
+		{
+			header('Location: ' . makeAbsoluteURI('./content-owners.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 			exit();
 		}
 	
@@ -112,6 +114,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth())
 			{
 				die($ccms['lang']['system']['error_forged']);
 			}
+			if (empty($ownership[$pageID])) $ownership[$pageID] = '';
 			$ownership[$pageID] .= '||' . $userID; // add user; we'll trim leading '||' in phase 2
 		}
 		
@@ -129,53 +132,12 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth())
 			}
 		}	
 		
-		header("Location: ./content-owners.Manage.php?status=notice&action=".$ccms['lang']['backend']['success']);
+		header('Location: ' . makeAbsoluteURI('./content-owners.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['success'])));
 		exit();
-
-		
-		
-		
-		
-if (0) // old code - lots of queries.
-{	
-		// Set all values back to zero
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values["user_ids"] = 0;
-		if($db->UpdateRows($cfg['db_prefix']."pages", $values))
-		{
-			// If all empty, we're done here
-			if(empty($_POST['owner'])) {
-				header("Location: ./content-owners.Manage.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
-				exit();
-			}
-		
-			// Otherwise, set the page owners
-			$i=0;
-			foreach ($_POST['owner'] as $value) 
-			{
-				// Split posted variable
-				$explode = explode("||",$value);
-			
-				// Set variables
-				$userID = filterParam4Number($explode[0]);
-				$pageID = filterParam4Number($explode[1]);
-				$current = $db->SelectSingleValue($cfg['db_prefix']."pages", array('page_id' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_NUMBER)), array('user_ids'));
-				$users = $userID . '||' . $current; // concatenate user IDs with '||' between them!
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values["user_ids"] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
-			
-				if($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
-				{
-					$i++;
-				}
-				else
-					$db->Kill();
-			}	
-			// within loop: if($i==count($_POST['owner']))     -- [i_a] very odd way of writing this end-of-loop bit... :-S   simplified now.
-			header("Location: ./content-owners.Manage.php?status=notice&action=".$ccms['lang']['backend']['success']);
-			exit();
-		}
-}
-	} else die($ccms['lang']['auth']['featnotallowed']);
-} else die("No external access to file");
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
+} 
+else 
+	die("No external access to file");
 ?>
