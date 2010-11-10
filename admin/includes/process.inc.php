@@ -570,6 +570,14 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		{ $errors[] = "- ".$ccms['lang']['system']['error_subtitle']; }
 	if ($description=='' || strlen($description)<3)
 		{ $errors[] = "- ".$ccms['lang']['system']['error_description']; }
+	if (strlen($post_urlpage) > 50)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_filesize_2']; }
+	if (strlen($pagetitle) > 100)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_pagetitle_2']; }
+	if (strlen($subheader) > 200)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_subtitle_2']; }
+	if (strlen($description) > 250)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_description_2']; }
 	if ($post_urlpage=='403' || $post_urlpage=='404' || $post_urlpage=='sitemap' || $post_urlpage=='home')
 		{ $errors[] = "- ".$ccms['lang']['system']['error_reserved']; }
 	
