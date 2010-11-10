@@ -47,13 +47,15 @@ $currenthost	= md5($_SERVER['HTTP_HOST']);
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
+
 // Set default variables
 $commentID 	= (isset($_GET['commentID'])&&!empty($_GET['commentID'])&&is_numeric($_GET['commentID'])?$_GET['commentID']:'0');
 $pageID		= (isset($_POST['pageID'])&&!empty($_POST['pageID'])?$_POST['pageID']:'0');
 $cfgID		= (isset($_POST['cfgID'])&&!empty($_POST['cfgID'])?$_POST['cfgID']:'0');
 $do_action 	= (isset($_GET['action'])&&!empty($_GET['action'])?$_GET['action']:null);
 
- /**
+
+/**
  *
  * Show comments
  *
@@ -123,8 +125,10 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && checkAu
 
 	<?php 
 	} 
-	else 
+	else
+	{	
 		echo $ccms['lang']['guestbook']['noposts'];
+	}
 }
 
 /**
@@ -145,7 +149,9 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="del-comment" && checkAuth
 		} 
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -167,7 +173,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-comment" && checkAut
 	$db->InsertRow($cfg['db_prefix']."modcomment", $values);
 }
 
- /**
+/**
  *
  * Save configuration
  *

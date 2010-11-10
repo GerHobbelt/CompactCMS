@@ -30,7 +30,8 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ************************************************************ */
 
 // Check first whether installation directory exists
-if(is_dir('./_install/')&&is_file('./_install/index.php')) {
+if(is_dir('./_install/')&&is_file('./_install/index.php')) 
+{
 	header('Location: ./_install/index.php');
 	exit();
 }

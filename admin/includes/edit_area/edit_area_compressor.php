@@ -18,9 +18,8 @@
 	
 	$compressor= new Compressor($param);
 	
-	class Compressor{
-	
-		
+	class Compressor
+	{
 		function compressor($param)
 		{
 			$this->__construct($param);

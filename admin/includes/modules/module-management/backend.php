@@ -36,24 +36,28 @@ $canarycage	= md5(session_id());
 $currenthost= md5($_SERVER['HTTP_HOST']);
 $do 		= (isset($_GET['do'])?$_GET['do']:null);
 
-if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && md5(session_id())==$canarycage && isset($_SESSION['rc1']) && md5($_SERVER['HTTP_HOST'])==$currenthost) {
-	
+if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && md5(session_id())==$canarycage && isset($_SESSION['rc1']) && md5($_SERVER['HTTP_HOST'])==$currenthost) 
+{
 	// Include back-up functions
 	include_once('functions.php');
-	
-
 }
+
+
 ?>
 <?php if(md5(session_id())==$canarycage && isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && md5($_SERVER['HTTP_HOST']) == $currenthost) { ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-		<title>Back-up &amp; Restore module</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
-	</head>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>Back-up &amp; Restore module</title>
+	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
+</head>
 <body class="module">
 		
 </body>
 </html>
-<?php } else die("No external access to file");?>
+<?php 
+} 
+else 
+	die("No external access to file");
+?>

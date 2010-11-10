@@ -66,7 +66,6 @@ $db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` ORDER BY `published`, `me
 // Check whether the recordset is not empty
 if($db->HasRecords()) 
 {
-
 	// Set the pointer to the first row
 	$db->MoveFirst();
 
@@ -201,7 +200,9 @@ if($db->HasRecords())
 						<?php 
 						} 
 						else 
+						{
 							echo "&ndash;"; 
+						}
 						?>
 					<?php 
 					} 
@@ -514,14 +515,16 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		{
 			// Create the actual file
 			$filehandle = fopen("../../content/".strtolower($post_urlpage).".php", 'w');
-			if(!$filehandle) {
+			if(!$filehandle) 
+			{
 				$db->TransactionRollback();
 				$errors[] = $ccms['lang']['system']['error_write'];
 			} 
 			else 
 			{
 				// Write default contents to newly created file
-				if(strtolower($post_module)==="editor") {
+				if(strtolower($post_module)==="editor") 
+				{
 					fwrite($filehandle, "<p>".$ccms['lang']['backend']['newfiledone']."</p>");
 				} 
 				// Write include_once tag to file (modname.Show.php)
@@ -530,22 +533,28 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 					fwrite($filehandle, "<?php include_once('./lib/modules/$post_module/$post_module.Show.php'); ?>");
 				}
 				else 
+				{
 					die("[ERR048] ".$ccms['lang']['system']['error_general']);
+				}
 			}
 			// Report success in notify area
 			if(fclose($filehandle)) 
 			{
 				echo "<p class=\"h1\"><span class=\"ss_sprite ss_accept\" title=\"".$ccms['lang']['backend']['success']."\"></span> ".$ccms['lang']['backend']['newfilecreated']."</p>".$ccms['lang']['backend']['starteditbody'];
 			} 
-			else 
+			else     
+			{
 				die($ccms['lang']['system']['error_create']);
+			}
 		} 
 		elseif(mysql_errno() == "1062") 
 		{
 			die("<p class=\"h1\"><span class=\"ss_sprite ss_exclamation\" title=\"".$ccms['lang']['system']['error_general']."\"></span> ".$ccms['lang']['backend']['fileexists']."</p>- ".$ccms['lang']['system']['error_exists']); 
 		} 
-		else 
+		else     
+		{
 			die($db->Error($ccms['lang']['system']['error_general'])); // Some error that has not been antipicated.
+		}
 	}
 }
 
@@ -590,17 +599,25 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 						echo '- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'<br/>';
 					} 
 					else 
+					{
 						die($ccms['lang']['system']['error_delete']);
+					}
 				} 
-				else 
+				else     
+				{
 					die($db->Error($ccms['lang']['system']['error_general']));
+				}
 			} 
-			else 
+			else     
+			{
 				die($ccms['lang']['system']['error_forged']);
+			}
 		}
 	} 
-	else 
+	else             
+	{
 		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p><span class="fault">- '.$ccms['lang']['system']['error_selection'].'</span>';
+	}
 }
 
 /**
@@ -632,7 +649,9 @@ if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 		echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['success'].'</p>'.$ccms['lang']['backend']['orderprefsaved'];
 	} 
 	else 
+	{
 		die($db->Error($ccms['lang']['system']['error_general']));
+	}
 }
 
  /**
@@ -650,7 +669,9 @@ if($do_action == "islink" && $_SERVER['REQUEST_METHOD'] == "POST" && md5(session
 		if($values["islink"] == "Y") { echo $ccms['lang']['backend']['yes']; } else echo $ccms['lang']['backend']['no'];
 	} 
 	else 
+	{
 		die($db->Error($ccms['lang']['system']['error_general']));
+	}
 }
 
 /**
@@ -664,9 +685,14 @@ if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] != "POST" && checkA
 	$page_id = explode("-", $_GET['id']);
 	
 	// Set the action for this call
-	if($page_id['0'] == "printable" || $page_id['0'] == "published" || $page_id['0'] == "iscoding") {
+	if($page_id['0'] == "printable" || $page_id['0'] == "published" || $page_id['0'] == "iscoding") 
+	{
 		$action	 = $page_id['0'];
-	} else die($ccms['lang']['system']['error_forged']);
+	} 
+	else 
+	{
+		die($ccms['lang']['system']['error_forged']);
+	}
 	if($_GET['s'] == "Y") { $new = "N"; } elseif($_GET['s'] == "N") { $new = "Y"; }
 	$values["$action"] = MySQL::SQLValue($new,MySQL::SQLVALUE_Y_N);
 	
@@ -682,7 +708,9 @@ if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] != "POST" && checkA
 		}
 	} 
 	else 
+	{
 		die($db->Error($ccms['lang']['system']['error_general']));
+	}
 }
 
 /**
@@ -720,7 +748,9 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	    	}
 	} 
 	else 
+	{
 		die($ccms['lang']['system']['error_value']);
+	}
 	
 	// Continue with content update
 	$page_id		= $_POST['id'];
@@ -826,7 +856,9 @@ if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 			$db->Kill();
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -866,7 +898,9 @@ if($do_action == "edit-user-details" && $_SERVER['REQUEST_METHOD'] == "POST" && 
 		}
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
  
 /**
@@ -903,7 +937,9 @@ if($do_action == "edit-user-password" && $_SERVER['REQUEST_METHOD'] == "POST" &&
 		}
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -933,7 +969,9 @@ if($do_action == "edit-user-level" && $_SERVER['REQUEST_METHOD'] == "POST" && ch
 		}
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -972,7 +1010,9 @@ if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 			$db->Kill();
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -1227,9 +1267,12 @@ if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth($c
 	{
 		function stripslashes_deep($value) 
 		{
-			if(is_array($value)) {
+			if(is_array($value)) 
+			{
 				$value = array_map('stripslashes_deep',$value);
-			} else {
+			} 
+			else 
+			{
 				$value = stripslashes($value);
 			}
 			return $value;
@@ -1248,14 +1291,18 @@ if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth($c
 
 	if (is_writable($filename)) 
 	{
-		if (!$handle = fopen($filename, 'w')) {
+		if (!$handle = fopen($filename, 'w')) 
+		{
 			die("[ERR105] ".$ccms['lang']['system']['error_openfile']." (".$filename.").");
 		}
-		if (fwrite($handle, $content) === FALSE) {
+		if (fwrite($handle, $content) === FALSE) 
+		{
 			die("[ERR106] ".$ccms['lang']['system']['error_write']." (".$filename.").");
 		}
 		fclose($handle);
-	} else {
+	} 
+	else 
+	{
 		die($ccms['lang']['system']['error_chmod']);
 	}
 		
@@ -1314,6 +1361,8 @@ if(isset($_POST['action']) && $_POST['action'] == "Save changes" && checkAuth($c
 	<?php 	
 	} 
 	else 
+	{
 		$db->Kill();
+	}
 } 
 ?>

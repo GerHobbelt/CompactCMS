@@ -35,8 +35,8 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
   Released under GNU Public license
 */
 
-class createZip  {  
-
+class createZip  
+{  
     public $compressedData = array();
     public $centralDirectory = array(); // central directory   
     public $endOfCentralDirectory = "\x50\x4b\x05\x06\x00\x00\x00\x00"; //end of Central directory record
@@ -479,4 +479,4 @@ function pr($val)
     print_r($val);
     echo '</pre>';
 }  
-?> 
+?>

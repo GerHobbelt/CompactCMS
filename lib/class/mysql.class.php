@@ -463,10 +463,14 @@ class MySQL
 			if ($this->error_number <> 0)
 			{
 				return $this->error_number;
-			} else {
+			} 
+			else 
+			{
 				return -1;
 			}
-		} else {
+		} 
+		else 
+		{
 			return $this->error_number;
 		}
 	}
@@ -716,25 +720,37 @@ class MySQL
 	 *                      last returned records are used
 	 * @return array An array that contains the column names
 	 */
-	public function GetColumnNames($table = "") {
+	public function GetColumnNames($table = "") 
+	{
 		$this->ResetError();
-		if (empty($table)) {
+		if (empty($table)) 
+		{
 			$columnCount = mysql_num_fields($this->last_result);
-			if (! $columnCount) {
+			if (! $columnCount) 
+			{
 				$this->SetError();
 				$columns = false;
-			} else {
-				for ($column = 0; $column < $columnCount; $column++) {
+			} 
+			else 
+			{
+				for ($column = 0; $column < $columnCount; $column++) 
+				{
 					$columns[] = mysql_field_name($this->last_result, $column);
 				}
 			}
-		} else {
+		} 
+		else 
+		{
 			$result = mysql_query("SHOW COLUMNS FROM " . $table);
-			if (! $result) {
+			if (! $result) 
+			{
 				$this->SetError();
 				$columns = false;
-			} else {
-				while ($array_data = mysql_fetch_array($result)) {
+			} 
+			else 
+			{
+				while ($array_data = mysql_fetch_array($result)) 
+				{
 					$columns[] = $array_data[0];
 				}
 			}
@@ -858,22 +874,30 @@ class MySQL
 	 *
 	 * @return array An array that contains the table names
 	 */
-	public function GetTables() {
+	public function GetTables() 
+	{
 		$this->ResetError();
 		// Query to get the tables in the current database:
 		$records = mysql_query("SHOW TABLES");
-		if (! $records) {
+		if (! $records) 
+		{
 			$this->SetError();
 			return FALSE;
-		} else {
-			while ($array_data = mysql_fetch_array($records)) {
+		} 
+		else 
+		{
+			while ($array_data = mysql_fetch_array($records)) 
+			{
 				$tables[] = $array_data[0];
 			}
 
 			// Returns the array or NULL
-			if (count($tables) > 0) {
+			if (count($tables) > 0) 
+			{
 				return $tables;
-			} else {
+			} 
+			else 
+			{
 				return FALSE;
 			}
 		}
@@ -1003,11 +1027,15 @@ class MySQL
 	 * @param date/string $value
 	 * @return boolean Returns TRUE if value is date or FALSE if not date
 	 */
-	static public function IsDate($value) {
+	static public function IsDate($value) 
+	{
 		$date = date('Y', strtotime($value));
-		if ($date == "1969" || $date == '') {
+		if ($date == "1969" || $date == '') 
+		{
 			return false;
-		} else {
+		} 
+		else 
+		{
 			return true;
 		}
 	}
@@ -1623,7 +1651,8 @@ class MySQL
 	 * @param string $value
 	 * @return string
 	 */
-	static public function SQLUnfix($value) {
+	static public function SQLUnfix($value) 
+	{
 		return @stripslashes($value);
 	}
 
@@ -1694,23 +1723,32 @@ class MySQL
 				}
 				break;
 			case "date":
-				if (self::IsDate($value)) {
+				if (self::IsDate($value)) 
+				{
 					$return_value = "'" . date('Y-m-d', strtotime($value)) . "'";
-				} else {
+				} 
+				else 
+				{
 					$return_value = "NULL";
 				}
 				break;
 			case "datetime":
-				if (self::IsDate($value)) {
+				if (self::IsDate($value)) 
+				{
 					$return_value = "'" . date('Y-m-d H:i:s', strtotime($value)) . "'";
-				} else {
+				} 
+				else 
+				{
 					$return_value = "NULL";
 				}
 				break;
 			case "time":
-				if (self::IsDate($value)) {
+				if (self::IsDate($value)) 
+				{
 					$return_value = "'" . date('H:i:s', strtotime($value)) . "'";
-				} else {
+				} 
+				else 
+				{
 					$return_value = "NULL";
 				}
 				break;

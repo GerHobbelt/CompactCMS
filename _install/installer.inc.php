@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
-	
+Revision:   CompactCMS - v 1.4.1
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -46,8 +46,8 @@ $additional = (isset($_GET['do'])&&!empty($_GET['do'])?$_GET['do']:null);
 **/
 
 // Step two
-if($nextstep == md5('2') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) { 
-	
+if($nextstep == md5('2') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) 
+{ 
 	//
 	// Installation actions
 	//  - Environmental variables
@@ -92,7 +92,8 @@ if($nextstep == md5('2') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['
 } // Close step two
 
 // Step three
-if($nextstep == md5('3') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) { 
+if($nextstep == md5('3') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) 
+{ 
 	//
 	// Installation actions
 	//  - Saving preferences
@@ -129,8 +130,8 @@ if($nextstep == md5('3') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['
 } // Close step three
 
 // Step four
-if($nextstep == md5('4') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) { 
-	
+if($nextstep == md5('4') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) 
+{ 
 	//
 	// Installation actions
 	//  - Process database
@@ -150,7 +151,8 @@ if($nextstep == md5('4') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['
 	//
 	// Check for current chmod() if server != Windows
 	//
-	if(!strpos($_SERVER['SERVER_SOFTWARE'], "Win")) {
+	if(!strpos($_SERVER['SERVER_SOFTWARE'], "Win")) 
+	{
 		if(substr(sprintf('%o', fileperms(BASE_PATH.'/.htaccess')),-4)!='0666') { $chfile[] = '.htaccess (0666)'; }
 		if(substr(sprintf('%o', fileperms(BASE_PATH.'/lib/config.inc.php')),-4)!='0666') { $chfile[] = '/lib/config.inc.php (0666)'; }
 		if(substr(sprintf('%o', fileperms(BASE_PATH.'/content/home.php')),-4)!='0666') { $chfile[] = '/content/home.php (0666)'; }
@@ -165,17 +167,31 @@ if($nextstep == md5('4') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['
 	}
 ?>	
 	<legend class="installMsg">Step 4 - Review your input</legend>
-		<?php if(!isset($chfile)) { ?><p class="center"><span class="ss_sprite ss_tick"><em>All files are already correctly chmod()'ed</em></span></p><?php } ?>
-		<?php if(ini_get('safe_mode') || isset($chfile)) { ?>
+		<?php 
+		if(!isset($chfile)) 
+		{ 
+		?>
+			<p class="center"><span class="ss_sprite ss_tick"><em>All files are already correctly chmod()'ed</em></span></p>
+		<?php 
+		} 
+		
+		if(ini_get('safe_mode') || isset($chfile)) 
+		{ 
+		?>
 			<span class="ss_sprite ss_exclamation">&#160;</span><h2 style="display:inline;">Warning</h2>
 			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">built-in FTP chmod function</a>.</p>
 			<span>&rarr; <em>Files that still require chmod():</em></span>
 				<ul>
-					<?php foreach ($chfile as $value) {
+					<?php 
+					foreach ($chfile as $value) 
+					{
 						if(!empty($value)&&!is_numeric($value)) { echo "<li>$value</li>"; }
-					}?>
+					}
+					?>
 				</ul>
-		<?php } ?>
+		<?php 
+		} 
+		?>
 		<span class="ss_sprite ss_computer">&#160;</span><h2 style="display:inline;">Environment</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr style="background-color: <?php echo $alt_row; ?>;">
@@ -243,13 +259,13 @@ if($nextstep == md5('4') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['
 				<td><?php echo $_SESSION['variables']['db_prefix'];?></td>
 			</tr>
 		</table>
-		
+
 		<hr noshade="noshade" />
 		<p class="quiet">
 			<strong><span class="ss_sprite ss_exclamation">Please note</span></strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your servers' configuration.
 		</p>
-		
+
 		<p class="span-8 right">
 			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite ss_accept">Install <strong>CompactCMS</strong></span></button>
 			<a href="index.php" title="Back to step first step">Cancel</a>
@@ -266,138 +282,160 @@ if($nextstep == md5('4') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['
 **/
 
 // Final step
-if($nextstep == md5('final') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) {
-	
+if($nextstep == md5('final') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) 
+{
 	//
 	// Installation actions
 	//  - Set collected data
 	//
-	
+
 	// Let's start with a clean sheet
 	$err = 0;
-	
+
 	// Include MySQL class && initiate
 	require_once(BASE_PATH.'/lib/class/mysql.class.php');
 	$db = new MySQL();
-	
+
 	//
 	// Try database connection
 	//
-	if (!$db->Open($_SESSION['variables']['db_name'], $_SESSION['variables']['db_host'], $_SESSION['variables']['db_user'], $_SESSION['variables']['db_pass'])) {
-    	$errors[] = 'Error: could not connect to the database';
-    	$errors[] = $db->Error();
-    	$err++;
-	} else { 
+	if (!$db->Open($_SESSION['variables']['db_name'], $_SESSION['variables']['db_host'], $_SESSION['variables']['db_user'], $_SESSION['variables']['db_pass'])) 
+	{
+	    	$errors[] = 'Error: could not connect to the database';
+	    	$errors[] = $db->Error();
+	    	$err++;
+	} 
+	else 
+	{ 
 		$log[] = "Database connection successful"; 
 	}
 	
 	//
 	// Insert database structure and sample data
 	//
-	if($err==0) {
+	if($err==0) 
+	{
 		$sql = file_get_contents(BASE_PATH.'/_docs/structure.sql');
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
 		$sql = preg_replace('/52dcb810931e20f7aa2f49b3510d3805/', md5($_SESSION['variables']['adminpass'].$_SESSION['variables']['authcode']), $sql);
 		
 		// Execute per sql piece
 		$tok = strtok($sql, ";");
-		while ($tok !== false) {
+		while ($tok !== false) 
+		{
 			$results = $db->Query("$tok");
-		    $tok = strtok(";");
-		}	$log[] = "Database structure and data successfully imported";
+			$tok = strtok(";");
+		}	
+		$log[] = "Database structure and data successfully imported";
 	}
 	
 	//
 	// Set chmod on config.inc.php, .htaccess, content, cache and albums
 	//
-	if($err==0 && !isset($_POST['ftp_host']) && empty($_POST['ftp_host']) && !strpos($_SERVER['SERVER_SOFTWARE'], "Win")) {
+	if($err==0 && !isset($_POST['ftp_host']) && empty($_POST['ftp_host']) && !strpos($_SERVER['SERVER_SOFTWARE'], "Win"))
+	{
 		// Set warning when safe mode is enabled
-		if(ini_get('safe_mode')) {
+		if(ini_get('safe_mode')) 
+		{
 			$errors[] = 'Warning: safe mode is enabled, skipping chmod()';
 		}
-		
+
 		// Set default values
 		$chmod = 0;
 		$errfile=0;
-		
+
 		// Chmod check and set function
-		function setChmod($path, $value) {
+		function setChmod($path, $value) 
+		{
 			// Check current chmod() status
-			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4)!=$value) {
+			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4)!=$value) 
+			{
 				// If not set, set
-				if(@chmod(BASE_PATH.$path, $value)) { 
+				if(@chmod(BASE_PATH.$path, $value)) 
+				{
 					return true;
-				} 
-			} else {
+				}
+			} 
+			else 
+			{
 				return true;
 			}
 		}
-		
+
 		// Do chmod() per necessary folder and set status
 		if(setChmod('/.htaccess','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
 		if(setChmod('/lib/config.inc.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
 		if(setChmod('/content/home.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
 		if(setChmod('/content/contact.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
 		if(setChmod('/lib/templates/ccms.tpl.html','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
-		
+
 		// Directories under risk due to chmod(0777)
 		if(setChmod('/content/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/';
 		if(setChmod('/media/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/';
 		if(setChmod('/media/albums/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
 		if(setChmod('/media/files/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
 		if(setChmod('/lib/includes/cache/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
-					
-		if($chmod>0) { 
+
+		if($chmod>0) 
+		{
 			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files</abbr>';
-		} 
-		if(!isset($chmod)||$chmod==0||$errfile>0) {
+		}
+		if(!isset($chmod)||$chmod==0||$errfile>0) 
+		{
 			$errors[] = 'Warning: could not chmod() all files.';
-			foreach ($errfile as $key => $value) {
+			foreach ($errfile as $key => $value) 
+			{
 				$errors[] = $value;
 			}
 			$errors[] = 'Either use the <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">built-in FTP chmod function</a>, or manually perform chmod().';
 		}
 	}
-	
+
 	//
 	// Perform optional FTP chmod command
 	//
-	if(isset($_POST['ftp_host']) && !empty($_POST['ftp_host']) && isset($_POST['ftp_user']) && !empty($_POST['ftp_user'])) {
-	
+	if(isset($_POST['ftp_host']) && !empty($_POST['ftp_host']) && isset($_POST['ftp_user']) && !empty($_POST['ftp_user'])) 
+	{
 		// Set up a connection or die
-		$conn_id = ftp_connect($_POST['ftp_host']) or die("Couldn't connect to ".$_POST['ftp_host']); 
-		
+		$conn_id = ftp_connect($_POST['ftp_host']) or die("Couldn't connect to ".$_POST['ftp_host']);
+
 		// Try to login using provided details
 		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) {
-		    
+
 			// trimPath function
-			function trimPath($path,$depth) {
+			function trimPath($path,$depth) 
+			{
 				$path = explode('/',$path);
 				$np = '/';
-				for ($i=$depth; $i<count($path); $i++) { 
+				for ($i=$depth; $i<count($path); $i++) 
+				{
 					$np .= $path[$i].'/';
 				}
-				return $np;	
+				return $np;
 			}
-			
+
 			// Find FTP path
-			$i 		= 1;
-			$path 	= $_POST['ftp_path'];
-			
+			$i      = 1;
+			$path   = $_POST['ftp_path'];
+
 			// Set max tries to 15
-			for ($i=1; $i<15; $i++) { 
-				if(@ftp_chdir($conn_id, trimPath($path,$i))) {
+			for ($i=1; $i<15; $i++) 
+			{ 
+				if(@ftp_chdir($conn_id, trimPath($path,$i))) 
+				{
 					$log[] = "Successfully connected to FTP server";
 					$i = 15;
 				}
 			}
-		} else {
-		    $errors[] = "Fatal: couldn't connect to the FTP server. Perform chmod() manually.";
-		    $err++;
+		} 
+		else 
+		{
+			$errors[] = "Fatal: couldn't connect to the FTP server. Perform chmod() manually.";
+			$err++;
 		}
 		// Count the ftp_chmod() successes
 		$ftp_chmod = 0;
-		
+
 		// Perform the ftp_chmod command
 		if(@ftp_chmod($conn_id, 0666, "./.htaccess")) { $ftp_chmod++; }
 		if(@ftp_chmod($conn_id, 0666, "./lib/config.inc.php")) { $ftp_chmod++; }
@@ -410,46 +448,59 @@ if($nextstep == md5('final') && md5(session_id())==$_SESSION['id'] && md5($_SERV
 		if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; }
 		if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; }
 		if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; }
-	
-		if($ftp_chmod>0) { 
+
+		if($ftp_chmod>0) 
+		{
 			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files using FTP.</abbr>';
-		} elseif($ftp_chmod==0) {
+		} 
+		elseif($ftp_chmod==0) 
+		{
 			$errors[] = 'Fatal: could not FTP chmod() various files.';
 			$err++;
 		}
-	
+
 		// Close the connection
-		ftp_close($conn_id);  
+		ftp_close($conn_id);
 	}
-	
+
 	//
 	// Write config.inc.php file
 	//
-	if($err==0) {
+	if($err==0) 
+	{
 		include(BASE_PATH.'/lib/config.inc.php');
 		$config_str = "\$cfg = array();\r\n";
 		$write_err	= null;
 		
 		// Write new variables to configuration file
-		if ($fp = @fopen(BASE_PATH.'/lib/config.inc.php', 'w')) {
+		if ($fp = @fopen(BASE_PATH.'/lib/config.inc.php', 'w')) 
+		{
 			// Write start line
 			fwrite($fp, "<?php\r\n// Copyright (C) 2008 - ".date('Y')." by Xander Groesbeek (CompactCMS.nl)\r\n// This file is part of CompactCMS\r\n// Please refer to license.txt for information on license conditions.\r\n");
 		
 			// Compare old and new variables
-			foreach($cfg as $key=>$val) {
-				if (isset($_SESSION['variables'][$key])) {
+			foreach($cfg as $key=>$val) 
+			{
+				if (isset($_SESSION['variables'][$key])) 
+				{
 					$new_val = $_SESSION['variables'][$key];
-				} else {
+				} 
+				else 
+				{
 					$new_val = $cfg[$key];
 				}
 				// Rewrite the previous loaded string
-				if($new_val=="true"||$new_val=="false") {
+				if($new_val=="true"||$new_val=="false") 
+				{
 					$config_str = "\$cfg['{$key}'] = {$new_val}; \r\n";
-				} else {
+				} 
+				else 
+				{
 					$config_str = "\$cfg['{$key}'] = '{$new_val}'; \r\n";
 				}
 				// Write each new variable to the config file
-				if(!fwrite($fp, $config_str, strlen($config_str))) {
+				if(!fwrite($fp, $config_str, strlen($config_str))) 
+				{
 					$write_err = "1";
 					$errors[] = "Fatal: Problem saving new configuration values";
 					$err++;
@@ -459,10 +510,13 @@ if($nextstep == md5('final') && md5(session_id())==$_SESSION['id'] && md5($_SERV
 			fwrite($fp, "\$cfg['restrict'] = array();\r\n?>");
 			
 			// Check for errors
-			if(empty($write_err)) {
+			if(empty($write_err)) 
+			{
 				$log[] = "Configuration successfully saved to config.inc.php";
 			}
-		} else {
+		} 
+		else 
+		{
 			$errors[] = 'Fatal: the configuration file is not writable.';
 			$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
 			$err++;
@@ -471,47 +525,71 @@ if($nextstep == md5('final') && md5(session_id())==$_SESSION['id'] && md5($_SERV
 	//
 	// Modify .htaccess file
 	//
-	if($err==0 && $_SESSION['variables']['rootdir']!='/') {
+	if($err==0 && $_SESSION['variables']['rootdir']!='/') 
+	{
 		$htaccess 	= file_get_contents(BASE_PATH.'/.htaccess');
 		$newline	= "RewriteBase ".$_SESSION['variables']['rootdir'];
 	
-		if(strpos($htaccess, $newline)===false) {
+		if(strpos($htaccess, $newline)===false) 
+		{
 			$htaccess = preg_replace("/RewriteBase \//", $newline, $htaccess);
 
-			if ($fp = fopen(BASE_PATH.'/.htaccess', 'w')) {			
-				if(fwrite($fp, $htaccess, strlen($htaccess))) {
+			if ($fp = fopen(BASE_PATH.'/.htaccess', 'w')) 
+			{
+				if(fwrite($fp, $htaccess, strlen($htaccess))) 
+				{
 					$log[] = "Successfully rewrote the .htaccess file";
 				} 
-			} elseif($_SESSION['variables']['rootdir']=="/") {
+			} 
+			elseif($_SESSION['variables']['rootdir']=="/") 
+			{
 				$errors[] = 'Warning: the .htaccess file is not writable.';
-			} elseif($_SESSION['variables']['rootdir']!="/") {
+			} 
+			elseif($_SESSION['variables']['rootdir']!="/") 
+			{
 				$errors[] = 'Fatal: the .htaccess file is not writable.';
 				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
 				$err++;
 			}
 		}
 	}
-	
-?>	
+
+?>
 	<legend class="installMsg">Final - Finishing the installation</legend>
-		<?php if(isset($log)) { 
-			unset($_SESSION['variables']); ?>
+	<?php 
+	if(isset($log)) 
+	{
+		unset($_SESSION['variables']); 
+		?>
 		<h2>Process results</h2>
 		<p>
-			<?php 
-			while (list($key,$value) = each($log)) {
+			<?php
+			while (list($key,$value) = each($log)) 
+			{
 				echo '<span class="ss_sprite ss_accept">'.$value.'</span><br />';
-			} ?>
+			} 
+			?>
 		</p>
-		<?php } if(isset($errors)) { ?>
+	<?php 
+	} 
+	if(isset($errors)) 
+	{ 
+	?>
 		<h2>Errors &amp; warnings</h2>
 		<p>
-			<?php 
-			while (list($key,$value) = each($errors)) {
+			<?php
+			while (list($key,$value) = each($errors)) 
+			{
 				echo '<span class="ss_sprite ss_exclamation">'.$value.'</span><br />';
-			} ?>
+			} 
+			?>
 		</p>
-		<?php } if($err==0) { ?>
+	<?php 
+	} 
+	
+	if($err==0) 
+	{ 
+	?>
 		<h2>What's next?</h2>
 		<p>The installation has been successful! You should now follow the steps below, to get you started.</p>
 		<ol>
@@ -520,8 +598,12 @@ if($nextstep == md5('final') && md5(session_id())==$_SESSION['id'] && md5($_SERV
 			<li>Change your password through the back-end</li>
 			<li><a href="http://www.compactcms.nl/contact.html" target="_blank">Let me know</a> how you like CompactCMS!</li>
 		</ol>
-		<?php } else echo '<a href="index.php">Retry setting the variables</a>'; ?>
-	
-<?php
+	<?php 
+	} 
+	else 
+	{
+		echo '<a href="index.php">Retry setting the variables</a>'; 
+	}
 } // Close final processing
+
 ?>

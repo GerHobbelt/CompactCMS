@@ -33,13 +33,15 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 require_once(dirname(dirname(__FILE__)).'/sitemap.php');
 
 // If session already exists
-if(isset($_SESSION['ccms_userID']) && isset($_SESSION['ccms_userName'])) {
+if(isset($_SESSION['ccms_userID']) && isset($_SESSION['ccms_userName'])) 
+{
 	header("Location: ../../admin/index.php");
 	exit();
 }
 
 // Check for ./install directory
-if(is_dir('../../_install/')) {
+if(is_dir('../../_install/')) 
+{
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
 
@@ -116,9 +118,14 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	</div>
 	
 	<div id="login" class="span-9">
-		<?php if(isset($_SESSION['logmsg'])||!empty($_SESSION['logmsg'])) { ?>
+		<?php 
+		if(isset($_SESSION['logmsg'])||!empty($_SESSION['logmsg'])) 
+		{ 
+		?>
 			<div class="loginMsg"><?php echo (isset($_SESSION['logmsg'])&&!empty($_SESSION['logmsg'])?$_SESSION['logmsg']:null);?></div>
-		<?php } ?>
+		<?php 
+		} 
+		?>
 		<p>&#160;</p>
 		<form id="loginFrm" name="loginFrm" class="clear" action="./auth.inc.php" method="post">
 			<label for="userName"><?php echo $ccms['lang']['login']['username']; ?></label><input type="text" class="alt title" autofocus placeholder="username" name="userName" style="width:300px;" value="<?php echo (!empty($_POST['userName'])?$_POST['userName']:null);?>" id="userName" />

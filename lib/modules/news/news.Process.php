@@ -82,10 +82,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkA
 			exit();
 		} 
 		else 
+		{
 			$db->Kill();
+		}
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -124,10 +128,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth($
 			exit();
 		} 
 		else 
+		{
 			$db->Kill();
+		}
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**
@@ -154,9 +162,13 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="cfg-news" && checkAuth($
 			exit();
 		} 
 		else 
+		{
 			$db->Kill();
+		}
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 ?>

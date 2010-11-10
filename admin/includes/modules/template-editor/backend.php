@@ -32,9 +32,9 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 // Include general configuration
 require_once('../../../../lib/sitemap.php');
 
-$canarycage	= md5(session_id());
+$canarycage = md5(session_id());
 $currenthost= md5($_SERVER['HTTP_HOST']);
-$do 		= (isset($_GET['do'])?$_GET['do']:null);
+$do = (isset($_GET['do'])?$_GET['do']:null);
 
 if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && md5(session_id())==$canarycage && isset($_SESSION['rc1']) && md5($_SERVER['HTTP_HOST'])==$currenthost) 
 {
@@ -48,8 +48,10 @@ $get_temp = (isset($_GET['template'])?htmlentities($_GET['template']):$template[
 $chstatus = (substr(sprintf('%o', fileperms($dir_temp.$get_temp)), -4)>='0666'?1:0);
 	
 // Check for filename	
-if(!empty($get_temp)) {
-	if(@fopen($dir_temp.$get_temp, "r")) {
+if(!empty($get_temp)) 
+{
+	if(@fopen($dir_temp.$get_temp, "r")) 
+	{
 		$handle = fopen($dir_temp.$get_temp, "r");
 		// PHP5+ Feature
 		// $contents = stream_get_contents($handle);
@@ -196,4 +198,8 @@ function confirmation()
 	</div>
 </body>
 </html>
-<?php } else die("No external access to file");?>
+<?php 
+} 
+else 
+	die("No external access to file");
+?>

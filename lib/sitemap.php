@@ -123,7 +123,7 @@ if ($handle = @opendir(BASE_PATH . '/lib/templates/'))
     {
         if ($file != "." && $file != ".." && strpos($file, ".tpl.html")) 
 	{
-			// Add the templates to an array for use through-out CCMS, while removing the extension .tpl.html (=9)
+		// Add the templates to an array for use through-out CCMS, while removing the extension .tpl.html (=9)
         	$template[] = substr($file,0,-9);
         }
     }
@@ -186,9 +186,12 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	}
 
 	// Select the appropriate statement (home page versus specified page)
-	if(!empty($pagereq)) {
+	if(!empty($pagereq)) 
+	{
 		if (!$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = '$curr_page'")) $db->Kill();
-	} else {
+	} 
+	else 
+	{
 		if (!$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = 'home'")) $db->Kill();
 	}
 

@@ -145,5 +145,7 @@ function confirmation()
 		</form>
 	</div>
 <?php
-} else die("No external access to file"); 
+} 
+else 
+	die("No external access to file"); 
 ?>

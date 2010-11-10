@@ -50,7 +50,8 @@ class ccmsParser {
   # $value = value to check condition against
   #
   
-  function checkCondition($value, $condition) {
+  function checkCondition($value, $condition) 
+  {
     preg_match("/([^ ]+) (.+)/",$condition,$cond);
     $chh = $cond[1];
     $wert = $cond[2];
@@ -230,8 +231,9 @@ class ccmsParser {
   }
 
   ## Prints PHP code to the output page
-  function CheckPHP($text) {
-  eval('?>'.$text.'<?'); 
+  function CheckPHP($text) 
+  {
+    eval('?>'.$text.'<?'); 
   }
   
   function append($text) {

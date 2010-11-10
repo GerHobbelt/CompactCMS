@@ -33,9 +33,9 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 require_once('../../../../lib/sitemap.php');
 
 // Set default variables
-$canarycage	= md5(session_id());
+$canarycage = md5(session_id());
 $currenthost= md5($_SERVER['HTTP_HOST']);
-$do 		= (isset($_GET['do'])?$_GET['do']:null);
+$do = (isset($_GET['do'])?$_GET['do']:null);
 
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");

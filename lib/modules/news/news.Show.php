@@ -35,7 +35,8 @@ global $db,$cfg,$ccms;
 
 // Load news preferences
 $pageID	= (isset($_GET['page'])?$_GET['page']:null);
-if(isset($pageID)&&$pageID>0) {
+if(isset($pageID)&&$pageID>0) 
+{
 	$rsCfg	= $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgnews` WHERE pageID='$pageID'");
 	$numCfg	= $db->RowCount();
 }

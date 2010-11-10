@@ -47,7 +47,7 @@ $currenthost	= md5($_SERVER['HTTP_HOST']);
 // Get permissions
 $perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
- /**
+/**
  *
  * Either INSERT or UPDATE preferences
  *
@@ -57,13 +57,13 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost))
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
 	{
-		
 		// Set all values back to zero
 		$values["user_ids"] = 0;
 		if($db->UpdateRows($cfg['db_prefix']."pages", $values))
 		{
 			// If all empty, we're done here
-			if(empty($_POST['owner'])) {
+			if(empty($_POST['owner'])) 
+			{
 				header("Location: ./content-owners.Manage.php?status=notice&action=".$ccms['lang']['backend']['settingssaved']);
 				exit();
 			}
@@ -93,6 +93,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth($canarycage,$currenthost))
 				} 
 			}
 		}
-	} else die($ccms['lang']['auth']['featnotallowed']);
-} else die("No external access to file");
+	} 
+	else 
+		die($ccms['lang']['auth']['featnotallowed']);
+} 
+else 
+	die("No external access to file");
 ?>

@@ -14,7 +14,9 @@ if($action_type=='send' && !empty($_POST))
 		exit();
 	} 
 	else 
+	{
 		die("<p class=\"error center\">Error while processing your e-mail</p>");
+	}
 }
 else 
 {

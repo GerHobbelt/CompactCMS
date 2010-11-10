@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:   CompactCMS - v 1.4.1
 	
 This file is part of CompactCMS.
 
@@ -58,29 +58,38 @@ if(!empty($do) && $_GET['do']=="backup" && isset($_POST['btn_backup']) && $_POST
 	$backupName 		= date('Ymd_His').'-data.zip';
 	
 	$createZip = new createZip;
-	if (isset($configBackup) && is_array($configBackup) && count($configBackup)>0) {
-	    foreach ($configBackup as $dir) {
-	        $basename = basename($dir);
-	        if (is_file($dir)) {
-	            $fileContents = file_get_contents($dir);
-	            $createZip->addFile($fileContents,$basename);
-	        } else {
-	            $createZip->addDirectory($basename."/");
-	            $files = directoryToArray($dir,true);
-	            $files = array_reverse($files);
+	if (isset($configBackup) && is_array($configBackup) && count($configBackup)>0) 
+	{
+		foreach ($configBackup as $dir) 
+		{
+			$basename = basename($dir);
+			if (is_file($dir)) 
+			{
+				$fileContents = file_get_contents($dir);
+				$createZip->addFile($fileContents,$basename);
+			} 
+			else 
+			{
+				$createZip->addDirectory($basename."/");
+				$files = directoryToArray($dir,true);
+				$files = array_reverse($files);
 	
-	            foreach ($files as $file) {
-	                $zipPath = explode($dir,$file);
-	                $zipPath = $zipPath[1];
-	                if (is_dir($file)) {
-	                    $createZip->addDirectory($basename."/".$zipPath);
-	                } else {
-	                    $fileContents = file_get_contents($file);
-	                    $createZip->addFile($fileContents,$basename."/".$zipPath);
-	                }
-	            }
-	        }
-	    }
+				foreach ($files as $file) 
+				{
+					$zipPath = explode($dir,$file);
+					$zipPath = $zipPath[1];
+					if (is_dir($file)) 
+					{
+						$createZip->addDirectory($basename."/".$zipPath);
+					} 
+					else 
+					{
+						$fileContents = file_get_contents($file);
+						$createZip->addFile($fileContents,$basename."/".$zipPath);
+					}
+				}
+			}
+		}
 	}
 	
 	$backup = new MySQL_Backup(); 
@@ -91,17 +100,18 @@ if(!empty($do) && $_GET['do']=="backup" && isset($_POST['btn_backup']) && $_POST
 	
 	// Get all current tables in database
 	$tables = $db->GetTables();
-	foreach ($tables as $table) {
-    	$backup->tables[] = $table;
+	foreach ($tables as $table) 
+	{
+		$backup->tables[] = $table;
 	}
 	
 	$backup->backup_dir = $configBackupDir;
 	$sqldump = $backup->Execute(MSB_STRING,"",false);
 	$createZip->addFile($sqldump,$cfg['db_name'].'-sqldump.sql');
 	
-	$fileName	= $configBackupDir.$backupName;
-	$fd			= fopen ($fileName, "wb");
-	$out		= fwrite ($fd, $createZip -> getZippedfile());
+	$fileName = $configBackupDir.$backupName;
+	$fd = fopen($fileName, "wb");
+	$out = fwrite($fd, $createZip -> getZippedfile());
 	fclose ($fd);
 }
 
@@ -202,8 +212,8 @@ if($perm['manageModBackup']>0&&checkAuth($canarycage,$currenthost))
 							        echo '</tr>';
 								$i++;
 							} 
-					    }
-					    closedir($handle);
+						}
+						closedir($handle);
 					}
 					?>
 				</table>
@@ -214,7 +224,7 @@ if($perm['manageModBackup']>0&&checkAuth($canarycage,$currenthost))
 				{ 
 				?>
 					<p><button type="submit" onclick="return confirmation();" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
-				<?php 	
+				<?php   
 				} 
 				else 
 					echo $ccms['lang']['system']['noresults'];

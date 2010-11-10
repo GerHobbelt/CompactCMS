@@ -33,26 +33,35 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 session_start();
 
 // If no step, set session hash
-if(!isset($nextstep) && !isset($_SESSION['id']) && !isset($_SESSION['host'])) {
+if(!isset($nextstep) && !isset($_SESSION['id']) && !isset($_SESSION['host'])) 
+{
 	// Setting safety variables
 	$_SESSION['host'] 	= md5($_SERVER['HTTP_HOST']);
 	$_SESSION['id']		= md5(session_id());
-
 } 
 // Set root directory
 $rootdir = dirname(dirname($_SERVER['PHP_SELF']));
-if($rootdir=='\\'||$rootdir=='/') {
+if($rootdir=='\\'||$rootdir=='/') 
+{
 	$rootdir = '/';
-} else $rootdir = $rootdir.'/';
+} 
+else    
+{
+	$rootdir = $rootdir.'/';
+}
 
 // FTP directories
-function findFiles() {
+function findFiles() 
+{
 	
 }
 
+
 // Set friendly local names languages
-function setLanguage($lang) {
-	switch ($lang) {
+function setLanguage($lang) 
+{
+	switch ($lang) 
+	{
 		case 'en':
 			return "English";
 			break;
@@ -152,7 +161,10 @@ function setLanguage($lang) {
 			<fieldset id="install" style="border:none;" class="none">
 			<legend class="installMsg"><?php echo (!isset($_GET['do'])&&empty($_GET['do'])?'Step 1 - Knowing the environment':'FTP - Setting permissions right');?></legend>
 			
-				<?php if(!isset($_GET['do'])&&empty($_GET['do'])) { ?>
+				<?php 
+				if(!isset($_GET['do'])&&empty($_GET['do'])) 
+				{ 
+				?>
 				<p>The details below have been filled-out based on information readily available. Please confirm these settings, select your language and click proceed.</p>
 				
 				<label for="sitename"><span class="ss_sprite ss_pencil">Site name</span></label><input type="text" class="alt title" name="sitename" style="width:300px;" value="<?php echo (!isset($_SESSION['variables']['sitename'])?ucfirst(preg_replace("/^www\./", "", $_SERVER['HTTP_HOST'])):$_SESSION['variables']['sitename']);?>" id="sitename" />
@@ -165,10 +177,13 @@ function setLanguage($lang) {
 				<label for="language"><span class="ss_sprite ss_comments">CCMS backend language</span></label>
 				<select name="language" class="title" style="padding:5px 10px;width:300px;" id="language" size="1">
 					<?php // Get current languages
-					if ($handle = opendir('../lib/languages')) {
-						while (false !== ($file = readdir($handle))) {
+					if ($handle = opendir('../lib/languages')) 
+					{
+						while (false !== ($file = readdir($handle))) 
+						{
 							// Filter out irrelevant files && dirs
-						    if ($file != "." && $file != ".." && $file != "index.html") {
+						    if ($file != "." && $file != ".." && $file != "index.html") 
+						    {
 						    	$f = substr($file,0,2);
 						    	$s = (isset($_SESSION['variables']['language'])?$_SESSION['variables']['language']:'en');
 						    	$c = ($f==$s?'selected="SELECTED"':null);
@@ -179,9 +194,12 @@ function setLanguage($lang) {
 					?>   	
 				</select>
 				<input type="hidden" name="do" value="<?php echo md5('2'); ?>" id="do" />
-				<?php } 
+				<?php 
+				} 
 				// Populate optional FTP form
-				elseif(isset($_GET['do']) && $_GET['do'] == md5('ftp') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) { ?>
+				elseif(isset($_GET['do']) && $_GET['do'] == md5('ftp') && md5(session_id())==$_SESSION['id'] && md5($_SERVER['HTTP_HOST']) == $_SESSION['host']) 
+				{ 
+				?>
 					<p>Whenever a chmod() command failes through standard procedures, the installer can try to execute the chmod() command over FTP. This requires you to submit your FTP details and full path of your CCMS installation. Any of the data entered below will <strong>never</strong> be saved by the installer.</p>
 					
 					<label for="ftp_host">FTP host</label>
@@ -199,7 +217,9 @@ function setLanguage($lang) {
 					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">CCMS will try to auto-find this using the default value above</span>
 					
 					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
-				<?php } ?>
+				<?php 
+				} 
+				?>
 				
 				<p class="span-8 right">
 					<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
@@ -207,7 +227,7 @@ function setLanguage($lang) {
 				</p>
 			</fieldset>
 		</form>
-		</div>
+	</div>
 </div>
 <p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
 
