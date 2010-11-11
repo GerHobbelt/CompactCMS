@@ -183,7 +183,8 @@ optgroup option {padding-left: 10px;}
 }
 
 /* [i_a] fix the default edit_area monospace font to be the admin page's regular serif: */
-#addForm /* <div id="fields"> */ textarea 
+/* <div id="fields"> */
+#addForm textarea 
 {
 	font-size: 90%;
 	font-family: "Palatino Linotype", Palatino, Baskerville, "Book Antiqua", Georgia, serif;
