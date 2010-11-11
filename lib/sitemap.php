@@ -217,7 +217,7 @@ $ccms['pagereq'] = $pagereq;
 $ccms['printing'] = getGETparam4boolYN('printing', 'N');
 
 // This files' current version
-$v = "1.4.1";
+$v = "1.4.2";
 
 // TEMPLATES ==
 // Read and list the available templates
