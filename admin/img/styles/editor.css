@@ -4,7 +4,14 @@
 .mocha {display: none;overflow: hidden;background-color: #e5e5e5;}
 .mocha.isFocused {}	
 .mochaOverlay {position: absolute;top: 0;left: 0;}
-.mochaTitlebar {width: 100%;overflow: hidden;background: url(../spacer.gif?from=fafafa&to=e5e5e5);}
+.mochaTitlebar 
+{
+	width: 100%;
+	overflow: hidden;
+	/* The ?.... query part is there to for MochaUI to generate a gradient in setColors() near line 2496 */
+	background: url(../spacer.gif?from=fafafa&to=e5e5e5);
+	/* background: url(../spacer.gif); */
+}
 .mochaTitlebar h3 {
 	font: 0.825em "Verdana", arial, sans-serif;
 	line-height: 15px;	
