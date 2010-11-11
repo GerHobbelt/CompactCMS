@@ -53,7 +53,7 @@ implied significantly raised server load.
 
 The way out of this conundrum is already in here: 
   the CSS/JS cache!
-By enahncing its use to include EVERY JS and CSS file on the site, we have
+By enhancing its use to include EVERY JS and CSS file on the site, we have
 enabled a cache for all these. This seems pretty useless for single file fetches,
 but wait until you add 'on the fly compression/optimization'... Then it
 turns out to be pretty handy to feed every JS and CSS load through this baby:
