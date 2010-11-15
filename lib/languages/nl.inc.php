@@ -340,6 +340,7 @@ $ccms['lang']['guestbook']['success']	= "Dank je wel";
          ----------------------------------------------------------
       */
 	  
+$ccms['lang']['backend']['translation']     = "Translations";
 $ccms['lang']['backup']['wait4backup']  = "Please wait while the backup is being created...";
 $ccms['lang']['backup']['warn4media']	= "Warning :: Please be aware that your <dfn>lightbox</dfn> albums' images are <strong>not</strong> backed up! \nThe album descriptions <strong>are</strong>, but the images themselves and their thumbnails are <strong>not included in these backups</strong>. \nIf you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.";
 $ccms['lang']['forms']['add']           = "Add filter for";
@@ -355,6 +356,8 @@ $ccms['lang']['system']['error_filesize_2']	= "File name should be at most 50 ch
 $ccms['lang']['system']['error_pagetitle_2'] = "Enter a page title of 100 characters or less.";
 $ccms['lang']['system']['error_subtitle_2']	= "Enter a short sub-title of 200 characters or less for your page.";
 $ccms['lang']['template']['print']		= "Print";
+$ccms['lang']['translation']['explain'] = "Shows the translation strings.";
+$ccms['lang']['translation']['header']  = "Translate";
        
       /*
          ----------------------------------------------------------
