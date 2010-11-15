@@ -122,7 +122,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
 	SetUpLanguageAndLocale($rsLoc);
 
 	// Load recordset
-	if (!$db->SelectRows($cfg['db_prefix']."modcomment", array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, 'commentID', false, $limit4sql))
+	if (!$db->SelectRows($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID'), $limit4sql))
 		$db->Kill();
 	//echo "<pre>" . $db->GetLastSQL() . " -- $limit, $pageID, ".getGETparam4Number('offset')."\n";
 	//var_dump($_GET);

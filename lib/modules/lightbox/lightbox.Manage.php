@@ -423,7 +423,8 @@ function confirm_regen()
 					<select class="text" name="albumtopage" id="albumtopage" size="1">
 						<option value=""><?php echo $ccms['lang']['backend']['none']; ?></option>
 						<?php 
-						$lightboxes = $db->QueryArray("SELECT * FROM ".$cfg['db_prefix']."pages WHERE module='lightbox'", MYSQL_ASSOC); 
+						$lightboxes = $db->SelectArray($cfg['db_prefix'].'pages', array('module' => "'lightbox'")); 
+						if ($db->ErrorNumber()) $db->Kill();
 						for ($i=0; $i < count($lightboxes); $i++) 
 						{ 
 						?>

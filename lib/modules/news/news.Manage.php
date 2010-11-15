@@ -207,7 +207,7 @@ function confirmation()
 			
 				<h2><?php echo $ccms['lang']['news']['settings']; ?></h2>
 				<?php 
-				if (!$rsCfg = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgnews` WHERE pageID=".MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT)))
+				if (!$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT))))
 					$db->Kill();
 					
 				if ($db->HasRecords())

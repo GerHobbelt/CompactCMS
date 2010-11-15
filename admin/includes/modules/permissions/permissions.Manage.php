@@ -133,7 +133,7 @@ function confirmation()
 				</tr>
 				<?php
 				$i = 0;
-				$rsCfg = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgpermissions`");
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgpermissions');
 				if (!$rsCfg) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 				// Get column names and their comments from database

@@ -67,11 +67,11 @@ $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Get all pages
-$pages = $db->QueryArray("SELECT page_id,urlpage,user_ids FROM ".$cfg['db_prefix']."pages", MYSQL_ASSOC);
+$pages = $db->QueryArray("SELECT page_id,urlpage,user_ids FROM ".$cfg['db_prefix'].'pages');
 if (!is_array($pages)) $db->Kill();
 
 // Get all users
-$users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,userLevel FROM ".$cfg['db_prefix']."users", MYSQL_ASSOC);
+$users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,userLevel FROM ".$cfg['db_prefix'].'users');
 if (!is_array($users)) $db->Kill();
 
 

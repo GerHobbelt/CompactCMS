@@ -60,6 +60,9 @@ $cfg['restrict']    = array("foo","bar");
 $cfg['default_template'] = 'ccms'; 
 $cfg['enable_gravatar'] = true;  // set to 'false' if you don't want to show 'gravatars' in your comment pages for each commenter.
 
+$cfg['admin_page_dynlist_order'] = 'FTS0';    // default sort order for the page list in the admin screen: F=file name, T=title, S=subtitle, D=description, A=active/published, P=printable, C=coding, H=[hyper]link, I=menu ID, 1=toplevel, 2=sublevel, L=template, M=module (plugin), 0 = page_id
+
 
 define('CCMS_DEVELOPMENT_ENVIRONMENT', true); // set to FALSE for any release install (where you are not developing on a local & very safe machine)
+
 ?>

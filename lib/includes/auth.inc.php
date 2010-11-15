@@ -112,7 +112,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		{
 			// Select statement: alter the previous condition set:
 			$values['userActive'] = MySQL::SQLValue(true, MySQL::SQLVALUE_BOOLEAN);
-			$row = $db->SelectSingleRowArray($cfg['db_prefix'].'users', $values, null, null, true, null, MYSQL_ASSOC);
+			$row = $db->SelectSingleRowArray($cfg['db_prefix'].'users', $values);
 			if ($db->ErrorNumber()) $db->Kill();
 			
 			if ($db->RowCount() > 1)

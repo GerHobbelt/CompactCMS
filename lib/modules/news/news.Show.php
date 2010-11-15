@@ -49,7 +49,7 @@ $locale 	= ($numCfg>0?$rsCfg->showLocale:$cfg['locale']);
 
 // we only need to check if the given page is a valid news page...
 $news_in_page = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
-if ($db->Error()) $db->Kill();
+if ($db->ErrorNumber()) $db->Kill();
 
 // Set front-end language
 SetUpLanguageAndLocale($locale);
@@ -94,16 +94,17 @@ if($db->HasRecords())
 {
 	if(empty($do)) 
 	{
+		$newsCount = $db->RowCount();
 		if($numCfg>0) 
 		{
-			$listMax 	= ($rsCfg->showMessage > $db->RowCount() ? $db->RowCount() : $rsCfg->showMessage);
+			$listMax 	= ($rsCfg->showMessage > $newsCount ? $newsCount : $rsCfg->showMessage);
 			$showTeaser	= intval($rsCfg->showTeaser);
 			$showAuthor	= intval($rsCfg->showAuthor);
 			$showDate	= intval($rsCfg->showDate);
 		} 
 		else 
 		{
-			$listMax = $db->RowCount();
+			$listMax = $newsCount;
 			$showTeaser	= 1;
 			$showAuthor	= 1;
 			$showDate	= 1;
@@ -121,13 +122,13 @@ if($db->HasRecords())
 				<?php 
 				} 
 
+				// Filter spaces, non-file characters and account for UTF-8
+				$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
+				$newsTitle = str_replace($special_chars, "", $newsTitle); 
+				$newsTitle = str_replace(' ','-',$newsTitle);
+				
 				if(empty($id)) 
 				{ 
-					// Filter spaces, non-file characters and account for UTF-8
-					$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
-					$newsTitle = str_replace($special_chars, "", $newsTitle); 
-					$newsTitle = str_replace(' ','-',$newsTitle);
-					
 					?>
 					<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
 					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
@@ -178,7 +179,8 @@ if($db->HasRecords())
 					} 
 					?>
 					<p>&laquo; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a> | <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html"><?php 
-						echo $db->QuerySingleValue("SELECT `pagetitle` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = ".MySQL::SQLValue($rsNews->pageID, MySQL::SQLVALUE_TEXT)); 
+						// echo $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($rsNews->pageID, MySQL::SQLVALUE_TEXT)), array('pagetitle')); 
+						echo $ccms['pagetitle'];
 					?></a></p>
 				<?php 
 				} 
@@ -187,7 +189,7 @@ if($db->HasRecords())
 			<hr style="clear:both;"/>
 		<?php
 		}
-		if(empty($id) && $db->RowCount() > $rsCfg->showMessage) 
+		if(empty($id) && $newsCount > $rsCfg->showMessage) 
 		{ 
 		?>
 			<hr/><p style="text-align:center;"><a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a></p>

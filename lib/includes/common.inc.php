@@ -1230,6 +1230,150 @@ function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
 
 
 
+
+
+
+
+/**
+Return the list of fields as indicated by the 'ordercode' parameter
+as an array.
+
+Can, for example, be used to pass this set in the 'ordering' argument for any SQL query.
+*/
+function cvt_ordercode2list($ordercode)
+{
+	$dlorder = array();
+	$ordermask = 0x3FFF; // FTSDPACHIM12L0: 14 bits
+	for ($i = 0; $i < strlen($ordercode); $i++)
+	{
+		$c = $ordercode[$i];
+		
+		switch (strtoupper($c))
+		{
+		case 'F':
+			if ($ordermask & 0x0001)
+			{
+				$ordermask &= ~0x0001;
+				$dlorder[] = 'urlpage';
+			}
+			break;
+			
+		case 'T':
+			if ($ordermask & 0x0002)
+			{
+				$ordermask &= ~0x0002;
+				$dlorder[] = 'pagetitle';
+			}
+			break;
+			
+		case 'S':
+			if ($ordermask & 0x0004)
+			{
+				$ordermask &= ~0x0004;
+				$dlorder[] = 'subheader';
+			}
+			break;
+			
+		case 'D':
+			if ($ordermask & 0x0008)
+			{
+				$ordermask &= ~0x0008;
+				$dlorder[] = 'description';
+			}
+			break;
+			
+		case 'P':
+			if ($ordermask & 0x0010)
+			{
+				$ordermask &= ~0x0010;
+				$dlorder[] = 'printable';
+			}
+			break;
+			
+		case 'A':
+			if ($ordermask & 0x0020)
+			{
+				$ordermask &= ~0x0020;
+				$dlorder[] = 'published';
+			}
+			break;
+			
+		case 'C':
+			if ($ordermask & 0x0040)
+			{
+				$ordermask &= ~0x0040;
+				$dlorder[] = 'iscoding';
+			}
+			break;
+			
+		case 'H':
+			if ($ordermask & 0x0080)
+			{
+				$ordermask &= ~0x0080;
+				$dlorder[] = 'islink';
+			}
+			break;
+			
+		case 'I':
+			if ($ordermask & 0x0100)
+			{
+				$ordermask &= ~0x0100;
+				$dlorder[] = 'menu_id';
+			}
+			break;
+			
+		case '1':
+			if ($ordermask & 0x0200)
+			{
+				$ordermask &= ~0x0200;
+				$dlorder[] = 'toplevel';
+			}
+			break;
+			
+		case '2':
+			if ($ordermask & 0x0400)
+			{
+				$ordermask &= ~0x0400;
+				$dlorder[] = 'sublevel';
+			}
+			break;
+			
+		case 'M':
+			if ($ordermask & 0x0800)
+			{
+				$ordermask &= ~0x0800;
+				$dlorder[] = 'module';
+			}
+			break;
+			
+		case 'L':
+			if ($ordermask & 0x1000)
+			{
+				$ordermask &= ~0x1000;
+				$dlorder[] = 'variant';
+			}
+			break;
+			
+		case '0':
+			if ($ordermask & 0x2000)
+			{
+				$ordermask &= ~0x2000;
+				$dlorder[] = 'page_id';
+			}
+			break;
+			
+		default:
+			// should never get here...
+			break;
+		}
+	}
+	return $dlorder;
+}
+
+
+
+
+
 /**
  Check for authentic request ($cage=md5(SESSION_ID),$host=md5(CURRENT_HOST)) v.s. 'id' and 'host' session variable values.
  

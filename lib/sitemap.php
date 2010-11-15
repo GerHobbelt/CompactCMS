@@ -258,7 +258,7 @@ else
 
 
 // Fill active module array and load the plugin code
-$modules = $db->QueryArray("SELECT * FROM `".$cfg['db_prefix']."modules` WHERE modActive='1'", MYSQL_ASSOC);
+$modules = $db->SelectArray($cfg['db_prefix'].'modules', array('modActive' => "'1'"));
 if (!$modules)
 	$db->Kill();
 
@@ -312,7 +312,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	}
 
 	// Select the appropriate statement (home page versus specified page)
-	if (!$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = " . MySQL::SQLValue((!empty($pagereq) ? $pagereq : 'home'), MySQL::SQLVALUE_TEXT))) 
+	if (!$db->SelectRows($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue((!empty($pagereq) ? $pagereq : 'home'), MySQL::SQLVALUE_TEXT)))) 
 		$db->Kill();
 
 	// Start switch for pages, select all the right details
@@ -368,14 +368,14 @@ if (0)
 		else 
 		{
 			// [i_a] these branches didn't include the span which was included by the 'home' if(...) above.
-			if($row->sublevel=='0') 
+			if($row->sublevel==0) 
 			{
 				$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir'].$row->urlpage.".html\" title=\"".$row->subheader."\">".$row->pagetitle."</a></span>";
 			}
 			else 
 			{ 
 				// sublevel page
-				$subpath = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."pages` WHERE `toplevel` = '".$row->toplevel."' AND `sublevel`='0'");
+				$subpath = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('toplevel' => MySQL::SQLValue($row->toplevel, MySQL::SQLVALUE_NUMBER), 'sublevel' => 0));
 				if (!$subpath && $db->ErrorNumber()) 
 				{
 					$db->Kill();
@@ -440,7 +440,8 @@ if (0)
 	{
 		$menu_in_set .= ',' . $i;
 	}
-	$db->SelectRows($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, array('menu_id', 'toplevel', 'sublevel', 'page_id'));
+	$db->SelectRows($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
+	if ($db->ErrorNumber()) $db->Kill();
 
 	if($db->HasRecords()) 
 	{
@@ -645,7 +646,7 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 			http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 	<?php
 	// Select all published pages
-	if (!$db->Query("SELECT `urlpage`,`description`,`islink` FROM `".$cfg['db_prefix']."pages` WHERE `published` = 'Y'")) $db->Kill();
+	if (!$db->SelectRows($cfg['db_prefix'].'pages', array('published' => "'Y'"), array('urlpage', 'description', 'islink'))) $db->Kill();
 
 	$db->MoveFirst();
 	while (!$db->EndOfSeek()) 

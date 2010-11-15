@@ -157,7 +157,7 @@ function confirmation()
 			<?php 
 			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
 			{ 
-				$rsCfg = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgcomment` WHERE pageID='$pageID'"); 
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
 				if ($db->HasRecords())
 				{
 					$showmsg = max(1,intval($rsCfg->showMessage)); // always show at least 1 news item on a comment page!

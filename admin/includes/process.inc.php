@@ -83,7 +83,7 @@ $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Fill active module array
-// $modules = $db->QueryArray("SELECT * FROM `".$cfg['db_prefix']."modules` WHERE modActive='1'", MYSQL_ASSOC);    // [i_a] already collected in sitemap.php 
+// $modules = $db->SelectArray($cfg['db_prefix'].'modules', array('modActive' => "'1'"));    // [i_a] already collected in sitemap.php 
 
 
 
@@ -153,9 +153,9 @@ if ($do_update_or_livefilter)
 $target_form = getPOSTparam4IdOrNumber('form');
 
 
-
 // Open recordset for sites' pages
 $db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, array('published', 'menu_id', 'toplevel', 'sublevel'));
+if ($db->ErrorNumber()) $db->Kill();
 
 // Check whether the recordset is not empty
 if($db->HasRecords()) 
@@ -603,7 +603,7 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		$result = $db->TransactionBegin();
 		if ($result)
 		{
-			$result = $db->InsertRow($cfg['db_prefix']."pages", $values);
+			$result = $db->InsertRow($cfg['db_prefix'].'pages', $values);
 
 			// Check for errors
 			if($result) 
@@ -710,15 +710,15 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 				// Delete details from the database
 				$values = array(); // [i_a] make sure $values is an empty array to start with here
 				$values['page_id'] = MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER);
-				$result = $db->DeleteRows($cfg['db_prefix']."pages", $values);
+				$result = $db->DeleteRows($cfg['db_prefix'].'pages', $values);
 				
 				// Delete linked rows from module tables
 				if($module!='editor') 
 				{
 					$filter = array(); // [i_a] make sure $filter is an empty array to start with here
 					$filter['pageID'] = MySQL::SQLValue($correct_filename,MySQL::SQLVALUE_TEXT);
-					$delmod = $db->DeleteRows($cfg['db_prefix']."mod".$module, $filter);
-					$delcfg = $db->DeleteRows($cfg['db_prefix']."cfg".$module, $filter);
+					$delmod = $db->DeleteRows($cfg['db_prefix'].'mod'.$module, $filter);
+					$delcfg = $db->DeleteRows($cfg['db_prefix'].'cfg'.$module, $filter);
 				}
 				
 				if ($result) 
@@ -779,7 +779,7 @@ if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 		$values["menu_id"]	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
 		
 		// Execute the update
-		if(!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+		if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 		{
 			$error = $db->Error();
 		}
@@ -809,7 +809,7 @@ if($do_action == "islink" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values['islink'] = MySQL::SQLValue($islink_in_menu, MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 	{
 		if($values["islink"] == "Y") 
 		{ 
@@ -852,7 +852,7 @@ if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] == "GET" && checkAu
 	// TOGGLE the flag (printable/published/iscoding) state:
 	$values[$action] = MySQL::SQLValue(!getGETparam4boolean('s'),MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
 	{
 		if($values[$action] == "Y")
 		{ 
@@ -904,7 +904,7 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
 	
-	if (!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+	if (!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
 	{
 		$db->Kill();
 	}
@@ -1000,7 +1000,7 @@ if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
 		
 		// Execute the insert
-		$result = $db->InsertRow($cfg['db_prefix']."users", $values);
+		$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
 		
 		// Check for errors
 		if($result) 
@@ -1042,7 +1042,7 @@ if($do_action == "edit-user-details" && $_SERVER['REQUEST_METHOD'] == "POST" && 
 			$values["userLast"]	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
 			$values["userEmail"]= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
 			
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				if($userID==$_SESSION['ccms_userID']) 
 				{
@@ -1221,7 +1221,8 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 	$filename	= BASE_PATH . "/content/".$name.".php";
 	
 	// Check for editor.css in template directory
-	$template	= $db->QuerySingleValue("SELECT `variant` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = ".MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT));
+	$template	= $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('variant'));
+	if (!$template) $db->Kill();
 	$css = "";
 	if (is_file($cfg['rootdir'] . '/lib/templates/'.$template.'/editor.css')) 
 	{
@@ -1248,7 +1249,7 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 	} 
 	
 	// Get keywords for current file
-	$keywords = $db->QuerySingleValue("SELECT `keywords` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = '$name'");
+	$keywords = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('keywords'));
 	
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1502,7 +1503,7 @@ if($do_action == "save-changes" && checkAuth())
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values["keywords"] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
 	{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
