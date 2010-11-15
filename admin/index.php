@@ -166,12 +166,6 @@ function set_filter_msgs(el)
 					<li><span class="ss_sprite ss_drive_disk"><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><?php echo $ccms['lang']['backup']['createhd'];?></a></span></li>
 				<?php 
 				} 
-				if($_SESSION['ccms_userLevel']>=4 && CCMS_DEVELOPMENT_ENVIRONMENT) 
-				{ 
-				?>
-					<li><span class="ss_sprite ss_group_key"><a id="sys-perm" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['translation']; ?></a></span></li>
-				<?php 
-				} 
 				?>
 			</ul>
 		</div>
