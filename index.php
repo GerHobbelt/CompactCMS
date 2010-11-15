@@ -69,8 +69,36 @@ $STP->setTemplate('./lib/templates/'.$ccms['template'].'.tpl.html', '<?php globa
 $STP->setParams($ccms);
 $STP->parseAndEchoPHP();
 
-/*
-echo "<p>\$ccms = <pre>";
-var_dump($ccms);
-*/
+?>
+<?php
+
+if (0)
+{
+	global $_SERVER;
+	global $_ENV;
+	global $ccms;
+	global $cfg;
+
+	echo '<h1>$_SERVER</h1>';
+	echo "<pre>";
+	var_dump($_SERVER);
+	echo "</pre>";
+	echo '<h1>$_ENV</h1>';
+	echo "<pre>";
+	var_dump($_ENV);
+	echo "</pre>";
+	echo '<h1>$_SESSION</h1>';
+	echo "<pre>";
+	var_dump($_SESSION);
+	echo "</pre>";
+	echo '<h1>$ccms</h1>';
+	echo "<pre>";
+	var_dump($ccms);
+	echo "</pre>";
+	echo '<h1>$cfg</h1>';
+	echo "<pre>";
+	var_dump($cfg);
+	echo "</pre>";
+}
+
 ?>

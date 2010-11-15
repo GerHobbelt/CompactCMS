@@ -199,10 +199,10 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 	{
 	?>
+		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
 		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
 		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
 		<script type="text/javascript" src="../../../admin/includes/fancyupload/FancyUpload2.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
 		<script type="text/javascript" charset="utf-8">
 function confirmation()
 {

@@ -973,11 +973,69 @@ function send_response_status_header($response_code)
 
 
 /**
+Return TRUE when the given code is a valid HTTP response code.
+*/
+function is_http_response_code($response_code)
+{
+	$response_code = intval($response_code);
+	switch ($response_code)
+	{
+	case 100:	// RFC2616 Section 10.1.1: Continue
+	case 101:	// RFC2616 Section 10.1.2: Switching Protocols
+	case 200:	// RFC2616 Section 10.2.1: OK
+	case 201:	// RFC2616 Section 10.2.2: Created
+	case 202:	// RFC2616 Section 10.2.3: Accepted
+	case 203:	// RFC2616 Section 10.2.4: Non-Authoritative Information
+	case 204:	// RFC2616 Section 10.2.5: No Content
+	case 205:	// RFC2616 Section 10.2.6: Reset Content
+	case 206:	// RFC2616 Section 10.2.7: Partial Content
+	case 300:	// RFC2616 Section 10.3.1: Multiple Choices
+	case 301:	// RFC2616 Section 10.3.2: Moved Permanently
+	case 302:	// RFC2616 Section 10.3.3: Found
+	case 303:	// RFC2616 Section 10.3.4: See Other
+	case 304:	// RFC2616 Section 10.3.5: Not Modified
+	case 305:	// RFC2616 Section 10.3.6: Use Proxy
+	case 307:	// RFC2616 Section 10.3.8: Temporary Redirect
+	case 400:	// RFC2616 Section 10.4.1: Bad Request
+	case 401:	// RFC2616 Section 10.4.2: Unauthorized
+	case 402:	// RFC2616 Section 10.4.3: Payment Required
+	case 403:	// RFC2616 Section 10.4.4: Forbidden
+	case 404:	// RFC2616 Section 10.4.5: Not Found
+	case 405:	// RFC2616 Section 10.4.6: Method Not Allowed
+	case 406:	// RFC2616 Section 10.4.7: Not Acceptable
+	case 407:	// RFC2616 Section 10.4.8: Proxy Authentication Required
+	case 408:	// RFC2616 Section 10.4.9: Request Time-out
+	case 409:	// RFC2616 Section 10.4.10: Conflict
+	case 410:	// RFC2616 Section 10.4.11: Gone
+	case 411:	// RFC2616 Section 10.4.12: Length Required
+	case 412:	// RFC2616 Section 10.4.13: Precondition Failed
+	case 413:	// RFC2616 Section 10.4.14: Request Entity Too Large
+	case 414:	// RFC2616 Section 10.4.15: Request-URI Too Large
+	case 415:	// RFC2616 Section 10.4.16: Unsupported Media Type
+	case 416:	// RFC2616 Section 10.4.17: Requested range not satisfiable
+	case 417:	// RFC2616 Section 10.4.18: Expectation Failed
+	case 500:	// RFC2616 Section 10.5.1: Internal Server Error
+	case 501:	// RFC2616 Section 10.5.2: Not Implemented
+	case 502:	// RFC2616 Section 10.5.3: Bad Gateway
+	case 503:	// RFC2616 Section 10.5.4: Service Unavailable
+	case 504:	// RFC2616 Section 10.5.5: Gateway Time-out
+	case 505:	// RFC2616 Section 10.5.6: HTTP Version not supported
+		return true;
+		
+	default:
+		return false;
+	}
+}
+
+
+
+/**
 Return the HTTP response code string for the given response code
 */
 function get_response_code_string($response_code)
 {
-	switch (intval($response_code))
+	$response_code = intval($response_code);
+	switch ($response_code)
 	{
 	case 100:	return "RFC2616 Section 10.1.1: Continue";
 	case 101:	return "RFC2616 Section 10.1.2: Switching Protocols";
@@ -1019,7 +1077,7 @@ function get_response_code_string($response_code)
 	case 503:	return "RFC2616 Section 10.5.4: Service Unavailable";
 	case 504:	return "RFC2616 Section 10.5.5: Gateway Time-out";
 	case 505:	return "RFC2616 Section 10.5.6: HTTP Version not supported";
-	default:	return "Unknown Response Code";
+	default:   return rtrim("Unknown Response Code " . $response_code);
 	}
 }
 
@@ -1031,7 +1089,7 @@ http://nadeausoftware.com/node/79
 function path_remove_dot_segments($path)
 {
     // multi-byte character explode
-    $inSegs  = preg_split( '!/!u', $path);
+    $inSegs  = preg_split('!/!u', $path);
     $outSegs = array();
     foreach ($inSegs as $seg)
     {

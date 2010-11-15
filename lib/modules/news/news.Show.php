@@ -38,6 +38,7 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 $pageID	= getGETparam4Filename('page');
 $do	= getGETparam4IdOrNumber('do');
 $id = getGETparam4IdOrNumber('id');
+$is_printing = ($ccms['printing'] == 'Y');
 
 $numCfg = 0;
 if(!empty($pageID)) 
@@ -158,7 +159,21 @@ if($db->HasRecords())
 				} 
 				else
 				{ 
-				?>
+					if ($i == 0)
+					{
+						// and augment the breadcrumb trail and other template variables:
+						$preview_qry = ($ccms['preview'] ? '?preview=' . $cfg['authcode'] : '');
+						$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a></span>';
+						$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+
+						$ccms['urlpage']   .= '/' . rm0lead($rsNews->newsID).'-'.$newsTitle;
+						$ccms['pagetitle'] = $rsNews->newsTitle;
+						//$ccms['subheader']  = $row->subheader;
+						$ccms['desc']       = $rsNews->newsContent;
+						//$ccms['keywords']   = $row->keywords;
+						$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+					}
+					?>
 					<h1><?php echo $rsNews->newsTitle; ?></h1>
 					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
 					<p><?php echo $rsNews->newsContent; ?></p>
@@ -199,6 +214,18 @@ if($db->HasRecords())
 	
 	if($do == "all") 
 	{
+		// and augment the breadcrumb trail and other template variables:
+		$preview_qry = ($ccms['preview'] ? '&preview=' . $cfg['authcode'] : '');
+		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a></span>';
+		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+
+		$ccms['urlpage']   .= '?do=all';
+		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['news']['viewarchive'];
+		//$ccms['subheader']  = $row->subheader;
+		//$ccms['desc']       = $rsNews->newsContent;
+		//$ccms['keywords']   = $row->keywords;
+		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+		
 		for ($i=0; $i<$db->RowCount(); $i++) 
 		{ 
 			$rsNews = $db->Row();

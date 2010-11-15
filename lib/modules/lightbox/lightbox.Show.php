@@ -39,6 +39,7 @@ $album_url	= $cfg['rootdir'].'media/albums';
 
 $pageID	= getGETparam4Filename('page');
 $imgID	= getGETparam4Filename('id');
+$is_printing = ($ccms['printing'] == 'Y');
 
 // Read through selected album, get first and count all
 function fileList($d)
@@ -250,19 +251,38 @@ elseif($singleShow==true)
 {
 	$album = (!empty($imgID) ? $imgID : (count($spec_album) > 0 ? $spec_album[0] : $albums[0])); // [i_a] PHP evaluates nested ?: from RIGHT-TO-LEFT! Without the braces, you'ld get the wrong result.
 	
-	echo "<h3>".$ccms['lang']['album']['album']." ".ucfirst($album)."</h3>";
-	if(!empty($imgID)) 
-	{
-		echo "<p style=\"text-align:right\"><a href=\"".$cfg['rootdir'].$pageID.".html\"\">".$ccms['lang']['backend']['tooverview']."</a></p>"; 
-	}
-
 	$desc = null;
 	$lines = @file($album_path.'/'.$album.'/info.txt');
 	for ($x = 1; $x < count($lines); $x++) 
 	{
     	$desc = trim($desc.' '.$lines[$x]); // [i_a] double invocation of htmlspecialchars, together with the form input (lightbox.Process.php)
 	} 
-	echo "<p>$desc</p>";
+
+	echo '<h3>'.$ccms['lang']['album']['album'].' '.ucfirst($album)."</h3>\n";
+
+	$back_to_overview_html = '';
+	if(!empty($imgID)) 
+	{
+		if (!$is_printing)
+		{
+			$back_to_overview_html = '<div class="album-back-to-ov-top"><a href="'.$cfg['rootdir'].$pageID.'.html">'.$ccms['lang']['backend']['tooverview']."</a></div>\n";
+			echo $back_to_overview_html;
+		}
+		
+		// and augment the breadcrumb trail and other template variables:
+		$preview_qry = ($ccms['preview'] ? '?preview=' . $cfg['authcode'] : '');
+		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a></span>';
+		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+
+		$ccms['urlpage']   .= '/' . $album;
+		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['album']['album'].' '.ucfirst($album);
+		//$ccms['subheader']  = $row->subheader;
+		$ccms['desc']       = $desc;
+		//$ccms['keywords']   = $row->keywords;
+		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+	}
+
+	echo '<p>' . $desc . "</p>\n";
 
 	// Get the images in an album
 	$images = fileList($album_path.'/'.$album);
@@ -318,10 +338,7 @@ elseif($singleShow==true)
 		echo "<p>&#160;</p><p>".$ccms['lang']['system']['error_value']."</p>";
 	}
 	
-	if(!empty($imgID))
-	{ 
-		echo "<p style=\"text-align:right;clear:both;\"><a href=\"".$cfg['rootdir'].$pageID.".html\">".$ccms['lang']['backend']['tooverview']."</a></p>"; 
-	}
+	echo str_replace("album-back-to-ov-top", "album-back-to-ov-bottom", $back_to_overview_html);
 } 
 else 
 {
