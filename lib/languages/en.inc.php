@@ -203,9 +203,11 @@ $ccms['lang']['auth']['featnotallowed']	= "Your current account level does not a
 // Back-up messages
 $ccms['lang']['backup']['createhd']		= "Create new back-up";
 $ccms['lang']['backup']['explain']		= "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files regularly.";
+$ccms['lang']['backup']['warn4media']	= "Warning :: Please be aware that your <dfn>lightbox</dfn> albums' images are <strong>not</strong> backed up! \nThe album descriptions <strong>are</strong>, but the images themselves and their thumbnails are <strong>not included in these backups</strong>. \nIf you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.";
 $ccms['lang']['backup']['currenthd']	= "Available back-ups";
 $ccms['lang']['backup']['timestamp']	= "Back-up file name";
 $ccms['lang']['backup']['download']		= "Download archive";
+$ccms['lang']['backup']['wait4backup']  = "Please wait while the backup is being created...";
 
 // User management messages
 $ccms['lang']['users']['createuser']	= "Create a user";
