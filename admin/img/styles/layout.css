@@ -49,6 +49,14 @@ a.external {
 .safari{display:inline-block;width:80px;height:15px;background-position: 0 -60px;}
 .chrome{display:inline-block;width:80px;height:15px;background-position: 0 -80px;}
 
+/*
+Make sure the admin content has a scrollbar when needed. Override body+html:overflow=hidden CSS setup in Mocha: we want our Y-scrollbar!
+*/
+#pageWrapper
+{
+	overflow: auto;
+}
+
 /* === 1. CORE === */
 /* === TAGS === */
 #dyn_list.loading {
@@ -385,10 +393,3 @@ div.module
 	margin-top: 20px;
 }
 
-/*
-Make sure the admin content has a scrollbar when needed. Override body+html:overflow=hidden CSS setup in Mocha: we want our Y-scrollbar!
-*/
-#pageWrapper
-{
-	overflow: auto;
-}
