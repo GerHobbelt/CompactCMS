@@ -6,6 +6,16 @@
 #
 ##
 
+#
+# WARNING:
+# 
+# Be sure to read 
+#    http://httpd.apache.org/docs/2.2/howto/htaccess.html#when
+# and note that you should move the content of this .htaccess file to a
+# <Directory> directory within your <VirtualHost> or 'main' apache config
+# files, whenever possible, following the advice at the above-mentioned URL.
+#
+
 AddDefaultCharset utf-8
 Options +FollowSymLinks
 RewriteEngine On 
@@ -42,8 +52,10 @@ RewriteRule ^([^/]+)\.print$                    index.php?page=$1&printing=Y [QS
 RewriteRule ^lib/includes/js/([^/]+\.js)$       lib/includes/combine.inc.php?type=javascript&files=$1 [L]
 RewriteRule ^admin/img/styles/([^/]+\.css)$     lib/includes/combine.inc.php?type=css&files=$1 [L]    
 # pull EVERY OTHER JS/CSS file through combine as well: that's our generic cacher/compressor/optimizer
-RewriteRule ^(.+)/([^/]+\.js)$                  lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
-RewriteRule ^(.+)/([^/]+\.css)$                 lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
+RewriteRule ^(lib/.+)/([^/]+\.js)$              lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
+RewriteRule ^(lib/.+)/([^/]+\.css)$             lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
+RewriteRule ^(admin/.+)/([^/]+\.js)$            lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
+RewriteRule ^(admin/.+)/([^/]+\.css)$           lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
 RewriteRule ^sitemap\.xml$                      index.php?page=sitemap [L]
 
 ##
