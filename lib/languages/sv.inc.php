@@ -32,188 +32,296 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 /* Translation by Bob Axell <cyberdyze@gmail.com> */
 
 // System wide messages
-$ccms['lang']['system']['error_database'] 	= "Kunde ej koppla till databasen. Var god verifiera databasinformation nedan.";
-$ccms['lang']['system']['error_openfile'] 	= "Kunde ej öppna den specifierade filen";
-$ccms['lang']['system']['error_notemplate']	= "Inga stilmallar hittades som kunde appliceras på din sida. Var god lägg in din stilmall i mappen ./lib/templates/.";
-$ccms['lang']['system']['error_templatedir'] = "Couldn't find the templates directory! Make sure it exists and contains at least one template.";
-$ccms['lang']['system']['error_write'] 		= "Filen är ej skrivbar";
-$ccms['lang']['system']['error_chmod'] 		= "Den nuvarande filen kunde ej modifieras. Var vänlig kontrollera skrivbarhetsinställningar på filen och dess mapp (666).";
-$ccms['lang']['system']['error_value'] 		= "Fel: felaktigt värde";
-$ccms['lang']['system']['error_default']	= "Huvudsida kan ej raderas.";
-$ccms['lang']['system']['error_forged']		= "Värde har manipulerats";
-$ccms['lang']['system']['error_filedots']	= "Filnamn bör ej innehålla punkter, t.e.x. '.html'.";
-$ccms['lang']['system']['error_filesize']	= "Filnamn måste innehålla minst 3 tecken.";
-$ccms['lang']['system']['error_pagetitle']	= "Skriv in en sidotitel med minst 3 tecken.";
-$ccms['lang']['system']['error_subtitle']	= "Skriv in en kort undertitel till din sida";
+$ccms['lang']['system']['error_database'] = "Kunde ej koppla till databasen. Var god verifiera databasinformation nedan.";
+$ccms['lang']['system']['error_openfile'] = "Kunde ej öppna den specifierade filen";
+$ccms['lang']['system']['error_notemplate'] = "Inga stilmallar hittades som kunde appliceras på din sida. Var god lägg in din stilmall i mappen ./lib/templates/.";
+$ccms['lang']['system']['error_templatedir'] = /* BABELFISH */ "Kunde inte hitta mallar katalog! Se till att den finns och innehåller minst en mall.";
+$ccms['lang']['system']['error_write'] = "Filen är ej skrivbar";
+$ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "Nummer Inga skrivrättigheter";
+$ccms['lang']['system']['error_chmod'] = "Den nuvarande filen kunde ej modifieras. Var vänlig kontrollera skrivbarhetsinställningar på filen och dess mapp (666).";
+$ccms['lang']['system']['error_value'] = "Fel: felaktigt värde";
+$ccms['lang']['system']['error_default'] = "Huvudsida kan ej raderas.";
+$ccms['lang']['system']['error_forged'] = "Värde har manipulerats";
+$ccms['lang']['system']['error_filedots'] = "Filnamn bör ej innehålla punkter, t.e.x. '.html'.";
+$ccms['lang']['system']['error_filesize'] = "Filnamn måste innehålla minst 3 tecken.";
+$ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "Filnamnet ska vara högst 50 tecken långt.";
+$ccms['lang']['system']['error_pagetitle'] = "Skriv in en sidotitel med minst 3 tecken.";
+$ccms['lang']['system']['error_pagetitle_2'] = /* BABELFISH */ "Ange en sida titel på 100 tecken eller mindre.";
+$ccms['lang']['system']['error_subtitle'] = "Skriv in en kort undertitel till din sida";
+$ccms['lang']['system']['error_subtitle_2'] = /* BABELFISH */ "Skriv en kort underrubrik på 200 tecken eller mindre för din sida.";
 $ccms['lang']['system']['error_description'] = "Skriv in en beskrivning med mer än 3 tecken";
-$ccms['lang']['system']['error_reserved'] 	= "Du har specifierat ett filnamn som reserverats för intern användning.";
-$ccms['lang']['system']['error_general']	= "Fel inträffade";
-$ccms['lang']['system']['error_correct'] 	= "Var god rätta till följande:";
-$ccms['lang']['system']['error_create'] 	= "Fel vid skapandet av den nya filen";
-$ccms['lang']['system']['error_exists'] 	= "Det filnamn du valt existerar redan.";
-$ccms['lang']['system']['error_delete']		= "Fel vid raderandet av den nya filen";
-$ccms['lang']['system']['error_selection'] 	= "Ingen fil har valts.";
+$ccms['lang']['system']['error_description_2'] = /* BABELFISH */ "Ange en beskrivning av mindre än 250 tecken";
+$ccms['lang']['system']['error_reserved'] = "Du har specifierat ett filnamn som reserverats för intern användning.";
+$ccms['lang']['system']['error_general'] = "Fel inträffade";
+$ccms['lang']['system']['error_correct'] = "Var god rätta till följande:";
+$ccms['lang']['system']['error_create'] = "Fel vid skapandet av den nya filen";
+$ccms['lang']['system']['error_exists'] = "Det filnamn du valt existerar redan.";
+$ccms['lang']['system']['error_delete'] = "Fel vid raderandet av den nya filen";
+$ccms['lang']['system']['error_selection'] = "Ingen fil har valts.";
 $ccms['lang']['system']['error_versioninfo'] = "Det finns ingen versioninformation tillgänglig.";
-$ccms['lang']['system']['error_misconfig']	= "<strong>Det verkar finnas en felkonfigurering.</strong><br/>Vad vänlig se till att .htaccess filens inställningar motsvarar nuvarande filstruktur. Om du har<br/>installerat CompactCMS i en underkatalog, justera då .htaccess filen i enlighet med detta.";
-$ccms['lang']['system']['error_deleted']	= "<h1>Filen du har valt verkar ha raderats</h1><p>Uppdatera listan av filer för att undvika att detta händer. Om detta inte hjälper måste du manuellt öppna sökvägen och leta reda på filen du vill ha.</p>";
-$ccms['lang']['system']['error_404title'] 	= "Flen hittades ej";
-$ccms['lang']['system']['error_404header']	= "Ett 404 fel inträffade, den begärda filen kunde ej hittas.";
-$ccms['lang']['system']['error_sitemap'] 	= "En översikt över alla sidor";
-$ccms['lang']['system']['tooriginal']		= "Tillbaka till originalet";
-$ccms['lang']['system']['message_rights'] 	= "Alla rättigheter reserverade";
+$ccms['lang']['system']['error_misconfig'] = "<strong>Det verkar finnas en felkonfigurering.</strong><br/>Vad vänlig se till att .htaccess filens inställningar motsvarar nuvarande filstruktur. Om du har<br/>installerat CompactCMS i en underkatalog, justera då .htaccess filen i enlighet med detta.";
+$ccms['lang']['system']['error_deleted'] = "<h1>Filen du har valt verkar ha raderats</h1><p>Uppdatera listan av filer för att undvika att detta händer. Om detta inte hjälper måste du manuellt öppna sökvägen och leta reda på filen du vill ha.</p>";
+$ccms['lang']['system']['error_404title'] = "Flen hittades ej";
+$ccms['lang']['system']['error_404header'] = "Ett 404 fel inträffade, den begärda filen kunde ej hittas.";
+$ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Den begärda filen <strong>{% pagereq%}. html</strong> inte kunde hittas.";
+$ccms['lang']['system']['error_403title'] = "Forbidden";
+$ccms['lang']['system']['error_403header'] = /* BABELFISH */ "En 403 fel uppstod: Du har inte behörighet att komma åt den önskade filen.";
+$ccms['lang']['system']['error_403content'] = /* BABELFISH */ "Du får inte tillgång till <strong>{% pagereq%}. html</strong> just nu.";
+$ccms['lang']['system']['error_sitemap'] = "En översikt över alla sidor";
+$ccms['lang']['system']['error_tooshort'] = /* BABELFISH */ "En eller flera värden som lämnas antingen för korta eller felaktiga";
+$ccms['lang']['system']['error_passshort'] = /* BABELFISH */ "Ett lösenord bör innehålla mer än 6 tecken";
+$ccms['lang']['system']['error_passnequal'] = /* BABELFISH */ "Den inmatade lösenord matchar inte";
+$ccms['lang']['system']['noresults'] = /* BABELFISH */ "Inga resultat";
+$ccms['lang']['system']['tooriginal'] = "Tillbaka till originalet";
+$ccms['lang']['system']['message_rights'] = "Alla rättigheter reserverade";
 $ccms['lang']['system']['message_compatible'] = "Testkörd på ";
 
 // Administration general messages
-$ccms['lang']['backend']['gethelp'] 		= "Har du förslag, feedback eller problem? Besök <a href=\"http://community.compactcms.nl/forum/\" title=\"Besök det officiella forumet\" class=\"external\" rel=\"external\">forumet</a>!";
-$ccms['lang']['backend']['ordertip'] 		= "Använd drop-down menyn nedan för att justera menyn på din sida. Notera att systemet inte lägger märka till dubletter.";
-$ccms['lang']['backend']['createtip'] 		= "För att skapa en ny sida, fyll i formuläret nedan och sidan kommer att skapas direkt. När sidan har skapats kan du redigera den som vanligt";
-$ccms['lang']['backend']['currentfiles'] 	= "I listan nedan hittar du alla hittills publicerade sidor. Huvudsisdan kan ej raderas, eftersom den är förstasidan på din webbplats. Andra filer kan ha begränsad åtkomlighet eftersom endast administratören äger tillträde till dem.";
-$ccms['lang']['backend']['confirmdelete'] 	= "Var vänlig bekräfta att du verkligen vill ta bort alla dessa sidor och dess innehåll.";
-$ccms['lang']['backend']['changevalue']		= "Klicka för att ändra";
-$ccms['lang']['backend']['previewpage']		= "Förhandsgranska";
-$ccms['lang']['backend']['editpage']		= "Redigera";
-$ccms['lang']['backend']['restrictpage'] 	= "Begränsad";
-$ccms['lang']['backend']['newfiledone'] 	= "Denna fil är fräsh och klar att fyllas i!";
-$ccms['lang']['backend']['newfilecreated']	= "Filen har skapats";
-$ccms['lang']['backend']['startedittitle'] 	= "Börja redigera!";
-$ccms['lang']['backend']['starteditbody']	= "Den nya filen har skapats. Börja redigera genast eller skapa nya sidor, eller alternativt redigera gammla.";
-$ccms['lang']['backend']['success'] 		= "Framgång!";
-$ccms['lang']['backend']['fileexists'] 		= "Filen existerar";
-$ccms['lang']['backend']['statusdelete'] 	= "Status av utvald radering:";
-$ccms['lang']['backend']['statusremoved']	= "raderad";
-$ccms['lang']['backend']['uptodate']		= "aktuell.";
-$ccms['lang']['backend']['outofdate']		= "inaktuell.";
-$ccms['lang']['backend']['considerupdate'] 	= "Överväg uppdatering";
-$ccms['lang']['backend']['orderprefsaved'] 	= "Dina menyinställningar har sparats.";
-$ccms['lang']['backend']['inmenu']			= "I meny";
-$ccms['lang']['backend']['updatelist']		= "Uppdatera fil-lista";
-$ccms['lang']['backend']['administration']	= "Administration";
-$ccms['lang']['backend']['currentversion']	= "Du kör för tillfället version";
-$ccms['lang']['backend']['mostrecent']		= "Den senaste stabila CompactCMS versionen är";
-$ccms['lang']['backend']['versionstatus'] 	= "Din installation är";
-$ccms['lang']['backend']['createpage']		= "Skapa en ny sida";
-$ccms['lang']['backend']['managemenu']		= "Hantera meny";
-$ccms['lang']['backend']['managefiles'] 	= "Hantera nuvarande filer";
-$ccms['lang']['backend']['delete'] 			= "Radera";
-$ccms['lang']['backend']['toplevel']		= "Huvudgrupper";
-$ccms['lang']['backend']['sublevel'] 		= "Undergrupper";
-$ccms['lang']['backend']['active']			= "Aktiv";
-$ccms['lang']['backend']['disabled']		= "Avaktiverad";
-$ccms['lang']['backend']['template']		= "Aktiverad";
-$ccms['lang']['backend']['notinmenu']		= "Föremål ej i meny";
-$ccms['lang']['backend']['menutitle']		= "Meny";
-$ccms['lang']['backend']['linktitle']		= "Länk";
-$ccms['lang']['backend']['item']			= "Föremål";
-$ccms['lang']['backend']['yes']				= "Ja";
-$ccms['lang']['backend']['no']				= "Nej";
+$ccms['lang']['backend']['gethelp'] = "Har du förslag, feedback eller problem? Besök <a href=\"http://community.compactcms.nl/forum/\" title=\"Besök det officiella forumet\" class=\"external\" rel=\"external\">forumet</a>!";
+$ccms['lang']['backend']['ordertip'] = "Använd drop-down menyn nedan för att justera menyn på din sida. Notera att systemet inte lägger märka till dubletter.";
+$ccms['lang']['backend']['createtip'] = "För att skapa en ny sida, fyll i formuläret nedan och sidan kommer att skapas direkt. När sidan har skapats kan du redigera den som vanligt";
+$ccms['lang']['backend']['currentfiles'] = "I listan nedan hittar du alla hittills publicerade sidor. Huvudsisdan kan ej raderas, eftersom den är förstasidan på din webbplats. Andra filer kan ha begränsad åtkomlighet eftersom endast administratören äger tillträde till dem.";
+$ccms['lang']['backend']['confirmdelete'] = "Var vänlig bekräfta att du verkligen vill ta bort alla dessa sidor och dess innehåll.";
+$ccms['lang']['backend']['confirmthumbregen'] = /* BABELFISH */ "Vänligen bekräfta att du vill att förnya alla miniatyrer.";
+$ccms['lang']['backend']['settingssaved'] = /* BABELFISH */ "Dina ändringar har sparats.";
+$ccms['lang']['backend']['must_refresh'] = /* BABELFISH */ "Se till att ladda om huvudsidan för att se <strong>alla</strong> dina ändringar";
+$ccms['lang']['backend']['itemcreated'] = /* BABELFISH */ "Kunde bearbeta in post (er).";
+$ccms['lang']['backend']['fullremoved'] = /* BABELFISH */ "Tagits bort vald post (er).";
+$ccms['lang']['backend']['fullregenerated'] = /* BABELFISH */ "Framgångsrikt regenererad miniatyrerna.";
+$ccms['lang']['backend']['tooverview'] = /* BABELFISH */ "Tillbaka till översikten";
+$ccms['lang']['backend']['permissions'] = /* BABELFISH */ "Ställ CCMS behörigheter";
+$ccms['lang']['backend']['contentowners'] = /* BABELFISH */ "Definiera innehåll ägare";
+$ccms['lang']['backend']['templateeditor'] = /* BABELFISH */ "Mall redaktör";
+$ccms['lang']['backend']['usermanagement'] = /* BABELFISH */ "Användarhantering";
+$ccms['lang']['backend']['changevalue'] = "Klicka för att ändra";
+$ccms['lang']['backend']['previewpage'] = "Förhandsgranska";
+$ccms['lang']['backend']['editpage'] = "Redigera";
+$ccms['lang']['backend']['restrictpage'] = "Begränsad";
+$ccms['lang']['backend']['newfiledone'] = "Denna fil är fräsh och klar att fyllas i!";
+$ccms['lang']['backend']['newfilecreated'] = "Filen har skapats";
+$ccms['lang']['backend']['startedittitle'] = "Börja redigera!";
+$ccms['lang']['backend']['starteditbody'] = "Den nya filen har skapats. Börja redigera genast eller skapa nya sidor, eller alternativt redigera gammla.";
+$ccms['lang']['backend']['success'] = "Framgång!";
+$ccms['lang']['backend']['fileexists'] = "Filen existerar";
+$ccms['lang']['backend']['statusdelete'] = "Status av utvald radering:";
+$ccms['lang']['backend']['statusremoved'] = "raderad";
+$ccms['lang']['backend']['uptodate'] = "aktuell.";
+$ccms['lang']['backend']['outofdate'] = "inaktuell.";
+$ccms['lang']['backend']['considerupdate'] = "Överväg uppdatering";
+$ccms['lang']['backend']['orderprefsaved'] = "Dina menyinställningar har sparats.";
+$ccms['lang']['backend']['inmenu'] = "I meny";
+$ccms['lang']['backend']['updatelist'] = "Uppdatera fil-lista";
+$ccms['lang']['backend']['administration'] = "Administration";
+$ccms['lang']['backend']['currentversion'] = "Du kör för tillfället version";
+$ccms['lang']['backend']['mostrecent'] = "Den senaste stabila CompactCMS versionen är";
+$ccms['lang']['backend']['versionstatus'] = "Din installation är";
+$ccms['lang']['backend']['createpage'] = "Skapa en ny sida";
+$ccms['lang']['backend']['managemenu'] = "Hantera meny";
+$ccms['lang']['backend']['managefiles'] = "Hantera nuvarande filer";
+$ccms['lang']['backend']['delete'] = "Radera";
+$ccms['lang']['backend']['toplevel'] = "Huvudgrupper";
+$ccms['lang']['backend']['sublevel'] = "Undergrupper";
+$ccms['lang']['backend']['active'] = "Aktiv";
+$ccms['lang']['backend']['disabled'] = "Avaktiverad";
+$ccms['lang']['backend']['template'] = "Aktiverad";
+$ccms['lang']['backend']['notinmenu'] = "Föremål ej i meny";
+$ccms['lang']['backend']['menutitle'] = "Meny";
+$ccms['lang']['backend']['linktitle'] = "Länk";
+$ccms['lang']['backend']['item'] = "Föremål";
+$ccms['lang']['backend']['none'] = /* BABELFISH */ "Inga";
+$ccms['lang']['backend']['yes'] = "Ja";
+$ccms['lang']['backend']['no'] = "Nej";
+$ccms['lang']['backend']['translation'] = /* BABELFISH */ "Översättningar";
 
 // Texts for authentication screen
-$ccms['lang']['login']['welcome']			= "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
-$ccms['lang']['login']['username']			= "Username";
-$ccms['lang']['login']['password']			= "Password";
-$ccms['lang']['login']['login']				= "Login";
-$ccms['lang']['login']['provide']			= "Please provide your user credentials";
-$ccms['lang']['login']['nodetails']			= "Enter both your username and password";
-$ccms['lang']['login']['nouser']			= "Enter your username";
-$ccms['lang']['login']['nopass']			= "Enter your password";
-$ccms['lang']['login']['notactive']			= "This account has been deactivated";
-$ccms['lang']['login']['falsetries']		= "Note that you already made multiple attempts";
-$ccms['lang']['login']['nomatch']			= "Incorrect username or password";
+$ccms['lang']['login']['welcome'] = /* BABELFISH */ "  <p>Använd ett giltigt användarnamn och lösenord för att få tillgång till CompactCMS back-end. Om du kom hit av misstag, tillbaka till <a href=\"admin/includes/\">startsidan</a>.</p>  <p>Kontakta din webmaster för dina uppgifter.</p>  ";
+$ccms['lang']['login']['username'] = /* BABELFISH */ "Användarnamn";
+$ccms['lang']['login']['password'] = /* BABELFISH */ "Lösenord";
+$ccms['lang']['login']['login'] = /* BABELFISH */ "Logga in";
+$ccms['lang']['login']['provide'] = /* BABELFISH */ "Ange dina autentiseringsuppgifter";
+$ccms['lang']['login']['nodetails'] = /* BABELFISH */ "Ange både ditt användarnamn och lösenord";
+$ccms['lang']['login']['nouser'] = /* BABELFISH */ "Ange ditt användarnamn";
+$ccms['lang']['login']['nopass'] = /* BABELFISH */ "Ange ditt lösenord";
+$ccms['lang']['login']['notactive'] = /* BABELFISH */ "Detta konto har inaktiverats";
+$ccms['lang']['login']['falsetries'] = /* BABELFISH */ "Observera att du redan har gjort flera försök";
+$ccms['lang']['login']['nomatch'] = /* BABELFISH */ "Felaktigt användarnamn eller lösenord";
 
 // Menu titles for administration back-end
-$ccms['lang']['menu']['1']				= "Main";
-$ccms['lang']['menu']['2']				= "Left";
-$ccms['lang']['menu']['3']				= "Right";
-$ccms['lang']['menu']['4']				= "Footer";
-$ccms['lang']['menu']['5']				= "Extra";
+$ccms['lang']['menu']['1'] = "Main";
+$ccms['lang']['menu']['2'] = /* BABELFISH */ "Vänster";
+$ccms['lang']['menu']['3'] = /* BABELFISH */ "Höger";
+$ccms['lang']['menu']['4'] = /* BABELFISH */ "Sidfot";
+$ccms['lang']['menu']['5'] = "Extra";
 
 // Administration form related texts
-$ccms['lang']['forms']['filename']		= "Filnamn"; 
-$ccms['lang']['forms']['pagetitle']		= "Sidotitel";
-$ccms['lang']['forms']['subheader'] 	= "Undertitel";
-$ccms['lang']['forms']['description'] 	= "Beskrivning";
-$ccms['lang']['forms']['module'] 		= "Module";
-$ccms['lang']['forms']['contentitem']	= "Content item (default)";
-$ccms['lang']['forms']['additions']		= "Additions";
-$ccms['lang']['forms']['printable'] 	= "Utskrivbar";
-$ccms['lang']['forms']['published'] 	= "Aktiv";
-$ccms['lang']['forms']['iscoding'] 		= "Kodning";
-$ccms['lang']['forms']['createbutton'] 	= "Skapa!";
-$ccms['lang']['forms']['savebutton'] 	= "Spara";
+$ccms['lang']['forms']['filename'] = "Filnamn";
+$ccms['lang']['forms']['pagetitle'] = "Sidotitel";
+$ccms['lang']['forms']['subheader'] = "Undertitel";
+$ccms['lang']['forms']['description'] = "Beskrivning";
+$ccms['lang']['forms']['module'] = /* BABELFISH */ "Modul";
+$ccms['lang']['forms']['contentitem'] = /* BABELFISH */ "Innehåll post (standard)";
+$ccms['lang']['forms']['additions'] = /* BABELFISH */ "Tillägg";
+$ccms['lang']['forms']['printable'] = "Utskrivbar";
+$ccms['lang']['forms']['published'] = "Aktiv";
+$ccms['lang']['forms']['iscoding'] = "Kodning";
+$ccms['lang']['forms']['createbutton'] = "Skapa!";
+$ccms['lang']['forms']['modifybutton'] = /* BABELFISH */ "Ändra";
+$ccms['lang']['forms']['savebutton'] = "Spara";
+$ccms['lang']['forms']['setlocale'] = /* BABELFISH */ "Front-end språk";
+$ccms['lang']['forms']['filter_showing'] = /* BABELFISH */ "Just nu är vi bara visar sidor som har minst denna text här";
+$ccms['lang']['forms']['edit_remove'] = /* BABELFISH */ "Redigera eller ta bort filter för";
+$ccms['lang']['forms']['add'] = /* BABELFISH */ "Lägg till filter för";
 
 // Administration hints for form fields
-$ccms['lang']['hints']['filename']		= "Sido-URL:et (home.html) :: Filnamnet med vilket denna sida framtas (utan .html)";
-$ccms['lang']['hints']['pagetitle'] 	= "Titel för denna sida (Home) :: AEn kort förmedlande titel för denna sida.";
-$ccms['lang']['hints']['subheader']		= "Kort rubriktext (Välkommen till vår webbplats): En kort beskrivande text som används i sidhuvudet på varje sida samt i rubriken på varje sida.";
-$ccms['lang']['hints']['description']	= "Meta Beskrivning :: En unik beskrivning för denna sida som kommer att användas som sidorna 'meta beskrivning'.";
-$ccms['lang']['hints']['module']		= "Module :: Select what module should handle the content of this file. If you are unsure, select the default.";
-$ccms['lang']['hints']['printable']		= "ida tryckbarhet:: När alternativet 'JA' väljs skall en utskriftsvänlig sida genereras. 'NEJ' bör väljas för sidor med bilder eller andra medier. Dessa är bättre utan en utskrivbar sida.";
-$ccms['lang']['hints']['published']		= "Publicerad status :: Välj om sidan bör offentliggöras, om det blir i webbplatskartan och om den kommer att vara tillgänglig för allmänheten.";
-$ccms['lang']['hints']['toplevel']		= "Huvudgrupper :: Ange den högsta nivån för det här menyalternativet. Välj --- att inte inkludera sidan i menyn.";
-$ccms['lang']['hints']['sublevel']		= "Undergrupper :: Välj 0 när denna punkt bör ha högsta nivå. Om det är av lägre rang för en viss huvudgrupp, vänligen välj lämplig undergrupp.";
-$ccms['lang']['hints']['template']		= "Stilmall:: Om du använder flera mallar för din installation kan du tillsätta olika mallar för varje enskild sida genom denna drop-down meny.";
-$ccms['lang']['hints']['activelink']	= "	
+$ccms['lang']['hints']['filename'] = "Sido-URL:et (home.html) :: Filnamnet med vilket denna sida framtas (utan .html)";
+$ccms['lang']['hints']['pagetitle'] = "Titel för denna sida (Home) :: AEn kort förmedlande titel för denna sida.";
+$ccms['lang']['hints']['subheader'] = "Kort rubriktext (Välkommen till vår webbplats): En kort beskrivande text som används i sidhuvudet på varje sida samt i rubriken på varje sida.";
+$ccms['lang']['hints']['description'] = "Meta Beskrivning :: En unik beskrivning för denna sida som kommer att användas som sidorna 'meta beskrivning'.";
+$ccms['lang']['hints']['module'] = /* BABELFISH */ "Modul:: Välj vilken modul ska hantera innehållet i denna fil. Om du är osäker, välj standard.";
+$ccms['lang']['hints']['printable'] = "ida tryckbarhet:: När alternativet 'JA' väljs skall en utskriftsvänlig sida genereras. 'NEJ' bör väljas för sidor med bilder eller andra medier. Dessa är bättre utan en utskrivbar sida.";
+$ccms['lang']['hints']['published'] = "Publicerad status :: Välj om sidan bör offentliggöras, om det blir i webbplatskartan och om den kommer att vara tillgänglig för allmänheten.";
+$ccms['lang']['hints']['toplevel'] = "Huvudgrupper :: Ange den högsta nivån för det här menyalternativet. Välj --- att inte inkludera sidan i menyn.";
+$ccms['lang']['hints']['sublevel'] = "Undergrupper :: Välj 0 när denna punkt bör ha högsta nivå. Om det är av lägre rang för en viss huvudgrupp, vänligen välj lämplig undergrupp.";
+$ccms['lang']['hints']['template'] = "Stilmall:: Om du använder flera mallar för din installation kan du tillsätta olika mallar för varje enskild sida genom denna drop-down meny.";
+$ccms['lang']['hints']['activelink'] = "	
 Aktiv länk i menyn? :: Punkter måste inte alltid ha en faktisk koppling. Du kan avaktivera länken bakom denna punkt i front-end-menyn genom att avmarkera kryssrutan nedan.";
-$ccms['lang']['hints']['menuid']		= "Meny kategori: Välj i vilken meny denna punkt bör förtecknas i. Standardvärdet är huvudmenyn (1), där även hemsideslänken visas.";
-$ccms['lang']['hints']['iscoding']		= "Innehåller kodning :: Inehåller denna fil exempelvis PHP eller Javascript? Om du väljer 'Ja' begränsas tillgången till filen från back-end WYSIWYG redigeraren och redaktören.";
+$ccms['lang']['hints']['menuid'] = "Meny kategori: Välj i vilken meny denna punkt bör förtecknas i. Standardvärdet är huvudmenyn (1), där även hemsideslänken visas.";
+$ccms['lang']['hints']['iscoding'] = "Innehåller kodning :: Inehåller denna fil exempelvis PHP eller Javascript? Om du väljer 'Ja' begränsas tillgången till filen från back-end WYSIWYG redigeraren och redaktören.";
+$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>Du kan klicka på <span class=\"sprite livefilter livefilter_active\"> filtret ikonen till vänster om titeln för att lägga till, redigera eller ta bort en  text för att filtrera sidan listan, t.ex. när du skriver \"hem\" i  redigeringsfältet som visas när du klickar på ikonen, tryck sedan på  Enter / Retur, bara sidor som har texten \"Hem\" i denna kolumn visas. <br>Om  du klickar på ikonen igen och ta bort texten i textfältet och sedan  trycka på Enter / Retur-tangenten, kommer att ta bort filtret.<br>Håll  muspekaren över ikonen för filtrering för att se om kolumnen för  närvarande filtreras, och i så fall använda som filter text.";
 
 // Editor messages
-$ccms['lang']['editor']['closeeditor']	= "Stäng redigeraren";
-$ccms['lang']['editor']['editorfor']	= "Text redigerare för";
-$ccms['lang']['editor']['instruction']	= "Use the editor below to modify the current file. Once you're done, hit the 'Save changes' button below to directly publish your modifications to the world wide web. Also add up to ten relevant keywords for search engine optimalization.";
-$ccms['lang']['editor']['savebtn']		= "Spara ändringar";
-$ccms['lang']['editor']['cancelbtn'] 	= "Ångra";
+$ccms['lang']['editor']['closeeditor'] = "Stäng redigeraren";
+$ccms['lang']['editor']['editorfor'] = "Text redigerare för";
+$ccms['lang']['editor']['instruction'] = "Use the editor below to modify the current file. Once you're done, hit the 'Save changes' button below to directly publish your modifications to the world wide web. Also add up to ten relevant keywords for search engine optimalization.";
+$ccms['lang']['editor']['savebtn'] = "Spara ändringar";
+$ccms['lang']['editor']['cancelbtn'] = "Ångra";
 $ccms['lang']['editor']['confirmclose'] = "Stäng detta fönster och kassera förändringar?";
-$ccms['lang']['editor']['preview']		= "Förhandsgranska resultatsidan";
-$ccms['lang']['editor']['savesuccess'] 	= "<strong>Framgång!</strong> Innehållet nedan har sparats till";
-$ccms['lang']['editor']['backeditor'] 	= "Tillbaka till redigerare";
-$ccms['lang']['editor']['closewindow'] 	= "Stäng fönstret";
-$ccms['lang']['editor']['keywords']		= "Nyckelord - <em>åtskillda med kommatecken, max 250 tecken totalt</em>";
+$ccms['lang']['editor']['preview'] = "Förhandsgranska resultatsidan";
+$ccms['lang']['editor']['savesuccess'] = "<strong>Framgång!</strong> Innehållet nedan har sparats till";
+$ccms['lang']['editor']['backeditor'] = "Tillbaka till redigerare";
+$ccms['lang']['editor']['closewindow'] = "Stäng fönstret";
+$ccms['lang']['editor']['keywords'] = "Nyckelord - <em>åtskillda med kommatecken, max 250 tecken totalt</em>";
+
+// Authorization messages
+$ccms['lang']['auth']['generatepass'] = /* BABELFISH */ "Auto generera ett säkert lösenord";
+$ccms['lang']['auth']['featnotallowed'] = /* BABELFISH */ "Ditt nuvarande nivå kan du inte använda funktionen.";
 
 ################### MODULES ###################
 
 // Back-up messages
-$ccms['lang']['backup']['createhd']		= "Create new back-up";
-$ccms['lang']['backup']['explain']		= "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files reguraly.";
-$ccms['lang']['backup']['currenthd']	= "Available back-ups";
-$ccms['lang']['backup']['timestamp']	= "Back-up file name";
-$ccms['lang']['backup']['download']		= "Download archive";
+$ccms['lang']['backup']['createhd'] = /* BABELFISH */ "Skapa ett nytt back-up";
+$ccms['lang']['backup']['explain'] = "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files reguraly.";
+$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Varning: Tänk på att din <dfn>ljusbord</dfn> album \"bilder är <strong>inte</strong> backas upp beskrivningar! Albumet <strong>är</strong>, men bilderna själva och deras miniatyrer <strong>inte i dessa säkerhetskopior</strong>med.  Om du vill ha säkerhetskopior av dessa, då du kommer att behöva ge  webbplatsadministratören om en extra backup system som hjälper dig att  säkerhetskopiera och återställa dessa (möjligen stor) fil samlingar.";
+$ccms['lang']['backup']['currenthd'] = /* BABELFISH */ "Finns back-ups";
+$ccms['lang']['backup']['timestamp'] = /* BABELFISH */ "Back-up filnamn";
+$ccms['lang']['backup']['download'] = /* BABELFISH */ "Hämta arkiv";
+$ccms['lang']['backup']['wait4backup'] = /* BABELFISH */ "Vänta medan säkerhetskopian skapas ...";
+
+// User management messages
+$ccms['lang']['users']['createuser'] = /* BABELFISH */ "Skapa en användare";
+$ccms['lang']['users']['overviewusers'] = /* BABELFISH */ "Översikt CCMS användare";
+$ccms['lang']['users']['editdetails'] = /* BABELFISH */ "Redigera användarens personliga detaljer";
+$ccms['lang']['users']['editpassword'] = /* BABELFISH */ "Redigera användarens lösenord";
+$ccms['lang']['users']['accountcfg'] = /* BABELFISH */ "Kontoinställningar";
+$ccms['lang']['users']['user'] = /* BABELFISH */ "Användare";
+$ccms['lang']['users']['username'] = /* BABELFISH */ "Användarnamn";
+$ccms['lang']['users']['name'] = /* BABELFISH */ "Namn";
+$ccms['lang']['users']['firstname'] = /* BABELFISH */ "Förnamn";
+$ccms['lang']['users']['lastname'] = /* BABELFISH */ "Efternamn";
+$ccms['lang']['users']['password'] = /* BABELFISH */ "Lösenord";
+$ccms['lang']['users']['cpassword'] = /* BABELFISH */ "Bekräfta lösenord";
+$ccms['lang']['users']['email'] = /* BABELFISH */ "E-post";
+$ccms['lang']['users']['active'] = /* BABELFISH */ "Aktiv";
+$ccms['lang']['users']['level'] = /* BABELFISH */ "Nivå";
+$ccms['lang']['users']['userlevel'] = /* BABELFISH */ "Användarnivå";
+$ccms['lang']['users']['lastlog'] = /* BABELFISH */ "Senaste log";
+
+// Template editor
+$ccms['lang']['template']['manage'] = /* BABELFISH */ "Hantera mallar";
+$ccms['lang']['template']['nowrite'] = /* BABELFISH */ "Den nuvarande mallen är <strong>inte</strong> skrivbar";
+$ccms['lang']['template']['print'] = /* BABELFISH */ "Skriv ut";
+
+// Permissions
+$ccms['lang']['permission']['header'] = /* BABELFISH */ "Tillstånd preferenser";
+$ccms['lang']['permission']['explain'] = /* BABELFISH */ "Använd tabellen nedan för att ange vilka minimikrav användarnivå kan använda vissa funktioner. Alla användare under den angivna minsta användaren nivå kommer inte att se eller ha tillgång till funktionen.";
+$ccms['lang']['permission']['target'] = "Target";
+$ccms['lang']['permission']['level1'] = /* BABELFISH */ "Nivå 1 - User";
+$ccms['lang']['permission']['level2'] = /* BABELFISH */ "Nivå 2 - Redaktör";
+$ccms['lang']['permission']['level3'] = /* BABELFISH */ "Nivå 3 - Manager";
+$ccms['lang']['permission']['level4'] = /* BABELFISH */ "Nivå 4 - Admin";
+
+// Content owners
+$ccms['lang']['owners']['header'] = /* BABELFISH */ "Upphovsrättsinnehavare";
+$ccms['lang']['owners']['explain'] = /* BABELFISH */ "Här kan du utse särskild sida äganderätt till enskilda användare. Om en cartain sida ingen användare är vald, kan alla ändra på sidan. Annars bara den angivna användaren hade modifiering rättigheter till filen. Administratörer har alltid tillgång till alla filer.";
+$ccms['lang']['owners']['pages'] = /* BABELFISH */ "Sidor";
+$ccms['lang']['owners']['users'] = /* BABELFISH */ "Användare";
+
+// Translation assistance page 
+$ccms['lang']['translation']['header'] = /* BABELFISH */ "Översätt";
+$ccms['lang']['translation']['explain'] = /* BABELFISH */ "Visar översättning strängarna.";
 
 // Album messages
-$ccms['lang']['album']['album']			= "Album";
-$ccms['lang']['album']['errordir']		= "The specified album name is too short (min. 4).";
-$ccms['lang']['album']['newdircreated']	= "album directory has been created.";
-$ccms['lang']['album']['renamed']		= "has been renamed to";
-$ccms['lang']['album']['removed']		= "and all of its contents have been removed.";
-$ccms['lang']['album']['refresh']		= "Refresh";
-$ccms['lang']['album']['manage']		= "Manage albums";
-$ccms['lang']['album']['albumlist']		= "Album list";
-$ccms['lang']['album']['newalbum']		= "New album name";
-$ccms['lang']['album']['noalbums']		= "No albums have been created yet!";
-$ccms['lang']['album']['directory']		= "Directory (#)";
-$ccms['lang']['album']['tooverview']	= "Return to overview";
-$ccms['lang']['album']['nodir']			= "Please make sure the directory <strong>albums</strong> exists in your image directory";
+$ccms['lang']['album']['album'] = "Album";
+$ccms['lang']['album']['settings'] = /* BABELFISH */ "Album inställningar";
+$ccms['lang']['album']['apply_to'] = /* BABELFISH */ "Specifikt gäller det här albumet att";
+$ccms['lang']['album']['description'] = /* BABELFISH */ "Album beskrivning";
+$ccms['lang']['album']['currentalbums'] = /* BABELFISH */ "Aktuellt album";
+$ccms['lang']['album']['uploadcontent'] = /* BABELFISH */ "Ladda upp innehåll";
+$ccms['lang']['album']['toexisting'] = /* BABELFISH */ "Överför till befintliga album";
+$ccms['lang']['album']['upload'] = /* BABELFISH */ "Börja ladda upp";
+$ccms['lang']['album']['browse'] = /* BABELFISH */ "Bläddra filer";
+$ccms['lang']['album']['clear'] = /* BABELFISH */ "Töm lista";
+$ccms['lang']['album']['singlefile'] = /* BABELFISH */ "<strong>Enkel filöverföring</strong><br>  <p>Flash loader gick inte att initiera. Se till att Javascript är aktiverat och Flash är installerat. Enkel uppladdning är möjligt, men inte optimalt.</p>  ";
+$ccms['lang']['album']['manage'] = "Manage albums";
+$ccms['lang']['album']['albumlist'] = /* BABELFISH */ "Albumlista";
+$ccms['lang']['album']['regenalbumthumbs'] = /* BABELFISH */ "Generera miniatyrer alla";
+$ccms['lang']['album']['newalbum'] = "New album name";
+$ccms['lang']['album']['noalbums'] = /* BABELFISH */ "Inga album har skapats ännu!";
+$ccms['lang']['album']['files'] = /* BABELFISH */ "Filer";
+$ccms['lang']['album']['nodir'] = "Please make sure the directory <strong>albums</strong> exists in your image directory";
+$ccms['lang']['album']['lastmod'] = /* BABELFISH */ "Senast uppdaterad";
+$ccms['lang']['album']['please_wait'] = /* BABELFISH */ "Var god vänta ...";
+
+// News messages
+$ccms['lang']['news']['manage'] = /* BABELFISH */ "Hantera aktuella nyheter";
+$ccms['lang']['news']['addnews'] = /* BABELFISH */ "Lägg till nyheter";
+$ccms['lang']['news']['addnewslink'] = /* BABELFISH */ "Skriv ny artikel";
+$ccms['lang']['news']['settings'] = /* BABELFISH */ "Hantera inställningar";
+$ccms['lang']['news']['writenews'] = /* BABELFISH */ "Skriv nyheter";
+$ccms['lang']['news']['numbermess'] = /* BABELFISH */ "# Meddelanden på front-end";
+$ccms['lang']['news']['showauthor'] = /* BABELFISH */ "Visa författare";
+$ccms['lang']['news']['showdate'] = /* BABELFISH */ "Visa publiceringsdatum";
+$ccms['lang']['news']['showteaser'] = /* BABELFISH */ "Visa bara teaser";
+$ccms['lang']['news']['title'] = /* BABELFISH */ "Nyheter titel";
+$ccms['lang']['news']['author'] = /* BABELFISH */ "Nyheter Författare";
+$ccms['lang']['news']['date'] = /* BABELFISH */ "Datum";
+$ccms['lang']['news']['published'] = /* BABELFISH */ "År?";
+$ccms['lang']['news']['teaser'] = "Teaser";
+$ccms['lang']['news']['contents'] = /* BABELFISH */ "Innehåll";
+$ccms['lang']['news']['viewarchive'] = /* BABELFISH */ "Visa arkiv";
 
 // Guestbook message
-$ccms['lang']['guestbook']['guestbook']	= "Guestbook";
-$ccms['lang']['guestbook']['noposts']	= "No reactions have been posted yet!";
-$ccms['lang']['guestbook']['verinstr']	= "To check that this message isn't automated, please re-enter";
-$ccms['lang']['guestbook']['reaction']	= "Reaction";
-$ccms['lang']['guestbook']['rating']	= "Rating";
-$ccms['lang']['guestbook']['avatar']	= "Gravatar.com user avatar";
-$ccms['lang']['guestbook']['wrote']		= "wrote";
-$ccms['lang']['guestbook']['manage']	= "Manage reactions";
-$ccms['lang']['guestbook']['delentry']	= "Delete this entry";
-$ccms['lang']['guestbook']['sendmail']	= "E-mail author";
-$ccms['lang']['guestbook']['removed'] 	= "has been removed from the database.";
-$ccms['lang']['guestbook']['name'] 		= "Your name";
-$ccms['lang']['guestbook']['email']		= "Your e-mail";
-$ccms['lang']['guestbook']['website']	= "Your website";
-$ccms['lang']['guestbook']['comments']	= "Comments";
-$ccms['lang']['guestbook']['verify']	= "Verification";
-$ccms['lang']['guestbook']['preview']	= "Preview comment";
-$ccms['lang']['guestbook']['add']		= "Add your comments";
-$ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
+$ccms['lang']['guestbook']['noposts'] = /* BABELFISH */ "Inga reaktioner har postat ännu!";
+$ccms['lang']['guestbook']['verinstr'] = /* BABELFISH */ "Att kontrollera att detta meddelande inte är automatiserad, nytt ange";
+$ccms['lang']['guestbook']['reaction'] = /* BABELFISH */ "Reaktion";
+$ccms['lang']['guestbook']['rating'] = /* BABELFISH */ "Betyg";
+$ccms['lang']['guestbook']['avatar'] = /* BABELFISH */ "Gravatar.com Användarvisningsbild";
+$ccms['lang']['guestbook']['wrote'] = /* BABELFISH */ "skrev";
+$ccms['lang']['guestbook']['manage'] = /* BABELFISH */ "Hantera reaktioner";
+$ccms['lang']['guestbook']['delentry'] = /* BABELFISH */ "Ta bort den här posten";
+$ccms['lang']['guestbook']['sendmail'] = /* BABELFISH */ "E-post författare";
+$ccms['lang']['guestbook']['removed'] = /* BABELFISH */ "har tagits bort från databasen.";
+$ccms['lang']['guestbook']['name'] = /* BABELFISH */ "Ditt namn";
+$ccms['lang']['guestbook']['email'] = /* BABELFISH */ "Din e-post";
+$ccms['lang']['guestbook']['website'] = /* BABELFISH */ "Din webbplats";
+$ccms['lang']['guestbook']['comments'] = /* BABELFISH */ "Kommentarer";
+$ccms['lang']['guestbook']['verify'] = /* BABELFISH */ "Verifiering";
+$ccms['lang']['guestbook']['preview'] = /* BABELFISH */ "Förhandsgranska kommentar";
+$ccms['lang']['guestbook']['add'] = /* BABELFISH */ "Lägg till kommentarer";
+$ccms['lang']['guestbook']['posted'] = "Comment has been posted!";
+$ccms['lang']['guestbook']['success'] = /* BABELFISH */ "Tack";
+$ccms['lang']['guestbook']['error'] = /* BABELFISH */ "Fel & Avvisning";
+$ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Din kommentar har avvisats.";
 
 
       /* ### OBSOLETED ENTRIES ### */
@@ -229,19 +337,11 @@ $ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
        
          ----------------------------------------------------------
 	
-	$ccms['lang']['album']['directory']		
-	$ccms['lang']['album']['errordir']		
-	$ccms['lang']['album']['newdircreated']	
 	$ccms['lang']['album']['nodir']			
-	$ccms['lang']['album']['refresh']		
-	$ccms['lang']['album']['removed']		
-	$ccms['lang']['album']['renamed']		
-	$ccms['lang']['album']['tooverview']	
 	$ccms['lang']['backend']['fileexists'] 		
 	$ccms['lang']['backend']['startedittitle'] 	
 	$ccms['lang']['backend']['updatelist']		
 	$ccms['lang']['editor']['closeeditor']	
-	$ccms['lang']['guestbook']['guestbook']	
 	$ccms['lang']['guestbook']['reaction']	
 	$ccms['lang']['guestbook']['removed'] 	
 	$ccms['lang']['login']['falsetries']		
@@ -263,126 +363,6 @@ $ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
          ----------------------------------------------------------
       */
 	  
-$ccms['lang']['album']['apply_to']		= "Specifically apply this album to";
-$ccms['lang']['album']['browse']		= "Browse files";
-$ccms['lang']['album']['clear']			= "Clear list";
-$ccms['lang']['album']['currentalbums']	= "Current albums";
-$ccms['lang']['album']['description']	= "Album description";
-$ccms['lang']['album']['files']			= "Files";
-$ccms['lang']['album']['lastmod']		= "Last modified";
-$ccms['lang']['album']['please_wait'] 	= "Please wait ...";
-$ccms['lang']['album']['regenalbumthumbs']	= "Regenerate all thumbnails";
-$ccms['lang']['album']['settings']		= "Album settings";
-$ccms['lang']['album']['singlefile']	= "<strong>Single file upload</strong><br/><p>The Flash loader failed to initialize. Make sure Javascript is enabled and Flash is installed. Single file uploads are possible, but not optimized.</p>";
-$ccms['lang']['album']['toexisting']	= "Upload to existing album";
-$ccms['lang']['album']['upload']		= "Start upload";
-$ccms['lang']['album']['uploadcontent']	= "Upload content";
-$ccms['lang']['auth']['featnotallowed']	= "Your current account level does not allow you to use this feature.";
-$ccms['lang']['auth']['generatepass'] 	= "Auto generate a safe password";
-$ccms['lang']['backend']['confirmthumbregen'] 	= "Please confirm that you want to regenerate all thumbnails.";
-$ccms['lang']['backend']['contentowners']	= "Define content owners";
-$ccms['lang']['backend']['fullregenerated']	= "Successfully regenerated the thumbnails.";
-$ccms['lang']['backend']['fullremoved']		= "Successfully deleted the selected item(s).";
-$ccms['lang']['backend']['itemcreated']		= "Successfully processed the submitted item(s).";
-$ccms['lang']['backend']['must_refresh']	= "Please make sure to reload the main page to see <strong>all</strong> your changes";
-$ccms['lang']['backend']['none']			= "None";
-$ccms['lang']['backend']['permissions']		= "Set CCMS permissions";
-$ccms['lang']['backend']['settingssaved']	= "Your changes have been successfully saved.";
-$ccms['lang']['backend']['templateeditor']	= "Template editor";
-$ccms['lang']['backend']['tooverview']		= "Back to overview";
-$ccms['lang']['backend']['translation']     = "Translations";
-$ccms['lang']['backend']['usermanagement']	= "User management";
-$ccms['lang']['backup']['wait4backup']  = "Please wait while the backup is being created...";
-$ccms['lang']['backup']['warn4media']	= "Warning :: Please be aware that your <dfn>lightbox</dfn> albums' images are <strong>not</strong> backed up! \nThe album descriptions <strong>are</strong>, but the images themselves and their thumbnails are <strong>not included in these backups</strong>. \nIf you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.";
-$ccms['lang']['forms']['add']           = "Add filter for";
-$ccms['lang']['forms']['edit_remove']   = "Edit or remove filter for";
-$ccms['lang']['forms']['filter_showing']	= "right now we're only showing pages which have at least this text in here";
-$ccms['lang']['forms']['modifybutton'] 	= "Modify";
-$ccms['lang']['forms']['setlocale']		= "Front-end language";
-$ccms['lang']['guestbook']['error']		= "Failures &amp; Rejections";
-$ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
-$ccms['lang']['guestbook']['success']	= "Thank you";
-$ccms['lang']['hints']['filter']        = "<br>You can click on the <span class='sprite livefilter livefilter_active'>&#160;filter icon</span> at left of the title to add, edit or remove a text to filter the page list on, e.g. when you type 'home' in the edit field which appears when you click the icon, then press the Enter/Return key, only pages which have the text 'home' in this column will be shown. <br>Clicking the icon again and deleting the text in the edit field, then pressing the Enter/Return key, will remove the filter.<br>Hover over the filter icon to see whether the column is currently being filtered, and if so, using which filter text.";
-$ccms['lang']['news']['addnews']		= "Add news";
-$ccms['lang']['news']['addnewslink']	= "Write new article";
-$ccms['lang']['news']['author']			= "News author";
-$ccms['lang']['news']['contents']		= "Article contents";
-$ccms['lang']['news']['date']			= "Date";
-$ccms['lang']['news']['manage']			= "Manage current news items";
-$ccms['lang']['news']['numbermess']		= "# messages on front-end";
-$ccms['lang']['news']['published']		= "Published?";
-$ccms['lang']['news']['settings']		= "Manage settings";
-$ccms['lang']['news']['showauthor']		= "Show author";
-$ccms['lang']['news']['showdate']		= "Show publication date";
-$ccms['lang']['news']['showteaser']		= "Only show teaser";
-$ccms['lang']['news']['teaser']			= "Teaser";
-$ccms['lang']['news']['title']			= "News title";
-$ccms['lang']['news']['viewarchive']	= "View archive";
-$ccms['lang']['news']['writenews']		= "Write news";
-$ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a cartain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
-$ccms['lang']['owners']['header']		= "Content owners";
-$ccms['lang']['owners']['pages']		= "Pages";
-$ccms['lang']['owners']['users']		= "Users";
-$ccms['lang']['permission']['explain']	= "Use the table below to specify what minimum user level can use certain features. Any user below the specified minimum required user level, will not see nor have access to the feature.";
-$ccms['lang']['permission']['header']	= "Permission preferences";
-$ccms['lang']['permission']['level1']	= "Level 1 - User";
-$ccms['lang']['permission']['level2']	= "Level 2 - Editor";
-$ccms['lang']['permission']['level3']	= "Level 3 - Manager";
-$ccms['lang']['permission']['level4']	= "Level 4 - Admin";
-$ccms['lang']['permission']['target']	= "Target";
-$ccms['lang']['system']['error_403content']	= "You are not allowed to access <strong>{%pagereq%}.html</strong> at this moment.";
-$ccms['lang']['system']['error_403header']  = "A 403 error occurred: you don't have permission to access the requested file.";
-$ccms['lang']['system']['error_403title']   = "Forbidden";
-$ccms['lang']['system']['error_404content']	= "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
-$ccms['lang']['system']['error_description_2'] = "Enter a description of less than 250 characters";
-$ccms['lang']['system']['error_dirwrite']	= "Directory has no write access";
-$ccms['lang']['system']['error_filesize_2']	= "File name should be at most 50 characters long.";
-$ccms['lang']['system']['error_pagetitle_2'] = "Enter a page title of 100 characters or less.";
-$ccms['lang']['system']['error_passnequal']	= "The entered passwords did not match";
-$ccms['lang']['system']['error_passshort']	= "A password should contain more than 6 characters";
-$ccms['lang']['system']['error_subtitle_2']	= "Enter a short sub-title of 200 characters or less for your page.";
-$ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrxplain'] = /* BABELFISH */ "Använd tabellen nedan för att ange vilka minimikrav användarnivå kan använda vissa funktioner. Alla användare under den angivna minsta användaren nivå kommer inte att se eller ha tillgång till funktionen.";
-$ccms['lang']['permission']['header'] = /* BABELFISH */ "Tillstånd preferenser";
-$ccms['lang']['permission']['level1'] = /* BABELFISH */ "Nivå 1 - User";
-$ccms['lang']['permission']['level2'] = /* BABELFISH */ "Nivå 2 - Redaktör";
-$ccms['lang']['permission']['level3'] = /* BABELFISH */ "Nivå 3 - Manager";
-$ccms['lang']['permission']['level4'] = /* BABELFISH */ "Nivå 4 - Admin";
-$ccms['lang']['permission']['target'] = "Target";
-$ccms['lang']['system']['error_403content'] = /* BABELFISH */ "Du får inte tillgång till <strong>{% pagereq%}. html</strong> just nu.";
-$ccms['lang']['system']['error_403header'] = /* BABELFISH */ "En 403 fel uppstod: Du har inte behörighet att komma åt den önskade filen.";
-$ccms['lang']['system']['error_403title'] = "Forbidden";
-$ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Den begärda filen <strong>{% pagereq%}. html</strong> inte kunde hittas.";
-$ccms['lang']['system']['error_description_2'] = /* BABELFISH */ "Ange en beskrivning av mindre än 250 tecken";
-$ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "Nummer Inga skrivrättigheter";
-$ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "Filnamnet ska vara högst 50 tecken långt.";
-$ccms['lang']['system']['error_pagetitle_2'] = /* BABELFISH */ "Ange en sida titel på 100 tecken eller mindre.";
-$ccms['lang']['system']['error_passnequal'] = /* BABELFISH */ "Den inmatade lösenord matchar inte";
-$ccms['lang']['system']['error_passshort'] = /* BABELFISH */ "Ett lösenord bör innehålla mer än 6 tecken";
-$ccms['lang']['system']['error_subtitle_2'] = /* BABELFISH */ "Skriv en kort underrubrik på 200 tecken eller mindre för din sida.";
-$ccms['lang']['system']['error_tooshort'] = /* BABELFISH */ "En eller flera värden som lämnas antingen för korta eller felaktiga";
-$ccms['lang']['system']['noresults'] = /* BABELFISH */ "Inga resultat";
-$ccms['lang']['template']['manage'] = /* BABELFISH */ "Hantera mallar";
-$ccms['lang']['template']['nowrite'] = /* BABELFISH */ "Den nuvarande mallen är <strong>inte</strong> skrivbar";
-$ccms['lang']['template']['print'] = /* BABELFISH */ "Skriv ut";
-$ccms['lang']['translation']['explain'] = /* BABELFISH */ "Visar översättning strängarna.";
-$ccms['lang']['translation']['header'] = /* BABELFISH */ "Översätt";
-$ccms['lang']['users']['accountcfg'] = /* BABELFISH */ "Kontoinställningar";
-$ccms['lang']['users']['active'] = /* BABELFISH */ "Aktiv";
-$ccms['lang']['users']['cpassword'] = /* BABELFISH */ "Bekräfta lösenord";
-$ccms['lang']['users']['createuser'] = /* BABELFISH */ "Skapa en användare";
-$ccms['lang']['users']['editdetails'] = /* BABELFISH */ "Redigera användarens personliga detaljer";
-$ccms['lang']['users']['editpassword'] = /* BABELFISH */ "Redigera användarens lösenord";
-$ccms['lang']['users']['email'] = /* BABELFISH */ "E-post";
-$ccms['lang']['users']['firstname'] = /* BABELFISH */ "Förnamn";
-$ccms['lang']['users']['lastlog'] = /* BABELFISH */ "Senaste log";
-$ccms['lang']['users']['lastname'] = /* BABELFISH */ "Efternamn";
-$ccms['lang']['users']['level'] = /* BABELFISH */ "Nivå";
-$ccms['lang']['users']['name'] = /* BABELFISH */ "Namn";
-$ccms['lang']['users']['overviewusers'] = /* BABELFISH */ "Översikt CCMS användare";
-$ccms['lang']['users']['password'] = /* BABELFISH */ "Lösenord";
-$ccms['lang']['users']['user'] = /* BABELFISH */ "Användare";
-$ccms['lang']['users']['userlevel'] = /* BABELFISH */ "Användarnivå";
-$ccms['lang']['users']['username'] = /* BABELFISH */ "Användarnamn";
        
       /*
          ----------------------------------------------------------
