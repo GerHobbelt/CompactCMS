@@ -109,8 +109,9 @@ function confirmation()
 			
 		<div class="span-16 colborder">
 		<h2><?php echo $ccms['lang']['guestbook']['manage']; ?></h2>
-		<?php // Load recordset
-		if (!$db->SelectRows($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('commentID')))
+		<?php 
+		// Load recordset; most recent comments on top; the extra order by commentID bit is there to ensure the sort/order is repeatable.
+		if (!$db->SelectRows($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID')))
 			$db->Kill();
 	
 		// Start switch for news, select all the right details

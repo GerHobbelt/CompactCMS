@@ -77,6 +77,8 @@ if(!isset($_SESSION['rc1']) || !isset($_SESSION['rc2']))
 
 // Prevent PHP warning by setting default (null) values
 $do_action = getGETparam4IdOrNumber('action');
+$dynlist_sortorder = getGETparam4IdOrNumber('dlorder', $cfg['admin_page_dynlist_order']);
+
 
 // Get permissions
 $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
@@ -154,7 +156,7 @@ $target_form = getPOSTparam4IdOrNumber('form');
 
 
 // Open recordset for sites' pages
-$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, array('published', 'menu_id', 'toplevel', 'sublevel'));
+$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
 if ($db->ErrorNumber()) $db->Kill();
 
 // Check whether the recordset is not empty
