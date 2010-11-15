@@ -80,7 +80,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
 {
 	// Pagination variables
 	$pageID	= getGETparam4Filename('page');
-	$rs = $db->SelectSingleRow($cfg['db_prefix']."cfgcomment", array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('showMessage', 'showLocale'));
+	$rs = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('showMessage', 'showLocale'));
 	if (!$rs)
 		$db->Kill();
 	$rsCfg	= $rs->showMessage;
@@ -100,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
 	have been taken. (Well, /hardcoding/ it like this is the safest possible
 	thing right there, so no worries, mate! ;-) )
 	*/
-	$total = $db->SelectSingleValue($cfg['db_prefix']."modcomment", array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), 'COUNT(commentID)');
+	$total = $db->SelectSingleValue($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), 'COUNT(commentID)');
 	if ($db->ErrorNumber()) 
 		$db->Kill();
 	$limit = getGETparam4Number('offset') * $max;
@@ -208,7 +208,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="del-comment" && checkAuth
 			/* only do this when a good pageID value was specified! */
 			$values["pageID"] = MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT);
 			
-			if($db->DeleteRows($cfg['db_prefix']."modcomment", $values)) 
+			if($db->DeleteRows($cfg['db_prefix'].'modcomment', $values)) 
 			{
 				header('Location: ' . makeAbsoluteURI('comment.Manage.php?status=notice&file='.$pageID.'&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
 				exit();
@@ -251,7 +251,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-comment" && $_POST['
 		$values['commentHost']	= MySQL::SQLValue($commentHost, MySQL::SQLVALUE_TEXT);
 		
 		// Insert new page into database
-		if (!$db->InsertRow($cfg['db_prefix']."modcomment", $values))
+		if (!$db->InsertRow($cfg['db_prefix'].'modcomment', $values))
 		{
 			$error = $db->Error();
 		}

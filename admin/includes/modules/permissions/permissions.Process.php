@@ -89,7 +89,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth())
 					throw new FbX($ccms['lang']['system']['error_forged']); 
 				$values[$key] = MySQL::SQLValue($setting, MySQL::SQLVALUE_NUMBER);
 			}
-			if($db->UpdateRows($cfg['db_prefix']."cfgpermissions", $values)) 
+			if($db->UpdateRows($cfg['db_prefix'].'cfgpermissions', $values)) 
 			{
 				header('Location: ' . makeAbsoluteURI('permissions.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();

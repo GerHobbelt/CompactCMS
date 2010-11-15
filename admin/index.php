@@ -248,27 +248,6 @@ function set_filter_msgs(el)
 	</div>
 	<?php 
 	} 
-	else 
-	{
-	?>
-<!--
-	<div id="createnew" class="span-9">
-	<fieldset>
-		<legend><span class="ss_sprite ss_add">&#160;</span><a class="toggle" rel="form_wrapper" href="#"><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
-		<div id="form_wrapper">
-		<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
-		<form method="post" id="addForm" action="#">
-			<div id="fields">
-				<div id="editor-options">
-				</div>
-			</div>
-		</form>	
-		</div>
-	</fieldset>
-	</div>
--->
-	<?php
-	}
 
 		
 	// Manage menu depths & languages 
@@ -308,23 +287,6 @@ function set_filter_msgs(el)
 	</div>
 	<?php 
 	} 
-	else 
-	{
-	?>
-<!--
-	<div id="menudepth" class="span-16">
-	<fieldset>
-		<legend><span class="ss_sprite ss_text_list_bullets">&#160;</span> <a class="toggle" rel="menu_wrapper" href="#"><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
-		<div id="menu_wrapper">
-		<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
-		<form method="post" id="menuForm" action="#">
-		</form>	
-		</div>
-	</fieldset>
-	</div>
--->
-	<?php
-	}
 	
 
 		

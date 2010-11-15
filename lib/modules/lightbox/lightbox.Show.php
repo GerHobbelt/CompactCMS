@@ -324,5 +324,7 @@ elseif($singleShow==true)
 	}
 } 
 else 
+{
 	echo $ccms['lang']['system']['noresults']; 
+}
 ?>

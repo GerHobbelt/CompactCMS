@@ -316,8 +316,12 @@ div.module
 	/* float: left; */
 	position: relative;
 }
-.module label{display:block;}
-.module h1,.module h2 {
+.module label
+{
+	display:block;
+}
+.module h1,.module h2 
+{
 	font-size:1.2em;
 	padding:2px 5px;
 	background-color:#e6f5d6;
@@ -327,9 +331,20 @@ div.module
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
-.module h2 {font-size:1em;}
-.hover{height:32px;border:1px solid #EFEFEF;}
-.hover:hover{border:solid 2px #618CBD;background-color:#E2EAF3;}
+.module h2 
+{
+	font-size:1em;
+}
+.hover
+{
+	height:32px;
+	border:1px solid #EFEFEF;
+}
+.hover:hover
+{
+	border:solid 2px #618CBD;
+	background-color:#E2EAF3;
+}
 
 /* === USER MANAGEMENT === */
 #passwordStrength{height:10px;display:block;float:left;}

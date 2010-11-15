@@ -137,7 +137,7 @@ function confirmation()
 				if (!$rsCfg) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 				// Get column names and their comments from database
-				$columns = $db->GetColumnComments($cfg['db_prefix']."cfgpermissions");
+				$columns = $db->GetColumnComments($cfg['db_prefix'].'cfgpermissions');
 				foreach ($columns as $columnName => $comments) 
 				{
 					if($i%2 != 1) 

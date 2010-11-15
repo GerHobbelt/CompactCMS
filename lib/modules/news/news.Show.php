@@ -42,13 +42,13 @@ $id = getGETparam4IdOrNumber('id');
 $numCfg = 0;
 if(!empty($pageID)) 
 {
-	$rsCfg = $db->SelectSingleRow($cfg['db_prefix']."cfgnews", array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
+	$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
 	$numCfg	= $db->RowCount();
 }
 $locale 	= ($numCfg>0?$rsCfg->showLocale:$cfg['locale']);
 
 // we only need to check if the given page is a valid news page...
-$news_in_page = $db->SelectSingleValue($cfg['db_prefix']."pages", array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
+$news_in_page = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
 if ($db->Error()) $db->Kill();
 
 // Set front-end language
@@ -205,6 +205,7 @@ if($db->HasRecords())
 			$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
   			$newsTitle = str_replace($special_chars, "", $newsTitle); 
 			$newsTitle = str_replace(' ','-',$newsTitle); 
+			
 			?>
 	    	
 			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
