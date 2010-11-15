@@ -64,5 +64,6 @@ $cfg['admin_page_dynlist_order'] = 'FTS0';    // default sort order for the page
 
 
 define('CCMS_DEVELOPMENT_ENVIRONMENT', true); // set to FALSE for any release install (where you are not developing on a local & very safe machine)
+define('HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION', false); // set to FALSE when your httpd doesn't have gzip/deflate compression enabled, e.g. through mod_deflate configuration for your vhost */
 
 ?>

@@ -215,6 +215,10 @@ else
 		$encoding = 'none';
 	}
 
+	if (HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION)
+	{
+		$encoding = 'none';
+	}
 
 	
 	// First time visit or files were modified
