@@ -129,6 +129,7 @@ $ccms['lang']['backend']['item']			= "Item";
 $ccms['lang']['backend']['none']			= "None";
 $ccms['lang']['backend']['yes']				= "Yes";
 $ccms['lang']['backend']['no']				= "No";
+$ccms['lang']['backend']['translation']     = "Translations";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']			= "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
@@ -251,6 +252,10 @@ $ccms['lang']['owners']['header']		= "Content owners";
 $ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a cartain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
 $ccms['lang']['owners']['pages']		= "Pages";
 $ccms['lang']['owners']['users']		= "Users";
+
+// Translation assistance page 
+$ccms['lang']['translation']['header']  = "Translate";
+$ccms['lang']['translation']['explain'] = "Shows the translation strings.";
 
 // Album messages
 $ccms['lang']['album']['album']			= "Album";
