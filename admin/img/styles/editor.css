@@ -9,8 +9,8 @@
 	width: 100%;
 	overflow: hidden;
 	/* The ?.... query part is there to for MochaUI to generate a gradient in setColors() near line 2496 */
-	background: url(../spacer.gif?from=fafafa&to=e5e5e5);
-	/* background: url(../spacer.gif); */
+	/* background: url(../spacer.gif?from=fafafa&to=e5e5e5); */
+	background: url(../spacer.gif);                       
 }
 .mochaTitlebar h3 {
 	font: 0.825em "Verdana", arial, sans-serif;
