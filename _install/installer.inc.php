@@ -426,7 +426,7 @@ if($nextstep == md5('final') && CheckAuth())
 				continue;
 
 
-			if (!defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+			if (!CCMS_DEVELOPMENT_ENVIRONMENT)
 			{
 				$results = $db->Query($tok);
 				if ($results == false)
@@ -445,7 +445,7 @@ if($nextstep == md5('final') && CheckAuth())
 		{
 			$log[] = "Database structure and data successfully imported";
 		}
-		if (defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+		if (CCMS_DEVELOPMENT_ENVIRONMENT)
 		{
 ?>
 			<div id="configinc_display" >
@@ -638,7 +638,7 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 
 		// Write the new setup to the config file
-		if (!defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+		if (!CCMS_DEVELOPMENT_ENVIRONMENT)
 		{
 			if ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w'))
 			{
@@ -689,7 +689,7 @@ if($nextstep == md5('final') && CheckAuth())
 			}
 			else
 			{
-				if (!defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+				if (!CCMS_DEVELOPMENT_ENVIRONMENT)
 				{
 					if ($fp = fopen(BASE_PATH.'/.htaccess', 'w'))
 					{
