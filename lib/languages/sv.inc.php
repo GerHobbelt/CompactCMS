@@ -341,33 +341,55 @@ $ccms['lang']['system']['error_pagetitle_2'] = "Enter a page title of 100 charac
 $ccms['lang']['system']['error_passnequal']	= "The entered passwords did not match";
 $ccms['lang']['system']['error_passshort']	= "A password should contain more than 6 characters";
 $ccms['lang']['system']['error_subtitle_2']	= "Enter a short sub-title of 200 characters or less for your page.";
-$ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrect";
-$ccms['lang']['system']['noresults']		= "No results";
-$ccms['lang']['template']['manage']		= "Manage templates";
-$ccms['lang']['template']['nowrite']	= "The current template is <strong>not</strong> writable";
-$ccms['lang']['template']['print']		= "Print";
-$ccms['lang']['translation']['explain'] = "Shows the translation strings.";
-$ccms['lang']['translation']['header']  = "Translate";
-$ccms['lang']['users']['accountcfg']	= "Account settings";
-$ccms['lang']['users']['active']		= "Active";
-$ccms['lang']['users']['cpassword']		= "Confirm password";
-$ccms['lang']['users']['createuser']	= "Create a user";
-$ccms['lang']['users']['editdetails']	= "Edit user's personal details";
-$ccms['lang']['users']['editpassword']	= "Edit user's password";
-$ccms['lang']['users']['email']			= "E-mail";
-$ccms['lang']['users']['firstname']		= "First name";
-$ccms['lang']['users']['lastlog']		= "Last log";
-$ccms['lang']['users']['lastname']		= "Last name";
-$ccms['lang']['users']['level']			= "Level";
-$ccms['lang']['users']['name']			= "Name";
-$ccms['lang']['users']['overviewusers']	= "Overview CCMS users";
-$ccms['lang']['users']['password']		= "Password";
-$ccms['lang']['users']['user']			= "User";
-$ccms['lang']['users']['userlevel']		= "User level";
-$ccms['lang']['users']['username']		= "Username";
+$ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrxplain'] = /* BABELFISH */ "Använd tabellen nedan för att ange vilka minimikrav användarnivå kan använda vissa funktioner. Alla användare under den angivna minsta användaren nivå kommer inte att se eller ha tillgång till funktionen.";
+$ccms['lang']['permission']['header'] = /* BABELFISH */ "Tillstånd preferenser";
+$ccms['lang']['permission']['level1'] = /* BABELFISH */ "Nivå 1 - User";
+$ccms['lang']['permission']['level2'] = /* BABELFISH */ "Nivå 2 - Redaktör";
+$ccms['lang']['permission']['level3'] = /* BABELFISH */ "Nivå 3 - Manager";
+$ccms['lang']['permission']['level4'] = /* BABELFISH */ "Nivå 4 - Admin";
+$ccms['lang']['permission']['target'] = "Target";
+$ccms['lang']['system']['error_403content'] = /* BABELFISH */ "Du får inte tillgång till <strong>{% pagereq%}. html</strong> just nu.";
+$ccms['lang']['system']['error_403header'] = /* BABELFISH */ "En 403 fel uppstod: Du har inte behörighet att komma åt den önskade filen.";
+$ccms['lang']['system']['error_403title'] = "Forbidden";
+$ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Den begärda filen <strong>{% pagereq%}. html</strong> inte kunde hittas.";
+$ccms['lang']['system']['error_description_2'] = /* BABELFISH */ "Ange en beskrivning av mindre än 250 tecken";
+$ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "Nummer Inga skrivrättigheter";
+$ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "Filnamnet ska vara högst 50 tecken långt.";
+$ccms['lang']['system']['error_pagetitle_2'] = /* BABELFISH */ "Ange en sida titel på 100 tecken eller mindre.";
+$ccms['lang']['system']['error_passnequal'] = /* BABELFISH */ "Den inmatade lösenord matchar inte";
+$ccms['lang']['system']['error_passshort'] = /* BABELFISH */ "Ett lösenord bör innehålla mer än 6 tecken";
+$ccms['lang']['system']['error_subtitle_2'] = /* BABELFISH */ "Skriv en kort underrubrik på 200 tecken eller mindre för din sida.";
+$ccms['lang']['system']['error_tooshort'] = /* BABELFISH */ "En eller flera värden som lämnas antingen för korta eller felaktiga";
+$ccms['lang']['system']['noresults'] = /* BABELFISH */ "Inga resultat";
+$ccms['lang']['template']['manage'] = /* BABELFISH */ "Hantera mallar";
+$ccms['lang']['template']['nowrite'] = /* BABELFISH */ "Den nuvarande mallen är <strong>inte</strong> skrivbar";
+$ccms['lang']['template']['print'] = /* BABELFISH */ "Skriv ut";
+$ccms['lang']['translation']['explain'] = /* BABELFISH */ "Visar översättning strängarna.";
+$ccms['lang']['translation']['header'] = /* BABELFISH */ "Översätt";
+$ccms['lang']['users']['accountcfg'] = /* BABELFISH */ "Kontoinställningar";
+$ccms['lang']['users']['active'] = /* BABELFISH */ "Aktiv";
+$ccms['lang']['users']['cpassword'] = /* BABELFISH */ "Bekräfta lösenord";
+$ccms['lang']['users']['createuser'] = /* BABELFISH */ "Skapa en användare";
+$ccms['lang']['users']['editdetails'] = /* BABELFISH */ "Redigera användarens personliga detaljer";
+$ccms['lang']['users']['editpassword'] = /* BABELFISH */ "Redigera användarens lösenord";
+$ccms['lang']['users']['email'] = /* BABELFISH */ "E-post";
+$ccms['lang']['users']['firstname'] = /* BABELFISH */ "Förnamn";
+$ccms['lang']['users']['lastlog'] = /* BABELFISH */ "Senaste log";
+$ccms['lang']['users']['lastname'] = /* BABELFISH */ "Efternamn";
+$ccms['lang']['users']['level'] = /* BABELFISH */ "Nivå";
+$ccms['lang']['users']['name'] = /* BABELFISH */ "Namn";
+$ccms['lang']['users']['overviewusers'] = /* BABELFISH */ "Översikt CCMS användare";
+$ccms['lang']['users']['password'] = /* BABELFISH */ "Lösenord";
+$ccms['lang']['users']['user'] = /* BABELFISH */ "Användare";
+$ccms['lang']['users']['userlevel'] = /* BABELFISH */ "Användarnivå";
+$ccms['lang']['users']['username'] = /* BABELFISH */ "Användarnamn";
        
       /*
          ----------------------------------------------------------
       */
 	  
 ?>
+
+
+/* ADDITION */
+

@@ -343,30 +343,56 @@ $ccms['lang']['system']['error_templatedir'] = "Couldn't find the templates dire
 $ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrect";
 $ccms['lang']['system']['noresults']		= "No results";
 $ccms['lang']['template']['manage']		= "Manage templates";
-$ccms['lang']['template']['nowrite']	= "The current template is <strong>not</strong> writable";
-$ccms['lang']['template']['print']		= "Print";
-$ccms['lang']['translation']['explain'] = "Shows the translation strings.";
-$ccms['lang']['translation']['header']  = "Translate";
-$ccms['lang']['users']['accountcfg']	= "Account settings";
-$ccms['lang']['users']['active']		= "Active";
-$ccms['lang']['users']['cpassword']		= "Confirm password";
-$ccms['lang']['users']['createuser']	= "Create a user";
-$ccms['lang']['users']['editdetails']	= "Edit user's personal details";
-$ccms['lang']['users']['editpassword']	= "Edit user's password";
-$ccms['lang']['users']['email']			= "E-mail";
-$ccms['lang']['users']['firstname']		= "First name";
-$ccms['lang']['users']['lastlog']		= "Last log";
-$ccms['lang']['users']['lastname']		= "Last name";
-$ccms['lang']['users']['level']			= "Level";
-$ccms['lang']['users']['name']			= "Name";
-$ccms['lang']['users']['overviewusers']	= "Overview CCMS users";
-$ccms['lang']['users']['password']		= "Password";
-$ccms['lang']['users']['user']			= "User";
-$ccms['lang']['users']['userlevel']		= "User level";
-$ccms['lang']['users']['username']		= "Username";
+$ccm$ccms['lang']['permission']['explain'] = /* BABELFISH */ "Verwenden  Sie die Tabelle unten, um festzulegen, welche Mindestanforderungen  Benutzer-Ebene können bestimmte Funktionen nicht nutzen. Jeder Benutzer unter dem angegebenen minimal erforderliche Benutzer-Ebene, nicht sehen, noch haben Zugriff auf die Funktion.";
+$ccms['lang']['permission']['header'] = /* BABELFISH */ "Permission Präferenzen";
+$ccms['lang']['permission']['level1'] = "Level 1 - User";
+$ccms['lang']['permission']['level2'] = "Level 2 - Editor";
+$ccms['lang']['permission']['level3'] = "Level 3 - Manager";
+$ccms['lang']['permission']['level4'] = "Level 4 - Admin";
+$ccms['lang']['permission']['target'] = "Target";
+$ccms['lang']['system']['error_403content'] = /* BABELFISH */ "Sie sind nicht berechtigt, den Zugang <strong>{% pagereq%}. html</strong> in diesem Moment.";
+$ccms['lang']['system']['error_403header'] = /* BABELFISH */ "A 403 Fehler: Sie haben keine Berechtigung, die angeforderte Datei zugreifen.";
+$ccms['lang']['system']['error_403title'] = /* BABELFISH */ "Verboten";
+$ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Die angeforderte Datei <strong>{% pagereq%}. html</strong> konnte nicht gefunden werden.";
+$ccms['lang']['system']['error_description_2'] = /* BABELFISH */ "Geben Sie eine Beschreibung von weniger als 250 Zeichen";
+$ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "Verzeichnis hat keine Schreibrechte";
+$ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "Dateiname sollte höchstens 50 Zeichen lang sein.";
+$ccms['lang']['system']['error_pagetitle_2'] = /* BABELFISH */ "Geben Sie einen Seitentitel von 100 Zeichen oder weniger.";
+$ccms['lang']['system']['error_passnequal'] = /* BABELFISH */ "Die eingegebenen Passwörter stimmen nicht überein";
+$ccms['lang']['system']['error_passshort'] = /* BABELFISH */ "Ein Passwort sollte mindestens 6 Stellen";
+$ccms['lang']['system']['error_subtitle_2'] = /* BABELFISH */ "Geben Sie eine kurze Sub-Titel von 200 Zeichen oder weniger für Ihre Seite.";
+$ccms['lang']['system']['error_templatedir'] = /* BABELFISH */ "Konnte nicht gefunden werden die Vorlagen-Verzeichnis! Stellen Sie sicher, dass es existiert und enthält mindestens eine Vorlage.";
+$ccms['lang']['system']['error_tooshort'] = /* BABELFISH */ "Ein oder mehrere vorgelegten Werte wurden entweder zu kurz oder falsch";
+$ccms['lang']['system']['noresults'] = /* BABELFISH */ "Keine Ergebnisse";
+$ccms['lang']['template']['manage'] = /* BABELFISH */ "Vorlagen verwalten";
+$ccms['lang']['template']['nowrite'] = /* BABELFISH */ "Die aktuelle Vorlage ist <strong>nicht</strong> beschreibbar";
+$ccms['lang']['template']['print'] = /* BABELFISH */ "Drucken";
+$ccms['lang']['translation']['explain'] = /* BABELFISH */ "Zeigt die Übersetzungs-Strings.";
+$ccms['lang']['translation']['header'] = /* BABELFISH */ "Übersetzen";
+$ccms['lang']['users']['accountcfg'] = /* BABELFISH */ "Konto-Einstellungen";
+$ccms['lang']['users']['active'] = "Active";
+$ccms['lang']['users']['cpassword'] = /* BABELFISH */ "Kennwort bestätigen";
+$ccms['lang']['users']['createuser'] = /* BABELFISH */ "Erstellen Sie einen Benutzer";
+$ccms['lang']['users']['editdetails'] = /* BABELFISH */ "Benutzer bearbeiten die persönlichen Daten";
+$ccms['lang']['users']['editpassword'] = /* BABELFISH */ "Bearbeiten Kennwort des Benutzers";
+$ccms['lang']['users']['email'] = /* BABELFISH */ "E-Mail";
+$ccms['lang']['users']['firstname'] = /* BABELFISH */ "Vorname";
+$ccms['lang']['users']['lastlog'] = /* BABELFISH */ "Letzter Login";
+$ccms['lang']['users']['lastname'] = /* BABELFISH */ "Nachname";
+$ccms['lang']['users']['level'] = "Level";
+$ccms['lang']['users']['name'] = "Name";
+$ccms['lang']['users']['overviewusers'] = /* BABELFISH */ "Übersicht CCMS Benutzer";
+$ccms['lang']['users']['password'] = /* BABELFISH */ "Passwort";
+$ccms['lang']['users']['user'] = "User";
+$ccms['lang']['users']['userlevel'] = /* BABELFISH */ "User-Ebene";
+$ccms['lang']['users']['username'] = /* BABELFISH */ "Benutzername";
        
       /*
          ----------------------------------------------------------
       */
 	  
 ?>
+
+
+/* ADDITION */
+
