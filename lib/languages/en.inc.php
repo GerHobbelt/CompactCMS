@@ -61,6 +61,10 @@ $ccms['lang']['system']['error_misconfig']	= "<strong>There seems to be a miscon
 $ccms['lang']['system']['error_deleted']	= "<h1>The file you selected seems to be deleted</h1><p>Refresh the filelist to see the most recent list of available files to prevent this error from happening. If this doesn't solve this error, manually check the content folder for the file you're trying to open.</p>";
 $ccms['lang']['system']['error_404title'] 	= "File not found";
 $ccms['lang']['system']['error_404header']	= "A 404 error occurred, the requested file could not be found.";
+$ccms['lang']['system']['error_404content']	= "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
+$ccms['lang']['system']['error_403title']   = "Forbidden";
+$ccms['lang']['system']['error_403header']  = "A 403 error occurred: you don't have permission to access the requested file.";
+$ccms['lang']['system']['error_403content']	= "You are not allowed to access <strong>{%pagereq%}.html</strong> at this moment.";
 $ccms['lang']['system']['error_sitemap'] 	= "An overview of all pages";
 $ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrect";
 $ccms['lang']['system']['error_passshort']	= "A password should contain more than 6 characters";
@@ -336,8 +340,6 @@ $ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
 	$ccms['lang']['login']['provide']			
 	$ccms['lang']['system']['error_default']	
 	$ccms['lang']['system']['error_sitemap'] 	
-	$ccms['lang']['system']['tooriginal']		
-	$ccms['lang']['template']['print']		
        
          ----------------------------------------------------------
 	

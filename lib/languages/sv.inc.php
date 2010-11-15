@@ -1,6 +1,6 @@
 <?php
 /* ************************************************************
-Copyright (C) 2008 - 2009 by Xander Groesbeek (CompactCMS.nl)
+Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
@@ -34,7 +34,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 // System wide messages
 $ccms['lang']['system']['error_database'] 	= "Kunde ej koppla till databasen. Var god verifiera databasinformation nedan.";
 $ccms['lang']['system']['error_openfile'] 	= "Kunde ej öppna den specifierade filen";
-$ccms['lang']['system']['error_notemplate']	= "No templates could be found to be applied to your site. Please add at least one template to ./lib/templates/.";
+$ccms['lang']['system']['error_notemplate']	= "Inga stilmallar hittades som kunde appliceras på din sida. Var god lägg in din stilmall i mappen ./lib/templates/.";
 $ccms['lang']['system']['error_templatedir'] = "Couldn't find the templates directory! Make sure it exists and contains at least one template.";
 $ccms['lang']['system']['error_write'] 		= "Filen är ej skrivbar";
 $ccms['lang']['system']['error_chmod'] 		= "Den nuvarande filen kunde ej modifieras. Var vänlig kontrollera skrivbarhetsinställningar på filen och dess mapp (666).";
@@ -62,7 +62,6 @@ $ccms['lang']['system']['error_sitemap'] 	= "En översikt över alla sidor";
 $ccms['lang']['system']['tooriginal']		= "Tillbaka till originalet";
 $ccms['lang']['system']['message_rights'] 	= "Alla rättigheter reserverade";
 $ccms['lang']['system']['message_compatible'] = "Testkörd på ";
-$ccms['lang']['system']['error_notemplate']	= "Inga stilmallar hittades som kunde appliceras på din sida. Var god lägg in din stilmall i mappen ./lib/templates/.";
 
 // Administration general messages
 $ccms['lang']['backend']['gethelp'] 		= "Har du förslag, feedback eller problem? Besök <a href=\"http://community.compactcms.nl/forum/\" title=\"Besök det officiella forumet\" class=\"external\" rel=\"external\">forumet</a>!";
@@ -249,7 +248,6 @@ $ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
 	$ccms['lang']['login']['provide']			
 	$ccms['lang']['system']['error_default']	
 	$ccms['lang']['system']['error_sitemap'] 	
-	$ccms['lang']['system']['tooriginal']		
        
          ----------------------------------------------------------
 	
@@ -293,6 +291,8 @@ $ccms['lang']['backend']['settingssaved']	= "Your changes have been successfully
 $ccms['lang']['backend']['templateeditor']	= "Template editor";
 $ccms['lang']['backend']['tooverview']		= "Back to overview";
 $ccms['lang']['backend']['usermanagement']	= "User management";
+$ccms['lang']['backup']['wait4backup']  = "Please wait while the backup is being created...";
+$ccms['lang']['backup']['warn4media']	= "Warning :: Please be aware that your <dfn>lightbox</dfn> albums' images are <strong>not</strong> backed up! \nThe album descriptions <strong>are</strong>, but the images themselves and their thumbnails are <strong>not included in these backups</strong>. \nIf you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.";
 $ccms['lang']['forms']['add']           = "Add filter for";
 $ccms['lang']['forms']['edit_remove']   = "Edit or remove filter for";
 $ccms['lang']['forms']['filter_showing']	= "right now we're only showing pages which have at least this text in here";
@@ -329,6 +329,10 @@ $ccms['lang']['permission']['level2']	= "Level 2 - Editor";
 $ccms['lang']['permission']['level3']	= "Level 3 - Manager";
 $ccms['lang']['permission']['level4']	= "Level 4 - Admin";
 $ccms['lang']['permission']['target']	= "Target";
+$ccms['lang']['system']['error_403content']	= "You are not allowed to access <strong>{%pagereq%}.html</strong> at this moment.";
+$ccms['lang']['system']['error_403header']  = "A 403 error occurred: you don't have permission to access the requested file.";
+$ccms['lang']['system']['error_403title']   = "Forbidden";
+$ccms['lang']['system']['error_404content']	= "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
 $ccms['lang']['system']['error_description_2'] = "Enter a description of less than 250 characters";
 $ccms['lang']['system']['error_dirwrite']	= "Directory has no write access";
 $ccms['lang']['system']['error_filesize_2']	= "File name should be at most 50 characters long.";
@@ -340,6 +344,7 @@ $ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values we
 $ccms['lang']['system']['noresults']		= "No results";
 $ccms['lang']['template']['manage']		= "Manage templates";
 $ccms['lang']['template']['nowrite']	= "The current template is <strong>not</strong> writable";
+$ccms['lang']['template']['print']		= "Print";
 $ccms['lang']['users']['accountcfg']	= "Account settings";
 $ccms['lang']['users']['active']		= "Active";
 $ccms['lang']['users']['cpassword']		= "Confirm password";

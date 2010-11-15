@@ -325,7 +325,6 @@ $ccms['lang']['guestbook']['success']	= "Dank je wel";
 	$ccms['lang']['login']['provide']			
 	$ccms['lang']['system']['error_default'] 	
 	$ccms['lang']['system']['error_sitemap'] 	
-	$ccms['lang']['system']['tooriginal']		
        
          ----------------------------------------------------------
 	
@@ -341,14 +340,21 @@ $ccms['lang']['guestbook']['success']	= "Dank je wel";
          ----------------------------------------------------------
       */
 	  
+$ccms['lang']['backup']['wait4backup']  = "Please wait while the backup is being created...";
+$ccms['lang']['backup']['warn4media']	= "Warning :: Please be aware that your <dfn>lightbox</dfn> albums' images are <strong>not</strong> backed up! \nThe album descriptions <strong>are</strong>, but the images themselves and their thumbnails are <strong>not included in these backups</strong>. \nIf you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.";
 $ccms['lang']['forms']['add']           = "Add filter for";
 $ccms['lang']['forms']['edit_remove']   = "Edit or remove filter for";
 $ccms['lang']['forms']['filter_showing']	= "right now we're only showing pages which have at least this text in here";
 $ccms['lang']['hints']['filter']        = "<br>You can click on the <span class='sprite livefilter livefilter_active'>&#160;filter icon</span> at left of the title to add, edit or remove a text to filter the page list on, e.g. when you type 'home' in the edit field which appears when you click the icon, then press the Enter/Return key, only pages which have the text 'home' in this column will be shown. <br>Clicking the icon again and deleting the text in the edit field, then pressing the Enter/Return key, will remove the filter.<br>Hover over the filter icon to see whether the column is currently being filtered, and if so, using which filter text.";
+$ccms['lang']['system']['error_403content']	= "You are not allowed to access <strong>{%pagereq%}.html</strong> at this moment.";
+$ccms['lang']['system']['error_403header']  = "A 403 error occurred: you don't have permission to access the requested file.";
+$ccms['lang']['system']['error_403title']   = "Forbidden";
+$ccms['lang']['system']['error_404content']	= "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
 $ccms['lang']['system']['error_description_2'] = "Enter a description of less than 250 characters";
 $ccms['lang']['system']['error_filesize_2']	= "File name should be at most 50 characters long.";
 $ccms['lang']['system']['error_pagetitle_2'] = "Enter a page title of 100 characters or less.";
 $ccms['lang']['system']['error_subtitle_2']	= "Enter a short sub-title of 200 characters or less for your page.";
+$ccms['lang']['template']['print']		= "Print";
        
       /*
          ----------------------------------------------------------

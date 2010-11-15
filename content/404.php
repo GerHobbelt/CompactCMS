@@ -5,10 +5,9 @@ if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
 
 send_response_status_header(404); 
 
-?>
-<p>The requested file <strong><?php echo strlen($ccms['pagereq']) > 0 ? $ccms['pagereq'].'.html' : '&lt;unidentified&gt;'; ?></strong> could not be found.</p>
+echo '<p>' . $ccms['lang']['system']['error_404content'] . '</p>';
 
-<?php
+
 if (0)
 {
 	echo "<pre>invocation_mode = " . get_interpreter_invocation_mode() . "\n";

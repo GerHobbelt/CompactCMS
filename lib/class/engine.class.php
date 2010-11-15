@@ -34,6 +34,7 @@ class ccmsParser
 	protected $template;
 	protected $output;
 	protected $includePath;
+	protected $nestingLevel;
 
 	########################################################
 	################## Internal Functions ##################
@@ -103,12 +104,13 @@ class ccmsParser
 	protected function splitTemplate($str) 
 	{
 		$sicherheitscounter = 0;
-		$this->template = array();
+		$orig_str = $str;
+		$template = array();
 		while ($str != '') 
 		{
-			$result = preg_match('/^(.*?)({%.*?%}|<!--.*?-->|\n?$)/s', $str, $matches);
+			$result = preg_match('/^([^{<]*)({%.*?%}|<!--.*?-->|{[^%][^{<]*|<[^{<]*|)/s', $str, $matches);
 			$str = substr($str, strlen($matches[0]));
-			if (strlen($matches[1])) $this->template[] = $matches[1];
+			if (strlen($matches[1])) $template[] = $matches[1];
 			if (preg_match('/{%INCLUDE (.*)%}/', $matches[2], $matches2)) 
 			{
 				$str = $this->loadInclude($matches2[1]).$str;
@@ -117,10 +119,9 @@ class ccmsParser
 			{
 				$this->colorSet($matches2[1]);
 			}
-			else 
+			else if (strlen($matches[2])) 
 			{
-				if (strlen($matches[2])) 
-					$this->template[] = $matches[2];
+				$template[] = $matches[2];
 			}
 			if (++$sicherheitscounter >= 2000) 
 			{
@@ -128,6 +129,7 @@ class ccmsParser
 				die("Parser stuck: '".$str."' $result ".strlen($str));
 			}
 		}
+		return $template;
 	}   
 	
 	# loads an Include file and returns its contents
@@ -198,6 +200,12 @@ class ccmsParser
 	# $enable: Output mode: 0=disabled; 1=active; -1=disabled, to be enabled with ELSE 
 	protected function process($from, $to, $vars, $enable = 1) 
 	{
+		$this->nestingLevel++;
+		if ($this->nestingLevel > 8)
+		{
+			die('INTERNAL ERROR: maximum recursive invocation level reached!');
+		}
+		
 		for ($i = $from; $i < $to; $i++) 
 		{
 			$p = $this->template[$i];
@@ -218,10 +226,11 @@ class ccmsParser
 					$j = $this->findEndOfIF($i, $to, $var, $p);
 					
 					# call process() recursively but don't output anything
-					$this->process($i, $j, $vars, 0);
-            
+					$new_j = $this->process($i, $j, $vars, 0);
+					$to += $new_j - $j;
+						
 					# Proceed after closing tag
-					$i = $j;
+					$i = $new_j;
 				}               
 			} 
 			elseif (preg_match("/^{%FOR (.*)%}/", $p, $matches)) 
@@ -242,7 +251,9 @@ class ccmsParser
 						if (!is_array($row)) 
 							$row = array('ROW' => $row);
 										
-						$this->process($i, $j, $row + $vars, 1);
+						$new_j = $this->process($i, $j, $row + $vars, 1);
+						$to += $new_j - $j;
+						$j = $new_j;
 					}
 				}
 					
@@ -268,8 +279,9 @@ class ccmsParser
 				$j = $this->findEndOfIF($i, $to, $var, $p);
 				
 				# call process() recursively if variable is set
-				$this->process($i, $j, $vars, $value ? 1 : -1);
-          
+				$new_j = $this->process($i, $j, $vars, $value ? 1 : -1);
+				$to += $new_j - $j;
+				$j = $new_j;
 					
 				# Proceed after closing tag
 				$i = $j;
@@ -280,15 +292,38 @@ class ccmsParser
 			} 
 			elseif (preg_match("/^{%(.*)%}/", $p, $matches)) 
 			{
-				# print variable value
-				$this->append($this->getvar($vars, $matches[1]));
+				# texts can be processed recursively.
+				# This creates a security issue when fields are self-referential, which 
+				# happens, for example, when a malicious commenter would include 
+				# '{%comment%}' as part of his comment -- IFF the comments weren't 
+				# loaded through AJAX/JS, bypassing this engine!
+				#
+				# The point?
+				#
+				# Watch out for recursive {%tag%} self-references: they will make the 
+				# engine run until it hits the 
+				#
+				# print variable value by replacing the tag with its value (split up in chunks), then rewinding the index by -1, so this template entry will be hit another time, now with altered content
+				$a = $this->splitTemplate(strval($this->getvar($vars, $matches[1])));
+				array_splice($this->template, $i, 1, $a);
+				$to += count($a) - 1; // one entry removed; replaced by count($a) new ones
+				$i--; // make sure we revisit template[$i]
 			} 
+			#elseif (preg_match("/^{%(.*)%}/", $p, $matches)) 
+			#{
+			#	# print variable value by replacing the tag with its value
+			#	$this->append($this->getvar($vars, $matches[1]));
+			#} 
 			else 
 			{ 
 				# Regular text
 				$this->append($p);
 			}
 		}
+		
+		$this->nestingLevel--;
+		// return (possibly adjusted) end index so caller can adjust theirs.
+		return $to; 
 	}
 
 	## Prints PHP code to the output page
@@ -313,9 +348,6 @@ class ccmsParser
 	# constructor
 	public function __construct() 
 	{
-		global $ADM_SESS;
-
-		if(isset($ADM_SESS['PERM_USERNAME'])) $this->params['ADMIN_USERNAME'] = $ADM_SESS['PERM_USERNAME'];
 	}
 	
 	# Returns all set parameters
@@ -393,7 +425,7 @@ class ccmsParser
 			}
 		}
 		
-		$this->splitTemplate($tmpl);
+		$this->template = $this->splitTemplate($tmpl);
 	}
 	
 	# Load a monolithic template
@@ -404,19 +436,20 @@ class ccmsParser
 		$idx = strrpos($tmpl, '/');
 		if (!isset($this->includePath))
 			$this->includePath = substr($tmpl, 0, $idx === false ? 0 : $idx+1);
-		$this->splitTemplate($leadin . file_get_contents($tmpl) . $leadout);
+		$this->template = $this->splitTemplate($leadin . file_get_contents($tmpl) . $leadout);
 	}
 	
 	# Sets the template content directly (not through a file)
 	public function setTemplateText($text) 
 	{
-		$this->splitTemplate($text);
+		$this->template = $this->splitTemplate($text);
 	}
 	
 	# Parse template and return the contents
 	public function parseAndReturn() 
 	{
 		$this->output = array();
+		$this->nestingLevel = 0;
 		$this->process(0, count($this->template), $this->params);
 		return @join('', $this->output);
 	}
@@ -425,6 +458,7 @@ class ccmsParser
 	public function parseAndEcho() 
 	{
 		$this->output = null;
+		$this->nestingLevel = 0;
 		$this->process(0, count($this->template), $this->params);
 	}
 	
@@ -481,7 +515,7 @@ class AlternativeParser extends ccmsParser
 	public function splitTemplate($str) 
 	{
 		$str = preg_replace('/\[(.*?)\]/e', "'{%'.strtolower('\\1').'%}'", $str);
-		parent::splitTemplate($str);
+		return parent::splitTemplate($str);
 	}
 }
 	
