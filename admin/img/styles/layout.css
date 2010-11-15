@@ -266,7 +266,6 @@ div.ss_help
 	-webkit-border-radius: 10px;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
-	behavior: url('./img/styles/PIE.php');
 }
 div.tip-title {
 	font-weight: bold;
@@ -278,7 +277,6 @@ div.tip-title {
 	-webkit-border-radius: 20px;
 	-moz-border-radius: 20px;
 	border-radius: 20px;
-	behavior: url('./img/styles/PIE.php');
 }
 div.tip-text {
 	font-size: 90%;

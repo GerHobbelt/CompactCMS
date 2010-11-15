@@ -55,7 +55,6 @@ table
 	-webkit-border-radius: 10px;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
-	behavior: url('../admin/img/styles/PIE.php');
 }
 #install-wrapper h2{font-size:1.2em;border-bottom:solid 1px #90D244;}
 .installMsg{background-color:rgba(229,215,238,0.8);margin-bottom:15px;}

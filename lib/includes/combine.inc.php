@@ -98,20 +98,21 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
-$cache		= true;
-$cachedir	= BASE_PATH . '/lib/includes/cache';
+
+$cache		= false;
+$cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
 
 $jsdir		= getGETparam4FullFilePath('jsdir');
 if (empty($jsdir)) 
-	$jsdir = BASE_PATH . '/lib/includes/js';
+	$jsdir = $cfg['rootdir'] . '/lib/includes/js';
 else if ($jsdir[0] != '/') 
-	$jsdir = BASE_PATH . '/' . $jsdir;
+	$jsdir = $cfg['rootdir'] . $jsdir;
 	
 $cssdir		= getGETparam4FullFilePath('cssdir');
 if (empty($cssdir)) 
-	$cssdir = BASE_PATH . '/admin/img/styles';
+	$cssdir = $cfg['rootdir'] . 'admin/img/styles';
 else if ($cssdir[0] != '/') 
-	$cssdir = BASE_PATH . '/' . $cssdir;
+	$cssdir = $cfg['rootdir'] . $cssdir;
 
 
 	
@@ -120,15 +121,18 @@ $type = getGETparam4IdOrNumber('type');
 switch ($type) 
 {
 case 'css':
-	$base = realpath($cssdir);
+	$http_base = path_remove_dot_segments($cssdir);
+	$base = cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH);
 	break;
 case 'javascript':
-	$base = realpath($jsdir);
+	$http_base = path_remove_dot_segments($jsdir);
+	$base = cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH);
 	break;
 default:
 	send_response_status_header(503); // Not Implemented
 	exit;
 };
+
 
 $elements = explode(',', getGETparam4CommaSeppedFilenames('files'));
 
@@ -244,7 +248,34 @@ else
 	while (list(,$element) = each($elements)) 
 	{
 		$path = realpath($base . '/' . $element);
-		$contents .= "\n\n" . file_get_contents($path);
+		$my_content = file_get_contents($path);
+		switch ($type)
+		{
+		case 'css':
+			/*
+			Before we go and optimize the CSS (or not), we fix up the CSS for IE7/8/... by adding the 
+			
+					 behavior: url(PIE.php);
+			
+			line in every definition which has a 'border-radius'.
+			
+			We do it this way to ensure all styles are patched correctly; previously this was done by hand in the
+			various CSS files, resulting in quite a few ommisions in the base css files and also the templates' ones.
+			
+			As we now force all CSS+JS requests through here, we can easily fix this kind of oddity very consistently
+			by performing the fix in code, right here.
+			
+			As the result is cached, this effort is only required once. Which would happen at install time when
+			you run the 'cache priming' action, resulting in a fully set up cache when you go 'live'.
+			*/
+			$my_content = fixup_css($my_content, $http_base);
+			break;
+			
+		default:
+			$my_content = fixup_js($my_content, $http_base);
+			break;
+		}
+		$contents .= "\n\n" . $my_content;
 	}
 
 	// invoke the apropriate optimizer for the given type:
@@ -278,4 +309,81 @@ else
 		}
 	}
 }
+
+
+
+function css_mk_abs_path($relpath, $basedir)
+{
+	global $cfg;
+	
+	$delimiter = false;
+	if ($relpath[0] == "'")
+	{
+		$delimiter = "'";
+		$relpath = trim($relpath, $delimiter);
+	}
+	else if ($relpath[0] == '\\' && $relpath[1] == '"')
+	{
+		$delimiter = '"';
+		// a bit of a hack; anyway, paths cannot contain a double quote so we're fine doing it like this (alternative to 'trim()')
+		$relpath = str_replace('\\"', '', $relpath);
+	}
+	
+	if ($relpath[0] != '/' && strpos($relpath, '://') === false)
+	{
+		/* 
+		a relative path was specified; either as		
+		  url(./relpath)
+		or
+		  url(../relpath)
+		or
+		  url(relpath)
+		  
+		Anyway, prepend the path with the absolute path to the given file and then discard the ./ and ../ entries in the path.
+		*/
+		$abspath = $basedir . (substr($basedir, -1, 1) != '/' ? '/' : '') . $relpath;
+		$abspath = path_remove_dot_segments($abspath);
+	}
+	else
+	{
+		// don't modify
+		$abspath = $relpath;
+	}
+		
+	return $delimiter . $abspath . $delimiter;
+}
+
+
+
+/**
+patch/correct CCS3 and other particulars
+*/
+function fixup_css($contents, $basedir)
+{
+	global $cfg;
+	
+	// fix CSS3 border-radius for IE:
+	$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
+
+	$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+
+	// make all url() paths in there ABSOLUTE:
+	$contents = preg_replace('/\surl\(([^)]+)\)/e', "' url('.css_mk_abs_path('\\1', '$basedir').')'", $contents);
+	
+	return $contents;
+}
+
+
+
+/**
+patch/correct JS relative paths and other particulars
+*/
+function fixup_js($contents, $basedir)
+{
+	global $cfg;
+	
+	return $contents;
+}
+
+
 ?>

@@ -1192,6 +1192,41 @@ function makeAbsoluteURI($path)
 
 
 
+/**
+Convert an absolute HTTP path to a 'real path' on physical disc
+
+notes: implies invocation of realpath().
+*/
+function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
+{
+	if (substr($http_base, 0, strlen($site_rootdir)) == $site_rootdir)
+	{
+		$http_base = substr($http_base, strlen($site_rootdir));
+		if ($http_base[0] == '/')
+			$http_base = substr($http_base, 1);
+		
+		$rp = $real_basedir;
+		if (substr($rp, -1, 1) != '/')
+			$rp .= '/';
+		
+		return realpath($rp . $http_base);
+	}
+	else
+	{
+		/*
+		path outside the CCMS 'root'; this MAY be allowed when CCMS is in a subdir itself.
+		
+		Anyway, let realpath and the caller cope with the security issues that may stem from this.
+		*/
+		return realpath($http_base);
+	}
+}
+
+
+
+
+
+
 
 
 
