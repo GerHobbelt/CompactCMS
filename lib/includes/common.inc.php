@@ -182,6 +182,14 @@ function getPOSTparam4IdOrNumber($name, $def = null)
 	return filterParam4IdOrNumber($_POST[$name], $def);
 }
 	
+function getREQUESTparam4IdOrNumber($name, $def = null) 
+{
+	if (!isset($_REQUEST[$name]))
+		return $def;
+
+	return filterParam4IdOrNumber(rawurldecode($_REQUEST[$name]), $def);
+}
+	
 function filterParam4IdOrNumber($value, $def = null) 
 {
 	if (!isset($value))

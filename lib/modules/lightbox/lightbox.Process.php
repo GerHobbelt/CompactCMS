@@ -446,7 +446,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 		}
 	}
 
-	if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'xml') 
+	$response = getREQUESTparam4IdOrNumber('response');
+	if ($response == 'xml') 
 	{
 		/* do nothing */
 	} 
