@@ -68,6 +68,7 @@ if ($perm['manageModBackup'] <= 0 || !checkAuth())
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Back-up &amp; Restore module</title>
+		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
 		<script type="text/javascript" charset="utf-8">
 function confirmation()
@@ -88,10 +89,29 @@ function confirmation()
 		return false;
 	}
 }
-</script>
+
+window.addEvent(
+	'domready',
+	function()
+	{
+		$('create-arch').addEvent('click', function()
+			{
+				var el = $('backup-module');
+				el.set('spinner', { 
+						message: "<?php echo $ccms['lang']['backup']['wait4backup']; ?>", 
+						img: {
+							'class': 'loading'
+						},
+					});
+				el.spin(); //obscure the element with the spinner
+
+				return true;
+			});
+	});
+		</script>
 	</head>
 <body>
-	<div class="module">
+	<div id="backup-module" class="module">
 <?php
 
 
@@ -106,6 +126,8 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');
 	
+	$error = null;
+	
 	$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
 
 	/*
@@ -114,16 +136,25 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 	required to ensure the MD5 hashes stored in the DB per user are still valid
 	when the backup is restored at an unfortunate moment later in time.
 	*/
-	$configBackup       = array('../../../../content/','../../../../lib/templates/','../../../../lib/config.inc.php');
+	$configBackup       = array('../../../../content/','../../../../lib/templates/','../../../../lib/config.inc.php','../../../../media/albums/:/\.txt$/i','../../../../media/albums/:/\/_thumbs\//i');
 	$configBackupDir    = '../../../../media/files/';
 	$backupName         = date('Ymd_His').'-data'.$current_user.'.zip';
 	
 	$createZip = new createZip;
 	if (isset($configBackup) && is_array($configBackup) && count($configBackup)>0) 
 	{
-		foreach ($configBackup as $dir) 
+		foreach ($configBackup as $spec) 
 		{
-			$basename = basename($dir);
+			$pathspec = explode(':', $spec);
+			$dir = $pathspec[0];
+			$regex_to_match = (count($pathspec) > 1 ? $pathspec[1] : null);
+			
+			/*
+			 strip off the relative-path-to-root so we're left with the full, yet relative, path. 
+			 
+			 Handy when restoring data: extract zip equals (almost) done.
+			*/
+			$basename = substr($dir, strlen('../../../../')); 
 			if (is_file($dir)) 
 			{
 				$fileContents = file_get_contents($dir);
@@ -131,22 +162,29 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 			} 
 			else 
 			{
-				$createZip->addDirectory($basename."/");
-				$files = directoryToArray($dir,true);
-				$files = array_reverse($files);
-	
+				$basename .= (substr($basename, -1, 1) != '/' ? '/' : '');
+				$createZip->addDirectory($basename);
+				$files = directoryToArray($dir, true, $regex_to_match);
+				/*
+				opendir+readdir deliver the file set in arbitrary order.
+				
+				In order for this code to work, we'll need a known order of the files.
+				*/
+				sort($files, SORT_STRING);
+				//$files = array_reverse($files);
+
 				foreach ($files as $file) 
 				{
 					$zipPath = explode($dir,$file);
 					$zipPath = $zipPath[1];
 					if (is_dir($file)) 
 					{
-						$createZip->addDirectory($basename."/".$zipPath);
+						$createZip->addDirectory($basename . $zipPath);
 					} 
 					else 
 					{
 						$fileContents = file_get_contents($file);
-						$createZip->addFile($fileContents,$basename."/".$zipPath);
+						$createZip->addFile($fileContents, $basename . $zipPath);
 					}
 				}
 			}
@@ -168,14 +206,93 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 	
 	$backup->backup_dir = $configBackupDir;
 	$sqldump = $backup->Execute(MSB_STRING,"",false);
-	$createZip->addFile($sqldump,$cfg['db_name'].'-sqldump.sql');
+	
+	/*
+	And make sure we 'position' the .sql file just right for a subsequent 
+	restore through our installer/wizard: to make that happen it has to live
+	in the /_docs/ directory.
+	*/
+	$createZip->addDirectory('_docs');
+	$createZip->addFile($sqldump, '_docs/' . $cfg['db_name'] . '-sqldump.sql');
 	
 	$fileName = $configBackupDir.$backupName;
-	$fd = fopen($fileName, "wb");
-	$out = fwrite($fd, $createZip -> getZippedfile());
-	fclose ($fd);
-	
-	echo "<p class=\"success center\">".$ccms['lang']['backend']['newfilecreated'].", <a href=\"../../../../media/files/$backupName\">".strtolower($ccms['lang']['backup']['download'])."</a>.</p>"; 
+	$fd = @fopen($fileName, "wb");
+	if (!$fd)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $fileName;
+	}
+	else
+	{
+		$out = fwrite($fd, $createZip->getZippedfile());
+		if (!$out)
+		{
+			$error[] = $ccms['lang']['system']['error_write'] . ": " . $fileName;
+		}
+		fclose($fd);
+	}
+
+	/*
+	To facilitate the auto-upgrade path we write the SQL dump to another
+	location: 
+	  /media/files/ccms-restore/<dbname>-sqldump.sql
+	This file will be picked up by the installer/wizard to perform an
+	automated upgrade when the admin so desires.
+	*/
+	if (!file_exists(BASE_PATH . '/media/files/ccms-restore'))
+	{
+		@mkdir(BASE_PATH . '/media/files/ccms-restore', fileperms(BASE_PATH . '/media/files'));
+	}
+	$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/' . $cfg['db_name'] . '-sqldump.sql';
+	$fd = @fopen($sqldumpfile, "wb");
+	if (!$fd)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;
+	}
+	else
+	{
+		$out = fwrite($fd, $sqldump);
+		if (!$out)
+		{
+			$error[] = $ccms['lang']['system']['error_write'] . ": " . $sqldumpfile;
+		}
+		fclose($fd);
+	}
+	// also copy the config.inc.php file over to the restore directory...
+	$cfgfile = BASE_PATH . '/lib/config.inc.php';
+	$fileContents = file_get_contents($cfgfile);
+	if (!$fileContents)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $cfgfile;
+	}
+	$cfgfile = BASE_PATH . '/media/files/ccms-restore/config.inc.php';
+	$fd = @fopen($cfgfile, "wb");
+	if (!$fd)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $cfgfile;
+	}
+	else
+	{
+		$out = fwrite($fd, $fileContents);
+		if (!$out)
+		{
+			$error[] = $ccms['lang']['system']['error_write'] . ": " . $cfgfile;
+		}
+		fclose($fd);
+	}
+
+	if (empty($error))
+	{
+		echo "<div class=\"module success center\"><p>".$ccms['lang']['backend']['newfilecreated'].", <a href=\"../../../../media/files/$backupName\">".strtolower($ccms['lang']['backup']['download'])."</a>.</p></div>"; 
+	}
+	else
+	{
+		echo "<div class=\"module error center\">\n";
+		foreach($error as $msg)
+		{
+			echo "<p>".msg."</p>\n";
+		}
+		echo "</div>"; 
+	}
 }
 
 /**
@@ -219,14 +336,60 @@ if($do=="delete" && $btn_delete=="dodelete" && checkAuth())
 }
 
 
+
+
+/*
+See if the site uses the lightbox or any other 'predefined' plugin/module: if so, warn
+about those bits not being backed up entirely (or not at all).
+*/
+$modules_in_use = $db->SelectArray($cfg['db_prefix'].'pages', null, 'DISTINCT module');
+if (!$modules_in_use)
+	$db->Kill();
+$show_warn_about_partial_backup = false;
+foreach($modules_in_use as $row)
+{
+	switch ($row['module'])
+	{
+	case 'editor':
+	case 'news':
+	case 'comment':
+		break;
+		
+	case 'lightbox':
+	default:
+		// when you use the lightbox or some plugin we don't know all about, the backup will be incomplete.
+		$show_warn_about_partial_backup = true;
+	}
+}
+
+$mediawarning = explode(' :: ', $ccms['lang']['backup']['warn4media']);
+$mediawarning[1] = explode("\n", $mediawarning[1]);
+
+
 ?>
 	
 		<div class="span-6 colborder">
-		<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
+			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
 			<p><?php echo $ccms['lang']['backup']['explain'];?></p>
-			<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8">
+			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8">
 				<p><button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite ss_package_add"><?php echo $ccms['lang']['forms']['createbutton'];?></span></button></p>
 			</form>
+			<?php
+			if ($show_warn_about_partial_backup)
+			{
+			?>
+				<div class="warning error center">
+					<h2><?php echo $mediawarning[0]; ?></h2>
+					<?php
+					foreach ($mediawarning[1] as $line)
+					{
+						echo '<p class="left">' . $line . "</p>\n";
+					}
+					?>
+				</div>
+			<?php
+			}
+			?>
 		</div>
 		
 		<div class="span-16 last">
