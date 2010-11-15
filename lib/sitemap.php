@@ -71,108 +71,6 @@ $db = new MySQL();
 
 
 // LANGUAGE ==
-
-/*
-You may specify a 2-char language code OR a 3-char 'locale' code
-to set up the proper language files and settings.
-*/
-function SetUpLanguageAndLocale($language)
-{
-	global $cfg;
-	global $ccms; // <-- this one will be augmented by the (probably) loaded language file(s).
-	
-	// Translate 2 character code to setlocale compliant code
-	//
-	// ALSO fix the 2-char language code if it is unknown (security + consistancy measure)!
-	switch ($language) 
-	{
-	default:
-	case 'en':
-	case 'eng':
-		$language = 'en'; $locale = 'eng';break;
-	case 'de':
-	case 'deu':
-		$language = 'de'; $locale = 'deu';break;
-	case 'it':
-	case 'ita':
-		$language = 'it'; $locale = 'ita';break;
-	case 'nl':
-	case 'nld':
-		$language = 'nl'; $locale = 'nld';break;
-	case 'ru':
-	case 'rus':
-		$language = 'ru'; $locale = 'rus';break;
-	case 'sv':
-	case 'sve':
-		$language = 'sv'; $locale = 'sve';break;
-	case 'fr':
-	case 'fra':
-		$language = 'fr'; $locale = 'fra';break;
-	case 'es':
-	case 'esp':
-		$language = 'es'; $locale = 'esp';break;
-	case 'pr':
-	case 'por':
-		$language = 'pr'; $locale = 'por';break;
-	case 'tr':
-	case 'tur':
-		$language = 'tr'; $locale = 'tur';break;
-	case 'ch':
-	case 'chs':
-		$language = 'ch'; $locale = 'chs';break;
-	}
-
-	// Either select the specified language file or fall back to English
-	$langfile = BASE_PATH . '/lib/languages/'.$language.'.inc.php';
-	if(is_file($langfile))
-	{
-		// only load language files when the current language has not been loaded just before.
-		if (!isset($cfg['language']) || $language !== $cfg['language'])
-		{
-			/*MARKER*/require($langfile);
-		}
-	} 
-	else 
-	{
-		$language = 'en';
-		$locale = 'eng';
-		// only load language files when the current language has not been loaded just before.
-		if ($language !== $cfg['language'])
-		{
-			/*MARKER*/require(BASE_PATH . '/lib/languages/en.inc.php');
-		}
-	}
-
-	// Set local for time, currency, etc
-	setlocale(LC_ALL, $locale);
-
-	
-	$mce_langfile = BASE_PATH . '/admin/includes/tiny_mce/langs/'.$language.'.js';
-	if (is_file($mce_langfile))
-	{
-		$cfg['tinymce_language'] = $language;
-	}
-	else
-	{
-		$cfg['tinymce_language'] = 'en';
-	}
-
-	$editarea_langfile = BASE_PATH . '/admin/includes/edit_area/langs/'.$language.'.js';
-	if (is_file($editarea_langfile))
-	{
-		$cfg['editarea_language'] = $language;
-	}
-	else
-	{
-		$cfg['editarea_language'] = 'en';
-	}
-	
-	$cfg['language'] = $language;
-	$cfg['locale'] = $locale;
-	
-	return $language;
-}
-
 // multilingual support per page through language cfg override:
 $language = getGETparam4IdOrNumber('lang');
 if (empty($language))
@@ -192,9 +90,6 @@ if(in_array("admin",$location))
 {
 	/*MARKER*/require_once(BASE_PATH . '/admin/includes/security.inc.php');
 }
-
-
-// CheckAuth() has been moved to common.inc.php
 
 
 
