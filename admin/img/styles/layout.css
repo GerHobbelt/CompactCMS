@@ -69,7 +69,7 @@ fieldset {
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
-legend, .loginMsg {
+legend, .loginMsg, .installMsg {
 	background-color: rgba(201,211,217,0.2);
 	font-size:1.1em;
 	font-weight: bold;
@@ -289,8 +289,9 @@ div.tip-text {
 }
 
 /* === 1. CORE === */
-/* === LOGIN === */
+/* LOGIN && INSTALL === */
 #logo{display:block;height:77px}
+#logo h1{display:none;}
 #login-wrapper{
 	width:750px;
 	background-color:#E6F5D6;
@@ -300,9 +301,21 @@ div.tip-text {
 	border-radius: 10px;
 	padding:10px;
 }
+#install-wrapper{
+	width:750px;
+	background-color:#E6F5D6;
+	border:10px solid #90D244;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	padding:10px;
+}
 #loginFrm label {display: block;}
-#login-wrapper h2 {font-size:1.2em;border-bottom:solid 1px #90D244;}
-.loginMsg{background-color:rgba(229,215,238,0.8);margin-bottom:15px;}
+#installFrm label {display: block;margin-top:10px;}
+#login-wrapper h2, #install-wrapper h2 {font-size:1.2em;border-bottom:solid 1px #90D244;}
+.loginMsg, .installMsg {background-color:rgba(229,215,238,0.8);margin-bottom:15px;}
+#install.loading {display:block;height:300px;background:transparent url('../spinner.gif') no-repeat 50% 50%;}
+#install {margin-top:10px;}
 
 /* === 1. CORE === */
 /* === MODULES === */
