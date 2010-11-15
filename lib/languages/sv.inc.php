@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
+Revision:   CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -134,7 +134,7 @@ $ccms['lang']['backend']['no'] = "Nej";
 $ccms['lang']['backend']['translation'] = /* BABELFISH */ "Översättningar";
 
 // Texts for authentication screen
-$ccms['lang']['login']['welcome'] = /* BABELFISH */ "  <p>Använd ett giltigt användarnamn och lösenord för att få tillgång till CompactCMS back-end. Om du kom hit av misstag, tillbaka till <a href=\"admin/includes/\">startsidan</a>.</p>  <p>Kontakta din webmaster för dina uppgifter.</p>  ";
+$ccms['lang']['login']['welcome'] = /* BABELFISH */ "<p>Använd ett giltigt användarnamn och lösenord för att få tillgång till CompactCMS back-end. Om du kom hit av misstag, tillbaka till <a href=\"admin/includes/\">startsidan</a>.</p> <p>Kontakta din webmaster för dina uppgifter.</p>";
 $ccms['lang']['login']['username'] = /* BABELFISH */ "Användarnamn";
 $ccms['lang']['login']['password'] = /* BABELFISH */ "Lösenord";
 $ccms['lang']['login']['login'] = /* BABELFISH */ "Logga in";
@@ -177,7 +177,7 @@ $ccms['lang']['hints']['filename'] = "Sido-URL:et (home.html) :: Filnamnet med v
 $ccms['lang']['hints']['pagetitle'] = "Titel för denna sida (Home) :: AEn kort förmedlande titel för denna sida.";
 $ccms['lang']['hints']['subheader'] = "Kort rubriktext (Välkommen till vår webbplats): En kort beskrivande text som används i sidhuvudet på varje sida samt i rubriken på varje sida.";
 $ccms['lang']['hints']['description'] = "Meta Beskrivning :: En unik beskrivning för denna sida som kommer att användas som sidorna 'meta beskrivning'.";
-$ccms['lang']['hints']['module'] = /* BABELFISH */ "Modul:: Välj vilken modul ska hantera innehållet i denna fil. Om du är osäker, välj standard.";
+$ccms['lang']['hints']['module'] = /* BABELFISH */ "Modul :: Välj vilken modul ska hantera innehållet i denna fil. Om du är osäker, välj standard.";
 $ccms['lang']['hints']['printable'] = "ida tryckbarhet:: När alternativet 'JA' väljs skall en utskriftsvänlig sida genereras. 'NEJ' bör väljas för sidor med bilder eller andra medier. Dessa är bättre utan en utskrivbar sida.";
 $ccms['lang']['hints']['published'] = "Publicerad status :: Välj om sidan bör offentliggöras, om det blir i webbplatskartan och om den kommer att vara tillgänglig för allmänheten.";
 $ccms['lang']['hints']['toplevel'] = "Huvudgrupper :: Ange den högsta nivån för det här menyalternativet. Välj --- att inte inkludera sidan i menyn.";
@@ -187,7 +187,7 @@ $ccms['lang']['hints']['activelink'] = "
 Aktiv länk i menyn? :: Punkter måste inte alltid ha en faktisk koppling. Du kan avaktivera länken bakom denna punkt i front-end-menyn genom att avmarkera kryssrutan nedan.";
 $ccms['lang']['hints']['menuid'] = "Meny kategori: Välj i vilken meny denna punkt bör förtecknas i. Standardvärdet är huvudmenyn (1), där även hemsideslänken visas.";
 $ccms['lang']['hints']['iscoding'] = "Innehåller kodning :: Inehåller denna fil exempelvis PHP eller Javascript? Om du väljer 'Ja' begränsas tillgången till filen från back-end WYSIWYG redigeraren och redaktören.";
-$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>Du kan klicka på <span class=\"sprite livefilter livefilter_active\"> filtret ikonen till vänster om titeln för att lägga till, redigera eller ta bort en  text för att filtrera sidan listan, t.ex. när du skriver \"hem\" i  redigeringsfältet som visas när du klickar på ikonen, tryck sedan på  Enter / Retur, bara sidor som har texten \"Hem\" i denna kolumn visas. <br>Om  du klickar på ikonen igen och ta bort texten i textfältet och sedan  trycka på Enter / Retur-tangenten, kommer att ta bort filtret.<br>Håll  muspekaren över ikonen för filtrering för att se om kolumnen för  närvarande filtreras, och i så fall använda som filter text.";
+$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>Du kan klicka på <span class=\"sprite livefilter livefilter_active\"> filtret ikonen till vänster om titeln för att lägga till, redigera eller ta bort en text för att filtrera sidan listan, t.ex. när du skriver \"hem\" i redigeringsfältet som visas när du klickar på ikonen, tryck sedan på Enter / Retur, bara sidor som har texten \"Hem\" i denna kolumn visas. <br>Om du klickar på ikonen igen och ta bort texten i textfältet och sedan trycka på Enter / Retur-tangenten, kommer att ta bort filtret.<br>Håll muspekaren över ikonen för filtrering för att se om kolumnen för närvarande filtreras, och i så fall använda som filter text.";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor'] = "Stäng redigeraren";
@@ -211,7 +211,7 @@ $ccms['lang']['auth']['featnotallowed'] = /* BABELFISH */ "Ditt nuvarande nivå 
 // Back-up messages
 $ccms['lang']['backup']['createhd'] = /* BABELFISH */ "Skapa ett nytt back-up";
 $ccms['lang']['backup']['explain'] = "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files reguraly.";
-$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Varning: Tänk på att din <dfn>ljusbord</dfn> album \"bilder är <strong>inte</strong> backas upp beskrivningar! Albumet <strong>är</strong>, men bilderna själva och deras miniatyrer <strong>inte i dessa säkerhetskopior</strong>med.  Om du vill ha säkerhetskopior av dessa, då du kommer att behöva ge  webbplatsadministratören om en extra backup system som hjälper dig att  säkerhetskopiera och återställa dessa (möjligen stor) fil samlingar.";
+$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Varning: Tänk på att din <dfn>ljusbord</dfn> album \"bilder är <strong>inte</strong> backas upp beskrivningar! Albumet <strong>är</strong>, men bilderna själva och deras miniatyrer <strong>inte i dessa säkerhetskopior</strong>med. Om du vill ha säkerhetskopior av dessa, då du kommer att behöva ge webbplatsadministratören om en extra backup system som hjälper dig att säkerhetskopiera och återställa dessa (möjligen stor) fil samlingar.";
 $ccms['lang']['backup']['currenthd'] = /* BABELFISH */ "Finns back-ups";
 $ccms['lang']['backup']['timestamp'] = /* BABELFISH */ "Back-up filnamn";
 $ccms['lang']['backup']['download'] = /* BABELFISH */ "Hämta arkiv";
@@ -252,7 +252,7 @@ $ccms['lang']['permission']['level4'] = /* BABELFISH */ "Nivå 4 - Admin";
 
 // Content owners
 $ccms['lang']['owners']['header'] = /* BABELFISH */ "Upphovsrättsinnehavare";
-$ccms['lang']['owners']['explain'] = /* BABELFISH */ "Här kan du utse särskild sida äganderätt till enskilda användare. Om en cartain sida ingen användare är vald, kan alla ändra på sidan. Annars bara den angivna användaren hade modifiering rättigheter till filen. Administratörer har alltid tillgång till alla filer.";
+$ccms['lang']['owners']['explain'] = /* BABELFISH */ "Här kan du utse särskild sida äganderätt till enskilda användare. Om en viss sida ingen användare är vald, kan alla ändra på sidan. Annars bara den angivna användaren hade modifiering rättigheter till filen. Administratörer har alltid tillgång till alla filer.";
 $ccms['lang']['owners']['pages'] = /* BABELFISH */ "Sidor";
 $ccms['lang']['owners']['users'] = /* BABELFISH */ "Användare";
 
@@ -271,7 +271,7 @@ $ccms['lang']['album']['toexisting'] = /* BABELFISH */ "Överför till befintlig
 $ccms['lang']['album']['upload'] = /* BABELFISH */ "Börja ladda upp";
 $ccms['lang']['album']['browse'] = /* BABELFISH */ "Bläddra filer";
 $ccms['lang']['album']['clear'] = /* BABELFISH */ "Töm lista";
-$ccms['lang']['album']['singlefile'] = /* BABELFISH */ "<strong>Enkel filöverföring</strong><br>  <p>Flash loader gick inte att initiera. Se till att Javascript är aktiverat och Flash är installerat. Enkel uppladdning är möjligt, men inte optimalt.</p>  ";
+$ccms['lang']['album']['singlefile'] = /* BABELFISH */ "<strong>Enkel filöverföring</strong><br> <p>Flash loader gick inte att initiera. Se till att Javascript är aktiverat och Flash är installerat. Enkel uppladdning är möjligt, men inte optimalt.</p>";
 $ccms['lang']['album']['manage'] = "Manage albums";
 $ccms['lang']['album']['albumlist'] = /* BABELFISH */ "Albumlista";
 $ccms['lang']['album']['regenalbumthumbs'] = /* BABELFISH */ "Generera miniatyrer alla";
@@ -295,7 +295,7 @@ $ccms['lang']['news']['showteaser'] = /* BABELFISH */ "Visa bara teaser";
 $ccms['lang']['news']['title'] = /* BABELFISH */ "Nyheter titel";
 $ccms['lang']['news']['author'] = /* BABELFISH */ "Nyheter Författare";
 $ccms['lang']['news']['date'] = /* BABELFISH */ "Datum";
-$ccms['lang']['news']['published'] = /* BABELFISH */ "År?";
+$ccms['lang']['news']['published'] = "Published?";
 $ccms['lang']['news']['teaser'] = "Teaser";
 $ccms['lang']['news']['contents'] = /* BABELFISH */ "Innehåll";
 $ccms['lang']['news']['viewarchive'] = /* BABELFISH */ "Visa arkiv";

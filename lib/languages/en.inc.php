@@ -249,7 +249,7 @@ $ccms['lang']['permission']['level4']	= "Level 4 - Admin";
 
 // Content owners
 $ccms['lang']['owners']['header']		= "Content owners";
-$ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a cartain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
+$ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a certain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
 $ccms['lang']['owners']['pages']		= "Pages";
 $ccms['lang']['owners']['users']		= "Users";
 

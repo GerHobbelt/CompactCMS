@@ -84,7 +84,10 @@ function load_lang_file($language)
 	$lang_file = BASE_PATH . '/lib/languages/' . $language . '.inc.php';
 	if (is_file($lang_file))
 	{
-		include($lang_file);
+		// include($lang_file);
+		$str = file_get_contents($lang_file);
+		$str = preg_replace('/\$ccms[^\n]+\/\* BABELFISH \*\/[^\n]+/u', '', $str);
+		eval('?>' . $str . '<?php');
 	}
 	
 	return $ccms;
@@ -277,7 +280,9 @@ if ($do == 'update')
 
 						// and last bits of cleanup
 						$entry = preg_replace('/<br\s*\/>/u', '<br>', $entry);
-						$entry = preg_replace('/\s*::\s*/u', ' :: ', $entry);
+						$entry = preg_replace('/\s*:\s*:\s*/u', ' :: ', $entry);
+						$entry = preg_replace('/\s*：\s*：\s*/u', ' :: ', $entry);
+						$entry = trim($entry);
 						
 						$entry_phpcode = '---';
 						get_i18n_ccms_key_as_code($entry_phpcode, $i18n_arr['lang'], $idx);
