@@ -50,71 +50,7 @@ session_start();
 
 
 // Set current && additional step
-$nextstep = getPOSTparam4IdOrNumber('do', 'ea2b2676c28c0db26d39331a336c6b92');
-
-if (empty($_SESSION['variables']))
-{
-	$_SESSION['variables'] = array();
-}
-
-
-/*
-preload the session variables
-*/
-if (empty($_SESSION['variables']['sitename']) && !empty($cfg['sitename']))
-{
-	$_SESSION['variables']['sitename'] = $cfg['sitename'];
-}
-if (empty($_SESSION['variables']['rootdir']) && !empty($cfg['rootdir']))
-{
-	$_SESSION['variables']['rootdir'] = $cfg['rootdir'];
-}
-if (empty($_SESSION['variables']['language']) && !empty($cfg['language']))
-{
-	$_SESSION['variables']['language'] = $cfg['language'];
-}
-if (empty($_SESSION['variables']['version']) && !empty($cfg['version']))
-{
-	$_SESSION['variables']['version'] = ($cfg['version'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['iframe']) && !empty($cfg['iframe']))
-{
-	$_SESSION['variables']['iframe'] = ($cfg['iframe'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['wysiwyg']) && !empty($cfg['wysiwyg']))
-{
-	$_SESSION['variables']['wysiwyg'] = ($cfg['wysiwyg'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['protect']) && !empty($cfg['protect']))
-{
-	$_SESSION['variables']['protect'] = ($cfg['protect'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['authcode']) && !empty($cfg['authcode']))
-{
-	$_SESSION['variables']['authcode'] = $cfg['authcode'];
-}
-if (empty($_SESSION['variables']['db_host']) && !empty($cfg['db_host']))
-{
-	$_SESSION['variables']['db_host'] = $cfg['db_host'];
-}
-if (empty($_SESSION['variables']['db_user']) && !empty($cfg['db_user']))
-{
-	$_SESSION['variables']['db_user'] = $cfg['db_user'];
-}
-if (empty($_SESSION['variables']['db_pass']) && !empty($cfg['db_pass']))
-{
-	$_SESSION['variables']['db_pass'] = $cfg['db_pass'];
-}
-if (empty($_SESSION['variables']['db_name']) && !empty($cfg['db_name']))
-{
-	$_SESSION['variables']['db_name'] = $cfg['db_name'];
-}
-if (empty($_SESSION['variables']['db_prefix']) && !empty($cfg['db_prefix']))
-{
-	$_SESSION['variables']['db_prefix'] = $cfg['db_prefix'];
-}
-
-
+$nextstep = getPOSTparam4IdOrNumber('do');
 
 
 
@@ -164,10 +100,17 @@ if($nextstep == md5('2') && CheckAuth())
 		<label for="wysiwyg"><input type="checkbox" name="wysiwyg" value="true"  <?php
 			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] == 'true' ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
 		&#160;<span class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</span>
+		<label for="upgrade" class="quiet" ><input type="checkbox" name="upgrade" value="true"  <?php
+			echo (!empty($_SESSION['variables']['upgrade']) && $_SESSION['variables']['upgrade'] == 'true' ? 'checked' : ''); ?>  disabled="disabled" id="upgrade" /> Perform an 
+			<span class="ss_sprite ss_help" title="When and how can we upgrade? :: You can perform an upgrade when you have <strong>made a backup of your site within the last hour</strong>: this installer will automatically detect this and consequently enable the 'upgrade' tickbox.<br />Note that you can also <strong>restore an existing site</strong> by taking its backup and extracting the contents of the backup (zip archive) in the root directory of the website: this will result in the backed-up content to be placed in the ./content/ directory and the <file>config.inc.php</file> and <file>compactcms-sqldump.sql</file> files are available in the web site's root directory. Subsequently running this install wizard will result in auto-detection of such a restore operation and enable the 'upgrade' tickbox for you.">
+				&#160;<strong>upgrade</strong>
+			</span>
+			</label>
+		&#160;<span class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to execute a fresh install (your site data will be lost!)</span>
 
 		<p class="span-8 right">
 			<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-			<a href="index.php" title="Back to step first step">Cancel</a>
+			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
 			<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
 		</p>
 
@@ -210,7 +153,7 @@ if($nextstep == md5('3') && CheckAuth())
 
 		<p class="span-8 right">
 			<button name="submit" type="submit"><span class="ss_sprite ss_information">To confirmation</span></button>
-			<a href="index.php" title="Back to step first step">Cancel</a>
+			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
 			<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
 		</p>
 
@@ -370,7 +313,7 @@ if($nextstep == md5('4') && CheckAuth())
 
 		<p class="span-8 right">
 			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite ss_accept">Install <strong>CompactCMS</strong></span></button>
-			<a href="index.php" title="Back to step first step">Cancel</a>
+			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
 			<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 		</p>
 
@@ -589,8 +532,8 @@ if($nextstep == md5('final') && CheckAuth())
 		$conn_id = ftp_connect($_POST['ftp_host']) or die("Couldn't connect to ".$_POST['ftp_host']);
 
 		// Try to login using provided details
-		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) {
-
+		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+		{
 			// trimPath function
 			function trimPath($path,$depth) 
 			{

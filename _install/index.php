@@ -87,50 +87,91 @@ if($rootdir != '/')
 }
 
 
-// Set friendly local names languages
-function setLanguage($lang) 
-{
-	switch ($lang) 
-	{
-		case 'en':
-			return "English";
-			break;
-		case 'nl':
-			return "Nederlands";
-			break;
-		case 'de':
-			return "Deutsch";
-			break;
-		case 'it':
-			return "italiano";
-			break;
-		case 'ru':
-			return "русский";
-			break;
-		case 'sv':
-			return "svenska";
-			break;
-		case 'fr':
-			return "français";
-			break;
-		case 'es':
-			return "español (castellano)";
-			break;
-		case 'pr':
-			return "Português";
-			break;
-		case 'tr':
-			return "Türk";
-			break;
-		case 'ch':
-			return "中文";
-			break;
 
-		default:
-			return $lang;
-			break;
-	}
+
+/*
+To detect the possiblity of an upgrade action, there's two ways we support:
+
+1) someone extracted a backup archive and (when this is from a pre-1.4.2 backup) moved all the files
+   in the appropriate spots, which we ASSUME HAS HAPPENED when we find the 
+     <dbname>-sqldump.sql
+   file in the site's _docs/ directory. 
+   This implies the config.inc.php file has also been properly set up already.
+   
+2) someone actually ran the 'backup' command in the admin backup within the last
+   hour or so (timeout configurable through the UPGRADE_FROM_BACKUP_ACTION_TIMEOUT
+   constant) as the backup will have not only generated the expected .zip archive
+   but (since 1.4.2) also dumped the SQL dump and config file to the /media/files/ccms-restore/
+   directory.
+*/
+
+if (empty($_SESSION['variables']))
+{
+	$_SESSION['variables'] = array();
 }
+
+
+/*
+preload the session variables
+*/
+if (empty($_SESSION['variables']['sitename']) && !empty($cfg['sitename']))
+{
+	$_SESSION['variables']['sitename'] = $cfg['sitename'];
+}
+if (empty($_SESSION['variables']['rootdir']) && !empty($cfg['rootdir']))
+{
+	$_SESSION['variables']['rootdir'] = $cfg['rootdir'];
+}
+if (empty($_SESSION['variables']['language']) && !empty($cfg['language']))
+{
+	$_SESSION['variables']['language'] = $cfg['language'];
+}
+if (empty($_SESSION['variables']['version']) && !empty($cfg['version']))
+{
+	$_SESSION['variables']['version'] = ($cfg['version'] ? 'true' : 'false');
+}
+if (empty($_SESSION['variables']['iframe']) && !empty($cfg['iframe']))
+{
+	$_SESSION['variables']['iframe'] = ($cfg['iframe'] ? 'true' : 'false');
+}
+if (empty($_SESSION['variables']['wysiwyg']) && !empty($cfg['wysiwyg']))
+{
+	$_SESSION['variables']['wysiwyg'] = ($cfg['wysiwyg'] ? 'true' : 'false');
+}
+if (empty($_SESSION['variables']['protect']) && !empty($cfg['protect']))
+{
+	$_SESSION['variables']['protect'] = ($cfg['protect'] ? 'true' : 'false');
+}
+if (empty($_SESSION['variables']['authcode']) && !empty($cfg['authcode']))
+{
+	$_SESSION['variables']['authcode'] = $cfg['authcode'];
+}
+if (empty($_SESSION['variables']['db_host']) && !empty($cfg['db_host']))
+{
+	$_SESSION['variables']['db_host'] = $cfg['db_host'];
+}
+if (empty($_SESSION['variables']['db_user']) && !empty($cfg['db_user']))
+{
+	$_SESSION['variables']['db_user'] = $cfg['db_user'];
+}
+if (empty($_SESSION['variables']['db_pass']) && !empty($cfg['db_pass']))
+{
+	$_SESSION['variables']['db_pass'] = $cfg['db_pass'];
+}
+if (empty($_SESSION['variables']['db_name']) && !empty($cfg['db_name']))
+{
+	$_SESSION['variables']['db_name'] = $cfg['db_name'];
+}
+if (empty($_SESSION['variables']['db_prefix']) && !empty($cfg['db_prefix']))
+{
+	$_SESSION['variables']['db_prefix'] = $cfg['db_prefix'];
+}
+
+
+
+
+
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -143,7 +184,7 @@ function setLanguage($lang)
 		<script type="text/javascript" src="../lib/includes/js/mootools.js" charset="utf-8"></script>
 		<script type="text/javascript" src="../admin/includes/modules/user-management/passwordcheck.js" charset="utf-8"></script>
 		<script type="text/javascript" charset="utf-8">
-			window.addEvent('domready', function(){
+			window.addEvent('domready', function() {
 				// Process steps
 				$('installFrm').addEvent('submit', function(install) {
 					new Event(install).stop();
@@ -161,10 +202,31 @@ function setLanguage($lang)
 						onComplete: function() {
 							install_div.removeClass('loading');
 							scroll.toElement('install-wrapper');
+							build_tips();
 						}
 					}).send($('installFrm'));
 				});
+
+				build_tips();
 			});			
+			
+			function build_tips()
+			{
+				// Tips links
+				$$('span.ss_help').each(function(element,index) {  
+					var content = element.get('title').split('::');  
+					element.store('tip:title', content[0]);  
+					element.store('tip:text', content[1]);  
+				});  
+			  
+				// Create the tooltips  
+				var tipz = new Tips('.ss_help',{  
+					className: 'ss_help_large',  
+					fixed: true,  
+					hideDelay: 50,  
+					showDelay: 50  
+				}); 
+			}
 		</script>
 	</head>
 <body>
@@ -188,7 +250,7 @@ function setLanguage($lang)
 		<p>Cheers!<br/><em>Xander</em>.</p>
 	</div>
 	<div class="span-9">
-		<form action="./installer.inc.php" method="post" id="installFrm">
+		<form action="" method="post" id="installFrm">
 			<fieldset id="install" style="border:none;" class="none">
 				<legend class="installMsg"><?php echo (!$do_ftp_chmod ? 'Step 1 - Knowing the environment' : 'FTP - Setting permissions right');?></legend>
 				<?php 
@@ -206,20 +268,14 @@ function setLanguage($lang)
 					
 					<label for="language"><span class="ss_sprite ss_comments">CCMS backend language</span></label>
 					<select name="language" class="title" style="padding:5px 10px;width:300px;" id="language" size="1">
-						<?php // Get current languages
-						if ($handle = opendir('../lib/languages')) 
+						<?php 
+						// Get current languages
+						$s = (isset($_SESSION['variables']['language'])?$_SESSION['variables']['language']:'en');
+						$lcoll = GetAvailableLanguages();
+						foreach($lcoll as $lcode => $ldesc)
 						{
-							while (false !== ($file = readdir($handle))) 
-							{
-								// Filter out irrelevant files && dirs
-								if ($file != "." && $file != ".." && $file != "index.html") 
-								{
-									$f = substr($file,0,2);
-									$s = (isset($_SESSION['variables']['language'])?$_SESSION['variables']['language']:'en');
-									$c = ($f==$s?'selected="selected"':null);
-									echo '<option value="'.$f.'" '.$c.'>'.setLanguage($f).'</option>';
-								}
-							}
+							$c = ($lcode == $s ? 'selected="selected"' : null);
+							echo '<option value="'.$lcode.'" '.$c.'>'.$ldesc.'</option>';
 						}
 						?>   	
 					</select>
@@ -253,7 +309,7 @@ function setLanguage($lang)
 				
 				<p class="span-8 right">
 					<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-					<a href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>">Cancel</a>
+					<span class="ss_sprite ss_cancel"><a href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>">Cancel</a></span>
 				</p>
 			</fieldset>
 		</form>
