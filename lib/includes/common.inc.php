@@ -1295,6 +1295,52 @@ function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
 
 
 
+// Set friendly local names languages
+function setLanguage($lang) 
+{
+	switch ($lang) 
+	{
+		case 'en':
+			return "English";
+			break;
+		case 'nl':
+			return "Nederlands";
+			break;
+		case 'de':
+			return "Deutsch";
+			break;
+		case 'it':
+			return "italiano";
+			break;
+		case 'ru':
+			return "русский";
+			break;
+		case 'sv':
+			return "svenska";
+			break;
+		case 'fr':
+			return "français";
+			break;
+		case 'es':
+			return "español (castellano)";
+			break;
+		case 'pr':
+			return "Português";
+			break;
+		case 'tr':
+			return "Türk";
+			break;
+		case 'ch':
+			return "中文";
+			break;
+
+		default:
+			return $lang;
+			break;
+	}
+}
+
+
 
 /*
 You may specify a 2-char language code OR a 3-char 'locale' code
@@ -1396,6 +1442,29 @@ function SetUpLanguageAndLocale($language)
 	
 	return $language;
 }
+
+
+/**
+Collect the available languages (translations) and return those in an array.
+*/
+function GetAvailableLanguages()
+{
+	$sl = array();
+	if ($handle = opendir('../lib/languages')) 
+	{
+		while (false !== ($file = readdir($handle))) 
+		{
+			// Filter out irrelevant files && dirs
+			if ($file != "." && $file != ".." && strmatch_tail($file, ".inc.php"))
+			{
+				$f = substr($file,0,strpos($file, '.'));
+				$sl[$f] = setLanguage($f);
+			}
+		}
+	}
+	return $sl;
+}
+
 
 
 
