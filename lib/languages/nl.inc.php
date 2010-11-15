@@ -35,20 +35,20 @@ $ccms['lang']['system']['error_openfile'] = "Kon het aangegeven bestand niet ope
 $ccms['lang']['system']['error_notemplate'] = "Er zijn momenteel geen templates beschikbaar. Voeg minstens 1 template toe in de ./lib/templates/ map.";
 $ccms['lang']['system']['error_templatedir'] = "Kon de template map niet vinden! Controleer of de map bestaat en voeg tenminste 1 template toe.";
 $ccms['lang']['system']['error_write'] = "Geen schrijfrechten tot het bestand";
-$ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "Map heeft geen schrijf toegang";
+$ccms['lang']['system']['error_dirwrite'] = "Geen schrijfrechten tot deze map";
 $ccms['lang']['system']['error_chmod'] = "Het huidige bestand kon niet aangepast worden. Controleer de schrijfrechten op de bestanden in de /content map (666).";
 $ccms['lang']['system']['error_value'] = "Fout: waarde onjuist";
 $ccms['lang']['system']['error_default'] = "De standaardpagina kan niet verwijderd worden.";
 $ccms['lang']['system']['error_forged'] = "Waarde is verstoord";
 $ccms['lang']['system']['error_filedots'] = "De bestandsnaam kan geen punten bevatten, bijv. '.html'.";
 $ccms['lang']['system']['error_filesize'] = "De bestandsnaam moet minimaal 3 karakters lang zijn.";
-$ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "Bestandsnaam dient te worden ten hoogste 50 tekens lang zijn.";
+$ccms['lang']['system']['error_filesize_2'] = "De bestandsnaam dient ten hoogste 50 tekens lang te zijn.";
 $ccms['lang']['system']['error_pagetitle'] = "Geef een titel van meer dan 3 karakters op.";
-$ccms['lang']['system']['error_pagetitle_2'] = /* BABELFISH */ "Geef een paginatitel van 100 tekens of minder.";
+$ccms['lang']['system']['error_pagetitle_2'] = "Geef een paginatitel van 100 tekens of minder.";
 $ccms['lang']['system']['error_subtitle'] = "Specificeer een korte sub-koptekst.";
-$ccms['lang']['system']['error_subtitle_2'] = /* BABELFISH */ "Voer een korte sub-titel van 200 tekens of minder voor uw pagina.";
+$ccms['lang']['system']['error_subtitle_2'] = "Voer een korte sub-titel van 200 tekens of minder in voor uw pagina.";
 $ccms['lang']['system']['error_description'] = "De huidige beschrijving is te kort";
-$ccms['lang']['system']['error_description_2'] = /* BABELFISH */ "Geef een beschrijving van minder dan 250 tekens";
+$ccms['lang']['system']['error_description_2'] = "Geef een beschrijving van minder dan 250 tekens";
 $ccms['lang']['system']['error_reserved'] = "De gekozen bestandsnaam is gereserveerd voor intern gebruik.";
 $ccms['lang']['system']['error_general'] = "Er deed zich een fout voor";
 $ccms['lang']['system']['error_correct'] = "Corrigeer het volgende:";
@@ -61,10 +61,10 @@ $ccms['lang']['system']['error_misconfig'] = "<strong>Onjuiste configuratie aang
 $ccms['lang']['system']['error_deleted'] = "<h1>Het geselecteerd bestand lijkt al verwijderd</h1><p>Vernieuw de pagina lijst om het meest recente overzicht te zien en zo deze foutmelding te voorkomen. Als dit het probleem niet oplost, controleer dan handmating of het desbetreffende bestand &uuml;berhaupt in de content map bestaat.</p>";
 $ccms['lang']['system']['error_404title'] = "Bestand niet gevonden";
 $ccms['lang']['system']['error_404header'] = "Er deed zich een 404 fout voor, de pagina werd niet gevonden.";
-$ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Het gevraagde bestand <strong>{% pagereq%}. html</strong> kon niet worden gevonden.";
-$ccms['lang']['system']['error_403title'] = /* BABELFISH */ "Verboden";
-$ccms['lang']['system']['error_403header'] = /* BABELFISH */ "Een 403-fout opgetreden: U hebt geen toestemming om de gevraagde bestand te openen.";
-$ccms['lang']['system']['error_403content'] = /* BABELFISH */ "U bent niet toegestaan om de toegang <strong>{% pagereq%}. html</strong> op dit moment.";
+$ccms['lang']['system']['error_404content'] = "Het gevraagde bestand <strong>{%pagereq%}.html</strong> kon niet worden gevonden.";
+$ccms['lang']['system']['error_403title'] = "Verboden toegang";
+$ccms['lang']['system']['error_403header'] = "Er is een 403-fout opgetreden: U hebt geen toestemming om het gevraagde bestand te openen.";
+$ccms['lang']['system']['error_403content'] = "U hebt niet de juiste rechten om toegang tot <strong>{%pagereq%}.html</strong> te krijgen op dit moment.";
 $ccms['lang']['system']['error_sitemap'] = "Een overzicht van alle pagina's";
 $ccms['lang']['system']['error_tooshort'] = "Een of meerdere waardes waren te kort of onjuist";
 $ccms['lang']['system']['error_passshort'] = "Een wachtwoord dient uit minstens 6 karakters te bestaan";
@@ -107,7 +107,7 @@ $ccms['lang']['backend']['uptodate'] = "up to date.";
 $ccms['lang']['backend']['outofdate'] = "verouderd.";
 $ccms['lang']['backend']['considerupdate'] = "Overweeg bij te werken";
 $ccms['lang']['backend']['orderprefsaved'] = "Je voorkeur voor de volgorde van de menu items is opgeslagen.";
-$ccms['lang']['backend']['inmenu'] = /* BABELFISH */ "In het menu";
+$ccms['lang']['backend']['inmenu'] = "In het menu";
 $ccms['lang']['backend']['updatelist'] = "Ververs paginalijst";
 $ccms['lang']['backend']['administration'] = "Administratie";
 $ccms['lang']['backend']['currentversion'] = "Je gebruikt momenteel versie";
@@ -121,21 +121,21 @@ $ccms['lang']['backend']['toplevel'] = "1ste level";
 $ccms['lang']['backend']['sublevel'] = "2e level";
 $ccms['lang']['backend']['active'] = "Actief";
 $ccms['lang']['backend']['disabled'] = "Inactief";
-$ccms['lang']['backend']['template'] = /* BABELFISH */ "Sjabloon";
+$ccms['lang']['backend']['template'] = "Sjabloon";
 $ccms['lang']['backend']['notinmenu'] = "Item niet in een menu";
-$ccms['lang']['backend']['menutitle'] = /* BABELFISH */ "Het menu";
+$ccms['lang']['backend']['menutitle'] = "Het menu";
 $ccms['lang']['backend']['linktitle'] = "Link";
 $ccms['lang']['backend']['item'] = "Item";
 $ccms['lang']['backend']['none'] = "Geen";
 $ccms['lang']['backend']['yes'] = "Ja";
 $ccms['lang']['backend']['no'] = "Nee";
-$ccms['lang']['backend']['translation'] = /* BABELFISH */ "Vertalingen";
+$ccms['lang']['backend']['translation'] = "Vertalingen";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome'] = "<p>Gebruik een geldige gebruikersnaam en wachtwoord om in te loggen op CompactCMS. Indien u hier per abuis belandde, keer dan terug naar de <a href='../../'>start pagina</a>.</p><p>E-mail de webmaster voor uw gegevens.</p>";
 $ccms['lang']['login']['username'] = "Gebruikersnaam";
 $ccms['lang']['login']['password'] = "Wachtwoord";
-$ccms['lang']['login']['login'] = /* BABELFISH */ "Inloggen";
+$ccms['lang']['login']['login'] = "Inloggen";
 $ccms['lang']['login']['provide'] = "Geef uw gebruikers gegevens op";
 $ccms['lang']['login']['nodetails'] = "Vul zowel gebruikersnaam als wachtwoord in";
 $ccms['lang']['login']['nouser'] = "Geef uw gebruikersnaam op";
@@ -145,10 +145,10 @@ $ccms['lang']['login']['falsetries'] = "Let op: u deed al meerdere onjuiste pogi
 $ccms['lang']['login']['nomatch'] = "Onjuiste gebruikersnaam of wachtwoord";
 
 // Menu titles for administration back-end
-$ccms['lang']['menu']['1'] = /* BABELFISH */ "Belangrijkste";
+$ccms['lang']['menu']['1'] = "Hoofdmenu";
 $ccms['lang']['menu']['2'] = "Links";
 $ccms['lang']['menu']['3'] = "Rechts";
-$ccms['lang']['menu']['4'] = /* BABELFISH */ "Voettekst";
+$ccms['lang']['menu']['4'] = "Voettekst";
 $ccms['lang']['menu']['5'] = "Extra";
 
 // Administration form related texts
@@ -166,9 +166,9 @@ $ccms['lang']['forms']['createbutton'] = "Aanmaken!";
 $ccms['lang']['forms']['modifybutton'] = "Aanpassen";
 $ccms['lang']['forms']['savebutton'] = "Opslaan";
 $ccms['lang']['forms']['setlocale'] = "Front-end taalvoorkeur";
-$ccms['lang']['forms']['filter_showing'] = /* BABELFISH */ "nu zijn we slechts het tonen van pagina's die ten minste deze tekst in hier";
-$ccms['lang']['forms']['edit_remove'] = /* BABELFISH */ "Bewerken of verwijderen filter voor";
-$ccms['lang']['forms']['add'] = /* BABELFISH */ "Voeg filter voor";
+$ccms['lang']['forms']['filter_showing'] = "op dit moment worden alleen pagina's getoond die ten minste de volgende tekst in deze kolom hebben";
+$ccms['lang']['forms']['edit_remove'] = "Bewerk of verwijder het filter voor deze kolom";
+$ccms['lang']['forms']['add'] = "Zet filter aan voor deze kolom";
 
 // Administration hints for form fields
 $ccms['lang']['hints']['filename'] = "De bestandsnaam (home.html) :: De bestandsnaam waaronder deze pagina aan te roepen is (zonder .html)";
@@ -208,11 +208,11 @@ $ccms['lang']['auth']['featnotallowed'] = "Het huidige accountlevel heeft geen t
 // Back-up messages
 $ccms['lang']['backup']['createhd'] = "Cre&euml;er nieuwe back-up";
 $ccms['lang']['backup']['explain'] = "Om mogelijk verlies van data door externe omstandigheden te voorkomen, is het verstandig om regelmatig back-ups te maken.";
-$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Waarschuwing: Houd er rekening mee dat uw <dfn>lightbox</dfn> albums 'beelden zijn <strong>niet</strong> een back-up beschrijvingen! Het album <strong>zijn</strong>, maar de beelden zichzelf en hun miniaturen zijn <strong>niet opgenomen in deze back-ups</strong>met.  Als u wilt back-ups van deze, dan moet u te verlenen uw sitebeheerder  over een extra back-up systeem om u te helpen backup en herstel van deze  (eventueel groot) bestand collecties.";
+$ccms['lang']['backup']['warn4media'] = "Waarschuwing: Houd er rekening mee dat de afbeeldingen in uw <dfn>lightbox</dfn> albums <strong>niet</strong> worden meegenomen in deze back-ups! Van elk album wordt wel de beschrijving ge-back-upt, maar de afbeeldingen zelf en de miniatuur-afbeeldingen die er van zijn afgeleid dienen middels een andere methode te worden ge-back-upt. Als u back-ups van deze elementen wenst (hetgeen raadzaam is), dan moet u uw sitebeheerder raadplegen omtrent het inzetten van een extra back-up systeem om u te helpen ook deze data te back-uppen en later desgewenst deze (mogelijk grote hoeveelheid) data te kunnen restoren (terugzetten).";
 $ccms['lang']['backup']['currenthd'] = "Beschikbare back-ups";
 $ccms['lang']['backup']['timestamp'] = "Back-up bestandsnaam";
 $ccms['lang']['backup']['download'] = "Download archief";
-$ccms['lang']['backup']['wait4backup'] = /* BABELFISH */ "Gelieve even te wachten terwijl de back-up wordt gemaakt ...";
+$ccms['lang']['backup']['wait4backup'] = "Gelieve even te wachten terwijl de back-up wordt gemaakt ...";
 
 // User management messages
 $ccms['lang']['users']['createuser'] = "Gebruiker aanmaken";
@@ -242,10 +242,10 @@ $ccms['lang']['template']['print'] = "Print";
 $ccms['lang']['permission']['header'] = "Toegangsvoorkeuren";
 $ccms['lang']['permission']['explain'] = "Gebruik onderstaande tabel om het minimale gebruikersniveau voor een bepaalde functie te bepalen. Een gebruiker onder het gespecificeerde niveau heeft geen toegang tot de desbetreffende functie.";
 $ccms['lang']['permission']['target'] = "Doel";
-$ccms['lang']['permission']['level1'] = /* BABELFISH */ "Niveau 1 - Gebruiker";
-$ccms['lang']['permission']['level2'] = /* BABELFISH */ "Niveau 2 - Redacteur";
-$ccms['lang']['permission']['level3'] = /* BABELFISH */ "Niveau 3 - Manager";
-$ccms['lang']['permission']['level4'] = /* BABELFISH */ "Niveau 4 - Admin";
+$ccms['lang']['permission']['level1'] = "Niveau 1 - Gebruiker";
+$ccms['lang']['permission']['level2'] = "Niveau 2 - Redacteur";
+$ccms['lang']['permission']['level3'] = "Niveau 3 - Manager";
+$ccms['lang']['permission']['level4'] = "Niveau 4 - Opperhoofd";
 
 // Content owners
 $ccms['lang']['owners']['header'] = "Content eigenaren";
@@ -254,8 +254,8 @@ $ccms['lang']['owners']['pages'] = "Pagina's";
 $ccms['lang']['owners']['users'] = "Gebruikers";
 
 // Translation assistance page 
-$ccms['lang']['translation']['header'] = /* BABELFISH */ "Vertalen";
-$ccms['lang']['translation']['explain'] = /* BABELFISH */ "Laat de vertaling snaren.";
+$ccms['lang']['translation']['header'] = "Vertalen";
+$ccms['lang']['translation']['explain'] = "Produceer een vertaling m.b.v. de google machine vertaler.";
 
 // Album messages
 $ccms['lang']['album']['album'] = "Album";
@@ -263,9 +263,9 @@ $ccms['lang']['album']['settings'] = "Album instellingen";
 $ccms['lang']['album']['apply_to'] = "Hang dit album aan de volgende index pagina:";
 $ccms['lang']['album']['description'] = "Album beschrijving";
 $ccms['lang']['album']['currentalbums'] = "Huidige albums";
-$ccms['lang']['album']['uploadcontent'] = /* BABELFISH */ "Inhoud uploaden";
+$ccms['lang']['album']['uploadcontent'] = "Inhoud uploaden";
 $ccms['lang']['album']['toexisting'] = "Upload naar huidig album";
-$ccms['lang']['album']['upload'] = /* BABELFISH */ "Uploaden starten";
+$ccms['lang']['album']['upload'] = "Upload starten";
 $ccms['lang']['album']['browse'] = "Kies foto's";
 $ccms['lang']['album']['clear'] = "Leeg lijst";
 $ccms['lang']['album']['singlefile'] = "<strong>Enkele file upload</strong><br/><p>De Flash lader kon niet laden. Zorg dat Javascript toegestaan is en Flash is geinstalleerd. Enkele uploads zijn mogelijk, maar niet geoptimaliseerd.</p>";
