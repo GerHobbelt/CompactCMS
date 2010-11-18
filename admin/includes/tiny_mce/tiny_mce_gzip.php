@@ -13,7 +13,18 @@
 	$isJS = (getParam("js", "") == "true");
 	$compress = (getParam("compress", "true") == "true");
 	$core = (getParam("core", "true") == "true");
-	$suffix = (getParam("suffix", "_src") == "_src" ? "_src" : "");
+	switch (getParam("suffix", "_src"))
+	{
+	case "_src":
+		$suffix = "_src";
+		break;
+	case "_dev":
+		$suffix = "_dev";
+		break;
+	default:
+		$suffix = "";
+		break;
+	}
 	$cachePath = "../cache/"; // Cache path, this is where the .gz files will be stored
 	$expiresOffset = 3600 * 24 * 7; // Cache for 7 days in browser cache
 	$content = "";
@@ -86,22 +97,32 @@
 
 	// Add core languages
 	foreach ($languages as $lang)
+	{
 		$content .= getFileContents("langs/" . $lang . ".js");
+	}
 
 	// Add themes
-	foreach ($themes as $theme) {
+	foreach ($themes as $theme) 
+	{
 		$content .= getFileContents( "themes/" . $theme . "/editor_template" . $suffix . ".js");
 
 		foreach ($languages as $lang)
+		{
 			$content .= getFileContents("themes/" . $theme . "/langs/" . $lang . ".js");
+			$content .= getFileContents("themes/" . $theme . "/langs/" . $lang . "_dlg.js");
+		}
 	}
 
 	// Add plugins
-	foreach ($plugins as $plugin) {
+	foreach ($plugins as $plugin) 
+	{
 		$content .= getFileContents("plugins/" . $plugin . "/editor_plugin" . $suffix . ".js");
 
 		foreach ($languages as $lang)
+		{
 			$content .= getFileContents("plugins/" . $plugin . "/langs/" . $lang . ".js");
+			$content .= getFileContents("plugins/" . $plugin . "/langs/" . $lang . "_dlg.js");
+		}
 	}
 
 	// Add custom files

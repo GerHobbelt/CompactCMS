@@ -75,7 +75,7 @@ $ccms['lang']['system']['message_rights'] = "Alle rechten voorbehouden";
 $ccms['lang']['system']['message_compatible'] = "Succesvol getest op";
 
 // Administration general messages
-$ccms['lang']['backend']['gethelp'] = "Heb je suggesties, feedback of problemen? Bezoek dan <a href=\"http://community.compactcms.nl/forum/\" title=\"Bezoek het offici&euml;le forum\" class=\"external\" rel=\"external\">het forum</a>!";
+$ccms['lang']['backend']['gethelp'] = "Heb je suggesties, feedback of problemen? Bezoek dan <a href='http://community.compactcms.nl/forum/' title='Bezoek het offici&euml;le forum' class='external' rel='external'>het forum</a>!";
 $ccms['lang']['backend']['ordertip'] = "Gebruik de 'drop-downs' hieronder om de structuur van de pagina's in het menu te verwerken. Let op dat het systeem geen rekening houdt met gelijke top- en subniveau's combinaties.";
 $ccms['lang']['backend']['createtip'] = "Vul onderstaand formulier in om direct een nieuwe pagina aan te maken. Nadat het bestand is aangemaakt, kan deze direct eenvoudig bijgewerkt worden.";
 $ccms['lang']['backend']['currentfiles'] = "In de lijst hieronder staan alle huidige pagina's weergegeven. De standaard pagina kan niet worden verwijderd omdat dit de startpagina van de website is. Andere pagina's kunnen afgeschermde content hebben omdat alleen de beheerder het recht heeft deze bewerken.";
@@ -130,6 +130,9 @@ $ccms['lang']['backend']['none'] = "Geen";
 $ccms['lang']['backend']['yes'] = "Ja";
 $ccms['lang']['backend']['no'] = "Nee";
 $ccms['lang']['backend']['translation'] = "Vertalingen";
+$ccms['lang']['backend']['hello'] = "Hi";
+$ccms['lang']['backend']['logout'] = "Uitloggen";
+$ccms['lang']['backend']['see_forum'] = "Kijk ook op het forum";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome'] = "<p>Gebruik een geldige gebruikersnaam en wachtwoord om in te loggen op CompactCMS. Indien u hier per abuis belandde, keer dan terug naar de <a href='../../'>start pagina</a>.</p><p>E-mail de webmaster voor uw gegevens.</p>";
@@ -184,12 +187,12 @@ $ccms['lang']['hints']['template'] = "Template :: Indien de website meerdere tem
 $ccms['lang']['hints']['activelink'] = "Actieve link in menu? :: Niet alle items hoeven altijd een link te zijn in het menu. Om de verwijzing (link) voor dit item uit te schakelen, dient de checkbox ge-deselecteerd te worden.";
 $ccms['lang']['hints']['menuid'] = "Menu categorie :: Kies in welk menu dit item opgenomen en getoond wordt. Standaard is dit main (1) waar ook de start pagina link onder hoort.";
 $ccms['lang']['hints']['iscoding'] = "Bevat programmeertaal :: Bevat dit bestand handmatig toegevoegde code zoals PHP of Javascript? Door 'Ja' te selecteren wordt toegang tot het bestand via de WYSIWYG editor stopgezet en schakelt de code editor in.";
-$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>U kunt klikken op het <span class=\"sprite livefilter livefilter_active\"> pictogram Filter op links van de titel toe te voegen, bewerken of verwijderen van een  tekst te filteren de pagina lijst, bijv. wanneer u 'thuis' in het  pictogram te bewerken veld dat wordt weergegeven wanneer u klikt u op  het, druk op de Enter / Return-toets, alleen de pagina's die \"de tekst  'thuis in deze kolom worden getoond. <br>Te  klikken op het icoontje weer en het verwijderen van de tekst in het  invulveld vervolgens op de Enter / Return-toets, zal het filter  verwijderen.<br>Ga met je muis over het filter pictogram om te zien of de kolom wordt momenteel gefilterd, en zo ja, met welke filter tekst.";
+$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>U kunt klikken op het <span class='sprite livefilter livefilter_active'> pictogram Filter op links van de titel toe te voegen, bewerken of verwijderen van een tekst te filteren de pagina lijst, bijv. wanneer u 'thuis' in het pictogram te bewerken veld dat wordt weergegeven wanneer u klikt u op het, druk op de Enter / Return-toets, alleen de pagina's die 'de tekst 'thuis in deze kolom worden getoond. <br>Te klikken op het icoontje weer en het verwijderen van de tekst in het invulveld vervolgens op de Enter / Return-toets, zal het filter verwijderen.<br>Ga met je muis over het filter pictogram om te zien of de kolom wordt momenteel gefilterd, en zo ja, met welke filter tekst.";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor'] = "Sluit de editor";
 $ccms['lang']['editor']['editorfor'] = "Tekst editor voor";
-$ccms['lang']['editor']['instruction'] = "Gebruik de editor hieronder om de huidige inhoud te wijzigen. Klaar? Klik dan op de button \"Aanpassingen opslaan\" om direct de aanpassingen door te voeren op het world wide web. Voeg ook tot tien relevante keywords toe voor zoekmachine-optimalisatie.";
+$ccms['lang']['editor']['instruction'] = "Gebruik de editor hieronder om de huidige inhoud te wijzigen. Klaar? Klik dan op de button 'Aanpassingen opslaan' om direct de aanpassingen door te voeren op het world wide web. Voeg ook tot tien relevante keywords toe voor zoekmachine-optimalisatie.";
 $ccms['lang']['editor']['savebtn'] = "Aanpassingen opslaan";
 $ccms['lang']['editor']['cancelbtn'] = "Annuleer";
 $ccms['lang']['editor']['confirmclose'] = "Het venster sluiten en wijzigingen annuleren?";
@@ -366,7 +369,3 @@ $ccms['lang']['guestbook']['rejected'] = "Jouw bijdrage is helaas afgewezen.";
       */
 	  
 ?>
-
-
-/* ADDITION */
-
