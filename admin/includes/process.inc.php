@@ -220,7 +220,7 @@ if($db->HasRecords())
 				?>
 				<td style="padding-left:2px;" class="span-1">
 				<?php 
-				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || in_array($row->urlpage, $cfg['restrict'])) 
+				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
 				{ 
 				?>
 					<span class="ss_sprite ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>"></span>
@@ -295,7 +295,7 @@ if($db->HasRecords())
 				</td>
 				<?php 
 				// Check for restrictions
-				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // [i_a] bugfix
+				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
 				{ 
 				?>
 					<td class="span-5" style="text-align: right;">
@@ -934,7 +934,7 @@ if($do_action == "save-template" && $_SERVER['REQUEST_METHOD'] == "POST" && chec
 			
 			$content	= $_POST['content']; // RAW CONTENT: the template may contain ANYTHING.
 			
-			if (is_writable($filename)) 
+			if (is_writable_ex($filename)) 
 			{
 				if (!$handle = fopen($filename, 'w'))  throw new FbX($ccms['lang']['system']['error_openfile']." (".$filename.").");
 				if (fwrite($handle, $content) === FALSE) 
@@ -1484,7 +1484,7 @@ if($do_action == "save-changes" && checkAuth())
 	$filename	= BASE_PATH . '/content/' . $name . '.php';
 	$keywords	= getPOSTparam4DisplayHTML('keywords');
 
-	if (is_writable($filename)) 
+	if (is_writable_ex($filename)) 
 	{
 		if (!$handle = fopen($filename, 'w')) 
 		{

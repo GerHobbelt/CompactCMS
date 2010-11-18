@@ -62,6 +62,9 @@ if (!checkAuth())
 	die($ccms['lang']['auth']['featnotallowed']);
 }
 
+// set jpeg quality for the thumbnails; turns out they are quite reasonable @ 70% quality (and still way smaller than @ 100%)
+define('THUMBNAIL_JPEG_QUALITY', 70);
+
 // Get permissions
 $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
@@ -398,20 +401,20 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 		$thumbnail	= $dest.'/_thumbs/'. $_FILES['Filedata']['name'];
 		$original	= $dest.'/'.$_FILES['Filedata']['name'];
 		
-		if($extension=="jpg" || $extension=="jpeg" ) 
+		if($extension=="jpg" || $extension=="jpeg") 
 		{
 			imagejpeg($tmp, $original, 100);
-			imagejpeg($tmp_t, $thumbnail, 100);
+			imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
 		} 
 		elseif($extension=="png") 
 		{
-			imagepng($tmp, $original, 7);
-			imagepng($tmp_t, $thumbnail, 7);
+			imagepng($tmp, $original, 9);
+			imagepng($tmp_t, $thumbnail, 9);
 		} 
 		else 
 		{
-			imagegif($tmp, $original, 100);
-			imagegif($tmp_t, $thumbnail, 100);
+			imagegif($tmp, $original);
+			imagegif($tmp_t, $thumbnail);
 		}
 		
 		imagedestroy($tmp);
@@ -572,15 +575,15 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 					
 					if($extension=="jpg" || $extension=="jpeg" ) 
 					{
-						imagejpeg($tmp_t, $thumbnail, 100);
+						imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
 					} 
 					elseif($extension=="png") 
 					{
-						imagepng($tmp_t, $thumbnail, 7);
+						imagepng($tmp_t, $thumbnail, 9);
 					} 
 					else 
 					{
-						imagegif($tmp_t, $thumbnail, 100);
+						imagegif($tmp_t, $thumbnail);
 					}
 					
 					imagedestroy($tmp_t);
