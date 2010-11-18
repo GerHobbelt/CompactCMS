@@ -275,6 +275,21 @@ div.ss_help
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
+/* for large tip boxes, i.e. boxes with lots of content: */
+div.ss_help_large 
+{
+	color: #000;
+	width: 500px;
+	z-index: 13000;
+	background: #DB7075;
+	border-left: 5px solid #EFAAAB;
+	border-right: 5px solid #F7D5D5;
+	border-top: 5px solid #F7D5D5;
+	border-bottom: 5px solid #EFAAAB;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
 div.tip-title {
 	font-weight: bold;
 	font-size: 100%;

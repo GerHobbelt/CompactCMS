@@ -212,8 +212,10 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 	restore through our installer/wizard: to make that happen it has to live
 	in the /_docs/ directory.
 	*/
-	$createZip->addDirectory('_docs');
-	$createZip->addFile($sqldump, '_docs/' . $cfg['db_name'] . '-sqldump.sql');
+	$createZip->addDirectory('media');
+	$createZip->addDirectory('media/files');
+	$createZip->addDirectory('media/files/ccms-restore');
+	$createZip->addFile($sqldump, 'media/files/ccms-restore/compactcms-sqldump.sql');
 	
 	$fileName = $configBackupDir.$backupName;
 	$fd = @fopen($fileName, "wb");
@@ -232,32 +234,23 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 	}
 
 	/*
-	To facilitate the auto-upgrade path we write the SQL dump to another
-	location: 
-	  /media/files/ccms-restore/<dbname>-sqldump.sql
-	This file will be picked up by the installer/wizard to perform an
+	To facilitate the auto-upgrade path we copy the current config.inc.php 
+	and write the SQL dump to another location: 
+	  /media/files/ccms-restore/config.inc.php
+	  /media/files/ccms-restore/compactcms-sqldump.sql
+	These files will be picked up by the installer/wizard to perform an
 	automated upgrade when the admin so desires.
+	
+	Note the comment in /_install/inde.php: the SQL DUMP must be the
+	VERY LAST FILE WRITTEN during the backup action (as we depend on 
+	its 'last modified' timestamp to be the latest thing in the 
+	content/media zone!
 	*/
 	if (!file_exists(BASE_PATH . '/media/files/ccms-restore'))
 	{
 		@mkdir(BASE_PATH . '/media/files/ccms-restore', fileperms(BASE_PATH . '/media/files'));
 	}
-	$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/' . $cfg['db_name'] . '-sqldump.sql';
-	$fd = @fopen($sqldumpfile, "wb");
-	if (!$fd)
-	{
-		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;
-	}
-	else
-	{
-		$out = fwrite($fd, $sqldump);
-		if (!$out)
-		{
-			$error[] = $ccms['lang']['system']['error_write'] . ": " . $sqldumpfile;
-		}
-		fclose($fd);
-	}
-	// also copy the config.inc.php file over to the restore directory...
+
 	$cfgfile = BASE_PATH . '/lib/config.inc.php';
 	$fileContents = file_get_contents($cfgfile);
 	if (!$fileContents)
@@ -276,6 +269,22 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 		if (!$out)
 		{
 			$error[] = $ccms['lang']['system']['error_write'] . ": " . $cfgfile;
+		}
+		fclose($fd);
+	}
+
+	$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/compactcms-sqldump.sql';
+	$fd = @fopen($sqldumpfile, "wb");
+	if (!$fd)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;
+	}
+	else
+	{
+		$out = fwrite($fd, $sqldump);
+		if (!$out)
+		{
+			$error[] = $ccms['lang']['system']['error_write'] . ": " . $sqldumpfile;
 		}
 		fclose($fd);
 	}

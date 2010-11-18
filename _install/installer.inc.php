@@ -50,71 +50,10 @@ session_start();
 
 
 // Set current && additional step
-$nextstep = getPOSTparam4IdOrNumber('do', 'ea2b2676c28c0db26d39331a336c6b92');
+$nextstep = getPOSTparam4IdOrNumber('do');
 
-if (empty($_SESSION['variables']))
-{
-	$_SESSION['variables'] = array();
-}
-
-
-/*
-preload the session variables
-*/
-if (empty($_SESSION['variables']['sitename']) && !empty($cfg['sitename']))
-{
-	$_SESSION['variables']['sitename'] = $cfg['sitename'];
-}
-if (empty($_SESSION['variables']['rootdir']) && !empty($cfg['rootdir']))
-{
-	$_SESSION['variables']['rootdir'] = $cfg['rootdir'];
-}
-if (empty($_SESSION['variables']['language']) && !empty($cfg['language']))
-{
-	$_SESSION['variables']['language'] = $cfg['language'];
-}
-if (empty($_SESSION['variables']['version']) && !empty($cfg['version']))
-{
-	$_SESSION['variables']['version'] = ($cfg['version'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['iframe']) && !empty($cfg['iframe']))
-{
-	$_SESSION['variables']['iframe'] = ($cfg['iframe'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['wysiwyg']) && !empty($cfg['wysiwyg']))
-{
-	$_SESSION['variables']['wysiwyg'] = ($cfg['wysiwyg'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['protect']) && !empty($cfg['protect']))
-{
-	$_SESSION['variables']['protect'] = ($cfg['protect'] ? 'true' : 'false');
-}
-if (empty($_SESSION['variables']['authcode']) && !empty($cfg['authcode']))
-{
-	$_SESSION['variables']['authcode'] = $cfg['authcode'];
-}
-if (empty($_SESSION['variables']['db_host']) && !empty($cfg['db_host']))
-{
-	$_SESSION['variables']['db_host'] = $cfg['db_host'];
-}
-if (empty($_SESSION['variables']['db_user']) && !empty($cfg['db_user']))
-{
-	$_SESSION['variables']['db_user'] = $cfg['db_user'];
-}
-if (empty($_SESSION['variables']['db_pass']) && !empty($cfg['db_pass']))
-{
-	$_SESSION['variables']['db_pass'] = $cfg['db_pass'];
-}
-if (empty($_SESSION['variables']['db_name']) && !empty($cfg['db_name']))
-{
-	$_SESSION['variables']['db_name'] = $cfg['db_name'];
-}
-if (empty($_SESSION['variables']['db_prefix']) && !empty($cfg['db_prefix']))
-{
-	$_SESSION['variables']['db_prefix'] = $cfg['db_prefix'];
-}
-
-
+$may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] == 'true'); 
+$do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] == 'true'); 
 
 
 
@@ -138,6 +77,7 @@ if($nextstep == md5('2') && CheckAuth())
 
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$rootdir,$sitename,$language);
+	
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
 
@@ -164,10 +104,35 @@ if($nextstep == md5('2') && CheckAuth())
 		<label for="wysiwyg"><input type="checkbox" name="wysiwyg" value="true"  <?php
 			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] == 'true' ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
 		&#160;<span class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</span>
+		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?>	>
+			<input type="checkbox" <?php if ($do_upgrade) { echo 'value="true"'; } ?> name="upgrade" 
+			<?php if ($may_upgrade) { echo 'checked'; } else { echo 'disabled="disabled"'; } ?> id="upgrade" /> Perform an 
+			<span class="ss_sprite ss_help" title="When and how can we upgrade? :: 
+						<ul>
+						<li>
+							<p>You can perform an upgrade when you have <strong>made a backup of your site</strong>: this installer will automatically detect this and consequently enable the 'upgrade' tickbox.</p>
+							<p><span class='small'>(assuming you have created the backup with a running version of CompactCMS 1.4.2 or later)</span></p>
+						</li>
+						<li>
+							<p>Note that you can also <strong>restore an existing site</strong> by taking its backup and extracting the contents of the backup (zip archive) 
+							in the root directory of the website:</p>
+							<p>This will result in the backed-up content to be placed in the <file><?php echo $dir; ?>content/</file> directory 
+							and the <file>config.inc.php</file> and <file>compactcms-sqldump.sql</file> files are available in the web site's restore directory
+							<file><?php echo $dir; ?>media/files/ccms-restore/</file> .</p>
+							<p><span class='small'>(This is assuming you have created the backup with a running version of CompactCMS 1.4.2 or later; if your backup
+							originates from an earlier version of CompactCMS, you will have to move the extracted content to the appropriate spots and possibly
+							recover your original config.inc.php some other way as those versions did not include that file in the backups. Consult the 
+							CompactCMS forum for assistance.)</span></p>
+							<p>Subsequently running this install wizard will result in auto-detection of such a restore operation and enable the 'upgrade' tickbox for you.</p>
+							">
+				&#160;<strong>upgrade</strong>
+			</span>
+			</label>
+		&#160;<span class="ss_sprite ss_bullet_star small <?php if (!$may_upgrade) { echo 'quiet'; } ?>">Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></span>
 
 		<p class="span-8 right">
 			<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-			<a href="index.php" title="Back to step first step">Cancel</a>
+			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
 			<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
 		</p>
 
@@ -186,11 +151,12 @@ if($nextstep == md5('3') && CheckAuth())
 	$iframe     = array('iframe' => getPOSTparam4boolean('iframe'));
 	$wysiwyg    = array('wysiwyg' => getPOSTparam4boolean('wysiwyg'));
 	$protect    = array('protect' => getPOSTparam4boolean('protect'));
-	$userPass   = array('userPass' => $_POST['userPass']); // must store this in RAW form - will not be displayed anywhere, only fed to MD5()
+	$userPass   = array('userPass' => $_POST['userPass']); // must store this in RAW form - will not be displayed anywhere, is only fed to MD5()
 	$authcode   = array('authcode' => getPOSTparam4IdOrNumber('authcode'));
+	$do_upgrade = array('do_upgrade' => getPOSTparam4boolean('upgrade'));
 
 	// Add new data to variable session
-	$_SESSION['variables'] = array_merge($_SESSION['variables'],$version,$iframe,$wysiwyg,$protect,$userPass,$authcode);
+	$_SESSION['variables'] = array_merge($_SESSION['variables'],$version,$iframe,$wysiwyg,$protect,$userPass,$authcode,$do_upgrade);
 ?>
 	<legend class="installMsg">Step 3 - Collecting your database details</legend>
 		<label for="db_host"><span class="ss_sprite ss_server_database">Database host</span></label><input type="text" class="alt title" name="db_host" style="width:300px;" value="<?php
@@ -210,7 +176,7 @@ if($nextstep == md5('3') && CheckAuth())
 
 		<p class="span-8 right">
 			<button name="submit" type="submit"><span class="ss_sprite ss_information">To confirmation</span></button>
-			<a href="index.php" title="Back to step first step">Cancel</a>
+			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
 			<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
 		</p>
 
@@ -237,36 +203,34 @@ if($nextstep == md5('4') && CheckAuth())
 	$alt_row = "#CDE6B3";
 
 	//
-	// Check for current chmod() if server != Windows
+	// Check for current chmod(); we only are interesting in whether these files and directories are readable and writeable:
+	// this also works out for Windows-based servers.
 	//
 	$chfile = array();
-	if(!strpos($_SERVER['SERVER_SOFTWARE'], "Win"))
-	{
-		/*
-		Note that the 'required' 0666/0777 access rights are, in reality, overdoing it. To be more precise:
-		these files and directories should have [W]rite access enabled for the user the php binary is running
-		under. Generally that user would be the user under which the webserver, e.g. apache, is running
-		(CGI may be a different story!)
+	/*
+	Note that the 'required' 0666/0777 access rights are, in reality, overdoing it. To be more precise:
+	these files and directories should have [W]rite access enabled for the user the php binary is running
+	under. Generally that user would be the user under which the webserver, e.g. apache, is running
+	(CGI may be a different story!)
 
-		Next to that, the directories tested here need e[X]ecutable access for that same user as well.
+	Next to that, the directories tested here need e[X]ecutable access for that same user as well.
 
-		This is /less/ than the 0666/0777 splattergun, but the latter is easier to grok and do for novices.
-		So the message can remain 0666/0777 but in here we're performing the stricter check, as 'is_writable()'
-		is the one which really counts after all: that's the very same check performed by the PHP engine on
-		open-for-writing any file/directory.
-		*/
-		if(!is_writable(BASE_PATH.'/.htaccess')) { $chfile[] = '.htaccess (0666)'; }
-		if(!is_writable(BASE_PATH.'/lib/config.inc.php')) { $chfile[] = '/lib/config.inc.php (0666)'; }
-		if(!is_writable(BASE_PATH.'/content/home.php')) { $chfile[] = '/content/home.php (0666)'; }
-		if(!is_writable(BASE_PATH.'/content/contact.php')) { $chfile[] = '/content/contact.php (0666)'; }
-		if(!is_writable(BASE_PATH.'/lib/templates/ccms.tpl.html')) { $chfile[] = '/lib/templates/ccms.tpl.html (0666)'; }
-		// Directories under risk due to chmod(0777)
-		if(!is_writable(BASE_PATH.'/content/')) { $chfile[] = '/content/ (0777)'; }
-		if(!is_writable(BASE_PATH.'/media/')) { $chfile[] = '/media/ (0777)'; }
-		if(!is_writable(BASE_PATH.'/media/albums/')) { $chfile[] = '/media/albums/ (0777)'; }
-		if(!is_writable(BASE_PATH.'/media/files/')) { $chfile[] = '/media/files/ (0777)'; }
-		if(!is_writable(BASE_PATH.'/lib/includes/cache/')) { $chfile[] = '/lib/includes/cache/ (0777)'; }
-	}
+	This is /less/ than the 0666/0777 splattergun, but the latter is easier to grok and do for novices.
+	So the message can remain 0666/0777 but in here we're performing the stricter check, as 'is_writable_ex()'
+	is the one which really counts after all: that's the very same check performed by the PHP engine on
+	open-for-writing any file/directory.
+	*/
+	if(!is_writable_ex(BASE_PATH.'/.htaccess')) { $chfile[] = '.htaccess (0666)'; }
+	if(!is_writable_ex(BASE_PATH.'/lib/config.inc.php')) { $chfile[] = '/lib/config.inc.php (0666)'; }
+	if(!is_writable_ex(BASE_PATH.'/content/home.php')) { $chfile[] = '/content/home.php (0666)'; }
+	if(!is_writable_ex(BASE_PATH.'/content/contact.php')) { $chfile[] = '/content/contact.php (0666)'; }
+	if(!is_writable_ex(BASE_PATH.'/lib/templates/ccms.tpl.html')) { $chfile[] = '/lib/templates/ccms.tpl.html (0666)'; }
+	// Directories under risk due to chmod(0777)
+	if(!is_writable_ex(BASE_PATH.'/content/')) { $chfile[] = '/content/ (0777)'; }
+	if(!is_writable_ex(BASE_PATH.'/media/')) { $chfile[] = '/media/ (0777)'; }
+	if(!is_writable_ex(BASE_PATH.'/media/albums/')) { $chfile[] = '/media/albums/ (0777)'; }
+	if(!is_writable_ex(BASE_PATH.'/media/files/')) { $chfile[] = '/media/files/ (0777)'; }
+	if(!is_writable_ex(BASE_PATH.'/lib/includes/cache/')) { $chfile[] = '/lib/includes/cache/ (0777)'; }
 ?>
 	<legend class="installMsg">Step 4 - Review your input</legend>
 		<?php 
@@ -336,6 +300,24 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Authentication PIN</th>
 				<td><?php echo $_SESSION['variables']['authcode'];?></td>
 			</tr>
+			<tr style="background-color: <?php echo $alt_row; ?>;">
+				<th width="55%" scope="row">Install Type</th>
+				<td><?php 
+				if ($_SESSION['variables']['do_upgrade'])
+				{
+					echo '<span class="signal_upgrade_mode">Upgrade/Restore</span>';
+				}
+				else if ($_SESSION['variables']['may_upgrade'])
+				{
+					// we MAY but we DO NOT upgrade... hmmm...
+					echo '<span class="signal_upgrade_mode">New Installation</span>';
+				}
+				else
+				{
+					echo 'New Installation';
+				}
+				?></td>
+			</tr>
 		</table>
 		<br class="clear"/>
 		<span class="ss_sprite ss_database">&#160;</span><h2 style="display:inline;">Database details</h2>
@@ -370,7 +352,7 @@ if($nextstep == md5('4') && CheckAuth())
 
 		<p class="span-8 right">
 			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite ss_accept">Install <strong>CompactCMS</strong></span></button>
-			<a href="index.php" title="Back to step first step">Cancel</a>
+			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
 			<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 		</p>
 
@@ -464,26 +446,34 @@ if($nextstep == md5('final') && CheckAuth())
 
 		$sql = file_get_contents(BASE_PATH.'/_docs/structure.sql');
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
-		$sql = preg_replace("/'[0-9a-f]{32}'/", "'".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
+		$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
 
-		// Execute per sql piece
+		// Execute per sql piece: 
+		$currently_in_sqltextdata = false;
+		$query_so_far = '';
 		$queries = explode(";\n", $sql);
 		foreach($queries as $tok)
 		{
 			// filter query: remove comment lines, then see if there's anything left to BE a query...
-			$currently_in_sqltextdata = false;
 			$lines = array_filter(explode("\n", $tok), "is_a_sql_query_piece");
 			if ($currently_in_sqltextdata)
 			{
-				echo "<pre>B0rked on query:\n".$tok."\n---------------------------------\n",implode("\n",$lines);
-				die();
+				/*
+				MySQL supports multiline texts in queries; apparently we have a text here which has a line ending with a semicolon :-(
+				
+				We can only be certain it's a b0rked query by the time we've reached the very end of the SQL file!
+				*/
+				$query_so_far .= implode("\n", $lines) . ";\n";
+				continue;
 			}
-			$tok = trim(implode("\n", $lines));
+				
+			$tok = trim($query_so_far . implode("\n", $lines));
+			$query_so_far = '';
+
 			if (empty($tok))
 				continue;
 
-
-			if (!defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			{
 				$results = $db->Query($tok);
 				if ($results == false)
@@ -498,11 +488,104 @@ if($nextstep == md5('final') && CheckAuth())
 				$sqldump[] = "Execute query:\n---------------------------------------\n" . $tok . "\n---------------------------------------\n";
 			}
 		}
-		if ($err = 0)
+		
+		if ($currently_in_sqltextdata)
+		{
+			echo "<pre>B0rked on query:\n".$query_so_far."\n---------------------------------\n";
+			die();
+		}
+
+		if ($err == 0 && $_SESSION['variables']['do_upgrade'])
+		{
+			$sql = file_get_contents(BASE_PATH.'/media/files/ccms-restore/compactcms-sqldump.sql');
+			// $sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql); -- all tables herin will already have the correct prefix: we're doing a restore anyway, so we have this info from the config.inc.php file
+			$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
+			// note that the passwords for the other users in the backup may be invalid IFF you changed the authcode!
+			
+			// Execute per sql piece: 
+			$currently_in_sqltextdata = false;
+			$query_so_far = '';
+			$queries = explode(";\n", $sql);
+			foreach($queries as $tok)
+			{
+				// filter query: remove comment lines, then see if there's anything left to BE a query...
+				$lines = array_filter(explode("\n", $tok), "is_a_sql_query_piece");
+				if ($currently_in_sqltextdata)
+				{
+					/*
+					MySQL supports multiline texts in queries; apparently we have a text here which has a line ending with a semicolon :-(
+					
+					We can only be certain it's a b0rked query by the time we've reached the very end of the SQL file!
+					*/
+					$query_so_far .= implode("\n", $lines) . ";\n";
+					continue;
+				}
+					
+				$tok = trim($query_so_far . implode("\n", $lines));
+				$query_so_far = '';
+
+				if (empty($tok))
+					continue;
+
+				/*
+				- ignore 'DROP TABLE' queries
+				
+				- process 'CREATE TABLE' queries by REPLACING them with 'TRUNCATE TABLE' queries; 
+				  after all, they will soon be followed up with INSERT INTO queries and we don't 
+				  want the 'fresh install' records to linger in there when performing 
+				  an upgrade/restore.
+				*/
+				if (preg_match('/DROP\sTABLE/i', $tok))
+					continue;
+					
+				if (preg_match('/CREATE\sTABLE\s`?([a-zA-Z0-9_\-]+)`?\s\(/is', $tok, $matches))
+				{
+					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+					{
+						$results = $db->TruncateTable($matches[1]);
+						if ($results == false)
+						{
+							$errors[] = 'Error: executing query: ' . $db->GetLastSQL();
+							$errors[] = $db->Error();
+							$err++;
+						}
+					}
+					else
+					{
+						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[1] . "`\n---------------------------------------\n";
+					}
+				}
+				else
+				{
+					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+					{
+						$results = $db->Query($tok);
+						if ($results == false)
+						{
+							$errors[] = 'Error: executing query: ' . $tok;
+							$errors[] = $db->Error();
+							$err++;
+						}
+					}
+					else
+					{
+						$sqldump[] = "Execute query:\n---------------------------------------\n" . $tok . "\n---------------------------------------\n";
+					}
+				}
+			}
+			
+			if ($currently_in_sqltextdata)
+			{
+				echo "<pre>B0rked on query:\n".$query_so_far."\n---------------------------------\n";
+				die();
+			}
+		}
+		
+		if ($err == 0)
 		{
 			$log[] = "Database structure and data successfully imported";
 		}
-		if (defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		{
 ?>
 			<div id="configinc_display" >
@@ -516,6 +599,8 @@ if($nextstep == md5('final') && CheckAuth())
 			</div>
 <?php
 		}
+
+		
 	}
 
 	//
@@ -589,8 +674,8 @@ if($nextstep == md5('final') && CheckAuth())
 		$conn_id = ftp_connect($_POST['ftp_host']) or die("Couldn't connect to ".$_POST['ftp_host']);
 
 		// Try to login using provided details
-		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) {
-
+		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+		{
 			// trimPath function
 			function trimPath($path,$depth) 
 			{
@@ -695,7 +780,7 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 
 		// Write the new setup to the config file
-		if (!defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		{
 			if ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w'))
 			{
@@ -733,7 +818,7 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	if($err==0)
 	{
-		$htaccess   = file_get_contents(BASE_PATH.'/.htaccess');
+		$htaccess   = @file_get_contents(BASE_PATH.'/.htaccess');
 		$newline    = "RewriteBase ".$_SESSION['variables']['rootdir']." "; // 'superfluous' space at the end there to simplify the match, even when moving the setup from /dir/ to /
 
 		if(strpos($htaccess, $newline)===false)
@@ -746,7 +831,7 @@ if($nextstep == md5('final') && CheckAuth())
 			}
 			else
 			{
-				if (!defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				{
 					if ($fp = fopen(BASE_PATH.'/.htaccess', 'w'))
 					{
