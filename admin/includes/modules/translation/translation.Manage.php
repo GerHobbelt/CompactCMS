@@ -54,7 +54,8 @@ if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 { 
 	die("No external access to file");
 }
-if(!CCMS_DEVELOPMENT_ENVIRONMENT) 
+
+if(!$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 { 
 	die($ccms['lang']['auth']['featnotallowed']);
 } 

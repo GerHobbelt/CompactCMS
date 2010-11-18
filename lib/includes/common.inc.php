@@ -10,7 +10,7 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 
-if (CCMS_DEVELOPMENT_ENVIRONMENT)
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 	/* always flush cached data at the start of each invocation -- which always passes through here, at least. */
 	clearstatcache();

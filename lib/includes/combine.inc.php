@@ -215,7 +215,7 @@ else
 		$encoding = 'none';
 	}
 
-	if (HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION)
+	if ($cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'])
 	{
 		$encoding = 'none';
 	}
