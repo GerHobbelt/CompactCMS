@@ -176,9 +176,13 @@ var tinyMCE_GZ = {
 		// Evaluate script
 		if (!w.execScript) {
 			if (/Gecko/.test(navigator.userAgent))
+			{
 				eval(co, w); // Firefox 3.0
+			}
 			else
+			{
 				eval.call(w, co);
+			}
 		} else
 			w.execScript(co); // IE
 	}

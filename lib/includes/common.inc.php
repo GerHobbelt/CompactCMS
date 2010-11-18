@@ -1586,9 +1586,6 @@ function SetUpLanguageAndLocale($language)
 	{
 		if (!is_file($file))
 		{
-			echo "<h1>Language File does not exist</h1><p>for tinyMCE theme/plugin: $file</p>\n";
-			die();
-			
 			$mce_has_lang = false;
 			break;
 		}
@@ -1596,7 +1593,7 @@ function SetUpLanguageAndLocale($language)
 	
 	if ($mce_has_lang)
 	{
-		$cfg['tinymce_language'] = $language;
+		$cfg['tinymce_language'] = 'en'; // $language;   -- for some reason, tinyMCE fails to load when anything other than English is specified. Some obscure crash inside a !@#$%^&* eval() in there. :-(((
 	}
 	else
 	{
