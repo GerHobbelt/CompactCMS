@@ -350,6 +350,20 @@ function confirm_regen()
 			} 
 			?>
 			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
+			<div class="clear right">
+			<?php
+			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+			{
+			?>
+				<span class="ss_sprite ss_arrow_in"><a onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
+				<?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
+				</a></span>
+			<?php
+			}
+			?>
+			<span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php"><?php echo $ccms['lang']['album']['albumlist']; ?></a></span>
+			</div>
+			<div>
 			<?php 
 			foreach ($images as $key => $value) 
 			{ 
@@ -367,20 +381,8 @@ function confirm_regen()
 				echo "\n";
 			} 
 			?>
-			<p class="clear right">
+			</div>
 			<?php
-			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
-			{
-			?>
-				<span class="ss_sprite ss_arrow_in"><a onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
-				<?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
-				</a></span>
-			<?php
-			}
-			?>
-			<span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php"><?php echo $ccms['lang']['album']['albumlist']; ?></a></span>
-			</p>
-		<?php 
 		} 
 		?>
 		</div>

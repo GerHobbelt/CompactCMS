@@ -65,7 +65,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 // Set the default template
 $dir_temp = BASE_PATH . "/lib/templates/";
 $get_temp = getGETparam4FullFilePath('template', $template[0].'.tpl.html');
-$chstatus = is_writable($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
+$chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
 	
 // Check for filename	
 if(!empty($get_temp)) 

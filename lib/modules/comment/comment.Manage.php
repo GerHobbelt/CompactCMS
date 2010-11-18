@@ -148,9 +148,13 @@ function confirmation()
 				</div>
 				<hr class="space" />
 				<?php 
-				$i++; 
 			}
-		} else echo $ccms['lang']['guestbook']['noposts']; ?>
+		} 
+		else 
+		{
+			echo $ccms['lang']['guestbook']['noposts']; 
+		}
+		?>
 		</div>
 	
 		<div class="span-6">
@@ -163,9 +167,6 @@ function confirmation()
 				{
 					$showmsg = max(1,intval($rsCfg->showMessage)); // always show at least 1 news item on a comment page!
 					$locale = $rsCfg->showLocale;
-					$showauth = intval($rsCfg->showAuthor);
-					$showdate = intval($rsCfg->showDate);
-					$showteaser = intval($rsCfg->showTeaser);
 					//$newscfgid = $rsCfg->cfgID;
 				}
 				else // set defaults 
@@ -173,9 +174,6 @@ function confirmation()
 					// [i_a] when no cfg record, fill in the defaults as were also set in the database
 					$showmsg = 3;
 					$locale = $cfg['locale'];
-					$showauth = 1;
-					$showdate = 1;
-					$showteaser = 0;
 					//$newscfgid = null;
 				}
 				?>
