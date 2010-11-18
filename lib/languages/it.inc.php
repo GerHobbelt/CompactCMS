@@ -75,7 +75,7 @@ $ccms['lang']['system']['message_rights'] = "Tutti i diritti sono riservati.";
 $ccms['lang']['system']['message_compatible'] = "Testato su";
 
 // Administration general messages
-$ccms['lang']['backend']['gethelp'] = "Suggerimenti o problemi? Visita <a href=\"http://www.compactcms.nl/forum/\" title=\"Visit the official forum\" class=\"external\" rel=\"external\">il forum</a>!";
+$ccms['lang']['backend']['gethelp'] = "Suggerimenti o problemi? Visita <a href='http://www.compactcms.nl/forum/' title='Visit the official forum' class='external' rel='external'>il forum</a>!";
 $ccms['lang']['backend']['ordertip'] = "Utilizzare la lista sotto per strutturare il menu del sito. Il sistema non gestisce i duplicati.";
 $ccms['lang']['backend']['createtip'] = "Per creare una nuova pagina, riempire il modulo sotto ad una nuova pagina sar&agrave; creata. Appena il file sar&agrave; creato sar&agrave; possibile modificarlo.";
 $ccms['lang']['backend']['currentfiles'] = "Nella lista sotto son presenti i file pubblicati. La pagina di default non pu&ograve; essere cancellata essendo la primapagina del sito. Gli altri file potrebbero essere soggette a restrizioni dell'amministratore.";
@@ -130,9 +130,12 @@ $ccms['lang']['backend']['none'] = /* BABELFISH */ "Nessuno";
 $ccms['lang']['backend']['yes'] = "S&igrave;";
 $ccms['lang']['backend']['no'] = "No";
 $ccms['lang']['backend']['translation'] = /* BABELFISH */ "Traduzioni";
+$ccms['lang']['backend']['hello'] = /* BABELFISH */ "Ciao";
+$ccms['lang']['backend']['logout'] = "Log-out";
+$ccms['lang']['backend']['see_forum'] = /* BABELFISH */ "Vedere forum";
 
 // Texts for authentication screen
-$ccms['lang']['login']['welcome'] = /* BABELFISH */ "<p>Usa un nome utente e password validi per accedere al back-end CompactCMS. Se sei arrivato qui per errore, tornare alla <a href=\"admin/includes/\">home page</a>.</p> <p>Contattare il webmaster per i vostri dati.</p>";
+$ccms['lang']['login']['welcome'] = /* BABELFISH */ "<p>Usa un nome utente e password validi per accedere al back-end CompactCMS. Se sei arrivato qui per errore, tornare alla <a href='admin/includes/'>home page</a>.</p> <p>Contattare il webmaster per i vostri dati.</p>";
 $ccms['lang']['login']['username'] = "Username";
 $ccms['lang']['login']['password'] = "Password";
 $ccms['lang']['login']['login'] = "Login";
@@ -184,12 +187,12 @@ $ccms['lang']['hints']['template'] = "Categoria :: Se si usano template multipli
 $ccms['lang']['hints']['activelink'] = "Menu attivo? :: Non tutte le pagine necessitano di un link attivo. Per disattivare una pagina premere la checkbox corrispondente.";
 $ccms['lang']['hints']['menuid'] = "Categoria Menu :: Selezione in quale menu questo oggetto deve essere inserito. Il default &egrave; il main menu (1), in cui &egrave; mostrato il link alla homepage.";
 $ccms['lang']['hints']['iscoding'] = "Contiene codice :: Il file contiene codice (es. PHP o Javascript)? Selezionado 'S&igrave;' &egrave; possibile inserire il proprio codice a mano nell'editor della pagina.";
-$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>È possibile fare clic sul <span class=\"sprite livefilter livefilter_active\"> icona del filtro a sinistra del titolo per aggiungere, modificare o rimuovere un testo per filtrare l'elenco pagina, ad esempio quando si 'tipo' a casa nel campo di modifica che appare quando si fa clic sull'icona, quindi premere il tasto Invio / tasto Invio, solo le pagine che hanno a casa 'il testo' in questa colonna sarà mostrata. <br>Facendo clic sull'icona di nuovo e cancellare il testo nel campo di modifica, quindi premendo il tasto \"Invio\", verrà rimosso il filtro.<br>Al passaggio del mouse sopra l'icona del filtro per vedere se la colonna è attualmente in fase di filtrato e, se sì, con quale testo del filtro.";
+$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>È possibile fare clic sul <span class='sprite livefilter livefilter_active'> icona del filtro a sinistra del titolo per aggiungere, modificare o rimuovere un testo per filtrare l'elenco pagina, ad esempio quando si 'tipo' a casa nel campo di modifica che appare quando si fa clic sull'icona, quindi premere il tasto Invio / tasto Invio, solo le pagine che hanno a casa 'il testo' in questa colonna sarà mostrata. <br>Facendo clic sull'icona di nuovo e cancellare il testo nel campo di modifica, quindi premendo il tasto 'Invio', verrà rimosso il filtro.<br>Al passaggio del mouse sopra l'icona del filtro per vedere se la colonna è attualmente in fase di filtrato e, se sì, con quale testo del filtro.";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor'] = "Chiudi l'editor";
 $ccms['lang']['editor']['editorfor'] = "Editor di testo per";
-$ccms['lang']['editor']['instruction'] = "Utilizzare l'editor sotto per modificare il file corrente. Premere poi il pulsante \"Salva cambiamenti\" per pubblicare le modifiche ed aggiornare automaticamente il sito.";
+$ccms['lang']['editor']['instruction'] = "Utilizzare l'editor sotto per modificare il file corrente. Premere poi il pulsante 'Salva cambiamenti' per pubblicare le modifiche ed aggiornare automaticamente il sito.";
 $ccms['lang']['editor']['savebtn'] = "Salva cambiamenti";
 $ccms['lang']['editor']['cancelbtn'] = "Annulla";
 $ccms['lang']['editor']['confirmclose'] = "Chiudere la finestra e scartare le modifiche?";
@@ -208,7 +211,7 @@ $ccms['lang']['auth']['featnotallowed'] = /* BABELFISH */ "Il tuo livello di con
 // Back-up messages
 $ccms['lang']['backup']['createhd'] = /* BABELFISH */ "Crea nuovo back-up";
 $ccms['lang']['backup']['explain'] = "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files reguraly.";
-$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Attenzione: Si prega di essere consapevole del fatto che la tua <dfn>lightbox</dfn> 'immagini album sono <strong>non</strong> backup descrizioni! L'album <strong>sono</strong>, ma le immagini stesse e le loro miniature sono <strong>non inclusi in queste copie di backup</strong>con. Se si desidera che i backup di questi, allora è necessario conferire l'amministratore del sito su un sistema di backup aggiuntive che consentono di backup e ripristino di questi (forse grande) collezioni di file.";
+$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Attenzione: Si prega di essere consapevole che la tua <dfn>lightbox</dfn> 'immagini album sono <strong>non</strong> backup descrizioni! L'album <strong>sono</strong>, ma le immagini stesse e le loro miniature sono <strong>non inclusi in queste copie di backup</strong>con. Se si desidera che i backup di questi, allora è necessario conferire l'amministratore del sito su un sistema di backup aggiuntive che consentono di backup e ripristino di questi (forse grande) collezioni di file.";
 $ccms['lang']['backup']['currenthd'] = /* BABELFISH */ "Disponibile back-up";
 $ccms['lang']['backup']['timestamp'] = /* BABELFISH */ "nome del file di back-up";
 $ccms['lang']['backup']['download'] = /* BABELFISH */ "Download archivio";
@@ -366,7 +369,3 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Il tuo commento è sta
       */
 	  
 ?>
-
-
-/* ADDITION */
-

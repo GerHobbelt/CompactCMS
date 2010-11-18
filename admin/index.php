@@ -113,7 +113,7 @@ function set_filter_msgs(el)
 		<p><?php 
 		if($cfg['protect'])
 		{
-			?><span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout">Log-out</a></span><?php 
+			?><span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout"><?php echo $ccms['lang']['backend']['logout']; ?></a></span><?php 
 		} 
 		?><a id="clockLink" style="text-decoration:none;" class="clock"><span class="ss_sprite ss_clock">&#160;</span></a></p>
 		<div id="notify_res">&#160;
@@ -132,7 +132,7 @@ function set_filter_msgs(el)
 		</div>
 	</div>
 	<div id="advanced" class="prepend-1 span-5 last">
-		<h2><span class="ss_sprite ss_user_red">Hi</span> <?php echo $_SESSION['ccms_userFirst']; ?></h2>
+		<h2><span class="ss_sprite ss_user_red"><?php echo $ccms['lang']['backend']['hello']; ?></span> <?php echo $_SESSION['ccms_userFirst']; ?></h2>
 		<div id="advanced_res">
 			<ul>
 				<?php 
@@ -352,7 +352,7 @@ function set_filter_msgs(el)
 			</tr>
 		</table>
 		<div id="dyn_list">
-			<?php echo $ccms['lang']['system']['error_misconfig']; ?> <a href="http://community.compactcms.nl/forum/"><strong>See forum</strong></a>.
+			<?php echo $ccms['lang']['system']['error_misconfig']; ?> <a href="http://community.compactcms.nl/forum/"><strong><?php echo $ccms['lang']['backend']['see_forum']; ?></strong></a>.
 			<!--spinner-->
 		</div>
 		<table width="100%">

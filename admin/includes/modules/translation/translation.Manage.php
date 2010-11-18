@@ -296,17 +296,17 @@ if ($do == 'update')
 						
 						if (!empty($original_value))
 						{
-							$i18n_units[$entry_phpcode] = '"'.str_replace('"', '\\"', $original_value).'";';
+							$i18n_units[$entry_phpcode] = '"'.str_replace('"', "'", $original_value).'";';
 						}
 						else if ($english_value != $entry)
 						{
 							// actual translation has happened!
-							$i18n_units[$entry_phpcode] = '/* BABELFISH */ "'.str_replace('"', '\\"', $entry).'";';
+							$i18n_units[$entry_phpcode] = '/* BABELFISH */ "'.str_replace('"', "'", $entry).'";';
 						}
 						else 
 						{
 							// no translation whatsoever
-							$i18n_units[$entry_phpcode] = '"'.str_replace('"', '\\"', $english_value).'";';
+							$i18n_units[$entry_phpcode] = '"'.str_replace('"', "'", $english_value).'";';
 						}
 						
 						//$content .= "\n".$entry_phpcode.' = /* BABELFISH */ "'.$entry.'";';
@@ -321,6 +321,8 @@ if ($do == 'update')
 				if (is_file($lang_file))
 				{
 					$orig_content = file_get_contents($lang_file);
+					$orig_content = preg_replace('/<\?php/', '', $orig_content);
+					$orig_content = preg_replace('/\?>/', '', $orig_content);
 				}
 				
 				$remaining = $i18n_units;
@@ -343,7 +345,7 @@ if ($do == 'update')
 					}
 				}
 				
-				file_put_contents(BASE_PATH . '/media/files/'.$to_lang.'.inc.php', $orig_content);
+				file_put_contents(BASE_PATH . '/media/files/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
 				if (0)
 				{
 					echo "<html><body><pre>" . htmlspecialchars($orig_content);
@@ -360,6 +362,8 @@ if ($do == 'update')
 				if (is_file($lang_file))
 				{
 					$orig_content = file_get_contents($lang_file);
+					$orig_content = preg_replace('/<\?php/', '', $orig_content);
+					$orig_content = preg_replace('/\?>/', '', $orig_content);
 				}
 				
 				$remaining = $i18n_units;
@@ -383,7 +387,7 @@ if ($do == 'update')
 				}
 				
 				@mkdir(BASE_PATH . '/media/files/lang-babel');
-				file_put_contents(BASE_PATH . '/media/files/lang-babel/'.$to_lang.'.inc.php', $orig_content);
+				file_put_contents(BASE_PATH . '/media/files/lang-babel/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
 				if (0)
 				{
 					echo "<html><body><pre>" . htmlspecialchars($orig_content);

@@ -77,7 +77,7 @@ $ccms['lang']['system']['message_rights'] = "Alle Rechte vorbehalten";
 $ccms['lang']['system']['message_compatible'] = "Erfolgreich getestet mit";
 
 // Administration general messages
-$ccms['lang']['backend']['gethelp'] = "Bei Vorschl&auml;gen, Feedback oder Schwierigkeiten  <a href=\"http://community.compactcms.nl/forum/\" title=\"Das offizielle CCMS-forum\" class=\"external\" rel=\"external\">gehe zum Forum</a>!";
+$ccms['lang']['backend']['gethelp'] = "Bei Vorschl&auml;gen, Feedback oder Schwierigkeiten  <a href='http://community.compactcms.nl/forum/' title='Das offizielle CCMS-forum' class='external' rel='external'>gehe zum Forum</a>!";
 $ccms['lang']['backend']['ordertip'] = "Drop-downs benutzen, um die Struktur der Seite im Menü wiederzugeben.";
 $ccms['lang']['backend']['createtip'] = "Um eine neue Seite zu erstellen, sind die Felder auszufüllen. Nach der Erstellung der Seite kann diese wie üblich bearbeitet werden.";
 $ccms['lang']['backend']['currentfiles'] = "In der Auflistung unten sind alle erstellten Seiten zu finden. Die Startseite kann grundsätzlich nicht gelöscht werden. Einige Seiten können nur vom Administrator verändert werden, da dieser allein die Berechtigungen vergibt.";
@@ -132,9 +132,12 @@ $ccms['lang']['backend']['none'] = /* BABELFISH */ "Keine";
 $ccms['lang']['backend']['yes'] = "Ja";
 $ccms['lang']['backend']['no'] = "Nein";
 $ccms['lang']['backend']['translation'] = /* BABELFISH */ "Übersetzungen";
+$ccms['lang']['backend']['hello'] = /* BABELFISH */ "Hallo";
+$ccms['lang']['backend']['logout'] = "Log-out";
+$ccms['lang']['backend']['see_forum'] = /* BABELFISH */ "Siehe Forum";
 
 // Texts for authentication screen
-$ccms['lang']['login']['welcome'] = /* BABELFISH */ "<p>Verwenden Sie einen gültigen Benutzernamen und Passwort zu Ende Zugriff auf die Back-CompactCMS. Wenn Sie hier angekommen versehentlich Rückkehr zur <a href=\"admin/includes/\">Startseite</a>.</p> <p>Kontaktieren Sie Ihren Webmaster für Ihre Daten.</p>";
+$ccms['lang']['login']['welcome'] = /* BABELFISH */ "<p>Verwenden Sie einen gültigen Benutzernamen und Passwort zu Ende Zugriff auf die Back-CompactCMS. Wenn Sie hier angekommen versehentlich Rückkehr zur <a href='admin/includes/'>Startseite</a>.</p> <p>Kontaktieren Sie Ihren Webmaster für Ihre Daten.</p>";
 $ccms['lang']['login']['username'] = /* BABELFISH */ "Benutzername";
 $ccms['lang']['login']['password'] = /* BABELFISH */ "Passwort";
 $ccms['lang']['login']['login'] = "Login";
@@ -186,7 +189,7 @@ $ccms['lang']['hints']['template'] = "Kategorie :: Bei der Verwendung mehrerer T
 $ccms['lang']['hints']['activelink'] = "Aktiver Link im menu? :: Nicht alle Menüpunkte benötigen einen aktiven Link (versteckte Seiten). Um den Link zu deaktivieren, muss der Haken aus der Checkbox entfernt werden.";
 $ccms['lang']['hints']['menuid'] = "Menü Kategorie :: Hier auswählen, in welchem Menü der Menüpunkt erscheinen soll. Standard ist das Hauptmenü (1), in dem auch die Startseite erscheint.";
 $ccms['lang']['hints']['iscoding'] = "Code :: Soll die Datei Code (PHP, Javascript) enthalten, 'Ja' ausählen. Der WISYWIG-Editor wird ausgeschaltet.";
-$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>Sie können das Klicken auf <span class='sprite livefilter livefilter_active'>&#160;das Symbol Filter</span> auf der linken Seite auf den Titel hinzufügen, bearbeiten oder entfernen Text Liste zu filtern die Seite, zB wenn Sie \"Heimat\" in das Symbol Eingabefeld erscheint der die klicken, wenn Sie, drücken Sie die Eingabetaste / Return-Taste, nur Seiten, die \"den Text\" Heimat in dieser Spalte angezeigt. <br>Ein Klick auf das Icon wieder und Löschen von Text in das Eingabefeld, das Drücken der Enter / Return, wird den Filter entfernen.<br>Mauszeiger über das Symbol Filter, um zu sehen, ob die Spalte wird derzeit filtriert, und wenn ja, mit welchem Filter Text.";
+$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br>Sie können das Klicken auf <span class='sprite livefilter livefilter_active'> das Symbol Filter auf der linken Seite auf den Titel hinzufügen, bearbeiten oder entfernen Text Liste zu filtern die Seite, zB wenn Sie 'Heimat' in das Symbol Eingabefeld erscheint der die klicken, wenn Sie, drücken Sie die Eingabetaste / Return-Taste, nur Seiten, die 'den Text' Heimat in dieser Spalte angezeigt. <br>Ein Klick auf das Icon wieder und Löschen von Text in das Eingabefeld, das Drücken der Enter / Return, wird den Filter entfernen.<br>Mauszeiger über das Symbol Filter, um zu sehen, ob die Spalte wird derzeit filtriert, und wenn ja, mit welchem Filter Text.";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor'] = "Editor schließen";
@@ -368,7 +371,3 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Ihr Kommentar wurde ab
       */
 	  
 ?>
-
-
-/* ADDITION */
-
