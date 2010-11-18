@@ -1294,6 +1294,552 @@ function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
 
 
 
+/*---------------------------------------------------------------------
+See also
+
+http://nl2.php.net/manual/en/function.glob.php
+*/
+
+
+/**
+ * Prepends $string to each element of $array
+ * If $deep is true, will indeed also apply to sub-arrays
+ * @author BigueNique AT yahoo DOT ca
+ * @since 080324
+ */
+function array_prepend($array, $string, $deep=false) 
+{
+    if (empty($array) || empty($string)) 
+		return $array;
+    foreach($array as $key => $element)
+	{
+        if(is_array($element))
+		{
+            if($deep)
+			{
+                $array[$key] = array_prepend($element,$string,$deep);
+            }
+			else
+            {
+				trigger_error('array_prepend: array element',E_USER_WARNING);
+			}
+		}
+        else
+		{
+            $array[$key] = $string.$element;
+		}
+	}
+    return $array;
+}
+
+/**
+ * A better "fnmatch" alternative for windows that converts a fnmatch
+ * pattern into a preg one. It should work on PHP >= 4.0.0.
+ * @author soywiz at php dot net
+ * @since 17-Jul-2006 10:12
+ */
+if (!function_exists('fnmatch')) 
+{
+    function fnmatch($pattern, $string) 
+	{
+        return preg_match('/^' . strtr(addcslashes($pattern, '\\.+^$(){}=!<>|'), array('*' => '.*', '?' => '.?')) . '$/i', $string);
+    }
+}
+
+
+/**#@+
+ * Extra GLOB constant for safe_glob()
+ */
+define('GLOB_NODIR',256);
+define('GLOB_PATH',512);
+define('GLOB_NODOTS',1024);
+define('GLOB_RECURSE',2048);
+/**#@-*/
+
+/**
+ * A safe empowered glob().
+ *
+ * Function glob() is prohibited on some server (probably in safe mode)
+ * (Message "Warning: glob() has been disabled for security reasons in
+ * (script) on line (line)") for security reasons as stated on:
+ * http://seclists.org/fulldisclosure/2005/Sep/0001.html
+ *
+ * safe_glob() intends to replace glob() using readdir() & fnmatch() instead.
+ * Supported flags: GLOB_MARK, GLOB_NOSORT, GLOB_ONLYDIR
+ * Additional flags: GLOB_NODIR, GLOB_PATH, GLOB_NODOTS, GLOB_RECURSE
+ * (not original glob() flags)
+ *
+ * @author BigueNique AT yahoo DOT ca
+ * @updates
+ * - 080324 Added support for additional flags: GLOB_NODIR, GLOB_PATH,
+ *   GLOB_NODOTS, GLOB_RECURSE
+ */
+function safe_glob($pattern, $flags = 0) 
+{
+    $split=explode('/',str_replace('\\','/',$pattern));
+    $mask=array_pop($split);
+    $path=implode('/',$split);
+    if (($dir=opendir($path))!==false) 
+	{
+        $glob=array();
+        while(($file=readdir($dir))!==false) 
+		{
+            // Recurse subdirectories (GLOB_RECURSE)
+            if (($flags&GLOB_RECURSE) && is_dir($file) && (!in_array($file,array('.','..'))))
+			{
+                $glob = array_merge($glob, array_prepend(safe_glob($path.'/'.$file.'/'.$mask, $flags), ($flags&GLOB_PATH?'':$file.'/')));
+			}
+            // Match file mask
+            if (fnmatch($mask,$file)) 
+			{
+                if ( ( (!($flags&GLOB_ONLYDIR)) || is_dir($path.'/'.$file) )
+                  && ( (!($flags&GLOB_NODIR)) || (!is_dir($path.'/'.$file)) )
+                  && ( (!($flags&GLOB_NODOTS)) || (!in_array($file,array('.','..'))) ) )
+				{
+                    $glob[] = ($flags&GLOB_PATH?$path.'/':'') . $file . ($flags&GLOB_MARK?'/':'');
+				}
+            }
+        }
+        closedir($dir);
+        if (!($flags&GLOB_NOSORT)) sort($glob);
+        return $glob;
+    } 
+	else 
+	{
+        return false;
+    }   
+}
+
+
+
+
+
+
+/**
+Derived from legolas558 d0t users dot sf dot net comments at
+  http://nl2.php.net/manual/en/function.is-writable.php
+
+ ---
+ 
+Detect whether a file or directory is writable for the current user.
+
+Will work despite the Windows ACLs bug:
+see http://bugs.php.net/bug.php?id=27609
+see http://bugs.php.net/bug.php?id=30931
+*/
+function is_writable_ex($path) 
+{
+    if (is_dir($path))
+	{
+		// try to write a temp file in this directory
+		$t = substr($path, -1, 1);
+		if ($t != '/' && $t != '\\')
+		{
+			$path .= '/';
+		}
+		do
+		{
+			$filepath = $path . uniqid(mt_rand()).'.tmp';
+		} while (@file_exists($filepath));
+		
+		$path = $filepath;
+		$f = @fopen($path, 'w');
+		if ($f===false)
+		{
+			return false;
+		}
+		fclose($f);
+		unlink($path);
+		return true;
+	}
+	if (is_file($path))
+	{
+		// check file for read/write capabilities
+		$f = @fopen($path, 'r+');
+		if ($f===false)
+			return false;
+		fclose($f);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+
+
+
+
+// Set friendly local names languages
+function setLanguage($lang) 
+{
+	switch ($lang) 
+	{
+		case 'en':
+			return "English";
+			break;
+		case 'nl':
+			return "Nederlands";
+			break;
+		case 'de':
+			return "Deutsch";
+			break;
+		case 'it':
+			return "italiano";
+			break;
+		case 'ru':
+			return "русский";
+			break;
+		case 'sv':
+			return "svenska";
+			break;
+		case 'fr':
+			return "français";
+			break;
+		case 'es':
+			return "español (castellano)";
+			break;
+		case 'pr':
+			return "Português";
+			break;
+		case 'tr':
+			return "Türk";
+			break;
+		case 'ch':
+			return "中文";
+			break;
+		case 'ar':
+			return "Arabic";
+			break;
+		case 'ja':
+			return "Japanese";
+			break;
+		case 'ko':
+			return "Korean";
+			break;
+		case 'pl':
+			return "Polish";
+			break;
+
+		default:
+			return $lang;
+			break;
+	}
+}
+
+
+
+/*
+You may specify a 2-char language code OR a 3-char 'locale' code
+to set up the proper language files and settings.
+*/
+function SetUpLanguageAndLocale($language)
+{
+	global $cfg;
+	global $ccms; // <-- this one will be augmented by the (probably) loaded language file(s).
+	
+	// Translate 2 character code to setlocale compliant code
+	//
+	// ALSO fix the 2-char language code if it is unknown (security + consistancy measure)!
+	switch ($language) 
+	{
+	default:
+	case 'en':
+	case 'eng':
+		$language = 'en'; $locale = 'eng';break;
+	case 'de':
+	case 'deu':
+		$language = 'de'; $locale = 'deu';break;
+	case 'it':
+	case 'ita':
+		$language = 'it'; $locale = 'ita';break;
+	case 'nl':
+	case 'nld':
+		$language = 'nl'; $locale = 'nld';break;
+	case 'ru':
+	case 'rus':
+		$language = 'ru'; $locale = 'rus';break;
+	case 'sv':
+	case 'sve':
+		$language = 'sv'; $locale = 'sve';break;
+	case 'fr':
+	case 'fra':
+		$language = 'fr'; $locale = 'fra';break;
+	case 'es':
+	case 'esp':
+		$language = 'es'; $locale = 'esp';break;
+	case 'pr':
+	case 'por':
+		$language = 'pr'; $locale = 'por';break;
+	case 'tr':
+	case 'tur':
+		$language = 'tr'; $locale = 'tur';break;
+	case 'ch':
+	case 'chs':
+		$language = 'ch'; $locale = 'chs';break;
+	case 'ar':
+	case 'ara':
+		$language = 'ar'; $locale = 'ara';break;
+	case 'ja':
+	case 'jpn':
+		$language = 'ja'; $locale = 'jpn';break;
+	case 'ko':
+	case 'kor':
+		$language = 'ko'; $locale = 'kor';break;
+	case 'pl':
+	case 'pol':
+		$language = 'pl'; $locale = 'pol';break;
+	}
+
+	// Either select the specified language file or fall back to English
+	$langfile = BASE_PATH . '/lib/languages/'.$language.'.inc.php';
+	if(is_file($langfile))
+	{
+		// only load language files when the current language has not been loaded just before.
+		if (!isset($cfg['language']) || $language !== $cfg['language'])
+		{
+			/*MARKER*/require($langfile);
+		}
+	} 
+	else 
+	{
+		$language = 'en';
+		$locale = 'eng';
+		// only load language files when the current language has not been loaded just before.
+		if ($language !== $cfg['language'])
+		{
+			/*MARKER*/require(BASE_PATH . '/lib/languages/en.inc.php');
+		}
+	}
+
+	// Set local for time, currency, etc
+	setlocale(LC_ALL, $locale);
+
+	
+	// core language
+	$mce_langfile = array();
+	$mce_langfile[] = BASE_PATH . '/admin/includes/tiny_mce/langs/'.$language.'.js';
+	if (0)
+	{
+		// themes language
+		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		foreach($dirlist as $dir)
+		{
+			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
+			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
+		}
+		// plugins language
+		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		foreach($dirlist as $dir)
+		{
+			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
+			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
+		}
+	}
+	$mce_has_lang = true;
+	foreach($mce_langfile as $file)
+	{
+		if (!is_file($file))
+		{
+			$mce_has_lang = false;
+			break;
+		}
+	}
+	
+	if ($mce_has_lang)
+	{
+		$cfg['tinymce_language'] = 'en'; // $language;   -- for some reason, tinyMCE fails to load when anything other than English is specified. Some obscure crash inside a !@#$%^&* eval() in there. :-(((
+	}
+	else
+	{
+		$cfg['tinymce_language'] = 'en';
+	}
+
+	$editarea_langfile = BASE_PATH . '/admin/includes/edit_area/langs/'.$language.'.js';
+	if (is_file($editarea_langfile))
+	{
+		$cfg['editarea_language'] = $language;
+	}
+	else
+	{
+		$cfg['editarea_language'] = 'en';
+	}
+	
+	$cfg['language'] = $language;
+	$cfg['locale'] = $locale;
+	
+	return $language;
+}
+
+
+/**
+Collect the available languages (translations) and return those in an array.
+*/
+function GetAvailableLanguages()
+{
+	$sl = array();
+	if ($handle = opendir('../lib/languages')) 
+	{
+		while (false !== ($file = readdir($handle))) 
+		{
+			// Filter out irrelevant files && dirs
+			if ($file != "." && $file != ".." && strmatch_tail($file, ".inc.php"))
+			{
+				$f = substr($file,0,strpos($file, '.'));
+				$sl[$f] = setLanguage($f);
+			}
+		}
+	}
+	return $sl;
+}
+
+
+
+
+
+
+
+
+/**
+Return the list of fields as indicated by the 'ordercode' parameter
+as an array.
+
+Can, for example, be used to pass this set in the 'ordering' argument for any SQL query.
+*/
+function cvt_ordercode2list($ordercode)
+{
+	$dlorder = array();
+	$ordermask = 0x3FFF; // FTSDPACHIM12L0: 14 bits
+	for ($i = 0; $i < strlen($ordercode); $i++)
+	{
+		$c = $ordercode[$i];
+		
+		switch (strtoupper($c))
+		{
+		case 'F':
+			if ($ordermask & 0x0001)
+			{
+				$ordermask &= ~0x0001;
+				$dlorder[] = 'urlpage';
+			}
+			break;
+			
+		case 'T':
+			if ($ordermask & 0x0002)
+			{
+				$ordermask &= ~0x0002;
+				$dlorder[] = 'pagetitle';
+			}
+			break;
+			
+		case 'S':
+			if ($ordermask & 0x0004)
+			{
+				$ordermask &= ~0x0004;
+				$dlorder[] = 'subheader';
+			}
+			break;
+			
+		case 'D':
+			if ($ordermask & 0x0008)
+			{
+				$ordermask &= ~0x0008;
+				$dlorder[] = 'description';
+			}
+			break;
+			
+		case 'P':
+			if ($ordermask & 0x0010)
+			{
+				$ordermask &= ~0x0010;
+				$dlorder[] = 'printable';
+			}
+			break;
+			
+		case 'A':
+			if ($ordermask & 0x0020)
+			{
+				$ordermask &= ~0x0020;
+				$dlorder[] = 'published';
+			}
+			break;
+			
+		case 'C':
+			if ($ordermask & 0x0040)
+			{
+				$ordermask &= ~0x0040;
+				$dlorder[] = 'iscoding';
+			}
+			break;
+			
+		case 'H':
+			if ($ordermask & 0x0080)
+			{
+				$ordermask &= ~0x0080;
+				$dlorder[] = 'islink';
+			}
+			break;
+			
+		case 'I':
+			if ($ordermask & 0x0100)
+			{
+				$ordermask &= ~0x0100;
+				$dlorder[] = 'menu_id';
+			}
+			break;
+			
+		case '1':
+			if ($ordermask & 0x0200)
+			{
+				$ordermask &= ~0x0200;
+				$dlorder[] = 'toplevel';
+			}
+			break;
+			
+		case '2':
+			if ($ordermask & 0x0400)
+			{
+				$ordermask &= ~0x0400;
+				$dlorder[] = 'sublevel';
+			}
+			break;
+			
+		case 'M':
+			if ($ordermask & 0x0800)
+			{
+				$ordermask &= ~0x0800;
+				$dlorder[] = 'module';
+			}
+			break;
+			
+		case 'L':
+			if ($ordermask & 0x1000)
+			{
+				$ordermask &= ~0x1000;
+				$dlorder[] = 'variant';
+			}
+			break;
+			
+		case '0':
+			if ($ordermask & 0x2000)
+			{
+				$ordermask &= ~0x2000;
+				$dlorder[] = 'page_id';
+			}
+			break;
+			
+		default:
+			// should never get here...
+			break;
+		}
+	}
+	return $dlorder;
+}
+
+
+
 
 // Set friendly local names languages
 function setLanguage($lang) 

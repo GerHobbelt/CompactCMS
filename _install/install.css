@@ -42,6 +42,16 @@ table
 	line-height:0.95;
 } 
 
+.small
+{
+	font-size:0.8em;
+}
+.signal_upgrade_mode
+{
+	font-weight: bold;
+	color: #f00;
+}
+
 /* LOGIN && INSTALL === */
 
 /*

@@ -29,16 +29,26 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
+/*-------------------------------------------------------------------
+WARNING NOTE:
+
+This config file will be loaded multiple times (for good reasons) when you run the
+installer.
+Hence ANY define() in here MUST be surrounded by 'if(!defined(XYZ)){...}'.
+
+This config file is only loaded /once/ during regular web site operation.
+-------------------------------------------------------------------*/
+
 //
 // Below you'll find all the configuration variables. Please refer to the
 // documentation (http://www.compactcms.nl/docs.html) for descriptions and details.
 //
 
 // Standard configuration
-$cfg['sitename']    = "CompactCMS"; // Your site name - this will show in the front-end.
+$cfg['sitename']    = "";           // Your site name - this will show in the front-end, e.g. "CompactCMS"
 $cfg['language']    = "en";         // Select the language of your (front-end) website - en, nl, de, es.
 $cfg['rootdir']     = "/";          // The root directory where CCMS is installed under, must include trailing slash ('/').
-$cfg['authcode']    = "12345";      // Add ?preview=X (where X is your authcode) to your address bar to preview unpublished items.
+$cfg['authcode']    = "";           // Add ?preview=X (where X is your authcode) to your address bar to preview unpublished items, e.g. "12345". 
 
 // Detailed configuration. By default shouldn't need adjusting.
 $cfg['version']     = true;         // Check for the latest CompactCMS version [true/false]
@@ -56,8 +66,9 @@ $cfg['db_name']     = "compactcms"; // MySQL setting - your database name.
 $cfg['db_prefix']   = "ccms_";      // MySQL setting - the table prefix.
 
 // Restrict for editing with the editor. Use the filenames without extension.
-$cfg['restrict']    = array("foo","bar");
-$cfg['default_template'] = 'ccms'; 
+$cfg['restrict']    = array();      // restrictions will apply to all pages listed in this array, e.g. array("foo","bar") will deny editing access to the pages called 'foo' and 'bar' (a.k.a. foo.html & bar.html). Note that only the OWNER(S) of such pages will be allowed editing access!
+
+$cfg['default_template'] = 'ccms';  // pick your default template, e.g. 'ccms', which will be used for pages when the template info is inconclusive, i.e. for HTTP error 404 and 403 pages.
 $cfg['enable_gravatar'] = true;  // set to 'false' if you don't want to show 'gravatars' in your comment pages for each commenter.
 
 $cfg['admin_page_dynlist_order'] = 'FTS0';    // default sort order for the page list in the admin screen: F=file name, T=title, S=subtitle, D=description, A=active/published, P=printable, C=coding, H=[hyper]link, I=menu ID, 1=toplevel, 2=sublevel, L=template, M=module (plugin), 0 = page_id
