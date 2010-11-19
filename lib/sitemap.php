@@ -117,7 +117,7 @@ $ccms['preview'] = $preview;
 
 
 // This files' current version
-$v = "1.4.2";
+$ccms['ccms_version'] = $v = "1.4.2";
 
 // TEMPLATES ==
 // Read and list the available templates
@@ -200,6 +200,10 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ccms['desc']       = $ccms['lang']['system']['error_404title'];
 		$ccms['keywords']   = strval($code);
 		$ccms['responsecode'] = $code;
+		$ccms['toplevel']   = 0;
+		$ccms['sublevel']   = 0;
+		$ccms['menu_id']    = 0;
+		$ccms['islink']     = 'N';
 
 		$ccms['template'] = DetermineTemplateName(null, $ccms['printing']);
 		
@@ -321,7 +325,11 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ccms['keywords']   = $row->keywords;
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 		$ccms['printable']  = $row->printable;
-		$ccms['responsecode'] = 0; // default: 200:OK
+		$ccms['responsecode'] = 0; // default: 200 : OK
+		$ccms['toplevel']   = $row->toplevel;
+		$ccms['sublevel']   = $row->sublevel;
+		$ccms['menu_id']    = $row->menu_id;
+		$ccms['islink']     = $row->islink;
 
 		// TEMPLATING ==
 		// Check whether template exists, specify default or throw "no templates" error.
