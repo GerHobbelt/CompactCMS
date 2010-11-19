@@ -99,7 +99,7 @@ if (!defined('BASE_PATH'))
 
 
 
-$cache		= false;
+$cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
 $cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
 
 $jsdir		= getGETparam4FullFilePath('jsdir');
