@@ -1511,16 +1511,16 @@ function setLanguage($lang)
 			return "中文";
 			break;
 		case 'ar':
-			return "Arabic";
+			return "العربية";
 			break;
 		case 'ja':
-			return "Japanese";
+			return "日本";
 			break;
 		case 'ko':
-			return "Korean";
+			return "한국어";
 			break;
 		case 'pl':
-			return "Polish";
+			return "Polska";
 			break;
 
 		default:
