@@ -25,9 +25,9 @@ After installation call your administration by adding '/admin' to the url of you
 installation.
 
 === 1.4.2 CHANGES ===
-The changes for 1.4.2 are completely driven by the hard work of GerHobbelt, who optimized
+The changes for 1.4.2 are completely driven by the hard work of Ger Hobbelt, who optimized
 most of the code both security and functionality wise. This latest release includes many
-(if not all) of the proposed improvements as made by GerHobbelt.
+(if not all) of the proposed improvements as made by Ger Hobbelt.
 
 * Sanitizing of all input variables through added functions (common.inc.php)
 * Optimized installer support
@@ -36,7 +36,7 @@ most of the code both security and functionality wise. This latest release inclu
 * Removal of my 'single minded developer rookie and biased' mistakes
 * Much more...
 
-Thank you GerHobbelt, your inputs and efforts are much appreciated!
+Thank you Ger Hobbelt, your inputs and efforts are much appreciated!
 
 === 1.4.1 CHANGES ===
 The list below includes a list of changes for version 1.4.1.
