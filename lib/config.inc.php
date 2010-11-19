@@ -74,7 +74,7 @@ $cfg['enable_gravatar'] = true;  // set to 'false' if you don't want to show 'gr
 $cfg['admin_page_dynlist_order'] = 'FTS0';    // default sort order for the page list in the admin screen: F=file name, T=title, S=subtitle, D=description, A=active/published, P=printable, C=coding, H=[hyper]link, I=menu ID, 1=toplevel, 2=sublevel, L=template, M=module (plugin), 0 = page_id
 
 
-$cfg['IN_DEVELOPMENT_ENVIRONMENT'] = true; // set to FALSE for any release install (where you are not developing on a local & very safe machine)
+$cfg['IN_DEVELOPMENT_ENVIRONMENT'] = false; // set to FALSE for any release install (where you are not developing on a local & very safe machine)
 $cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'] = true; // set to FALSE when your httpd doesn't have gzip/deflate compression enabled, e.g. through mod_deflate configuration for your vhost */
 
 ?>
