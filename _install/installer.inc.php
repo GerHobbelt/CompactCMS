@@ -447,6 +447,7 @@ if($nextstep == md5('final') && CheckAuth())
 		$sql = file_get_contents(BASE_PATH.'/_docs/structure.sql');
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
 		$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
+		$sql = str_replace("\r\n", "\n", $sql);
 
 		// Execute per sql piece: 
 		$currently_in_sqltextdata = false;
@@ -501,6 +502,7 @@ if($nextstep == md5('final') && CheckAuth())
 			// $sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql); -- all tables herin will already have the correct prefix: we're doing a restore anyway, so we have this info from the config.inc.php file
 			$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
 			// note that the passwords for the other users in the backup may be invalid IFF you changed the authcode!
+			$sql = str_replace("\r\n", "\n", $sql);
 			
 			// Execute per sql piece: 
 			$currently_in_sqltextdata = false;
