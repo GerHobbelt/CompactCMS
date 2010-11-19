@@ -98,6 +98,9 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
+$optimize = array();
+$optimize['css'] = 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
+$optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
 
 $cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
 $cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
@@ -164,7 +167,11 @@ while (list(,$element) = each($elements))
 }
 
 // Send Etag hash
-$hash = $lastmodified . '-' . md5($base . '::' . $_GET['files']);
+//
+// make sure all settings, which influence what should be fetched from cache, are 
+// include in the MD5 hash!
+// This includes the current minification settings in $optimize[]!
+$hash = $lastmodified . '-' . md5($base . ':' . implode(':', $optimize) . ':' . $_GET['files']);
 header("Etag: \"" . $hash . "\"");
 
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && 
@@ -283,7 +290,139 @@ else
 	}
 
 	// invoke the apropriate optimizer for the given type:
-	
+	switch ($type)
+	{
+	case 'css':
+		switch ($optimize['css'])
+		{
+		case 'csstidy':
+			/*
+			CSStidy would be great, but watch it with the 'optimise_shorthands'
+			setting: that bugger implicitly ASSUMES CSS3 ABILITY: the generated 
+			font:
+			and
+			background:
+			'shorthands' are NOT accepted by FF3.6.x at least.
+
+			Hence never dial that setting higher than '1' unless you fix csstidy.
+			*/
+			/*MARKER*/require_once(BASE_PATH . '/lib/includes/csstidy/class.csstidy.php');
+
+			$css = new csstidy();
+
+			$css->set_cfg('remove_last_;',true);
+			$css->set_cfg('preserve_css',false);
+			$css->set_cfg('lowercase_s', false); // MUST be 'false' or scrollbar in admin screen==MochaUI desktop is GONE :-(
+			/*
+			1 common shorthands optimization
+			2 + font property optimization
+			3 + background property optimization
+			*/
+			$css->set_cfg('optimise_shorthands', 1);
+			/* rewrite all properties with low case, better for later gzip */
+			$css->set_cfg('case_properties', false);
+			/* sort properties in alpabetic order, better for later gzip */
+			$css->set_cfg('sort_properties', true);
+			/*
+			1, 3, 5, etc -- enable sorting selectors inside @media: a{}b{}c{}
+			2, 5, 8, etc -- enable sorting selectors inside one CSS declaration: a,b,c{}
+			*/
+			$css->set_cfg('sort_selectors', false); // MUST be FALSE or admin screen is TOAST
+
+			/* is dangerous to be used: CSS is broken sometimes. Modes: 0,1,2 */
+			$css->set_cfg('merge_selectors', 0);
+
+			/* preserve or not browser hacks */
+			$css->set_cfg('discard_invalid_selectors', false);
+			$css->set_cfg('discard_invalid_properties', false);
+			$css->set_cfg('timestamp', false);
+
+			$css->set_cfg('compress_colors', true);
+			$css->set_cfg('compress_font-weight', true);
+			$css->set_cfg('css_level', 'CSS2.1');
+			$css->set_cfg('remove_bslash', true);
+
+			$css->set_cfg('template','highest'); // default, highest, high, low
+
+			$css->parse($contents);
+
+			$contents = $css->print->plain();
+			break;
+			
+		case 'css-compressor':
+			// http://www.phphulp.nl/php/script/php-algemeen/css-compressor/1145/
+			
+			/**
+			 * Remove superfluous characters from CSS.
+			 *
+			 * @param string $contents The CSS data to be compressed
+			 * @return string / boolean false
+			 */
+			function compress_css_file($sContent)
+			{
+				# Verwijder CSS kommentaar
+				$sContent = preg_replace('/\/\*.*?\*\//s', '', $sContent);
+				
+				# Verwijder alle enters en tabs uit de inhoud van het CSS bestand
+				$sContent = str_replace(array("\r", "\n", "\t"), '', $sContent);
+				
+				# Whitespaces rond bepaalde tekens  verwijderen
+				$sContent = preg_replace('/\s*({|}|;|:|,)\s*/', '$1', $sContent);
+				
+				# Verwijder alle dubbele spaties
+				$sContent = preg_replace('/ {2,}/', '', $sContent);
+				
+				# Grijp alle {....} blokken
+				if( preg_match_all('/{.*?}/s', $sContent, $aMatch) )
+				{
+					$aMatch[0] = array_unique($aMatch[0]);
+					
+					foreach( $aMatch[0] as $k => $v )
+					{
+						# Verwijder laatste ";" van laatste statement in een blok
+						$l = strlen($v);
+						if( $v[$l-2] == ';' )
+						{
+							$v = substr($v, 0, $l-2) . '}';
+						}
+
+						# Vervang het nieuw blok met het oude.            
+						$sContent = str_replace($aMatch[0][$k], $v, $sContent);
+					}
+				}
+				
+				return $sContent;
+			} 
+
+			$contents = compress_css_file($contents);
+			break;
+			
+		default:
+			// no optimization
+			break;
+		}
+		break;
+		
+	case 'js':
+	case 'javascript':
+		switch ($optimize['javascript'])
+		{
+		case 'JSmin':
+			/*MARKER*/require_once(BASE_PATH. '/lib/includes/rgrove-jsmin/jsmin.php');
+			$contents = JSMin::minify($contents);
+			break;
+
+		default:
+			// no optimization
+			break;
+		}
+		break;
+		
+	default:
+		// unidentified type: no optimization support.
+		break;
+	}
+			
 	
 	// Send Content-Type
 	header("Content-Type: text/" . $type);
