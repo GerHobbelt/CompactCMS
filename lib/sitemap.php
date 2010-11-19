@@ -193,7 +193,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ccms['printable']  = "N";
 		$ccms['published']  = "Y";
 		// [i_a] fix: close <span> here as well
-		$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir']."\" title=\"".ucfirst($cfg['sitename'])." Home\">Home</a> &raquo ".$ccms['lang']['system']['error_404title']."</span>";
+		$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' Home">Home</a> &raquo '.$ccms['lang']['system']['error_404title'].'</span>';
 		$ccms['iscoding']   = "Y";
 		$ccms['rootdir']    = (substr($cfg['rootdir'],-1)!=='/'?$cfg['rootdir'].'/':$cfg['rootdir']);
 		$ccms['urlpage']    = $pagereq; // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
@@ -213,7 +213,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 			// patch the $ccms[] data for the 403 error:
 			$ccms['pagetitle']  = $ccms['lang']['system']['error_403title'];
 			$ccms['subheader']  = $ccms['lang']['system']['error_403header'];
-			$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir']."\" title=\"".ucfirst($cfg['sitename'])." Home\">Home</a> &raquo ".$ccms['lang']['system']['error_403title']."</span>";
+			$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' Home">Home</a> &raquo '.$ccms['lang']['system']['error_403title'].'</span>';
 			//$ccms['urlpage']    = "403";
 			$ccms['desc']       = $ccms['lang']['system']['error_403title'];
 			//$ccms['keywords']   = "403";
@@ -279,16 +279,26 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		return $content;
 	}
 
+	// collect the menu entries first so we can peruse them in the breadcrumb code below.
+	$menu_in_set = '1';
+	for($i = 2; $i <= MENU_TARGET_COUNT; $i++) 
+	{
+		$menu_in_set .= ',' . $i;
+	}
+	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
+	if ($db->ErrorNumber()) $db->Kill();
+
 	// Select the appropriate statement (home page versus specified page)
-	if (!$db->SelectRows($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue((!empty($pagereq) ? $pagereq : 'home'), MySQL::SQLVALUE_TEXT)))) 
-		$db->Kill();
+	//
+	// This is a separate query for two reasons:
+	// (1) the above might be cached as a whole one day, and 
+	// (2) the requested page doesn't necessarily need to appear in any menu!
+	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue((!empty($pagereq) ? $pagereq : 'home'), MySQL::SQLVALUE_TEXT))); 
+	if ($db->ErrorNumber()) $db->Kill();
 
 	// Start switch for pages, select all the right details
-	if($db->HasRecords()) 
+	if($row) 
 	{
-		$db->MoveFirst();
-		$row = $db->Row();
-
 		// Internal reference
 		$ccms['published']  = $row->published;
 		$ccms['iscoding']   = $row->iscoding;
@@ -302,7 +312,12 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ccms['urlpage']    = $row->urlpage;
 		$ccms['pagetitle']  = $row->pagetitle;
 		$ccms['subheader']  = $row->subheader;
-		$ccms['desc']       = $row->description;
+		
+		// mirror the menu bielder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
+		$msg = explode(' ::', $row->description, 2);
+		$ccms['desc']       = $msg[0];
+		$ccms['desc_extra'] = (!empty($msg[1]) ? trim($msg[1]) : '');
+		
 		$ccms['keywords']   = $row->keywords;
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 		$ccms['printable']  = $row->printable;
@@ -332,31 +347,42 @@ if (0)
 		$preview_qry = ($preview ? '?preview=' . $cfg['authcode'] : '');
 		if($row->urlpage=="home") 
 		{
-			$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir'].$preview_qry."\" title=\"".ucfirst($cfg['sitename'])." Home\">Home</a></span>";
+			$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' Home">Home</a></span>';
 		}
 		else 
 		{
-			// [i_a] these branches didn't include the span which was included by the 'home' if(...) above.
 			if($row->sublevel==0) 
 			{
-				$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir'].$row->urlpage.".html".$preview_qry."\" title=\"".$row->subheader."\">".$row->pagetitle."</a></span>";
+				$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a></span>';
 			}
 			else 
 			{ 
 				// sublevel page
-				$subpath = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('toplevel' => MySQL::SQLValue($row->toplevel, MySQL::SQLVALUE_NUMBER), 'sublevel' => 0));
-				if (!$subpath && $db->ErrorNumber()) 
+				$parent = null;
+				if (is_array($pagelist) && count($pagelist) > 0)
 				{
-					$db->Kill();
+					foreach($pagelist as $entry)
+					{
+						if ($entry['menu_id'] == $row->menu_id // make sure to check the menu_id: we want OUR parent, which sits in OUR menu!
+							&& $entry['sublevel'] == 0  // accepts NULL or 0 which exactly what we want here!
+							&& $entry['toplevel'] == $row->toplevel)
+						{
+							$parent = $entry;
+							break;
+						}
+					}
 				}
-				else if ($subpath)
+				
+				if ($parent)
 				{
-					$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir'].$subpath->urlpage.".html".$preview_qry."\" title=\"".$subpath->subheader."\">".$subpath->pagetitle."</a> &raquo; <a href=\"".$cfg['rootdir'].$row->urlpage.".html".$preview_qry."\" title=\"".$row->subheader."\">".$row->pagetitle."</a></span>";
+					$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$parent['urlpage'].'.html'.$preview_qry.'" title="'.$parent['subheader'].'">'.$parent['pagetitle'].'</a>'
+							. ' &raquo; <a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a></span>';
 				}
 				else
 				{
-					// no main node record found!
-					$ccms['breadcrumb'] = "<span class=\"breadcrumb\">&raquo; <a href=\"".$cfg['rootdir'].$preview_qry."\" title=\"".ucfirst($cfg['sitename'])." Home\">Home</a> &raquo; <a href=\"".$cfg['rootdir'].$row->urlpage.".html".$preview_qry."\" title=\"".$row->subheader."\">".$row->pagetitle."</a></span>";
+					// no main node record found! get us 'home'!
+					$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' Home">Home</a>'
+							. ' &raquo; <a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a></span>';
 				}
 			}
 		}
@@ -378,15 +404,8 @@ if (0)
 	// flexibility in the sense that when user has assigned same top/sub numbers to multiple entries, this version will not b0rk
 	// but dump the items in alphabetic order instead.
 	// Also, when sub menu items with a top# that has no entry itself, is found, such an item will be assigned a 'dummy' top node.
-	$menu_in_set = '1';
-	for($i = 2; $i <= MENU_TARGET_COUNT; $i++) 
-	{
-		$menu_in_set .= ',' . $i;
-	}
-	$db->SelectRows($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
-	if ($db->ErrorNumber()) $db->Kill();
 
-	if($db->HasRecords()) 
+	if(is_array($pagelist) && count($pagelist) > 0) 
 	{
 		$current_menuID = 0;
 		$current_top = 0;
@@ -396,8 +415,6 @@ if (0)
 		$sub_done = false;
 		$dummy_top_written = false;
 		
-		$db->MoveFirst();
-
 		/*
 		When a submenu item is located which doesn't have a proper topmenu item set up as well, a dummy top is written.
 		
@@ -407,18 +424,18 @@ if (0)
 		
 		The same re-cycling mode is used to switch from one menu to the next (note the 'continue;' in there).
 		*/
-		while ($dummy_top_written || !$db->EndOfSeek()) 
+		for ($i = 0; $dummy_top_written || $i < count($pagelist); ) 
 		{
 			if (!$dummy_top_written)
 			{
-				$row = $db->Row();
+				$row = $pagelist[$i++];
 			}
 			$dummy_top_written = false;
 
 			// whether we have found the (expectedly) accompanying toplevel menu item.
-			$top_done = ($row->sublevel != 0 && $row->toplevel == $current_top && $row->menu_id == $current_menuID);
+			$top_done = ($row['sublevel'] != 0 && $row['toplevel'] == $current_top && $row['menu_id'] == $current_menuID);
 			
-			if ($row->menu_id != $current_menuID)
+			if ($row['menu_id'] != $current_menuID)
 			{
 				if ($current_top > 0)
 				{
@@ -431,7 +448,7 @@ if (0)
 				}
 				
 				// forward to next menu...
-				$current_menuID = $row->menu_id;
+				$current_menuID = $row['menu_id'];
 				$current_top = 0;
 				$current_structure = 'structure' . $current_menuID;
 				$top_idx = 0;
@@ -445,7 +462,7 @@ if (0)
 				$dummy_top_written = true;
 				continue;
 			}
-			else if ($row->toplevel != $current_top || $row->sublevel == 0)
+			else if ($row['toplevel'] != $current_top || $row['sublevel'] == 0)
 			{
 				// terminate generation of previous submenu
 				if ($current_top > 0)
@@ -457,18 +474,18 @@ if (0)
 					$ccms[$current_structure] .= "</li>\n";
 				}
 				
-				$current_top = $row->toplevel;
+				$current_top = $row['toplevel'];
 				$top_idx++;
 				$sub_idx = 0;
 				$sub_done = false;
 				
-				if (!$top_done && $row->sublevel != 0)
+				if (!$top_done && $row['sublevel'] != 0)
 				{
 					// write a dummy top
 					$dummy_top_written = true;
 				}
 			}
-			else if ($row->sublevel != 0)
+			else if ($row['sublevel'] != 0)
 			{
 				if ($sub_done)
 				{
@@ -486,12 +503,16 @@ if (0)
 			$current_class = '';
 			$current_extra = '';
 			$current_link = '';
-			if ($row->urlpage == $pagereq || (empty($pagereq) && $row->urlpage == "home"))
+			if ($row['urlpage'] == $pagereq || (empty($pagereq) && $row['urlpage'] == "home"))
 			{
 				// 'home' has a pagereq=='', but we still want to see the 'current' class for that one.
 				// (The original code didn't do this, BTW!)
 				$current_class = 'current';
 			}
+			
+			$msg = explode(' ::', $row['description'], 2);
+			$current_descr = $msg[0];
+			$current_extra = (!empty($msg[1]) ? trim($msg[1]) : '');
 			
 			$menu_item_class = '';
 			if ($dummy_top_written)
@@ -499,27 +520,24 @@ if (0)
 				$current_class = '';
 				$menu_item_class = 'menu_item_dummy';
 			}
-			else if ($row->islink != "Y")
+			else if ($row['islink'] != "Y")
 			{
 				$current_link = '#';
 				$menu_item_class = 'menu_item_nolink';
 			}
-			else if (regexUrl($row->description))
+			else if (regexUrl($current_descr))
 			{
-				$msg = explode(' ::', $row->description);
-				$current_link = $msg[0];
-				$current_extra = (!empty($msg[1]) ? $msg[1] : '');
 				$current_class = 'to_external_url';
 				$menu_item_class = 'menu_item_extref';
 			}
-			else if ($row->urlpage == "home")
+			else if ($row['urlpage'] == "home")
 			{
 				$current_link = $cfg['rootdir'];
 				$menu_item_class = 'menu_item_home';
 			}
 			else 
 			{
-				$current_link = $cfg['rootdir'] . $row->urlpage . '.html';
+				$current_link = $cfg['rootdir'] . $row['urlpage'] . '.html';
 			}
 			
 			if (!empty($current_extra))
@@ -529,8 +547,8 @@ if (0)
 			
 
 			// What text to show for the links
-			$link_text = ucfirst($row->pagetitle);
-			$link_title = ucfirst($row->subheader);
+			$link_text = ucfirst($row['pagetitle']);
+			$link_title = ucfirst($row['subheader']);
 
 			$current_link_classes = trim($current_class . ' ' . $menu_item_class);
 			if (!empty($current_link_classes))
@@ -547,7 +565,7 @@ if (0)
 				$menu_item_text = '<span ' . $current_link_classes . '>-</span>';
 				$ccms[$current_structure] .= '<li class="' . /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
 			}
-			else if ($row->sublevel != 0)
+			else if ($row['sublevel'] != 0)
 			{
 				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class . '">' . $menu_item_text;
 			}
