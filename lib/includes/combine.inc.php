@@ -99,8 +99,8 @@ if (!defined('BASE_PATH'))
 
 
 $optimize = array();
-$optimize['css'] = false;          // possible values: false, 'csstidy', 'css-compressor'
-$optimize['javascript'] = false;   // possible values: false, 'JSpack', 'EA-derived', 'JSmin'
+$optimize['css'] = 'css-compressor';   // possible values: false, 'csstidy', 'css-compressor'
+$optimize['javascript'] = false;       // possible values: false, 'JSpack', 'EA-derived', 'JSmin'
 
 $cache		= false;
 $cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
