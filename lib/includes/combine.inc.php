@@ -99,8 +99,8 @@ if (!defined('BASE_PATH'))
 
 
 $optimize = array();
-$optimize['css'] = 'css-compressor';   // possible values: false, 'csstidy', 'css-compressor'
-$optimize['javascript'] = false;       // possible values: false, 'JSpack', 'EA-derived', 'JSmin'
+$optimize['css'] = 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
+$optimize['javascript'] = 'JSmin';       // possible values: false, 'JSpack', 'EA-derived', 'JSmin'
 
 $cache		= false;
 $cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
@@ -167,7 +167,11 @@ while (list(,$element) = each($elements))
 }
 
 // Send Etag hash
-$hash = $lastmodified . '-' . md5($base . '::' . $_GET['files']);
+//
+// make sure all settings, which influence what should be fetched from cache, are 
+// include in the MD5 hash!
+// This includes the current minification settings in $optimize[]!
+$hash = $lastmodified . '-' . md5($base . ':' . implode(':', $optimize) . ':' . $_GET['files']);
 header("Etag: \"" . $hash . "\"");
 
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && 
@@ -331,14 +335,14 @@ else
 			/* preserve or not browser hacks */
 			$css->set_cfg('discard_invalid_selectors', false);
 			$css->set_cfg('discard_invalid_properties', false);
-			$css->set_cfg('timestamp', true);
+			$css->set_cfg('timestamp', false);
 
 			$css->set_cfg('compress_colors', true);
 			$css->set_cfg('compress_font-weight', true);
 			$css->set_cfg('css_level', 'CSS2.1');
 			$css->set_cfg('remove_bslash', true);
 
-			$css->set_cfg('template','high'); // default, highest, high, low
+			$css->set_cfg('template','highest'); // default, highest, high, low
 
 			$css->parse($contents);
 
@@ -404,7 +408,7 @@ else
 		switch ($optimize['javascript'])
 		{
 		case 'JSpack':
-			$jspack_encoding = 'Normal';
+			$jspack_encoding = 62; // ~ 'Normal';
 			$jspack_fast_decode = true;
 			$jspack_special_char = false; // we can't be sure only 'local functions' have an underscore prefix
 
