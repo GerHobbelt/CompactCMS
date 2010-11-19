@@ -628,16 +628,19 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 {
 	$dir = $cfg['rootdir'];   // [i_a] the original substr($_SERVER[]) var would fail when called with this req URL: index.php?page=sitemap
 
-	// Start generating sitemap
-	header ("content-type: text/xml");
+	/*
+	 Start generating sitemap
+	 
+	 See also: http://hsivonen.iki.fi/producing-xml/
+	*/
+	header ("content-type: application/xml");
 
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	?>
 	<urlset
 		xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-			http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+		xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 	<?php
 	// Select all published pages
 	if (!$db->SelectRows($cfg['db_prefix'].'pages', array('published' => "'Y'"), array('urlpage', 'description', 'islink'))) $db->Kill();
