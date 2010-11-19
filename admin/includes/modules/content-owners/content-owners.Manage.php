@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -33,7 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -51,8 +51,8 @@ if (!defined('BASE_PATH'))
 
 
 // security check done ASAP
-if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{ 
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
 	die("No external access to file");
 }
 
@@ -67,10 +67,12 @@ $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Get all pages
-$pages = $db->QueryArray("SELECT page_id,urlpage,user_ids FROM ".$cfg['db_prefix']."pages", MYSQL_ASSOC);
+$pages = $db->QueryArray("SELECT page_id,urlpage,user_ids FROM ".$cfg['db_prefix'].'pages');
+if (!is_array($pages)) $db->Kill();
 
 // Get all users
-$users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,userLevel FROM ".$cfg['db_prefix']."users", MYSQL_ASSOC);
+$users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,userLevel FROM ".$cfg['db_prefix'].'users');
+if (!is_array($users)) $db->Kill();
 
 
 ?>
@@ -81,7 +83,7 @@ $users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,us
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Page-owners</title>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
-	
+
 		<!-- Confirm close -->
 		<script type="text/javascript">
 function confirmation()
@@ -102,20 +104,20 @@ function confirmation()
 		return false;
 	}
 }
-		</script>	
+		</script>
 	</head>
 <body>
 	<div class="module">
 
 	<div class="center <?php echo $status; ?>">
-		<?php 
-		if(!empty($status_message)) 
-		{ 
-			echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
-		} 
+		<?php
+		if(!empty($status_message))
+		{
+			echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
+		}
 		?>
 	</div>
-	
+
 	<div>
 		<h2><span class="ss_sprite ss_group_gear"><?php echo $ccms['lang']['owners']['header']; ?></span></h2>
 		<p><?php echo $ccms['lang']['owners']['explain']; ?></p>
@@ -124,56 +126,60 @@ function confirmation()
 		<tr>
 			<th><span class="ss_sprite ss_arrow_down"><?php echo $ccms['lang']['owners']['pages']; ?></span> \ <span class="ss_sprite ss_arrow_right"><?php echo $ccms['lang']['owners']['users']; ?></span></th>
 			<?php
-			for ($ar1=0; $ar1<count($users); $ar1++) 
-			{ 
+			for ($ar1=0; $ar1<count($users); $ar1++)
+			{
 			?>
 				<th class="center span-2" style="border-bottom:solid #AD8CCF 2px;">
 					<span class="ss_sprite ss_user_<?php echo ($users[$ar1]['userLevel']>=4?'suit':'green'); ?>"><?php echo $users[$ar1]['userFirst'].' '.substr($users[$ar1]['userLast'],0,1); ?>.</span>
 				</th>
-			<?php 
-			} 
+			<?php
+			}
 			?>
 		</tr>
-		<?php 
-		for ($i = 0; $i < count($pages); $i++) 
-		{ 
+		<?php
+		for ($i = 0; $i < count($pages); $i++)
+		{
 			$users_owning_page = explode('||', $pages[$i]['user_ids']);
-			
+
 		?>
-			<tr>			
+			<tr>
 			<td class="span-4" style="padding-left:2px;background-color:<?php echo ($i%2!=1?'#EAF3E2;':'#fff;'); ?>border-right:solid #AD8CCF 2px;">
 				<span class="ss_sprite ss_page_white_world"><?php echo $pages[$i]['urlpage']; ?>.html</span>
 			</td>
 				<?php
-				for ($ar2=0; $ar2<count($users); $ar2++) 
-				{ 
+				for ($ar2=0; $ar2<count($users); $ar2++)
+				{
 				?>
 					<td class="hover center">
 						<label for="<?php echo $i.'_'.$ar2;?>"><span>
-						<input type="checkbox" name="owner[]" 
-						<?php 
+						<input type="checkbox" name="owner[]"
+						<?php
 						/*
-						This code is a security issue of another kind: user ownership settings will OVERLAP for certain users when their IDs are substrings, e.g. user #1 will have everything user #11 has as well.
-						
-						if(strstr($pages[$i]['user_ids'], $users[$ar2]['userID'])!==false)
-						
-						Hence the code is replaced with an explode plus array scan. Another way to solve would be padding the rights string with leading and trailing '||' and then
-						regex matching against "/||$userid||/".
-						
+						* This code is a security issue of another kind: user
+						* ownership settings will OVERLAP for certain users
+						* when their IDs are substrings, e.g. user #1 will
+						* have everything user #11 has as well.
+						*
+						*   if(strstr($pages[$i]['user_ids'], $users[$ar2]['userID'])!==false)
+						*
+						* Hence the code is replaced with an explode plus
+						* array scan. Another way to solve would be padding
+						* the rights string with leading and trailing '||'
+						* and then regex matching against "/||$userid||/".
 						*/
-						if (in_array($users[$ar2]['userID'], $users_owning_page))
+						if (in_array(rm0lead($users[$ar2]['userID']), $users_owning_page))
 						{
 							echo 'checked';
-						} 
-						?> value="<?php echo $users[$ar2]['userID'].'||'.$pages[$i]['page_id'];?>" id="<?php echo $i.'_'.$ar2;?>" />
+						}
+						?> value="<?php echo rm0lead($users[$ar2]['userID']).'||'.rm0lead($pages[$i]['page_id']);?>" id="<?php echo $i.'_'.$ar2;?>" />
 						</span></label>
 					</td>
-				<?php 
-				} 
+				<?php
+				}
 				?>
 			</tr>
-		<?php 
-		} 
+		<?php
+		}
 		?>
 		</tr>
 		</table>

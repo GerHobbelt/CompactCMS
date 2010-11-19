@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
-Copyright (C) 2008 - 2009 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
+Revision:   CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -109,9 +109,8 @@ class createZip
      * @param $directoryName string
      *
      */
-    
-    public function addFile($data, $directoryName)   {
-
+    public function addFile($data, $directoryName)   
+	{
         $directoryName = str_replace("\\", "/", $directoryName);  
     
         $feedArrayRow = "\x50\x4b\x03\x04";
@@ -455,20 +454,38 @@ class MySQL_Backup
 
 } 
 
-function directoryToArray($directory, $recursive) {
+function directoryToArray($directory, $recursive, $regex_to_match = null) 
+{
     $array_items = array();
-    if ($handle = opendir($directory)) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != "." && $file != "..") {
-                if (is_dir($directory. "/" . $file)) {
-                    if($recursive) {
-                        $array_items = array_merge($array_items, directoryToArray($directory. "/" . $file, $recursive));
+    if ($handle = opendir($directory)) 
+	{
+		if (substr($directory, -1, 1) != '/')
+		{
+			$directory .= '/';
+		}
+        while (false !== ($file = readdir($handle))) 
+		{
+            if ($file != "." && $file != "..") 
+			{
+				$path = $directory . $file;
+                if (is_dir($path)) 
+				{
+                    if($recursive) 
+					{
+                        $subarr = directoryToArray($path, $recursive, $regex_to_match);
+						// do not include empty subdirectories 
+						if (count($subarr) > 0)
+						{
+							$array_items = array_merge($array_items, array($path), $subarr);
+						}
                     }
-                    $file = $directory . "/" . $file ."/";
-                    $array_items[] = preg_replace("/\/\//si", "/", $file);
-                } else {
-                    $file = $directory . "/" . $file;
-                    $array_items[] = preg_replace("/\/\//si", "/", $file);
+                } 
+				else 
+				{
+					if (empty($regex_to_match) || preg_match($regex_to_match, $path))
+					{
+						$array_items[] = $path;
+					}
                 }
             }
         }

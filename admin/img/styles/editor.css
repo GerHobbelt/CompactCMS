@@ -4,7 +4,14 @@
 .mocha {display: none;overflow: hidden;background-color: #e5e5e5;}
 .mocha.isFocused {}	
 .mochaOverlay {position: absolute;top: 0;left: 0;}
-.mochaTitlebar {width: 100%;overflow: hidden;background: url(../spacer.gif?from=fafafa&to=e5e5e5);}
+.mochaTitlebar 
+{
+	width: 100%;
+	overflow: hidden;
+	/* The ?.... query part is there to for MochaUI to generate a gradient in setColors() near line 2496 */
+	/* background: url(../spacer.gif?from=fafafa&to=e5e5e5); */
+	background: url(../spacer.gif);                       
+}
 .mochaTitlebar h3 {
 	font: 0.825em "Verdana", arial, sans-serif;
 	line-height: 15px;	
@@ -87,7 +94,7 @@ div.mochaToolbarWrapper.bottom {border: 0;border-bottom: 1px solid #d9d9d9;}
 	1. Set the useCanvasControls window option to false.
 	2. If you use a different button size you may need to reposition the controls.
 	   Modify the controlsOffset window option.		
-	2. Replcac the background-color with a background-image for each button.
+	2. Replace the background-color with a background-image for each button.
 
 */
 .mochaMinimizeButton, .mochaMaximizeButton, .mochaCloseButton {

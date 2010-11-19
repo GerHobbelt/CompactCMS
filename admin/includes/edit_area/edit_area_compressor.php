@@ -16,7 +16,7 @@
 	$param['use_gzip']= true;						// Enable gzip compression
 	// END CONFIG
 	
-	$compressor= new Compressor($param);
+	$compressor = new Compressor($param);
 	
 	class Compressor
 	{

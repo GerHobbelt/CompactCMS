@@ -10,7 +10,7 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 
-if (defined('CCMS_DEVELOPMENT_ENVIRONMENT'))
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 	/* always flush cached data at the start of each invocation -- which always passes through here, at least. */
 	clearstatcache();
@@ -56,6 +56,30 @@ function strmatch_tail($a, $b)
 
 
 /**
+Remove leading zeroes from the given string.
+
+When the string is ALL ZEROES, keep the last one.
+
+When the string is empty, return the string "0" instead.
+Hence this function acts like a string->integer->string comverter, as 
+empty strings equal zero as well as "0" strings do.
+
+@remark This function is used, among other things, in various spots to provide backwards compatibility 
+        with older CCMS releases which had 'zerofill'ed numeric columns in 
+		the database.
+*/
+function rm0lead($str)
+{
+	$rv = ltrim(strval($str), '0');
+	if (empty($rv))
+		return '0';
+	return $rv;
+}
+
+
+
+
+/**
 Convert any string input to a US-ASCII limited character set with a few common conversions included.
 
 Use this function for filtering any input which doesn't need the full UTF8 range. Most useful as a preprocessor for further 
@@ -70,7 +94,7 @@ function str2USASCII($src)
 	if (!$regex)
 	{
 		$regex = array(
-			explode(' ', '∆ Ê å ú ﬂ ‹ ¸ ÷ ˆ ƒ ‰ ¿ ¡ ¬ √ ƒ ≈ &#260; &#258; « &#262; &#268; &#270; &#272; – » …   À &#280; &#282; &#286; Ã Õ Œ œ &#304; &#321; &#317; &#313; — &#323; &#327; “ ” ‘ ’ ÷ ÿ &#336; &#340; &#344; ä &#346; &#350; &#356; &#354; Ÿ ⁄ € ‹ &#366; &#368; › é &#377; &#379; ‡ · ‚ „ ‰ Â &#261; &#259; Á &#263; &#269; &#271; &#273; Ë È Í Î &#281; &#283; &#287; Ï Ì Ó Ô &#305; &#322; &#318; &#314; Ò &#324; &#328;  Ú Û Ù ı ˆ ¯ &#337; &#341; &#345; &#347; ö &#351; &#357; &#355; ˘ ˙ ˚ ¸ &#367; &#369; ˝ ˇ û &#378; &#380;'),
+			explode(' ', '√Ü √¶ ≈í ≈ì √ü √ú √º √ñ √∂ √Ñ √§ √Ä √Å √Ç √É √Ñ √Ö &#260; &#258; √á &#262; &#268; &#270; &#272; √ê √à √â √ä √ã &#280; &#282; &#286; √å √ç √é √è &#304; &#321; &#317; &#313; √ë &#323; &#327; √í √ì √î √ï √ñ √ò &#336; &#340; &#344; ≈† &#346; &#350; &#356; &#354; √ô √ö √õ √ú &#366; &#368; √ù ≈Ω &#377; &#379; √† √° √¢ √£ √§ √• &#261; &#259; √ß &#263; &#269; &#271; &#273; √® √© √™ √´ &#281; &#283; &#287; √¨ √≠ √Æ √Ø &#305; &#322; &#318; &#314; √± &#324; &#328; √∞ √≤ √≥ √¥ √µ √∂ √∏ &#337; &#341; &#345; &#347; ≈° &#351; &#357; &#355; √π √∫ √ª √º &#367; &#369; √Ω √ø ≈æ &#378; &#380;'),
 			explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
 		);
 		
@@ -156,6 +180,14 @@ function getPOSTparam4IdOrNumber($name, $def = null)
 		return $def;
 
 	return filterParam4IdOrNumber($_POST[$name], $def);
+}
+	
+function getREQUESTparam4IdOrNumber($name, $def = null) 
+{
+	if (!isset($_REQUEST[$name]))
+		return $def;
+
+	return filterParam4IdOrNumber(rawurldecode($_REQUEST[$name]), $def);
 }
 	
 function filterParam4IdOrNumber($value, $def = null) 
@@ -437,7 +469,8 @@ function filterParam4Number($value, $def = null)
 		return $def;
 	
 	// see if the value is a valid integer (plus or minus)
-	$numval = intval($value);
+	$value = rm0lead($value);
+	$numval = (is_numeric($value)?intval($value):null);
 	if (strval($numval) !== $value)
 	{
 		// no full match for the integer check, so this is a non-numeric string:
@@ -765,7 +798,7 @@ function filterParam4DateTime($value, $def = null)
 		static $regex;
 		if (!$regex){
 			$regex = array(
-				explode(' ', '∆ Ê å ú ﬂ ‹ ¸ ÷ ˆ ƒ ‰ ¿ ¡ ¬ √ ƒ ≈ &#260; &#258; « &#262; &#268; &#270; &#272; – » …   À &#280; &#282; &#286; Ã Õ Œ œ &#304; &#321; &#317; &#313; — &#323; &#327; “ ” ‘ ’ ÷ ÿ &#336; &#340; &#344; ä &#346; &#350; &#356; &#354; Ÿ ⁄ € ‹ &#366; &#368; › é &#377; &#379; ‡ · ‚ „ ‰ Â &#261; &#259; Á &#263; &#269; &#271; &#273; Ë È Í Î &#281; &#283; &#287; Ï Ì Ó Ô &#305; &#322; &#318; &#314; Ò &#324; &#328;  Ú Û Ù ı ˆ ¯ &#337; &#341; &#345; &#347; ö &#351; &#357; &#355; ˘ ˙ ˚ ¸ &#367; &#369; ˝ ˇ û &#378; &#380;'),
+				explode(' ', '√Ü √¶ ≈í ≈ì √ü √ú √º √ñ √∂ √Ñ √§ √Ä √Å √Ç √É √Ñ √Ö &#260; &#258; √á &#262; &#268; &#270; &#272; √ê √à √â √ä √ã &#280; &#282; &#286; √å √ç √é √è &#304; &#321; &#317; &#313; √ë &#323; &#327; √í √ì √î √ï √ñ √ò &#336; &#340; &#344; ≈† &#346; &#350; &#356; &#354; √ô √ö √õ √ú &#366; &#368; √ù ≈Ω &#377; &#379; √† √° √¢ √£ √§ √• &#261; &#259; √ß &#263; &#269; &#271; &#273; √® √© √™ √´ &#281; &#283; &#287; √¨ √≠ √Æ √Ø &#305; &#322; &#318; &#314; √± &#324; &#328; √∞ √≤ √≥ √¥ √µ √∂ √∏ &#337; &#341; &#345; &#347; ≈° &#351; &#357; &#355; √π √∫ √ª √º &#367; &#369; √Ω √ø ≈æ &#378; &#380;'),
 				explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
 			);
 			
@@ -940,11 +973,69 @@ function send_response_status_header($response_code)
 
 
 /**
+Return TRUE when the given code is a valid HTTP response code.
+*/
+function is_http_response_code($response_code)
+{
+	$response_code = intval($response_code);
+	switch ($response_code)
+	{
+	case 100:	// RFC2616 Section 10.1.1: Continue
+	case 101:	// RFC2616 Section 10.1.2: Switching Protocols
+	case 200:	// RFC2616 Section 10.2.1: OK
+	case 201:	// RFC2616 Section 10.2.2: Created
+	case 202:	// RFC2616 Section 10.2.3: Accepted
+	case 203:	// RFC2616 Section 10.2.4: Non-Authoritative Information
+	case 204:	// RFC2616 Section 10.2.5: No Content
+	case 205:	// RFC2616 Section 10.2.6: Reset Content
+	case 206:	// RFC2616 Section 10.2.7: Partial Content
+	case 300:	// RFC2616 Section 10.3.1: Multiple Choices
+	case 301:	// RFC2616 Section 10.3.2: Moved Permanently
+	case 302:	// RFC2616 Section 10.3.3: Found
+	case 303:	// RFC2616 Section 10.3.4: See Other
+	case 304:	// RFC2616 Section 10.3.5: Not Modified
+	case 305:	// RFC2616 Section 10.3.6: Use Proxy
+	case 307:	// RFC2616 Section 10.3.8: Temporary Redirect
+	case 400:	// RFC2616 Section 10.4.1: Bad Request
+	case 401:	// RFC2616 Section 10.4.2: Unauthorized
+	case 402:	// RFC2616 Section 10.4.3: Payment Required
+	case 403:	// RFC2616 Section 10.4.4: Forbidden
+	case 404:	// RFC2616 Section 10.4.5: Not Found
+	case 405:	// RFC2616 Section 10.4.6: Method Not Allowed
+	case 406:	// RFC2616 Section 10.4.7: Not Acceptable
+	case 407:	// RFC2616 Section 10.4.8: Proxy Authentication Required
+	case 408:	// RFC2616 Section 10.4.9: Request Time-out
+	case 409:	// RFC2616 Section 10.4.10: Conflict
+	case 410:	// RFC2616 Section 10.4.11: Gone
+	case 411:	// RFC2616 Section 10.4.12: Length Required
+	case 412:	// RFC2616 Section 10.4.13: Precondition Failed
+	case 413:	// RFC2616 Section 10.4.14: Request Entity Too Large
+	case 414:	// RFC2616 Section 10.4.15: Request-URI Too Large
+	case 415:	// RFC2616 Section 10.4.16: Unsupported Media Type
+	case 416:	// RFC2616 Section 10.4.17: Requested range not satisfiable
+	case 417:	// RFC2616 Section 10.4.18: Expectation Failed
+	case 500:	// RFC2616 Section 10.5.1: Internal Server Error
+	case 501:	// RFC2616 Section 10.5.2: Not Implemented
+	case 502:	// RFC2616 Section 10.5.3: Bad Gateway
+	case 503:	// RFC2616 Section 10.5.4: Service Unavailable
+	case 504:	// RFC2616 Section 10.5.5: Gateway Time-out
+	case 505:	// RFC2616 Section 10.5.6: HTTP Version not supported
+		return true;
+		
+	default:
+		return false;
+	}
+}
+
+
+
+/**
 Return the HTTP response code string for the given response code
 */
 function get_response_code_string($response_code)
 {
-	switch (intval($response_code))
+	$response_code = intval($response_code);
+	switch ($response_code)
 	{
 	case 100:	return "RFC2616 Section 10.1.1: Continue";
 	case 101:	return "RFC2616 Section 10.1.2: Switching Protocols";
@@ -986,7 +1077,7 @@ function get_response_code_string($response_code)
 	case 503:	return "RFC2616 Section 10.5.4: Service Unavailable";
 	case 504:	return "RFC2616 Section 10.5.5: Gateway Time-out";
 	case 505:	return "RFC2616 Section 10.5.6: HTTP Version not supported";
-	default:	return "Unknown Response Code";
+	default:   return rtrim("Unknown Response Code " . $response_code);
 	}
 }
 
@@ -998,7 +1089,7 @@ http://nadeausoftware.com/node/79
 function path_remove_dot_segments($path)
 {
     // multi-byte character explode
-    $inSegs  = preg_split( '!/!u', $path);
+    $inSegs  = preg_split('!/!u', $path);
     $outSegs = array();
     foreach ($inSegs as $seg)
     {
@@ -1165,6 +1256,609 @@ function makeAbsoluteURI($path)
 	return $url;
 }
 
+
+
+/**
+Convert an absolute HTTP path to a 'real path' on physical disc
+
+notes: implies invocation of realpath().
+*/
+function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
+{
+	if (substr($http_base, 0, strlen($site_rootdir)) == $site_rootdir)
+	{
+		$http_base = substr($http_base, strlen($site_rootdir));
+		if ($http_base[0] == '/')
+			$http_base = substr($http_base, 1);
+		
+		$rp = $real_basedir;
+		if (substr($rp, -1, 1) != '/')
+			$rp .= '/';
+		
+		return realpath($rp . $http_base);
+	}
+	else
+	{
+		/*
+		path outside the CCMS 'root'; this MAY be allowed when CCMS is in a subdir itself.
+		
+		Anyway, let realpath and the caller cope with the security issues that may stem from this.
+		*/
+		return realpath($http_base);
+	}
+}
+
+
+
+
+
+
+
+/*---------------------------------------------------------------------
+See also
+
+http://nl2.php.net/manual/en/function.glob.php
+*/
+
+
+/**
+ * Prepends $string to each element of $array
+ * If $deep is true, will indeed also apply to sub-arrays
+ * @author BigueNique AT yahoo DOT ca
+ * @since 080324
+ */
+function array_prepend($array, $string, $deep=false) 
+{
+    if (empty($array) || empty($string)) 
+		return $array;
+    foreach($array as $key => $element)
+	{
+        if(is_array($element))
+		{
+            if($deep)
+			{
+                $array[$key] = array_prepend($element,$string,$deep);
+            }
+			else
+            {
+				trigger_error('array_prepend: array element',E_USER_WARNING);
+			}
+		}
+        else
+		{
+            $array[$key] = $string.$element;
+		}
+	}
+    return $array;
+}
+
+/**
+ * A better "fnmatch" alternative for windows that converts a fnmatch
+ * pattern into a preg one. It should work on PHP >= 4.0.0.
+ * @author soywiz at php dot net
+ * @since 17-Jul-2006 10:12
+ */
+if (!function_exists('fnmatch')) 
+{
+    function fnmatch($pattern, $string) 
+	{
+        return preg_match('/^' . strtr(addcslashes($pattern, '\\.+^$(){}=!<>|'), array('*' => '.*', '?' => '.?')) . '$/i', $string);
+    }
+}
+
+
+/**#@+
+ * Extra GLOB constant for safe_glob()
+ */
+define('GLOB_NODIR',256);
+define('GLOB_PATH',512);
+define('GLOB_NODOTS',1024);
+define('GLOB_RECURSE',2048);
+/**#@-*/
+
+/**
+ * A safe empowered glob().
+ *
+ * Function glob() is prohibited on some server (probably in safe mode)
+ * (Message "Warning: glob() has been disabled for security reasons in
+ * (script) on line (line)") for security reasons as stated on:
+ * http://seclists.org/fulldisclosure/2005/Sep/0001.html
+ *
+ * safe_glob() intends to replace glob() using readdir() & fnmatch() instead.
+ * Supported flags: GLOB_MARK, GLOB_NOSORT, GLOB_ONLYDIR
+ * Additional flags: GLOB_NODIR, GLOB_PATH, GLOB_NODOTS, GLOB_RECURSE
+ * (not original glob() flags)
+ *
+ * @author BigueNique AT yahoo DOT ca
+ * @updates
+ * - 080324 Added support for additional flags: GLOB_NODIR, GLOB_PATH,
+ *   GLOB_NODOTS, GLOB_RECURSE
+ */
+function safe_glob($pattern, $flags = 0) 
+{
+    $split=explode('/',str_replace('\\','/',$pattern));
+    $mask=array_pop($split);
+    $path=implode('/',$split);
+    if (($dir=opendir($path))!==false) 
+	{
+        $glob=array();
+        while(($file=readdir($dir))!==false) 
+		{
+            // Recurse subdirectories (GLOB_RECURSE)
+            if (($flags&GLOB_RECURSE) && is_dir($file) && (!in_array($file,array('.','..'))))
+			{
+                $glob = array_merge($glob, array_prepend(safe_glob($path.'/'.$file.'/'.$mask, $flags), ($flags&GLOB_PATH?'':$file.'/')));
+			}
+            // Match file mask
+            if (fnmatch($mask,$file)) 
+			{
+                if ( ( (!($flags&GLOB_ONLYDIR)) || is_dir($path.'/'.$file) )
+                  && ( (!($flags&GLOB_NODIR)) || (!is_dir($path.'/'.$file)) )
+                  && ( (!($flags&GLOB_NODOTS)) || (!in_array($file,array('.','..'))) ) )
+				{
+                    $glob[] = ($flags&GLOB_PATH?$path.'/':'') . $file . ($flags&GLOB_MARK?'/':'');
+				}
+            }
+        }
+        closedir($dir);
+        if (!($flags&GLOB_NOSORT)) sort($glob);
+        return $glob;
+    } 
+	else 
+	{
+        return false;
+    }   
+}
+
+
+
+
+
+
+/**
+Derived from legolas558 d0t users dot sf dot net comments at
+  http://nl2.php.net/manual/en/function.is-writable.php
+
+ ---
+ 
+Detect whether a file or directory is writable for the current user.
+
+Will work despite the Windows ACLs bug:
+see http://bugs.php.net/bug.php?id=27609
+see http://bugs.php.net/bug.php?id=30931
+*/
+function is_writable_ex($path) 
+{
+    if (is_dir($path))
+	{
+		// try to write a temp file in this directory
+		$t = substr($path, -1, 1);
+		if ($t != '/' && $t != '\\')
+		{
+			$path .= '/';
+		}
+		do
+		{
+			$filepath = $path . uniqid(mt_rand()).'.tmp';
+		} while (@file_exists($filepath));
+		
+		$path = $filepath;
+		$f = @fopen($path, 'w');
+		if ($f===false)
+		{
+			return false;
+		}
+		fclose($f);
+		unlink($path);
+		return true;
+	}
+	if (is_file($path))
+	{
+		// check file for read/write capabilities
+		$f = @fopen($path, 'r+');
+		if ($f===false)
+			return false;
+		fclose($f);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+
+
+
+
+// Set friendly local names languages
+function setLanguage($lang) 
+{
+	switch ($lang) 
+	{
+		case 'en':
+			return "English";
+			break;
+		case 'nl':
+			return "Nederlands";
+			break;
+		case 'de':
+			return "Deutsch";
+			break;
+		case 'it':
+			return "italiano";
+			break;
+		case 'ru':
+			return "—Ä—É—Å—Å–∫–∏–π";
+			break;
+		case 'sv':
+			return "svenska";
+			break;
+		case 'fr':
+			return "fran√ßais";
+			break;
+		case 'es':
+			return "espa√±ol (castellano)";
+			break;
+		case 'pr':
+			return "Portugu√™s";
+			break;
+		case 'tr':
+			return "T√ºrk";
+			break;
+		case 'zh': /* Chinese ('simplified' is assumed as we only support 2-char codes here... */
+			return "‰∏≠Êñá";
+			break;
+		case 'ar':
+			return "ÿßŸÑÿπÿ±ÿ®Ÿäÿ©";
+			break;
+		case 'ja':
+			return "Êó•Êú¨";
+			break;
+		case 'ko':
+			return "ÌïúÍµ≠Ïñ¥";
+			break;
+		case 'hi': /* Hindi: India */
+			return "‡§π‡§ø‡§®‡•ç‡§¶‡•Ä";
+			break;
+		case 'pl':
+			return "Polska";
+			break;
+
+		default:
+			return $lang;
+			break;
+	}
+}
+
+
+
+/*
+You may specify a 2-char language code OR a 3-char 'locale' code
+to set up the proper language files and settings.
+
+See also ISO639-2, e.g. http://www.loc.gov/standards/iso639-2/php/code_list.php
+
+Further info can be gathered at these locations:
+
+http://en.wikipedia.org/wiki/Locale
+http://en.wikipedia.org/wiki/BCP_47
+http://tools.ietf.org/rfc/bcp/bcp47.txt
+http://www.w3.org/International/articles/language-tags/Overview.en.php
+http://www.loc.gov/standards/iso639-2/php/code_list.php
+http://www.science.co.il/language/locale-codes.asp
+
+and for /country codes/ (which we don't use here!) there's ISO3166:
+
+http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+*/
+function SetUpLanguageAndLocale($language)
+{
+	global $cfg;
+	global $ccms; // <-- this one will be augmented by the (probably) loaded language file(s).
+	
+	// Translate 2 character code to setlocale compliant code
+	//
+	// ALSO fix the 2-char language code if it is unknown (security + consistancy measure)!
+	switch ($language) 
+	{
+	default:
+	case 'en':
+	case 'eng':
+		$language = 'en'; $locale = 'eng';break;
+	case 'de':
+	case 'deu':
+		$language = 'de'; $locale = 'deu';break;
+	case 'it':
+	case 'ita':
+		$language = 'it'; $locale = 'ita';break;
+	case 'nl':
+	case 'nld':
+		$language = 'nl'; $locale = 'nld';break;
+	case 'ru':
+	case 'rus':
+		$language = 'ru'; $locale = 'rus';break;
+	case 'sv':
+	case 'sve':
+		$language = 'sv'; $locale = 'sve';break;
+	case 'fr':
+	case 'fra':
+		$language = 'fr'; $locale = 'fra';break;
+	case 'es':
+	case 'esp':
+		$language = 'es'; $locale = 'esp';break;
+	case 'pr':
+	case 'por':
+		$language = 'pr'; $locale = 'por';break;
+	case 'tr':
+	case 'tur':
+		$language = 'tr'; $locale = 'tur';break;
+	case 'zh':
+	case 'zho':
+	case 'chi':
+		$language = 'zh'; $locale = 'zho';break;
+	case 'ar':
+	case 'ara':
+		$language = 'ar'; $locale = 'ara';break;
+	case 'ja':
+	case 'jpn':
+		$language = 'ja'; $locale = 'jpn';break;
+	case 'ko':
+	case 'kor':
+		$language = 'ko'; $locale = 'kor';break;
+	case 'hi':
+	case 'hin':
+		$language = 'hi'; $locale = 'hin';break;
+	case 'pl':
+	case 'pol':
+		$language = 'pl'; $locale = 'pol';break;
+	}
+
+	// Either select the specified language file or fall back to English
+	$langfile = BASE_PATH . '/lib/languages/'.$language.'.inc.php';
+	if(is_file($langfile))
+	{
+		// only load language files when the current language has not been loaded just before.
+		if (!isset($cfg['language']) || $language !== $cfg['language'])
+		{
+			/*MARKER*/require($langfile);
+		}
+	} 
+	else 
+	{
+		$language = 'en';
+		$locale = 'eng';
+		// only load language files when the current language has not been loaded just before.
+		if ($language !== $cfg['language'])
+		{
+			/*MARKER*/require(BASE_PATH . '/lib/languages/en.inc.php');
+		}
+	}
+
+	// Set local for time, currency, etc
+	setlocale(LC_ALL, $locale);
+
+	
+	// core language
+	$mce_langfile = array();
+	$mce_langfile[] = BASE_PATH . '/admin/includes/tiny_mce/langs/'.$language.'.js';
+	if (0)
+	{
+		// themes language
+		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		foreach($dirlist as $dir)
+		{
+			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
+			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
+		}
+		// plugins language
+		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		foreach($dirlist as $dir)
+		{
+			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
+			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
+		}
+	}
+	$mce_has_lang = true;
+	foreach($mce_langfile as $file)
+	{
+		if (!is_file($file))
+		{
+			$mce_has_lang = false;
+			break;
+		}
+	}
+	
+	if ($mce_has_lang)
+	{
+		$cfg['tinymce_language'] = 'en'; // $language;   -- for some reason, tinyMCE fails to load when anything other than English is specified. Some obscure crash inside a !@#$%^&* eval() in there. :-(((
+	}
+	else
+	{
+		$cfg['tinymce_language'] = 'en';
+	}
+
+	$editarea_langfile = BASE_PATH . '/admin/includes/edit_area/langs/'.$language.'.js';
+	if (is_file($editarea_langfile))
+	{
+		$cfg['editarea_language'] = $language;
+	}
+	else
+	{
+		$cfg['editarea_language'] = 'en';
+	}
+	
+	$cfg['language'] = $language;
+	$cfg['locale'] = $locale;
+	
+	return $language;
+}
+
+
+/**
+Collect the available languages (translations) and return those in an array.
+*/
+function GetAvailableLanguages()
+{
+	$sl = array();
+	if ($handle = opendir('../lib/languages')) 
+	{
+		while (false !== ($file = readdir($handle))) 
+		{
+			// Filter out irrelevant files && dirs
+			if ($file != "." && $file != ".." && strmatch_tail($file, ".inc.php"))
+			{
+				$f = substr($file,0,strpos($file, '.'));
+				$sl[$f] = setLanguage($f);
+			}
+		}
+	}
+	return $sl;
+}
+
+
+
+
+
+
+
+
+/**
+Return the list of fields as indicated by the 'ordercode' parameter
+as an array.
+
+Can, for example, be used to pass this set in the 'ordering' argument for any SQL query.
+*/
+function cvt_ordercode2list($ordercode)
+{
+	$dlorder = array();
+	$ordermask = 0x3FFF; // FTSDPACHIM12L0: 14 bits
+	for ($i = 0; $i < strlen($ordercode); $i++)
+	{
+		$c = $ordercode[$i];
+		
+		switch (strtoupper($c))
+		{
+		case 'F':
+			if ($ordermask & 0x0001)
+			{
+				$ordermask &= ~0x0001;
+				$dlorder[] = 'urlpage';
+			}
+			break;
+			
+		case 'T':
+			if ($ordermask & 0x0002)
+			{
+				$ordermask &= ~0x0002;
+				$dlorder[] = 'pagetitle';
+			}
+			break;
+			
+		case 'S':
+			if ($ordermask & 0x0004)
+			{
+				$ordermask &= ~0x0004;
+				$dlorder[] = 'subheader';
+			}
+			break;
+			
+		case 'D':
+			if ($ordermask & 0x0008)
+			{
+				$ordermask &= ~0x0008;
+				$dlorder[] = 'description';
+			}
+			break;
+			
+		case 'P':
+			if ($ordermask & 0x0010)
+			{
+				$ordermask &= ~0x0010;
+				$dlorder[] = 'printable';
+			}
+			break;
+			
+		case 'A':
+			if ($ordermask & 0x0020)
+			{
+				$ordermask &= ~0x0020;
+				$dlorder[] = 'published';
+			}
+			break;
+			
+		case 'C':
+			if ($ordermask & 0x0040)
+			{
+				$ordermask &= ~0x0040;
+				$dlorder[] = 'iscoding';
+			}
+			break;
+			
+		case 'H':
+			if ($ordermask & 0x0080)
+			{
+				$ordermask &= ~0x0080;
+				$dlorder[] = 'islink';
+			}
+			break;
+			
+		case 'I':
+			if ($ordermask & 0x0100)
+			{
+				$ordermask &= ~0x0100;
+				$dlorder[] = 'menu_id';
+			}
+			break;
+			
+		case '1':
+			if ($ordermask & 0x0200)
+			{
+				$ordermask &= ~0x0200;
+				$dlorder[] = 'toplevel';
+			}
+			break;
+			
+		case '2':
+			if ($ordermask & 0x0400)
+			{
+				$ordermask &= ~0x0400;
+				$dlorder[] = 'sublevel';
+			}
+			break;
+			
+		case 'M':
+			if ($ordermask & 0x0800)
+			{
+				$ordermask &= ~0x0800;
+				$dlorder[] = 'module';
+			}
+			break;
+			
+		case 'L':
+			if ($ordermask & 0x1000)
+			{
+				$ordermask &= ~0x1000;
+				$dlorder[] = 'variant';
+			}
+			break;
+			
+		case '0':
+			if ($ordermask & 0x2000)
+			{
+				$ordermask &= ~0x2000;
+				$dlorder[] = 'page_id';
+			}
+			break;
+			
+		default:
+			// should never get here...
+			break;
+		}
+	}
+	return $dlorder;
+}
 
 
 

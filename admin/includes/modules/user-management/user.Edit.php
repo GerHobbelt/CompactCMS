@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -60,7 +60,7 @@ $userID = getGETparam4Number('userID');
 
 if($userID > 0) 
 {
-	$row = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."users` WHERE userID = $userID");
+	$row = $db->SelectSingleRow($cfg['db_prefix'].'users', array('userID' => MySQL::SQLValue($userID, MySQL::SQLVALUE_NUMBER)));
 	if (!$row) $db->Kill($ccms['lang']['system']['error_general']);
 } 
 else

@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -65,7 +65,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 // Set the default template
 $dir_temp = BASE_PATH . "/lib/templates/";
 $get_temp = getGETparam4FullFilePath('template', $template[0].'.tpl.html');
-$chstatus = is_writable($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
+$chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
 	
 // Check for filename	
 if(!empty($get_temp)) 
@@ -83,7 +83,7 @@ if(!empty($get_temp))
 } 
 
 // Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 if($_SESSION['ccms_userLevel']<$perm['manageTemplate']) 

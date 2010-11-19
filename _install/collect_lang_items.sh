@@ -58,26 +58,28 @@ echo collecting data...
 #   8: again uniquify them and dump to file. THIS list will be used to check the /lib/languages/*
 #      files against!
 
-find ../ -type f -a ! -path '*/lib/languages/*' \
+find ../ -type f -a \( -name '*.htm*' -o -name '*.inc' -o -name '*.php' \) -a ! -path '*/lib/languages/*' \
 		-a ! -path '*/media/*' -a ! -path '*/includes/cache/*' -a ! -path '*.sh' \
 		-a ! -path '*.bak'  -a ! -path '*~' -print0 \
 	| xargs -0 grep -e "\$ccms\['lang'\]" \
 	| sed -e 's/\$/\n\$/g' -e 's/\:/:\n/g' -e 's/;/\n/g' -e 's/\]\./\]\n/g' -e 's/\]:/\]\n/g' -e 's/)/\n/g' -e 's/ /\n/g' \
-	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(../[.a-zA-Z0-9_/-]\+\:\)$" \
+	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(\.\./[.a-zA-Z0-9_/-]\+\:\)$" \
 	| gawk -- 'BEGIN { qt=39; for (i=1; i<=5; i++) { printf("../--manually-added--/:\t$ccms[%clang%c][%cmenu%c][%c%d%c]\n", qt, qt, qt, qt, qt, i, qt); } } /:/ { path=$0; next; } /./ { printf("%s\t%s\n", path, $0); }' \
 	| sort | uniq | tee ccms_lang_entries_log.txt \
 	> ccms_lang_entries.txt.tmp
 	
 # also find all template references to '{%lang:xyz:abc%}' template args as those are language items as well:
 # these are the template-language equivalent of $ccms['lang']['xyz']['abc']
-find ../lib/templates -type f -print0 \
+find ../lib/templates -type f -a ! -name '*.jpg' -a ! -name '*.png' -a ! -name '*.gif' -print0 \
 	| xargs -0 grep -e "\{%lang\:" \
-	| sed -e 's/{%/\n\$ccms\[/g' -e 's/\:/\]\[/g' -e 's/%}/\]\n/g' \
-	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(../[.a-zA-Z0-9_/-]\+\:\)$" \
+	| sed -e "s/{%/\n\$ccms\['/g" -e "s/\:\([a-z]\)/'\]\['\\1/g" -e "s/%}/'\]\n/g" \
+	| sed -e "s/^\(\.\.\/[.a-zA-Z0-9_/-]\+\:\).*$/\\1/g" \
+	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(\.\./[.a-zA-Z0-9_/-]\+\:\)$" \
 	| gawk -- ' /:/ { path=$0; next; } /./ { printf("%s\t%s\n", path, $0); }' \
 	| sort | uniq | tee -a ccms_lang_entries_log.txt \
 	>> ccms_lang_entries.txt.tmp
 
+	
 # marge both and turn them into one	
 cat ccms_lang_entries.txt.tmp \
 	| sed -e 's/^.*:\t//' \

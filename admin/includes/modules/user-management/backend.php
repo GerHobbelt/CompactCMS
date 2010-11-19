@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -136,21 +136,16 @@ window.addEvent('domready',function()
 					</tr>
 				
 					<?php 
-					// Get previously opened DB stream
-					$i=0;
 					// Open recordset for all users with levels <= to own
-					if (!$db->Query("SELECT * FROM `".$cfg['db_prefix']."users` ORDER BY userID ASC"))
-						$db->Kill();
-					$db->MoveFirst();
+					$usercoll = $db->SelectArray($cfg['db_prefix'].'users', null, null, array('userID'));
+					if ($db->ErrorNumber()) $db->Kill();
 					
 					// Loop through results
-					while (!$db->EndOfSeek()) 
+					$i = 0;
+					foreach($usercoll as $row) 
 					{
-						// Fill $row with values
-						$row = $db->Row();
-					
 						// Define $isEven for alternate table coloring
-						if($i%2 != 1) 
+						if($i % 2 != 1) 
 						{
 							echo '<tr style="background-color: #E6F2D9;">';
 						} 
@@ -161,10 +156,10 @@ window.addEvent('domready',function()
 						?>
 							<td>
 							<?php 
-							if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']&&$_SESSION['ccms_userLevel']>=$row->userLevel&&$_SESSION['ccms_userID']!=$row->userID) 
+							if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers'] && $_SESSION['ccms_userLevel']>=$row['userLevel'] && $_SESSION['ccms_userID']!=rm0lead($row['userID'])) 
 							{ 
 							?>	
-								<input type="checkbox" name="userID[]" value="<?php echo $row->userID; ?>" id="userID" />
+								<input type="checkbox" name="userID[]" value="<?php echo rm0lead($row['userID']); ?>" id="userID" />
 							<?php 
 							} 
 							else 
@@ -175,23 +170,23 @@ window.addEvent('domready',function()
 							</td>
 							<td>
 							<?php 
-							if($_SESSION['ccms_userID']==$row->userID||($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']&&$_SESSION['ccms_userLevel']>=$row->userLevel)) 
+							if($_SESSION['ccms_userID']==rm0lead($row['userID']) || ($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers'] && $_SESSION['ccms_userLevel']>=$row['userLevel'])) 
 							{ 
 							?>
-								<span class="ss_sprite ss_user_edit"><a href="user.Edit.php?userID=<?php echo $row->userID; ?>"><?php echo $row->userName; ?></a></span>
+								<span class="ss_sprite ss_user_edit"><a href="user.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><?php echo $row['userName']; ?></a></span>
 							<?php 
 							} 
 							else 
 							{
-								echo $row->userName; 
+								echo $row['userName']; 
 							}
 							?>
 							</td>
-							<td><?php echo substr($row->userFirst,0,1); ?>. <?php echo $row->userLast; ?></td>
-							<td><span class="ss_sprite ss_email"><a href="mailto:<?php echo $row->userEmail; ?>"><?php echo $row->userEmail; ?></a></span></td>
-							<td><?php echo ($row->userActive==1?$ccms['lang']['backend']['yes']:$ccms['lang']['backend']['no']); ?></td>
-							<td><?php echo $row->userLevel; ?></td>
-							<td><?php echo date('d-m-\'y',strtotime($row->userLastlog)); ?></td>
+							<td><?php echo substr($row['userFirst'],0,1); ?>. <?php echo $row['userLast']; ?></td>
+							<td><span class="ss_sprite ss_email"><a href="mailto:<?php echo $row['userEmail']; ?>"><?php echo $row['userEmail']; ?></a></span></td>
+							<td><?php echo ($row['userActive']==1 ? $ccms['lang']['backend']['yes'] : $ccms['lang']['backend']['no']); ?></td>
+							<td><?php echo $row['userLevel']; ?></td>
+							<td><?php echo date('d-m-\'y',strtotime($row['userLastlog'])); ?></td>
 						</tr>
 						<?php 
 						$i++; 

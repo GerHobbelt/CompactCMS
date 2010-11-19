@@ -29,13 +29,13 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="{%lang%}">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{%language%}">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>{%title%}</title>
 <meta name="description" content="{%sitename%} | {%desc%}" />
 <meta name="keywords" content="{%keywords%}" />
-<link href="{%rootdir%}lib/templates/ccms/base.css" rel="stylesheet" type="text/css" />
+<link href="{%rootdir%}lib/templates/ccms/base.css,layout.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="{%rootdir%}lib/includes/js/mootools.js" charset="utf-8"></script>
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
@@ -53,7 +53,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
 	<div id="left" class="span-4 colborder">
 		<p style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
-			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="Back to the administration">{%lang:login:login%}</a>
+			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="{%lang:backend:administration%}">{%lang:login:login%}</a>
 		</p>
 		
 	</div>

@@ -78,30 +78,44 @@ if(!isset($_SESSION['rc1']) || !isset($_SESSION['rc2']))
 // Prevent PHP warning by setting default (null) values
 $do_action = getGETparam4IdOrNumber('action');
 
+
 // Get permissions
 $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Fill active module array
-// $modules = $db->QueryArray("SELECT * FROM `".$cfg['db_prefix']."modules` WHERE modActive='1'", MYSQL_ASSOC);    // [i_a] already collected in sitemap.php 
-
+// $modules = $db->SelectArray($cfg['db_prefix'].'modules', array('modActive' => "'1'"));    // [i_a] already collected in sitemap.php 
 
 
 $do_update_or_livefilter = (($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST") || ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST"));
 
-$filter_pages_name = '';
-$filter_pages_title = '';
-$filter_pages_subheader = '';
 
-$page_selectquery_restriction = '';
 
-if ($do_update_or_livefilter)
+
+// Set the target for PHP processing
+$target_form = getPOSTparam4IdOrNumber('form');
+
+
+/**
+ *
+ * Render the dynamic list with files
+ *
+ */
+if ($do_update_or_livefilter && checkAuth()) 
 {
+	$dynlist_sortorder = getGETparam4IdOrNumber('dlorder', $cfg['admin_page_dynlist_order']);
+	
+	$filter_pages_name = '';
+	$filter_pages_title = '';
+	$filter_pages_subheader = '';
+
+	$page_selectquery_restriction = '';
+
 	$filter_pages_name = (!empty($_SESSION['filter_pages_name']) ? $_SESSION['filter_pages_name'] : '');
 	$filter_pages_title = (!empty($_SESSION['filter_pages_title']) ? $_SESSION['filter_pages_title'] : '');
 	$filter_pages_subheader = (!empty($_SESSION['filter_pages_subheader']) ? $_SESSION['filter_pages_subheader'] : '');
 
-	if ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) 
+	if ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST") 
 	{
 		switch (getPOSTparam4IdOrNumber('part'))
 		{
@@ -146,31 +160,18 @@ if ($do_update_or_livefilter)
 		
 		$page_selectquery_restriction = 'WHERE ' . $page_selectquery_restriction;
 	}
-}
 
+	// Open recordset for sites' pages
+	$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
+	if ($db->ErrorNumber()) $db->Kill();
 
-// Set the target for PHP processing
-$target_form = getPOSTparam4IdOrNumber('form');
-
-
-
-// Open recordset for sites' pages
-$db->Query("SELECT * FROM `".$cfg['db_prefix']."pages` " . $page_selectquery_restriction . " ORDER BY `published`, `menu_id`, `toplevel`, `sublevel` ASC");
-
-// Check whether the recordset is not empty
-if($db->HasRecords()) 
-{
-	/**
-	 *
-	 * Render the dynamic list with files
-	 *
-	 */
-	if ($do_update_or_livefilter && checkAuth()) 
+	// Check whether the recordset is not empty
+	if($db->HasRecords()) 
 	{
 		$i = 0;
 		
 		echo '<table cellpadding="0" cellspacing="0">';
-		
+
 		// Get previously opened DB stream
 		$db->MoveFirst();
 		while (!$db->EndOfSeek()) 
@@ -180,7 +181,7 @@ if($db->HasRecords())
 				
 			// Check whether current user is owner, or no owners at all
 			$owner = @explode('||', $row->user_ids);
-			if($row->user_ids==0||$perm['manageOwners']==0||$_SESSION['ccms_userLevel']>=4||in_array($_SESSION['ccms_userID'], $owner)) 
+			if(empty($row->user_ids) || $perm['manageOwners']==0 || $_SESSION['ccms_userLevel']>=4 || in_array($_SESSION['ccms_userID'], $owner)) 
 			{
 				// Determine file specific variables
 				if($row->module=="editor") 
@@ -218,7 +219,7 @@ if($db->HasRecords())
 				?>
 				<td style="padding-left:2px;" class="span-1">
 				<?php 
-				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || in_array($row->urlpage, $cfg['restrict'])) 
+				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
 				{ 
 				?>
 					<span class="ss_sprite ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>"></span>
@@ -227,7 +228,7 @@ if($db->HasRecords())
 				else 
 				{ 
 				?>
-					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].$row->page_id; ?>" />
+					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].rm0lead($row->page_id); ?>" />
 				<?php 
 				} 
 				?>
@@ -236,13 +237,13 @@ if($db->HasRecords())
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
 				</td>
 				<td class="span-4">
-					<span id="<?php echo $row->page_id; ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
+					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
 				<td class="span-6">
-					<span id="<?php echo $row->page_id; ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
+					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
 				<td class="span-2" style="text-align: center;">
-					<a href="#" id="printable-<?php echo $row->page_id; ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+					<a href="#" id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 						if($row->printable == "Y")
 						{ 
 							echo $ccms['lang']['backend']['yes']; 
@@ -258,7 +259,7 @@ if($db->HasRecords())
 					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
 					{ 
 					?>
-						<a href="#" id="published-<?php echo $row->page_id; ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+						<a href="#" id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 							if($row->published == "Y") 
 							{ 
 								echo $ccms['lang']['backend']['yes']; 
@@ -281,7 +282,7 @@ if($db->HasRecords())
 						if($row->module=="editor") 
 						{ 
 						?>
-							<a href="#" id="iscoding-<?php echo $row->page_id; ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php if($row->iscoding == "Y") { echo "<span style=\"color:#8F0000;font-weight:bold;\">".$ccms['lang']['backend']['yes']."</span>"; } else echo $ccms['lang']['backend']['no']; ?></a>
+							<a href="#" id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php if($row->iscoding == "Y") { echo "<span style=\"color:#8F0000;font-weight:bold;\">".$ccms['lang']['backend']['yes']."</span>"; } else echo $ccms['lang']['backend']['no']; ?></a>
 						<?php 
 						} 
 						else 
@@ -293,7 +294,7 @@ if($db->HasRecords())
 				</td>
 				<?php 
 				// Check for restrictions
-				if(!in_array($row->urlpage, $cfg['restrict'])||!in_array($row->page_id, $owners)) 
+				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
 				{ 
 				?>
 					<td class="span-5" style="text-align: right;">
@@ -345,7 +346,7 @@ if($db->HasRecords())
 					$description = ucfirst($description);
 				}
 				?>
-				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo $row->page_id; ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
+				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" style="text-align: right; padding-right:5px;">
 					<?php 
 					if($row->module=="editor" && !empty($row->toplevel)) 
@@ -400,16 +401,31 @@ if($db->HasRecords())
 		</table>
 	<?php 
 	}
-
-		
-	/**
-	 *
-	 * Render the entire menu list
-	 *
-	 */
-	if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) 
+	else
 	{
-		if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
+		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+	}
+}
+	
+
+	
+/**
+ *
+ * Render the entire menu list
+ *
+ */
+if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) 
+{
+	$menu_sortorder = getGETparam4IdOrNumber('m_order', 'I12LH0');
+	
+	if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
+	{
+		// Open recordset for sites' pages
+		$db->SelectRows($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
+		if ($db->ErrorNumber()) $db->Kill();
+
+		// Check whether the recordset is not empty
+		if($db->HasRecords()) 
 		{
 			echo '<table class="span-15" cellpadding="0" cellspacing="0">';
 			
@@ -431,9 +447,10 @@ if($db->HasRecords())
 				{ 
 					echo "<tr>"; 
 				} 
+				$pageIdAsStr = rm0lead($row->page_id); // empty cannot be; rm0lead() makes sure zero is actually "0"
 				?>
 					<td class="span-2">
-						<select class="span-2" name="menuid[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="menuid[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Menu">
 								<?php 
 								$y = 1; 
@@ -449,7 +466,7 @@ if($db->HasRecords())
 						</select>
 					</td>
 					<td class="span-2">
-						<select class="span-2" name="template[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="template[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
 								<?php 
 								$x = 0; 
@@ -465,7 +482,7 @@ if($db->HasRecords())
 						</select>
 					</td>
 					<td class="span-2">&#160;
-						<select class="span-2" name="toplevel[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="toplevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Toplevel">
 								<?php 
 								$z = 1; 
@@ -481,7 +498,7 @@ if($db->HasRecords())
 						</select>
 					</td>
 					<td class="span-2">
-						<select class="span-2" name="sublevel[<?php echo $row->page_id; ?>]">
+						<select class="span-2" name="sublevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Sublevel">
 								<?php 
 								$y = 0; 
@@ -496,7 +513,7 @@ if($db->HasRecords())
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-1-1" id="td-islink-<?php echo $row->page_id; ?>">
+					<td class="span-1-1" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php 
 						if($row->urlpage == "home") 
 						{ 
@@ -507,14 +524,14 @@ if($db->HasRecords())
 						else 
 						{ 
 						?>
-							<input type="checkbox" name="islink" id="<?php echo $row->page_id; ?>" class="islink" <?php echo($row->islink==="Y")?'checked="checked"':null;?> />
+							<input type="checkbox" name="islink" id="<?php echo $pageIdAsStr; ?>" class="islink" <?php echo($row->islink==="Y")?'checked="checked"':null;?> />
 						<?php 
 						} 
 						?>
 					</td>
 					<td class="span-4">
 						<?php echo $row->urlpage; ?><em>(.html)</em>
-						<input type="hidden" name="pageid[]" value="<?php echo $row->page_id; ?>" id="pageid"/>
+						<input type="hidden" name="pageid[]" value="<?php echo $pageIdAsStr; ?>" id="pageid"/>
 					</td>
 				</tr>
 				<?php 
@@ -524,12 +541,18 @@ if($db->HasRecords())
 			</table>
 		<?php 
 		} 
-		else 
+		else
 		{
-			echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_delete">'.$ccms['lang']['auth']['featnotallowed'].'</span></p>';
-		} 
+			echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+		}
 	}
+	else 
+	{
+		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_delete">'.$ccms['lang']['auth']['featnotallowed'].'</span></p>';
+	} 
 }
+
+
 
 
 /**
@@ -569,6 +592,14 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		{ $errors[] = "- ".$ccms['lang']['system']['error_subtitle']; }
 	if ($description=='' || strlen($description)<3)
 		{ $errors[] = "- ".$ccms['lang']['system']['error_description']; }
+	if (strlen($post_urlpage) > 50)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_filesize_2']; }
+	if (strlen($pagetitle) > 100)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_pagetitle_2']; }
+	if (strlen($subheader) > 200)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_subtitle_2']; }
+	if (strlen($description) > 250)
+		{ $errors[] = "- ".$ccms['lang']['system']['error_description_2']; }
 	if ($post_urlpage=='403' || $post_urlpage=='404' || $post_urlpage=='sitemap' || $post_urlpage=='home')
 		{ $errors[] = "- ".$ccms['lang']['system']['error_reserved']; }
 	
@@ -594,7 +625,7 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		$result = $db->TransactionBegin();
 		if ($result)
 		{
-			$result = $db->InsertRow($cfg['db_prefix']."pages", $values);
+			$result = $db->InsertRow($cfg['db_prefix'].'pages', $values);
 
 			// Check for errors
 			if($result) 
@@ -701,15 +732,15 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 				// Delete details from the database
 				$values = array(); // [i_a] make sure $values is an empty array to start with here
 				$values['page_id'] = MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER);
-				$result = $db->DeleteRows($cfg['db_prefix']."pages", $values);
+				$result = $db->DeleteRows($cfg['db_prefix'].'pages', $values);
 				
 				// Delete linked rows from module tables
 				if($module!='editor') 
 				{
 					$filter = array(); // [i_a] make sure $filter is an empty array to start with here
 					$filter['pageID'] = MySQL::SQLValue($correct_filename,MySQL::SQLVALUE_TEXT);
-					$delmod = $db->DeleteRows($cfg['db_prefix']."mod".$module, $filter);
-					$delcfg = $db->DeleteRows($cfg['db_prefix']."cfg".$module, $filter);
+					$delmod = $db->DeleteRows($cfg['db_prefix'].'mod'.$module, $filter);
+					$delcfg = $db->DeleteRows($cfg['db_prefix'].'cfg'.$module, $filter);
 				}
 				
 				if ($result) 
@@ -770,7 +801,7 @@ if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 		$values["menu_id"]	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
 		
 		// Execute the update
-		if(!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+		if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 		{
 			$error = $db->Error();
 		}
@@ -800,7 +831,7 @@ if($do_action == "islink" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values['islink'] = MySQL::SQLValue($islink_in_menu, MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 	{
 		if($values["islink"] == "Y") 
 		{ 
@@ -843,7 +874,7 @@ if($do_action == "editinplace" && $_SERVER['REQUEST_METHOD'] == "GET" && checkAu
 	// TOGGLE the flag (printable/published/iscoding) state:
 	$values[$action] = MySQL::SQLValue(!getGETparam4boolean('s'),MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
 	{
 		if($values[$action] == "Y")
 		{ 
@@ -895,7 +926,7 @@ if($do_action == "liveedit" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
 	
-	if (!$db->UpdateRows($cfg['db_prefix']."pages", $values, array("page_id" => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+	if (!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
 	{
 		$db->Kill();
 	}
@@ -923,7 +954,7 @@ if($do_action == "save-template" && $_SERVER['REQUEST_METHOD'] == "POST" && chec
 			
 			$content	= $_POST['content']; // RAW CONTENT: the template may contain ANYTHING.
 			
-			if (is_writable($filename)) 
+			if (is_writable_ex($filename)) 
 			{
 				if (!$handle = fopen($filename, 'w'))  throw new FbX($ccms['lang']['system']['error_openfile']." (".$filename.").");
 				if (fwrite($handle, $content) === FALSE) 
@@ -991,7 +1022,7 @@ if($do_action == "add-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
 		
 		// Execute the insert
-		$result = $db->InsertRow($cfg['db_prefix']."users", $values);
+		$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
 		
 		// Check for errors
 		if($result) 
@@ -1033,7 +1064,7 @@ if($do_action == "edit-user-details" && $_SERVER['REQUEST_METHOD'] == "POST" && 
 			$values["userLast"]	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
 			$values["userEmail"]= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
 			
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				if($userID==$_SESSION['ccms_userID']) 
 				{
@@ -1081,7 +1112,7 @@ if($do_action == "edit-user-password" && $_SERVER['REQUEST_METHOD'] == "POST" &&
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
 			$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
 			
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();
@@ -1126,13 +1157,13 @@ if($do_action == "edit-user-level" && $_SERVER['REQUEST_METHOD'] == "POST" && ch
 			$values["userLevel"] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
 			$values["userActive"] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
 				
-			if ($db->UpdateRows($cfg['db_prefix']."users", $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				if($userID==$_SESSION['ccms_userID']) 
 				{
 					$_SESSION['ccms_userLevel'] = $userLevel;
 				}
-				
+			
 				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();
 			}
@@ -1178,7 +1209,7 @@ if($do_action == "delete-user" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 			
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
 			$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
-			$result = $db->DeleteRows($cfg['db_prefix']."users", $values);
+			$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
 			$i++;
 		}
 		// Check for errors
@@ -1212,7 +1243,8 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 	$filename	= BASE_PATH . "/content/".$name.".php";
 	
 	// Check for editor.css in template directory
-	$template	= $db->QuerySingleValue("SELECT `variant` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = ".MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT));
+	$template	= $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('variant'));
+	if (!$template) $db->Kill();
 	$css = "";
 	if (is_file($cfg['rootdir'] . '/lib/templates/'.$template.'/editor.css')) 
 	{
@@ -1239,7 +1271,7 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 	} 
 	
 	// Get keywords for current file
-	$keywords = $db->QuerySingleValue("SELECT `keywords` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = '$name'");
+	$keywords = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('keywords'));
 	
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1472,7 +1504,7 @@ if($do_action == "save-changes" && checkAuth())
 	$filename	= BASE_PATH . '/content/' . $name . '.php';
 	$keywords	= getPOSTparam4DisplayHTML('keywords');
 
-	if (is_writable($filename)) 
+	if (is_writable_ex($filename)) 
 	{
 		if (!$handle = fopen($filename, 'w')) 
 		{
@@ -1493,7 +1525,7 @@ if($do_action == "save-changes" && checkAuth())
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values["keywords"] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 	
-	if ($db->UpdateRows($cfg['db_prefix']."pages", $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
 	{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

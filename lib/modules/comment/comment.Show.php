@@ -1,7 +1,7 @@
 <?php 
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -38,7 +38,7 @@ $_SESSION['ccms_captcha'] = mt_rand('123456','987654');
 
 // Load comment preferences
 $pageID	= getGETparam4Filename('page');
-
+$is_printing = ($ccms['printing'] == 'Y');
 
 ?>
 
@@ -97,6 +97,10 @@ window.addEvent(
 	<!--spinner-->
 </div>
 
+<?php
+if (!$is_printing)
+{
+?>
 <div id="preview-display" style="display:none;">
 	<h2><?php echo $ccms['lang']['guestbook']['preview']; ?></h2>
 	<?php 
@@ -140,3 +144,6 @@ window.addEvent(
 		</div>
 	</form>
 </fieldset>
+<?php
+}
+?>

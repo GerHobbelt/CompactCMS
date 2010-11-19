@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -199,10 +199,10 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 	{
 	?>
+		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
 		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
 		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
 		<script type="text/javascript" src="../../../admin/includes/fancyupload/FancyUpload2.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
 		<script type="text/javascript" charset="utf-8">
 function confirmation()
 {
@@ -350,6 +350,20 @@ function confirm_regen()
 			} 
 			?>
 			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
+			<div class="clear right">
+			<?php
+			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+			{
+			?>
+				<span class="ss_sprite ss_arrow_in"><a onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
+				<?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
+				</a></span>
+			<?php
+			}
+			?>
+			<span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php"><?php echo $ccms['lang']['album']['albumlist']; ?></a></span>
+			</div>
+			<div>
 			<?php 
 			foreach ($images as $key => $value) 
 			{ 
@@ -367,20 +381,8 @@ function confirm_regen()
 				echo "\n";
 			} 
 			?>
-			<p class="clear right">
+			</div>
 			<?php
-			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
-			{
-			?>
-				<span class="ss_sprite ss_arrow_in"><a onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
-				<?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
-				</a></span>
-			<?php
-			}
-			?>
-			<span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php"><?php echo $ccms['lang']['album']['albumlist']; ?></a></span>
-			</p>
-		<?php 
 		} 
 		?>
 		</div>
@@ -423,7 +425,8 @@ function confirm_regen()
 					<select class="text" name="albumtopage" id="albumtopage" size="1">
 						<option value=""><?php echo $ccms['lang']['backend']['none']; ?></option>
 						<?php 
-						$lightboxes = $db->QueryArray("SELECT * FROM ".$cfg['db_prefix']."pages WHERE module='lightbox'", MYSQL_ASSOC); 
+						$lightboxes = $db->SelectArray($cfg['db_prefix'].'pages', array('module' => "'lightbox'")); 
+						if ($db->ErrorNumber()) $db->Kill();
 						for ($i=0; $i < count($lightboxes); $i++) 
 						{ 
 						?>

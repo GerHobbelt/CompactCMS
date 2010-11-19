@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:   CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -42,9 +42,13 @@ $ccms['lang']['system']['error_default']	= "Default page cannot be deleted.";
 $ccms['lang']['system']['error_forged']		= "Value has been tampered with";
 $ccms['lang']['system']['error_filedots']	= "File name should not contain dots, e.g. '.html'.";
 $ccms['lang']['system']['error_filesize']	= "File name should be at least 3 characters long.";
+$ccms['lang']['system']['error_filesize_2']	= "File name should be at most 50 characters long.";
 $ccms['lang']['system']['error_pagetitle']	= "Enter a page title of 3 characters or more.";
+$ccms['lang']['system']['error_pagetitle_2'] = "Enter a page title of 100 characters or less.";
 $ccms['lang']['system']['error_subtitle']	= "Give a short sub-title for your page.";
+$ccms['lang']['system']['error_subtitle_2']	= "Enter a short sub-title of 200 characters or less for your page.";
 $ccms['lang']['system']['error_description'] = "Enter a description of more than 3 characters";
+$ccms['lang']['system']['error_description_2'] = "Enter a description of less than 250 characters";
 $ccms['lang']['system']['error_reserved'] 	= "You've specified a file name reserved for internal use.";
 $ccms['lang']['system']['error_general']	= "Error occurred";
 $ccms['lang']['system']['error_correct'] 	= "Please correct the following:";
@@ -57,6 +61,10 @@ $ccms['lang']['system']['error_misconfig']	= "<strong>There seems to be a miscon
 $ccms['lang']['system']['error_deleted']	= "<h1>The file you selected seems to be deleted</h1><p>Refresh the filelist to see the most recent list of available files to prevent this error from happening. If this doesn't solve this error, manually check the content folder for the file you're trying to open.</p>";
 $ccms['lang']['system']['error_404title'] 	= "File not found";
 $ccms['lang']['system']['error_404header']	= "A 404 error occurred, the requested file could not be found.";
+$ccms['lang']['system']['error_404content']	= "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
+$ccms['lang']['system']['error_403title']   = "Forbidden";
+$ccms['lang']['system']['error_403header']  = "A 403 error occurred: you don't have permission to access the requested file.";
+$ccms['lang']['system']['error_403content']	= "You are not allowed to access <strong>{%pagereq%}.html</strong> at this moment.";
 $ccms['lang']['system']['error_sitemap'] 	= "An overview of all pages";
 $ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrect";
 $ccms['lang']['system']['error_passshort']	= "A password should contain more than 6 characters";
@@ -121,6 +129,10 @@ $ccms['lang']['backend']['item']			= "Item";
 $ccms['lang']['backend']['none']			= "None";
 $ccms['lang']['backend']['yes']				= "Yes";
 $ccms['lang']['backend']['no']				= "No";
+$ccms['lang']['backend']['translation']     = "Translations";
+$ccms['lang']['backend']['hello'] = "Hi";
+$ccms['lang']['backend']['logout'] = "Log-out";
+$ccms['lang']['backend']['see_forum'] = "See forum";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']			= "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
@@ -175,7 +187,7 @@ $ccms['lang']['hints']['template']		= "Template :: If you use multiple templates
 $ccms['lang']['hints']['activelink']	= "Active link in menu? :: Not all items always need an actual link. To deactivate the link behind this item in the front-end menu, uncheck its checkbox below.";
 $ccms['lang']['hints']['menuid']		= "Menu :: Choose in which menu this item should be listed in. The default is the main menu (1), where also the home page link should be shown.";
 $ccms['lang']['hints']['iscoding']		= "Contains coding :: Does this file contain manual added code such as PHP or Javascript? Selecting 'Yes' will restrict access to the file from the back-end's WYSIWYG editor and enables the code editor.";
-$ccms['lang']['hints']['filter']        = "<br>You can click on the <span class='sprite livefilter livefilter_active'>&#160;filter icon</span> at left of the title to add, edit or remove a text to filter the page list on, e.g. when you type 'home' in the edit field which appears when you click the icon, then press the Enter/Return key, only pages which have the text 'home' in this column will be shown. <br>Clicking the icon again and deleting the text in the edit field, then pressing the Enter/Return key, will remove the filter.<br>Hover over the filter icon to see whether the column is currently being filtered, and if so, using which filter text.";
+$ccms['lang']['hints']['filter']        = "<br><br>You can click on the <span class='sprite livefilter livefilter_active'>&#160;filter icon</span> at left of the title to add, edit or remove a text to filter the page list on, e.g. when you type 'home' in the edit field which appears when you click the icon, then press the Enter/Return key, only pages which have the text 'home' in this column will be shown. <br>Clicking the icon again and deleting the text in the edit field, then pressing the Enter/Return key, will remove the filter.<br>Hover over the filter icon to see whether the column is currently being filtered, and if so, using which filter text.";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor']	= "Close the editor";
@@ -199,9 +211,11 @@ $ccms['lang']['auth']['featnotallowed']	= "Your current account level does not a
 // Back-up messages
 $ccms['lang']['backup']['createhd']		= "Create new back-up";
 $ccms['lang']['backup']['explain']		= "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files regularly.";
+$ccms['lang']['backup']['warn4media']	= "Warning :: Please be aware that your <dfn>lightbox</dfn> albums' images are <strong>not</strong> backed up! \nThe album descriptions <strong>are</strong>, but the images themselves and their thumbnails are <strong>not included in these backups</strong>. \nIf you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.";
 $ccms['lang']['backup']['currenthd']	= "Available back-ups";
 $ccms['lang']['backup']['timestamp']	= "Back-up file name";
 $ccms['lang']['backup']['download']		= "Download archive";
+$ccms['lang']['backup']['wait4backup']  = "Please wait while the backup is being created...";
 
 // User management messages
 $ccms['lang']['users']['createuser']	= "Create a user";
@@ -238,9 +252,13 @@ $ccms['lang']['permission']['level4']	= "Level 4 - Admin";
 
 // Content owners
 $ccms['lang']['owners']['header']		= "Content owners";
-$ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a cartain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
+$ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a certain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
 $ccms['lang']['owners']['pages']		= "Pages";
 $ccms['lang']['owners']['users']		= "Users";
+
+// Translation assistance page 
+$ccms['lang']['translation']['header']  = "Translate";
+$ccms['lang']['translation']['explain'] = "Shows the translation strings.";
 
 // Album messages
 $ccms['lang']['album']['album']			= "Album";
@@ -330,8 +348,6 @@ $ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
 	$ccms['lang']['login']['provide']			
 	$ccms['lang']['system']['error_default']	
 	$ccms['lang']['system']['error_sitemap'] 	
-	$ccms['lang']['system']['tooriginal']		
-	$ccms['lang']['template']['print']		
        
          ----------------------------------------------------------
 	

@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
-Copyright (C) 2008 - 2009 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.0
+Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
+Revision:   CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -29,189 +29,299 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-// System wide error messages
-$ccms['lang']['system']['error_database'] 	= "Impossibile connettersi al database. Verificare username, password ed il nome del database.";
-$ccms['lang']['system']['error_openfile'] 	= "Impossibile aprireilfile specificato.";
-$ccms['lang']['system']['error_notemplate']	= "No templates could be found to be applied to your site. Please add at least one template to ./lib/templates/.";
-$ccms['lang']['system']['error_templatedir'] = "Couldn't find the templates directory! Make sure it exists and contains at least one template.";
-$ccms['lang']['system']['error_write'] 		= "File senza accesso in scrittura";
-$ccms['lang']['system']['error_chmod'] 		= "Il file non pu&ograve; essere modificato. Controllare i permessi (CHMOD).";
-$ccms['lang']['system']['error_value'] 		= "Errore: valore incorretto";
-$ccms['lang']['system']['error_default'] 	= "La pagine principale non pu&ograve; essere cancellata.";
-$ccms['lang']['system']['error_forged'] 	= "Il valore &egrave; stato impostato con";
-$ccms['lang']['system']['error_filedots'] 	= "Il nome del file non pu&ograve; contenere punti, es. '.html'.";
-$ccms['lang']['system']['error_filesize'] 	= "Il nome del file deve essere almeno di tre caratteri.";
-$ccms['lang']['system']['error_pagetitle'] 	= "Inserire il titolo della pagina di almeno tre caratteri.";
-$ccms['lang']['system']['error_subtitle'] 	= "Inserire il sottotitolo della pagina.";
+// System wide messages
+$ccms['lang']['system']['error_database'] = "Impossibile connettersi al database. Verificare username, password ed il nome del database.";
+$ccms['lang']['system']['error_openfile'] = "Impossibile aprireilfile specificato.";
+$ccms['lang']['system']['error_notemplate'] = "Non ci sono template disponibili. Aggiungere almeno un template nella directory ./lib/templates/ map.";
+$ccms['lang']['system']['error_templatedir'] = /* BABELFISH */ "Impossibile trovare la directory dei template! Assicurarsi che esista e che contenga almeno un modello.";
+$ccms['lang']['system']['error_write'] = "File senza accesso in scrittura";
+$ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "Elenco non ha accesso in scrittura";
+$ccms['lang']['system']['error_chmod'] = "Il file non pu&ograve; essere modificato. Controllare i permessi (CHMOD).";
+$ccms['lang']['system']['error_value'] = "Errore: valore incorretto";
+$ccms['lang']['system']['error_default'] = "La pagine principale non pu&ograve; essere cancellata.";
+$ccms['lang']['system']['error_forged'] = "Il valore &egrave; stato impostato con";
+$ccms['lang']['system']['error_filedots'] = "Il nome del file non pu&ograve; contenere punti, es. '.html'.";
+$ccms['lang']['system']['error_filesize'] = "Il nome del file deve essere almeno di tre caratteri.";
+$ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "Nome del file dovrebbe essere al massimo di 50 caratteri.";
+$ccms['lang']['system']['error_pagetitle'] = "Inserire il titolo della pagina di almeno tre caratteri.";
+$ccms['lang']['system']['error_pagetitle_2'] = /* BABELFISH */ "Inserisci un titolo di pagina 100 caratteri o meno.";
+$ccms['lang']['system']['error_subtitle'] = "Inserire il sottotitolo della pagina.";
+$ccms['lang']['system']['error_subtitle_2'] = /* BABELFISH */ "Inserire un breve sottotitolo di 200 caratteri o meno per la tua pagina.";
 $ccms['lang']['system']['error_description'] = "Inserire una descrizione di almeno tre caratteri.";
-$ccms['lang']['system']['error_reserved'] 	= "E' stato specificato il nome di un file riservato.";
-$ccms['lang']['system']['error_general'] 	= "Errore";
-$ccms['lang']['system']['error_correct'] 	= "Corregere il/i seguente/i:";
-$ccms['lang']['system']['error_create'] 	= "Errore nel completamento del nuovo file";
-$ccms['lang']['system']['error_exists'] 	= "Nome di file esistente.";
-$ccms['lang']['system']['error_delete'] 	= "Errore durante l'eliminazione del file.";
-$ccms['lang']['system']['error_selection'] 	= "Nessun file selezionato.";
+$ccms['lang']['system']['error_description_2'] = /* BABELFISH */ "Inserire una descrizione di meno di 250 caratteri";
+$ccms['lang']['system']['error_reserved'] = "E' stato specificato il nome di un file riservato.";
+$ccms['lang']['system']['error_general'] = "Errore";
+$ccms['lang']['system']['error_correct'] = "Corregere il/i seguente/i:";
+$ccms['lang']['system']['error_create'] = "Errore nel completamento del nuovo file";
+$ccms['lang']['system']['error_exists'] = "Nome di file esistente.";
+$ccms['lang']['system']['error_delete'] = "Errore durante l'eliminazione del file.";
+$ccms['lang']['system']['error_selection'] = "Nessun file selezionato.";
 $ccms['lang']['system']['error_versioninfo'] = "Informazione non disponibile.";
-$ccms['lang']['system']['error_misconfig'] 	= "<strong>Errore di configurazione.</strong><br/>Verificare che il file .htaccess sia correttamente configurato. Se<br/>CompactCMS &egrave; stato installato in una sottodirectory, modificare correttamente il file .htaccess.";
-$ccms['lang']['system']['error_deleted']	= "<h1>Il file selezionato non &egrave; stato trovato</h1><p>Aggiornare la lista dei file per mostrare i file attualmente disponibili e prevenire il suddetto errore. Se ci&ograve; non risolve il problema, controllare manualmente l'esistenza del file nella cartella dei contenuti.</p>";
-$ccms['lang']['system']['error_404title'] 	= "File non trovato";
-$ccms['lang']['system']['error_404header'] 	= "Errore 404, il file richiesto &egrave; inesistente.";
-$ccms['lang']['system']['error_sitemap'] 	= "Anteprima di tutte le pagine";
-$ccms['lang']['system']['tooriginal']		= "Torna all'originale";
-$ccms['lang']['system']['message_rights'] 	= "Tutti i diritti sono riservati.";
+$ccms['lang']['system']['error_misconfig'] = "<strong>Errore di configurazione.</strong><br/>Verificare che il file .htaccess sia correttamente configurato. Se<br/>CompactCMS &egrave; stato installato in una sottodirectory, modificare correttamente il file .htaccess.";
+$ccms['lang']['system']['error_deleted'] = "<h1>Il file selezionato non &egrave; stato trovato</h1><p>Aggiornare la lista dei file per mostrare i file attualmente disponibili e prevenire il suddetto errore. Se ci&ograve; non risolve il problema, controllare manualmente l'esistenza del file nella cartella dei contenuti.</p>";
+$ccms['lang']['system']['error_404title'] = "File non trovato";
+$ccms['lang']['system']['error_404header'] = "Errore 404, il file richiesto &egrave; inesistente.";
+$ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Il file richiesto <strong>{%pagereq%}.html</strong> non è stato trovato.";
+$ccms['lang']['system']['error_403title'] = /* BABELFISH */ "Proibito";
+$ccms['lang']['system']['error_403header'] = /* BABELFISH */ "A 403 Errore: non si dispone dell'autorizzazione per accedere al file richiesto.";
+$ccms['lang']['system']['error_403content'] = /* BABELFISH */ "Non hai i permessi per accedere a <strong>{%pagereq%}.html</strong> in questo momento.";
+$ccms['lang']['system']['error_sitemap'] = "Anteprima di tutte le pagine";
+$ccms['lang']['system']['error_tooshort'] = /* BABELFISH */ "valori presentati uno o più erano o troppo brevi o non corretta";
+$ccms['lang']['system']['error_passshort'] = /* BABELFISH */ "La password deve contenere più di 6 caratteri";
+$ccms['lang']['system']['error_passnequal'] = /* BABELFISH */ "Le password immesse non corrispondono";
+$ccms['lang']['system']['noresults'] = /* BABELFISH */ "Nessun risultato";
+$ccms['lang']['system']['tooriginal'] = "Torna all'originale";
+$ccms['lang']['system']['message_rights'] = "Tutti i diritti sono riservati.";
 $ccms['lang']['system']['message_compatible'] = "Testato su";
-$ccms['lang']['system']['error_notemplate']	= "Non ci sono template disponibili. Aggiungere almeno un template nella directory ./lib/templates/ map.";
 
 // Administration general messages
-$ccms['lang']['backend']['gethelp'] 		= "Suggerimenti o problemi? Visita <a href=\"http://www.compactcms.nl/forum/\" title=\"Visit the official forum\" class=\"external\" rel=\"external\">il forum</a>!";
-$ccms['lang']['backend']['ordertip'] 		= "Utilizzare la lista sotto per strutturare il menu del sito. Il sistema non gestisce i duplicati.";
-$ccms['lang']['backend']['createtip'] 		= "Per creare una nuova pagina, riempire il modulo sotto ad una nuova pagina sar&agrave; creata. Appena il file sar&agrave; creato sar&agrave; possibile modificarlo.";
-$ccms['lang']['backend']['currentfiles'] 	= "Nella lista sotto son presenti i file pubblicati. La pagina di default non pu&ograve; essere cancellata essendo la primapagina del sito. Gli altri file potrebbero essere soggette a restrizioni dell'amministratore.";
-$ccms['lang']['backend']['confirmdelete'] 	= "Cancellare le pagine selezionate ed il loro contenuto?";
-$ccms['lang']['backend']['changevalue'] 	= "Premi per cambiare";
-$ccms['lang']['backend']['previewpage'] 	= "Anteprima";
-$ccms['lang']['backend']['editpage'] 		= "Modifica";
-$ccms['lang']['backend']['restrictpage'] 	= "Riservato";
-$ccms['lang']['backend']['newfiledone'] 	= "Inserire il contenuto...";
-$ccms['lang']['backend']['newfilecreated'] 	= "Il file &egrave; stato creato con successo";
-$ccms['lang']['backend']['startedittitle'] 	= "Inizio modifica!";
-$ccms['lang']['backend']['starteditbody'] 	= "Nuovo file creato. Modificare il suo contenuto o aggiungere/gestire nuove pagine.";
-$ccms['lang']['backend']['success'] 		= "Riuscito!";
-$ccms['lang']['backend']['fileexists'] 		= "File esistente";
-$ccms['lang']['backend']['statusdelete'] 	= "Stato dell'eliminazione della selezione:";
-$ccms['lang']['backend']['statusremoved'] 	= "rimosso";
-$ccms['lang']['backend']['uptodate'] 		= "aggiornato.";
-$ccms['lang']['backend']['outofdate'] 		= "obsoleto.";
-$ccms['lang']['backend']['considerupdate'] 	= "Aggiornamento consigliato";
-$ccms['lang']['backend']['orderprefsaved'] 	= "Ordine dei menu salvato.";
-$ccms['lang']['backend']['inmenu'] 			= "Nel menu";
-$ccms['lang']['backend']['updatelist'] 		= "Aggiorna lista file";
-$ccms['lang']['backend']['administration'] 	= "Amministrazione";
-$ccms['lang']['backend']['currentversion'] 	= "Versione corrente";
-$ccms['lang']['backend']['mostrecent'] 		= "L'ultima versione di CompactCMS stabile &egrave;";
-$ccms['lang']['backend']['versionstatus'] 	= "La tua installazione &egrave;";
-$ccms['lang']['backend']['createpage'] 		= "Crea nuova pagina";
-$ccms['lang']['backend']['managemenu'] 		= "Gestisci menu";
-$ccms['lang']['backend']['managefiles'] 	= "Gestisci i file correnti";
-$ccms['lang']['backend']['delete'] 			= "Elimina";
-$ccms['lang']['backend']['toplevel'] 		= "Livello top";
-$ccms['lang']['backend']['sublevel'] 		= "Sottolivello";
-$ccms['lang']['backend']['active'] 			= "Attivo";
-$ccms['lang']['backend']['disabled'] 		= "Disabilitato";
-$ccms['lang']['backend']['template'] 		= "Categoria";
-$ccms['lang']['backend']['notinmenu'] 		= "L'oggetto non &egrave; nel men&ugrave;";
-$ccms['lang']['backend']['menutitle'] 		= "Menu";
-$ccms['lang']['backend']['linktitle'] 		= "Link";
-$ccms['lang']['backend']['item'] 			= "Oggetto";
-$ccms['lang']['backend']['yes'] 			= "S&igrave;";
-$ccms['lang']['backend']['no'] 				= "No";
+$ccms['lang']['backend']['gethelp'] = "Suggerimenti o problemi? Visita <a href='http://www.compactcms.nl/forum/' title='Visit the official forum' class='external' rel='external'>il forum</a>!";
+$ccms['lang']['backend']['ordertip'] = "Utilizzare la lista sotto per strutturare il menu del sito. Il sistema non gestisce i duplicati.";
+$ccms['lang']['backend']['createtip'] = "Per creare una nuova pagina, riempire il modulo sotto ad una nuova pagina sar&agrave; creata. Appena il file sar&agrave; creato sar&agrave; possibile modificarlo.";
+$ccms['lang']['backend']['currentfiles'] = "Nella lista sotto son presenti i file pubblicati. La pagina di default non pu&ograve; essere cancellata essendo la primapagina del sito. Gli altri file potrebbero essere soggette a restrizioni dell'amministratore.";
+$ccms['lang']['backend']['confirmdelete'] = "Cancellare le pagine selezionate ed il loro contenuto?";
+$ccms['lang']['backend']['confirmthumbregen'] = /* BABELFISH */ "Si prega di confermare che si desidera rigenerare tutte le miniature.";
+$ccms['lang']['backend']['settingssaved'] = /* BABELFISH */ "Le modifiche sono state salvate con successo.";
+$ccms['lang']['backend']['must_refresh'] = /* BABELFISH */ "Assicurati di ricaricare la pagina principale per vedere <strong>tutte</strong> le modifiche";
+$ccms['lang']['backend']['itemcreated'] = /* BABELFISH */ "Ha elaborato la voce presentata (s).";
+$ccms['lang']['backend']['fullremoved'] = /* BABELFISH */ "Ha eliminato la voce selezionata (s).";
+$ccms['lang']['backend']['fullregenerated'] = /* BABELFISH */ "Rigenerato con successo le miniature.";
+$ccms['lang']['backend']['tooverview'] = /* BABELFISH */ "Torna alla pagina precedente";
+$ccms['lang']['backend']['permissions'] = /* BABELFISH */ "Set CCMS autorizzazioni";
+$ccms['lang']['backend']['contentowners'] = /* BABELFISH */ "Definire i proprietari di contenuti";
+$ccms['lang']['backend']['templateeditor'] = "Template editor";
+$ccms['lang']['backend']['usermanagement'] = /* BABELFISH */ "Gestione degli utenti";
+$ccms['lang']['backend']['changevalue'] = "Premi per cambiare";
+$ccms['lang']['backend']['previewpage'] = "Anteprima";
+$ccms['lang']['backend']['editpage'] = "Modifica";
+$ccms['lang']['backend']['restrictpage'] = "Riservato";
+$ccms['lang']['backend']['newfiledone'] = "Inserire il contenuto...";
+$ccms['lang']['backend']['newfilecreated'] = "Il file &egrave; stato creato con successo";
+$ccms['lang']['backend']['startedittitle'] = "Inizio modifica!";
+$ccms['lang']['backend']['starteditbody'] = "Nuovo file creato. Modificare il suo contenuto o aggiungere/gestire nuove pagine.";
+$ccms['lang']['backend']['success'] = "Riuscito!";
+$ccms['lang']['backend']['fileexists'] = "File esistente";
+$ccms['lang']['backend']['statusdelete'] = "Stato dell'eliminazione della selezione:";
+$ccms['lang']['backend']['statusremoved'] = "rimosso";
+$ccms['lang']['backend']['uptodate'] = "aggiornato.";
+$ccms['lang']['backend']['outofdate'] = "obsoleto.";
+$ccms['lang']['backend']['considerupdate'] = "Aggiornamento consigliato";
+$ccms['lang']['backend']['orderprefsaved'] = "Ordine dei menu salvato.";
+$ccms['lang']['backend']['inmenu'] = "Nel menu";
+$ccms['lang']['backend']['updatelist'] = "Aggiorna lista file";
+$ccms['lang']['backend']['administration'] = "Amministrazione";
+$ccms['lang']['backend']['currentversion'] = "Versione corrente";
+$ccms['lang']['backend']['mostrecent'] = "L'ultima versione di CompactCMS stabile &egrave;";
+$ccms['lang']['backend']['versionstatus'] = "La tua installazione &egrave;";
+$ccms['lang']['backend']['createpage'] = "Crea nuova pagina";
+$ccms['lang']['backend']['managemenu'] = "Gestisci menu";
+$ccms['lang']['backend']['managefiles'] = "Gestisci i file correnti";
+$ccms['lang']['backend']['delete'] = "Elimina";
+$ccms['lang']['backend']['toplevel'] = "Livello top";
+$ccms['lang']['backend']['sublevel'] = "Sottolivello";
+$ccms['lang']['backend']['active'] = "Attivo";
+$ccms['lang']['backend']['disabled'] = "Disabilitato";
+$ccms['lang']['backend']['template'] = "Categoria";
+$ccms['lang']['backend']['notinmenu'] = "L'oggetto non &egrave; nel men&ugrave;";
+$ccms['lang']['backend']['menutitle'] = "Menu";
+$ccms['lang']['backend']['linktitle'] = "Link";
+$ccms['lang']['backend']['item'] = "Oggetto";
+$ccms['lang']['backend']['none'] = /* BABELFISH */ "Nessuno";
+$ccms['lang']['backend']['yes'] = "S&igrave;";
+$ccms['lang']['backend']['no'] = "No";
+$ccms['lang']['backend']['translation'] = /* BABELFISH */ "Traduzioni";
+$ccms['lang']['backend']['hello'] = /* BABELFISH */ "Ciao";
+$ccms['lang']['backend']['logout'] = "Log-out";
+$ccms['lang']['backend']['see_forum'] = /* BABELFISH */ "Vedere forum";
 
 // Texts for authentication screen
-$ccms['lang']['login']['welcome']			= "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
-$ccms['lang']['login']['username']			= "Username";
-$ccms['lang']['login']['password']			= "Password";
-$ccms['lang']['login']['login']				= "Login";
-$ccms['lang']['login']['provide']			= "Please provide your user credentials";
-$ccms['lang']['login']['nodetails']			= "Enter both your username and password";
-$ccms['lang']['login']['nouser']			= "Enter your username";
-$ccms['lang']['login']['nopass']			= "Enter your password";
-$ccms['lang']['login']['notactive']			= "This account has been deactivated";
-$ccms['lang']['login']['falsetries']		= "Note that you already made multiple attempts";
-$ccms['lang']['login']['nomatch']			= "Incorrect username or password";
+$ccms['lang']['login']['welcome'] = /* BABELFISH */ "<p>Usa un nome utente e password validi per accedere al back-end CompactCMS. Se sei arrivato qui per errore, tornare alla <a href='admin/includes/'>home page</a>.</p> <p>Contattare il webmaster per i vostri dati.</p>";
+$ccms['lang']['login']['username'] = "Username";
+$ccms['lang']['login']['password'] = "Password";
+$ccms['lang']['login']['login'] = "Login";
+$ccms['lang']['login']['provide'] = /* BABELFISH */ "Si prega di fornire le credenziali utente";
+$ccms['lang']['login']['nodetails'] = /* BABELFISH */ "Inserisci il tuo nome utente e la password";
+$ccms['lang']['login']['nouser'] = /* BABELFISH */ "Inserisci il tuo nome";
+$ccms['lang']['login']['nopass'] = /* BABELFISH */ "Inserisci la tua password";
+$ccms['lang']['login']['notactive'] = /* BABELFISH */ "Questo account è stato disattivato";
+$ccms['lang']['login']['falsetries'] = /* BABELFISH */ "Si noti che è già fatto più tentativi";
+$ccms['lang']['login']['nomatch'] = /* BABELFISH */ "Utente o password incorrette";
 
 // Menu titles for administration back-end
-$ccms['lang']['menu']['1']				= "Principale";
-$ccms['lang']['menu']['2']				= "Sinistra";
-$ccms['lang']['menu']['3']				= "Destra";
-$ccms['lang']['menu']['4']				= "Fondo";
-$ccms['lang']['menu']['5']				= "Extra";
+$ccms['lang']['menu']['1'] = "Principale";
+$ccms['lang']['menu']['2'] = "Sinistra";
+$ccms['lang']['menu']['3'] = "Destra";
+$ccms['lang']['menu']['4'] = "Fondo";
+$ccms['lang']['menu']['5'] = "Extra";
 
 // Administration form related texts
-$ccms['lang']['forms']['filename'] 		= "Nome file";
-$ccms['lang']['forms']['pagetitle'] 	= "Titolo pagina";
-$ccms['lang']['forms']['subheader'] 	= "Sottotitolo";
-$ccms['lang']['forms']['description'] 	= "Descrizione";
-$ccms['lang']['forms']['module'] 		= "Module";
-$ccms['lang']['forms']['contentitem']	= "Content item (default)";
-$ccms['lang']['forms']['additions']		= "Additions";
-$ccms['lang']['forms']['printable'] 	= "Stampabile";
-$ccms['lang']['forms']['published'] 	= "Attiva";
-$ccms['lang']['forms']['createbutton'] 	= "Crea!";
-$ccms['lang']['forms']['savebutton'] 	= "Salva";
-$ccms['lang']['forms']['iscoding'] 		= "Codice";
+$ccms['lang']['forms']['filename'] = "Nome file";
+$ccms['lang']['forms']['pagetitle'] = "Titolo pagina";
+$ccms['lang']['forms']['subheader'] = "Sottotitolo";
+$ccms['lang']['forms']['description'] = "Descrizione";
+$ccms['lang']['forms']['module'] = /* BABELFISH */ "Modulo";
+$ccms['lang']['forms']['contentitem'] = /* BABELFISH */ "Elementi di contenuto (default)";
+$ccms['lang']['forms']['additions'] = /* BABELFISH */ "Aggiunte";
+$ccms['lang']['forms']['printable'] = "Stampabile";
+$ccms['lang']['forms']['published'] = "Attiva";
+$ccms['lang']['forms']['iscoding'] = "Codice";
+$ccms['lang']['forms']['createbutton'] = "Crea!";
+$ccms['lang']['forms']['modifybutton'] = /* BABELFISH */ "Modifica";
+$ccms['lang']['forms']['savebutton'] = "Salva";
+$ccms['lang']['forms']['setlocale'] = /* BABELFISH */ "Front-end lingua";
+$ccms['lang']['forms']['filter_showing'] = /* BABELFISH */ "in questo momento stiamo solo mostrando le pagine che hanno almeno in questo testo qui";
+$ccms['lang']['forms']['edit_remove'] = /* BABELFISH */ "Modificare o rimuovere il filtro per";
+$ccms['lang']['forms']['add'] = /* BABELFISH */ "Aggiungi filtro per";
 
 // Administration hints for form fields
-$ccms['lang']['hints']['filename'] 		= "Indirizzo URL (home.html) :: Nome del file (senza estensione .html)";
-$ccms['lang']['hints']['pagetitle'] 	= "Titolo della pagina (Home) :: Breve descrizione della pagina.";
-$ccms['lang']['hints']['subheader'] 	= "Intestazione della pagina (Benvenuto nel nostro sito) :: Una breve descrizione utilizzata sia in ogni pagina sia come titolo nella barra del broswer.";
-$ccms['lang']['hints']['description'] 	= "Codici Meta :: Descrizione unica di questa pagina (utilizzata anche nei dati meta).";
-$ccms['lang']['hints']['module']		= "Module :: Select what module should handle the content of this file. If you are unsure, select the default.";
-$ccms['lang']['hints']['printable'] 	= "Stampabile :: In caso positivo viene creata una pagina stampabile. 'NO' dovrebbe essere selezionato per le pagine contenenti immagini ed elementi multimediali.";
-$ccms['lang']['hints']['published'] 	= "Pubblicato? :: Selezionare la casella se si vuole pubblicare la pagina per renderla accessibile al pubblico ed inclusa nella sitemap.";
-$ccms['lang']['hints']['toplevel'] 		= "Livello Top :: Specifica il livello pi&ugrave;alto per questo menu. Selezionare N.I.M. per non includerla nei menu.";
-$ccms['lang']['hints']['sublevel'] 		= "Sottolivello :: Selezionando 0 l'oggetto del menu &egrave; nel livello pi&ugrave; alto. Se invece &egrave; un sottolivello per un certo menu, selezionare ilsottolivello appropriato.";
-$ccms['lang']['hints']['template'] 		= "Categoria :: Se si usano template multipli, &egrave; possibile categorizzare i menu in base al template.";
-$ccms['lang']['hints']['activelink'] 	= "Menu attivo? :: Non tutte le pagine necessitano di un link attivo. Per disattivare una pagina premere la checkbox corrispondente.";
-$ccms['lang']['hints']['menuid'] 		= "Categoria Menu :: Selezione in quale menu questo oggetto deve essere inserito. Il default &egrave; il main menu (1), in cui &egrave; mostrato il link alla homepage.";
-$ccms['lang']['hints']['iscoding'] 		= "Contiene codice :: Il file contiene codice (es. PHP o Javascript)? Selezionado 'S&igrave;' &egrave; possibile inserire il proprio codice a mano nell'editor della pagina.";
+$ccms['lang']['hints']['filename'] = "Indirizzo URL (home.html) :: Nome del file (senza estensione .html)";
+$ccms['lang']['hints']['pagetitle'] = "Titolo della pagina (Home) :: Breve descrizione della pagina.";
+$ccms['lang']['hints']['subheader'] = "Intestazione della pagina (Benvenuto nel nostro sito) :: Una breve descrizione utilizzata sia in ogni pagina sia come titolo nella barra del broswer.";
+$ccms['lang']['hints']['description'] = "Codici Meta :: Descrizione unica di questa pagina (utilizzata anche nei dati meta).";
+$ccms['lang']['hints']['module'] = /* BABELFISH */ "Modulo :: selezionare quale modulo dovrebbe gestire il contenuto di questo file. Se si è sicuri, selezionare l'impostazione predefinita.";
+$ccms['lang']['hints']['printable'] = "Stampabile :: In caso positivo viene creata una pagina stampabile. 'NO' dovrebbe essere selezionato per le pagine contenenti immagini ed elementi multimediali.";
+$ccms['lang']['hints']['published'] = "Pubblicato? :: Selezionare la casella se si vuole pubblicare la pagina per renderla accessibile al pubblico ed inclusa nella sitemap.";
+$ccms['lang']['hints']['toplevel'] = "Livello Top :: Specifica il livello pi&ugrave;alto per questo menu. Selezionare N.I.M. per non includerla nei menu.";
+$ccms['lang']['hints']['sublevel'] = "Sottolivello :: Selezionando 0 l'oggetto del menu &egrave; nel livello pi&ugrave; alto. Se invece &egrave; un sottolivello per un certo menu, selezionare ilsottolivello appropriato.";
+$ccms['lang']['hints']['template'] = "Categoria :: Se si usano template multipli, &egrave; possibile categorizzare i menu in base al template.";
+$ccms['lang']['hints']['activelink'] = "Menu attivo? :: Non tutte le pagine necessitano di un link attivo. Per disattivare una pagina premere la checkbox corrispondente.";
+$ccms['lang']['hints']['menuid'] = "Categoria Menu :: Selezione in quale menu questo oggetto deve essere inserito. Il default &egrave; il main menu (1), in cui &egrave; mostrato il link alla homepage.";
+$ccms['lang']['hints']['iscoding'] = "Contiene codice :: Il file contiene codice (es. PHP o Javascript)? Selezionado 'S&igrave;' &egrave; possibile inserire il proprio codice a mano nell'editor della pagina.";
+$ccms['lang']['hints']['filter'] = /* BABELFISH */ "<br><br>È possibile fare clic sul <span class='sprite livefilter livefilter_active'> icona del filtro a sinistra del titolo per aggiungere, modificare o rimuovere un testo per filtrare l'elenco pagina, ad esempio quando si 'tipo' a casa nel campo di modifica che appare quando si fa clic sull'icona, quindi premere il tasto Invio / tasto Invio, solo le pagine che hanno a casa 'il testo' in questa colonna sarà mostrata. <br>Facendo clic sull'icona di nuovo e cancellare il testo nel campo di modifica, quindi premendo il tasto 'Invio', verrà rimosso il filtro.<br>Al passaggio del mouse sopra l'icona del filtro per vedere se la colonna è attualmente in fase di filtrato e, se sì, con quale testo del filtro.";
 
 // Editor messages
-$ccms['lang']['editor']['closeeditor'] 	= "Chiudi l'editor";
-$ccms['lang']['editor']['editorfor'] 	= "Editor di testo per";
-$ccms['lang']['editor']['instruction'] 	= "Utilizzare l'editor sotto per modificare il file corrente. Premere poi il pulsante \"Salva cambiamenti\" per pubblicare le modifiche ed aggiornare automaticamente il sito.";
-$ccms['lang']['editor']['savebtn'] 		= "Salva cambiamenti";
-$ccms['lang']['editor']['cancelbtn'] 	= "Annulla";
+$ccms['lang']['editor']['closeeditor'] = "Chiudi l'editor";
+$ccms['lang']['editor']['editorfor'] = "Editor di testo per";
+$ccms['lang']['editor']['instruction'] = "Utilizzare l'editor sotto per modificare il file corrente. Premere poi il pulsante 'Salva cambiamenti' per pubblicare le modifiche ed aggiornare automaticamente il sito.";
+$ccms['lang']['editor']['savebtn'] = "Salva cambiamenti";
+$ccms['lang']['editor']['cancelbtn'] = "Annulla";
 $ccms['lang']['editor']['confirmclose'] = "Chiudere la finestra e scartare le modifiche?";
-$ccms['lang']['editor']['preview'] 		= "Anteprima pagina";
-$ccms['lang']['editor']['savesuccess'] 	= "<strong>Successo!</strong> Il contenuto sotto &egrave; stato salvato in ";
-$ccms['lang']['editor']['backeditor'] 	= "Torna all'editor";
-$ccms['lang']['editor']['closewindow'] 	= "Chiudi finestra";
-$ccms['lang']['editor']['keywords'] 	= "Parole chiave - <em> separate da virgole, massimo 250 caratteri </ em>";
+$ccms['lang']['editor']['preview'] = "Anteprima pagina";
+$ccms['lang']['editor']['savesuccess'] = "<strong>Successo!</strong> Il contenuto sotto &egrave; stato salvato in ";
+$ccms['lang']['editor']['backeditor'] = "Torna all'editor";
+$ccms['lang']['editor']['closewindow'] = "Chiudi finestra";
+$ccms['lang']['editor']['keywords'] = "Parole chiave - <em> separate da virgole, massimo 250 caratteri </ em>";
+
+// Authorization messages
+$ccms['lang']['auth']['generatepass'] = /* BABELFISH */ "Auto generare una password sicura";
+$ccms['lang']['auth']['featnotallowed'] = /* BABELFISH */ "Il tuo livello di conto corrente non consente di utilizzare questa funzionalità.";
 
 ################### MODULES ###################
 
 // Back-up messages
-$ccms['lang']['backup']['createhd']		= "Create new back-up";
-$ccms['lang']['backup']['explain']		= "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files reguraly.";
-$ccms['lang']['backup']['currenthd']	= "Available back-ups";
-$ccms['lang']['backup']['timestamp']	= "Back-up file name";
-$ccms['lang']['backup']['download']		= "Download archive";
+$ccms['lang']['backup']['createhd'] = /* BABELFISH */ "Crea nuovo back-up";
+$ccms['lang']['backup']['explain'] = "To prevent possible loss of data due to whatever external event, it's wise to create back-ups of your files reguraly.";
+$ccms['lang']['backup']['warn4media'] = /* BABELFISH */ "Attenzione :: Si prega di essere consapevole del fatto che la tua <dfn>lightbox</dfn> 'immagini album sono <strong>non</strong> backup descrizioni! L'album <strong>sono</strong>, ma le immagini stesse e le loro miniature sono <strong>non inclusi in queste copie di backup</strong>con. Se si desidera che i backup di questi, allora è necessario conferire l'amministratore del sito su un sistema di backup aggiuntive che consentono di backup e ripristino di questi (forse grande) collezioni di file.";
+$ccms['lang']['backup']['currenthd'] = /* BABELFISH */ "Disponibile back-up";
+$ccms['lang']['backup']['timestamp'] = /* BABELFISH */ "nome del file di back-up";
+$ccms['lang']['backup']['download'] = /* BABELFISH */ "Download archivio";
+$ccms['lang']['backup']['wait4backup'] = /* BABELFISH */ "Si prega di attendere il backup è stato creato ...";
+
+// User management messages
+$ccms['lang']['users']['createuser'] = /* BABELFISH */ "Creare un utente";
+$ccms['lang']['users']['overviewusers'] = /* BABELFISH */ "Panoramica CCMS utenti";
+$ccms['lang']['users']['editdetails'] = /* BABELFISH */ "Modifica dati personali dell'utente";
+$ccms['lang']['users']['editpassword'] = /* BABELFISH */ "Modificare la password dell'utente";
+$ccms['lang']['users']['accountcfg'] = /* BABELFISH */ "Impostazioni account";
+$ccms['lang']['users']['user'] = /* BABELFISH */ "Utente";
+$ccms['lang']['users']['username'] = "Username";
+$ccms['lang']['users']['name'] = /* BABELFISH */ "Nome";
+$ccms['lang']['users']['firstname'] = /* BABELFISH */ "Nome";
+$ccms['lang']['users']['lastname'] = /* BABELFISH */ "Cognome";
+$ccms['lang']['users']['password'] = "Password";
+$ccms['lang']['users']['cpassword'] = /* BABELFISH */ "Conferma la password";
+$ccms['lang']['users']['email'] = "E-mail";
+$ccms['lang']['users']['active'] = /* BABELFISH */ "Attivo";
+$ccms['lang']['users']['level'] = /* BABELFISH */ "Livello";
+$ccms['lang']['users']['userlevel'] = /* BABELFISH */ "A livello di utente";
+$ccms['lang']['users']['lastlog'] = /* BABELFISH */ "Ultimo log";
+
+// Template editor
+$ccms['lang']['template']['manage'] = /* BABELFISH */ "Gestire i modelli";
+$ccms['lang']['template']['nowrite'] = /* BABELFISH */ "Il modello attuale è <strong>non</strong> scrivibile";
+$ccms['lang']['template']['print'] = /* BABELFISH */ "Stampa";
+
+// Permissions
+$ccms['lang']['permission']['header'] = /* BABELFISH */ "Autorizzazione preferenze";
+$ccms['lang']['permission']['explain'] = /* BABELFISH */ "Utilizzare la tabella riportata di seguito per specificare quale livello minimo utente può utilizzare alcune funzionalità. Ogni utente al di sotto del livello minimo specificato dall'utente richiesta, non verrà visualizzato, né hanno accesso alla funzione.";
+$ccms['lang']['permission']['target'] = "Target";
+$ccms['lang']['permission']['level1'] = /* BABELFISH */ "Livello 1 - Istruzioni";
+$ccms['lang']['permission']['level2'] = /* BABELFISH */ "Livello 2 - Editor";
+$ccms['lang']['permission']['level3'] = /* BABELFISH */ "Livello 3 - Direttore";
+$ccms['lang']['permission']['level4'] = /* BABELFISH */ "Livello 4 - Admin";
+
+// Content owners
+$ccms['lang']['owners']['header'] = /* BABELFISH */ "I proprietari del contenuto";
+$ccms['lang']['owners']['explain'] = /* BABELFISH */ "Qui è possibile nominare la proprietà di pagina specifica per i singoli utenti. Se per una certa pagina non vi sono utenti selezionati, tutti possono modificare la pagina. In caso contrario, solo l'utente ha specificato diritti di modifica al file. Gli amministratori hanno sempre accesso a tutti i file.";
+$ccms['lang']['owners']['pages'] = /* BABELFISH */ "Pagine";
+$ccms['lang']['owners']['users'] = /* BABELFISH */ "Utenti";
+
+// Translation assistance page 
+$ccms['lang']['translation']['header'] = /* BABELFISH */ "Traduci";
+$ccms['lang']['translation']['explain'] = /* BABELFISH */ "Mostra le stringhe di traduzione.";
 
 // Album messages
-$ccms['lang']['album']['album']			= "Album";
-$ccms['lang']['album']['errordir']		= "The specified album name is too short (min. 4).";
-$ccms['lang']['album']['newdircreated']	= "album directory has been created.";
-$ccms['lang']['album']['renamed']		= "has been renamed to";
-$ccms['lang']['album']['removed']		= "and all of its contents have been removed.";
-$ccms['lang']['album']['refresh']		= "Refresh";
-$ccms['lang']['album']['manage']		= "Manage albums";
-$ccms['lang']['album']['albumlist']		= "Album list";
-$ccms['lang']['album']['newalbum']		= "New album name";
-$ccms['lang']['album']['noalbums']		= "No albums have been created yet!";
-$ccms['lang']['album']['directory']		= "Directory (#)";
-$ccms['lang']['album']['tooverview']	= "Return to overview";
-$ccms['lang']['album']['nodir']			= "Please make sure the directory <strong>albums</strong> exists in your image directory";
+$ccms['lang']['album']['album'] = "Album";
+$ccms['lang']['album']['settings'] = /* BABELFISH */ "Album impostazioni";
+$ccms['lang']['album']['apply_to'] = /* BABELFISH */ "In particolare si applicano a questo album";
+$ccms['lang']['album']['description'] = /* BABELFISH */ "Album descrizione";
+$ccms['lang']['album']['currentalbums'] = /* BABELFISH */ "album di corrente";
+$ccms['lang']['album']['uploadcontent'] = /* BABELFISH */ "Carica il contenuto";
+$ccms['lang']['album']['toexisting'] = /* BABELFISH */ "Carica esistenti album";
+$ccms['lang']['album']['upload'] = /* BABELFISH */ "Inizia upload";
+$ccms['lang']['album']['browse'] = /* BABELFISH */ "Sfogliare i file";
+$ccms['lang']['album']['clear'] = /* BABELFISH */ "Cancella elenco";
+$ccms['lang']['album']['singlefile'] = /* BABELFISH */ "<strong>Singolo file upload</strong><br> <p>Il caricatore Flash è riuscito a inizializzare. Assicurarsi che Javascript sia abilitato e Flash è installato. upload di file singole sono possibili, ma non ottimizzati.</p>";
+$ccms['lang']['album']['manage'] = "Manage albums";
+$ccms['lang']['album']['albumlist'] = /* BABELFISH */ "Lista album";
+$ccms['lang']['album']['regenalbumthumbs'] = /* BABELFISH */ "Rigenerare miniature tutti";
+$ccms['lang']['album']['newalbum'] = "New album name";
+$ccms['lang']['album']['noalbums'] = /* BABELFISH */ "Nessun album sono stati ancora creato!";
+$ccms['lang']['album']['files'] = "Files";
+$ccms['lang']['album']['nodir'] = "Please make sure the directory <strong>albums</strong> exists in your image directory";
+$ccms['lang']['album']['lastmod'] = /* BABELFISH */ "Ultima modifica";
+$ccms['lang']['album']['please_wait'] = /* BABELFISH */ "Si prega di attendere ...";
+
+// News messages
+$ccms['lang']['news']['manage'] = /* BABELFISH */ "Gestire le notizie attuali";
+$ccms['lang']['news']['addnews'] = /* BABELFISH */ "Aggiungi le notizie";
+$ccms['lang']['news']['addnewslink'] = /* BABELFISH */ "Scrivi nuovo articolo";
+$ccms['lang']['news']['settings'] = /* BABELFISH */ "Gestire le impostazioni";
+$ccms['lang']['news']['writenews'] = /* BABELFISH */ "Scrivere news";
+$ccms['lang']['news']['numbermess'] = /* BABELFISH */ "Messaggio # sul front-end";
+$ccms['lang']['news']['showauthor'] = /* BABELFISH */ "Mostra autore";
+$ccms['lang']['news']['showdate'] = /* BABELFISH */ "Mostra data di pubblicazione";
+$ccms['lang']['news']['showteaser'] = /* BABELFISH */ "Mostra solo teaser";
+$ccms['lang']['news']['title'] = /* BABELFISH */ "Notizie titolo";
+$ccms['lang']['news']['author'] = /* BABELFISH */ "News autore";
+$ccms['lang']['news']['date'] = /* BABELFISH */ "Data";
+$ccms['lang']['news']['published'] = /* BABELFISH */ "Pubblicato?";
+$ccms['lang']['news']['teaser'] = "Teaser";
+$ccms['lang']['news']['contents'] = /* BABELFISH */ "Articolo contenuti";
+$ccms['lang']['news']['viewarchive'] = /* BABELFISH */ "Visualizza l'archivio";
 
 // Guestbook message
-$ccms['lang']['guestbook']['guestbook']	= "Guestbook";
-$ccms['lang']['guestbook']['noposts']	= "No reactions have been posted yet!";
-$ccms['lang']['guestbook']['verinstr']	= "To check that this message isn't automated, please re-enter";
-$ccms['lang']['guestbook']['reaction']	= "Reaction";
-$ccms['lang']['guestbook']['rating']	= "Rating";
-$ccms['lang']['guestbook']['avatar']	= "Gravatar.com user avatar";
-$ccms['lang']['guestbook']['wrote']		= "wrote";
-$ccms['lang']['guestbook']['manage']	= "Manage reactions";
-$ccms['lang']['guestbook']['delentry']	= "Delete this entry";
-$ccms['lang']['guestbook']['sendmail']	= "E-mail author";
-$ccms['lang']['guestbook']['removed'] 	= "has been removed from the database.";
-$ccms['lang']['guestbook']['name'] 		= "Your name";
-$ccms['lang']['guestbook']['email']		= "Your e-mail";
-$ccms['lang']['guestbook']['website']	= "Your website";
-$ccms['lang']['guestbook']['comments']	= "Comments";
-$ccms['lang']['guestbook']['verify']	= "Verification";
-$ccms['lang']['guestbook']['preview']	= "Preview comment";
-$ccms['lang']['guestbook']['add']		= "Add your comments";
-$ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
+$ccms['lang']['guestbook']['noposts'] = /* BABELFISH */ "Nessuna reazione è stato pubblicato ancora!";
+$ccms['lang']['guestbook']['verinstr'] = /* BABELFISH */ "Per verificare che questo messaggio non è automatizzato, per favore rientrare";
+$ccms['lang']['guestbook']['reaction'] = /* BABELFISH */ "Reazione";
+$ccms['lang']['guestbook']['rating'] = "Rating";
+$ccms['lang']['guestbook']['avatar'] = /* BABELFISH */ "Gravatar.com utente avatar";
+$ccms['lang']['guestbook']['wrote'] = /* BABELFISH */ "ha scritto";
+$ccms['lang']['guestbook']['manage'] = /* BABELFISH */ "Gestire le reazioni";
+$ccms['lang']['guestbook']['delentry'] = /* BABELFISH */ "Eliminare questa voce";
+$ccms['lang']['guestbook']['sendmail'] = /* BABELFISH */ "E-mail autore";
+$ccms['lang']['guestbook']['removed'] = /* BABELFISH */ "è stato rimosso dal database.";
+$ccms['lang']['guestbook']['name'] = /* BABELFISH */ "Il tuo nome";
+$ccms['lang']['guestbook']['email'] = /* BABELFISH */ "Il tuo indirizzo e-mail";
+$ccms['lang']['guestbook']['website'] = /* BABELFISH */ "Il tuo sito web";
+$ccms['lang']['guestbook']['comments'] = /* BABELFISH */ "Commenti";
+$ccms['lang']['guestbook']['verify'] = /* BABELFISH */ "Verifica";
+$ccms['lang']['guestbook']['preview'] = /* BABELFISH */ "Anteprima del commento";
+$ccms['lang']['guestbook']['add'] = /* BABELFISH */ "Aggiungi il tuo commento";
+$ccms['lang']['guestbook']['posted'] = "Comment has been posted!";
+$ccms['lang']['guestbook']['success'] = /* BABELFISH */ "Grazie";
+$ccms['lang']['guestbook']['error'] = /* BABELFISH */ "Errori & Respingimenti";
+$ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Il tuo commento è stato respinto.";
 
 
       /* ### OBSOLETED ENTRIES ### */
@@ -227,26 +337,17 @@ $ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
        
          ----------------------------------------------------------
 	
-	$ccms['lang']['album']['directory']		
-	$ccms['lang']['album']['errordir']		
-	$ccms['lang']['album']['newdircreated']	
 	$ccms['lang']['album']['nodir']			
-	$ccms['lang']['album']['refresh']		
-	$ccms['lang']['album']['removed']		
-	$ccms['lang']['album']['renamed']		
-	$ccms['lang']['album']['tooverview']	
 	$ccms['lang']['backend']['fileexists'] 		
 	$ccms['lang']['backend']['startedittitle'] 	
-	$ccms['lang']['backend']['updatelist'] 		
-	$ccms['lang']['editor']['closeeditor'] 	
-	$ccms['lang']['guestbook']['guestbook']	
+	$ccms['lang']['backend']['updatelist']		
+	$ccms['lang']['editor']['closeeditor']	
 	$ccms['lang']['guestbook']['reaction']	
 	$ccms['lang']['guestbook']['removed'] 	
 	$ccms['lang']['login']['falsetries']		
 	$ccms['lang']['login']['provide']			
-	$ccms['lang']['system']['error_default'] 	
+	$ccms['lang']['system']['error_default']	
 	$ccms['lang']['system']['error_sitemap'] 	
-	$ccms['lang']['system']['tooriginal']		
        
          ----------------------------------------------------------
 	
@@ -262,94 +363,6 @@ $ccms['lang']['guestbook']['posted']	= "Comment has been posted!";
          ----------------------------------------------------------
       */
 	  
-$ccms['lang']['album']['apply_to']		= "Specifically apply this album to";
-$ccms['lang']['album']['browse']		= "Browse files";
-$ccms['lang']['album']['clear']			= "Clear list";
-$ccms['lang']['album']['currentalbums']	= "Current albums";
-$ccms['lang']['album']['description']	= "Album description";
-$ccms['lang']['album']['files']			= "Files";
-$ccms['lang']['album']['lastmod']		= "Last modified";
-$ccms['lang']['album']['please_wait'] 	= "Please wait ...";
-$ccms['lang']['album']['regenalbumthumbs']	= "Regenerate all thumbnails";
-$ccms['lang']['album']['settings']		= "Album settings";
-$ccms['lang']['album']['singlefile']	= "<strong>Single file upload</strong><br/><p>The Flash loader failed to initialize. Make sure Javascript is enabled and Flash is installed. Single file uploads are possible, but not optimized.</p>";
-$ccms['lang']['album']['toexisting']	= "Upload to existing album";
-$ccms['lang']['album']['upload']		= "Start upload";
-$ccms['lang']['album']['uploadcontent']	= "Upload content";
-$ccms['lang']['auth']['featnotallowed']	= "Your current account level does not allow you to use this feature.";
-$ccms['lang']['auth']['generatepass'] 	= "Auto generate a safe password";
-$ccms['lang']['backend']['confirmthumbregen'] 	= "Please confirm that you want to regenerate all thumbnails.";
-$ccms['lang']['backend']['contentowners']	= "Define content owners";
-$ccms['lang']['backend']['fullregenerated']	= "Successfully regenerated the thumbnails.";
-$ccms['lang']['backend']['fullremoved']		= "Successfully deleted the selected item(s).";
-$ccms['lang']['backend']['itemcreated']		= "Successfully processed the submitted item(s).";
-$ccms['lang']['backend']['must_refresh']	= "Please make sure to reload the main page to see <strong>all</strong> your changes";
-$ccms['lang']['backend']['none']			= "None";
-$ccms['lang']['backend']['permissions']		= "Set CCMS permissions";
-$ccms['lang']['backend']['settingssaved']	= "Your changes have been successfully saved.";
-$ccms['lang']['backend']['templateeditor']	= "Template editor";
-$ccms['lang']['backend']['tooverview']		= "Back to overview";
-$ccms['lang']['backend']['usermanagement']	= "User management";
-$ccms['lang']['forms']['add']           = "Add filter for";
-$ccms['lang']['forms']['edit_remove']   = "Edit or remove filter for";
-$ccms['lang']['forms']['filter_showing']	= "right now we're only showing pages which have at least this text in here";
-$ccms['lang']['forms']['modifybutton'] 	= "Modify";
-$ccms['lang']['forms']['setlocale']		= "Front-end language";
-$ccms['lang']['guestbook']['error']		= "Failures &amp; Rejections";
-$ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
-$ccms['lang']['guestbook']['success']	= "Thank you";
-$ccms['lang']['hints']['filter']        = "<br>You can click on the <span class='sprite livefilter livefilter_active'>&#160;filter icon</span> at left of the title to add, edit or remove a text to filter the page list on, e.g. when you type 'home' in the edit field which appears when you click the icon, then press the Enter/Return key, only pages which have the text 'home' in this column will be shown. <br>Clicking the icon again and deleting the text in the edit field, then pressing the Enter/Return key, will remove the filter.<br>Hover over the filter icon to see whether the column is currently being filtered, and if so, using which filter text.";
-$ccms['lang']['news']['addnews']		= "Add news";
-$ccms['lang']['news']['addnewslink']	= "Write new article";
-$ccms['lang']['news']['author']			= "News author";
-$ccms['lang']['news']['contents']		= "Article contents";
-$ccms['lang']['news']['date']			= "Date";
-$ccms['lang']['news']['manage']			= "Manage current news items";
-$ccms['lang']['news']['numbermess']		= "# messages on front-end";
-$ccms['lang']['news']['published']		= "Published?";
-$ccms['lang']['news']['settings']		= "Manage settings";
-$ccms['lang']['news']['showauthor']		= "Show author";
-$ccms['lang']['news']['showdate']		= "Show publication date";
-$ccms['lang']['news']['showteaser']		= "Only show teaser";
-$ccms['lang']['news']['teaser']			= "Teaser";
-$ccms['lang']['news']['title']			= "News title";
-$ccms['lang']['news']['viewarchive']	= "View archive";
-$ccms['lang']['news']['writenews']		= "Write news";
-$ccms['lang']['owners']['explain']		= "Here you can appoint specific page ownership to individual users. If for a cartain page no users are selected, everyone can modify the page. Otherwise only the specified user had modification rights to the file. Administrators always have access to all files.";
-$ccms['lang']['owners']['header']		= "Content owners";
-$ccms['lang']['owners']['pages']		= "Pages";
-$ccms['lang']['owners']['users']		= "Users";
-$ccms['lang']['permission']['explain']	= "Use the table below to specify what minimum user level can use certain features. Any user below the specified minimum required user level, will not see nor have access to the feature.";
-$ccms['lang']['permission']['header']	= "Permission preferences";
-$ccms['lang']['permission']['level1']	= "Level 1 - User";
-$ccms['lang']['permission']['level2']	= "Level 2 - Editor";
-$ccms['lang']['permission']['level3']	= "Level 3 - Manager";
-$ccms['lang']['permission']['level4']	= "Level 4 - Admin";
-$ccms['lang']['permission']['target']	= "Target";
-$ccms['lang']['system']['error_dirwrite']	= "Directory has no write access";
-$ccms['lang']['system']['error_passnequal']	= "The entered passwords did not match";
-$ccms['lang']['system']['error_passshort']	= "A password should contain more than 6 characters";
-$ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrect";
-$ccms['lang']['system']['noresults']		= "No results";
-$ccms['lang']['template']['manage']		= "Manage templates";
-$ccms['lang']['template']['nowrite']	= "The current template is <strong>not</strong> writable";
-$ccms['lang']['users']['accountcfg']	= "Account settings";
-$ccms['lang']['users']['active']		= "Active";
-$ccms['lang']['users']['cpassword']		= "Confirm password";
-$ccms['lang']['users']['createuser']	= "Create a user";
-$ccms['lang']['users']['editdetails']	= "Edit user's personal details";
-$ccms['lang']['users']['editpassword']	= "Edit user's password";
-$ccms['lang']['users']['email']			= "E-mail";
-$ccms['lang']['users']['firstname']		= "First name";
-$ccms['lang']['users']['lastlog']		= "Last log";
-$ccms['lang']['users']['lastname']		= "Last name";
-$ccms['lang']['users']['level']			= "Level";
-$ccms['lang']['users']['name']			= "Name";
-$ccms['lang']['users']['overviewusers']	= "Overview CCMS users";
-$ccms['lang']['users']['password']		= "Password";
-$ccms['lang']['users']['user']			= "User";
-$ccms['lang']['users']['userlevel']		= "User level";
-$ccms['lang']['users']['username']		= "Username";
        
       /*
          ----------------------------------------------------------

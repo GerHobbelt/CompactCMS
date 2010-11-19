@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -109,8 +109,9 @@ function confirmation()
 			
 		<div class="span-16 colborder">
 		<h2><?php echo $ccms['lang']['guestbook']['manage']; ?></h2>
-		<?php // Load recordset
-		if (!$db->Query("SELECT * FROM `".$cfg['db_prefix']."modcomment` WHERE pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT) . " ORDER BY `commentID` DESC"))
+		<?php 
+		// Load recordset; most recent comments on top; the extra order by commentID bit is there to ensure the sort/order is repeatable.
+		if (!$db->SelectRows($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID')))
 			$db->Kill();
 	
 		// Start switch for news, select all the right details
@@ -136,7 +137,7 @@ function confirmation()
 					if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
 					{ 
 					?>
-						<span class="ss_sprite ss_cross small"><a onclick="return confirmation()" href="comment.Process.php?pageID=<?php echo $pageID;?>&amp;commentID=<?php echo $rsComment->commentID;?>&amp;action=del-comment"><?php echo $ccms['lang']['guestbook']['delentry'];?></a></span>
+						<span class="ss_sprite ss_cross small"><a onclick="return confirmation()" href="comment.Process.php?pageID=<?php echo $pageID; ?>&amp;commentID=<?php echo rm0lead($rsComment->commentID); ?>&amp;action=del-comment"><?php echo $ccms['lang']['guestbook']['delentry'];?></a></span>
 					<?php 
 					} 
 					?>
@@ -147,9 +148,13 @@ function confirmation()
 				</div>
 				<hr class="space" />
 				<?php 
-				$i++; 
 			}
-		} else echo $ccms['lang']['guestbook']['noposts']; ?>
+		} 
+		else 
+		{
+			echo $ccms['lang']['guestbook']['noposts']; 
+		}
+		?>
 		</div>
 	
 		<div class="span-6">
@@ -157,14 +162,11 @@ function confirmation()
 			<?php 
 			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
 			{ 
-				$rsCfg = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgcomment` WHERE pageID='$pageID'"); 
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
 				if ($db->HasRecords())
 				{
 					$showmsg = max(1,intval($rsCfg->showMessage)); // always show at least 1 news item on a comment page!
 					$locale = $rsCfg->showLocale;
-					$showauth = intval($rsCfg->showAuthor);
-					$showdate = intval($rsCfg->showDate);
-					$showteaser = intval($rsCfg->showTeaser);
 					//$newscfgid = $rsCfg->cfgID;
 				}
 				else // set defaults 
@@ -172,9 +174,6 @@ function confirmation()
 					// [i_a] when no cfg record, fill in the defaults as were also set in the database
 					$showmsg = 3;
 					$locale = $cfg['locale'];
-					$showauth = 1;
-					$showdate = 1;
-					$showteaser = 0;
 					//$newscfgid = null;
 				}
 				?>
@@ -200,7 +199,7 @@ function confirmation()
 					</select>
 					
 					<p>
-						<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.$rsCfg->cfgID.'" id="cfgID" />':null); ?>
+						<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.rm0lead($rsCfg->cfgID).'" id="cfgID" />':null); ?>
 						<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
 						<button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton']; ?></span></button>
 					</p>

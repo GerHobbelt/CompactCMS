@@ -113,7 +113,7 @@ function set_filter_msgs(el)
 		<p><?php 
 		if($cfg['protect'])
 		{
-			?><span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout">Log-out</a></span><?php 
+			?><span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout"><?php echo $ccms['lang']['backend']['logout']; ?></a></span><?php 
 		} 
 		?><a id="clockLink" style="text-decoration:none;" class="clock"><span class="ss_sprite ss_clock">&#160;</span></a></p>
 		<div id="notify_res">&#160;
@@ -132,7 +132,7 @@ function set_filter_msgs(el)
 		</div>
 	</div>
 	<div id="advanced" class="prepend-1 span-5 last">
-		<h2><span class="ss_sprite ss_user_red">Hi</span> <?php echo $_SESSION['ccms_userFirst']; ?></h2>
+		<h2><span class="ss_sprite ss_user_red"><?php echo $ccms['lang']['backend']['hello']; ?></span> <?php echo $_SESSION['ccms_userFirst']; ?></h2>
 		<div id="advanced_res">
 			<ul>
 				<?php 
@@ -164,6 +164,12 @@ function set_filter_msgs(el)
 				{ 
 				?>
 					<li><span class="ss_sprite ss_drive_disk"><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><?php echo $ccms['lang']['backup']['createhd'];?></a></span></li>
+				<?php 
+				} 
+				if($_SESSION['ccms_userLevel']>=4 && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+				{ 
+				?>
+					<li><span class="ss_sprite ss_group_key"><a id="sys-perm" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['translation']; ?></a></span></li>
 				<?php 
 				} 
 				?>
@@ -248,27 +254,6 @@ function set_filter_msgs(el)
 	</div>
 	<?php 
 	} 
-	else 
-	{
-	?>
-<!--
-	<div id="createnew" class="span-9">
-	<fieldset>
-		<legend><span class="ss_sprite ss_add">&#160;</span><a class="toggle" rel="form_wrapper" href="#"><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
-		<div id="form_wrapper">
-		<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
-		<form method="post" id="addForm" action="#">
-			<div id="fields">
-				<div id="editor-options">
-				</div>
-			</div>
-		</form>	
-		</div>
-	</fieldset>
-	</div>
--->
-	<?php
-	}
 
 		
 	// Manage menu depths & languages 
@@ -308,23 +293,6 @@ function set_filter_msgs(el)
 	</div>
 	<?php 
 	} 
-	else 
-	{
-	?>
-<!--
-	<div id="menudepth" class="span-16">
-	<fieldset>
-		<legend><span class="ss_sprite ss_text_list_bullets">&#160;</span> <a class="toggle" rel="menu_wrapper" href="#"><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
-		<div id="menu_wrapper">
-		<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
-		<form method="post" id="menuForm" action="#">
-		</form>	
-		</div>
-	</fieldset>
-	</div>
--->
-	<?php
-	}
 	
 
 		
@@ -354,9 +322,9 @@ function set_filter_msgs(el)
 		<table id="table_manage">
 			<tr>
 				<th style="padding-left: 5px;" class="span-1"></th>
-				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
 				<th class="center span-2-1"><?php echo $ccms['lang']['forms']['printable']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
 				<th class="center span-2">
 					<?php 
@@ -384,7 +352,7 @@ function set_filter_msgs(el)
 			</tr>
 		</table>
 		<div id="dyn_list">
-			<?php echo $ccms['lang']['system']['error_misconfig']; ?> <a href="http://community.compactcms.nl/forum/"><strong>See forum</strong></a>.
+			<?php echo $ccms['lang']['system']['error_misconfig']; ?> <a href="http://community.compactcms.nl/forum/"><strong><?php echo $ccms['lang']['backend']['see_forum']; ?></strong></a>.
 			<!--spinner-->
 		</div>
 		<table width="100%">
@@ -412,7 +380,41 @@ function set_filter_msgs(el)
 	</fieldset>
 	</div>
 
-	<div id='debugMsg' class="span-25" style="visibility: visible; opacity: 1;" >&#160;</div>
+	<div id='debugMsg' class="span-25" style="visibility: visible; opacity: 1;" >&#160;
+
+<?php
+
+if (0)
+{
+	global $_SERVER;
+	global $_ENV;
+	global $ccms;
+	global $cfg;
+
+	echo '<h1>$_SERVER</h1>';
+	echo "<pre>";
+	var_dump($_SERVER);
+	echo "</pre>";
+	echo '<h1>$_ENV</h1>';
+	echo "<pre>";
+	var_dump($_ENV);
+	echo "</pre>";
+	echo '<h1>$_SESSION</h1>';
+	echo "<pre>";
+	var_dump($_SESSION);
+	echo "</pre>";
+	echo '<h1>$ccms</h1>';
+	echo "<pre>";
+	var_dump($ccms);
+	echo "</pre>";
+	echo '<h1>$cfg</h1>';
+	echo "<pre>";
+	var_dump($cfg);
+	echo "</pre>";
+}
+
+?>
+	</div>
 
 	<?php // Footer block ?>
 	<div id="footer" class="span-25">

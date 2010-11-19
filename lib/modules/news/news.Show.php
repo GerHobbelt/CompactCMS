@@ -1,7 +1,7 @@
 <?php 
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -38,18 +38,19 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 $pageID	= getGETparam4Filename('page');
 $do	= getGETparam4IdOrNumber('do');
 $id = getGETparam4IdOrNumber('id');
+$is_printing = ($ccms['printing'] == 'Y');
 
 $numCfg = 0;
 if(!empty($pageID)) 
 {
-	$rsCfg = $db->SelectSingleRow($cfg['db_prefix']."cfgnews", array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
+	$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
 	$numCfg	= $db->RowCount();
 }
 $locale 	= ($numCfg>0?$rsCfg->showLocale:$cfg['locale']);
 
 // we only need to check if the given page is a valid news page...
-$news_in_page = $db->SelectSingleValue($cfg['db_prefix']."pages", array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
-if ($db->Error()) $db->Kill();
+$news_in_page = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
+if ($db->ErrorNumber()) $db->Kill();
 
 // Set front-end language
 SetUpLanguageAndLocale($locale);
@@ -94,16 +95,17 @@ if($db->HasRecords())
 {
 	if(empty($do)) 
 	{
+		$newsCount = $db->RowCount();
 		if($numCfg>0) 
 		{
-			$listMax 	= ($rsCfg->showMessage > $db->RowCount() ? $db->RowCount() : $rsCfg->showMessage);
+			$listMax 	= ($rsCfg->showMessage > $newsCount ? $newsCount : $rsCfg->showMessage);
 			$showTeaser	= intval($rsCfg->showTeaser);
 			$showAuthor	= intval($rsCfg->showAuthor);
 			$showDate	= intval($rsCfg->showDate);
 		} 
 		else 
 		{
-			$listMax = $db->RowCount();
+			$listMax = $newsCount;
 			$showTeaser	= 1;
 			$showAuthor	= 1;
 			$showDate	= 1;
@@ -121,15 +123,15 @@ if($db->HasRecords())
 				<?php 
 				} 
 
+				// Filter spaces, non-file characters and account for UTF-8
+				$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
+				$newsTitle = str_replace($special_chars, "", $newsTitle); 
+				$newsTitle = str_replace(' ','-',$newsTitle);
+				
 				if(empty($id)) 
 				{ 
-					// Filter spaces, non-file characters and account for UTF-8
-					$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
-					$newsTitle = str_replace($special_chars, "", $newsTitle); 
-					$newsTitle = str_replace(' ','-',$newsTitle);
-					
 					?>
-					<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
+					<h2><a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
 					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
 					<?php 
 					if($showTeaser==0) 
@@ -157,7 +159,21 @@ if($db->HasRecords())
 				} 
 				else
 				{ 
-				?>
+					if ($i == 0)
+					{
+						// and augment the breadcrumb trail and other template variables:
+						$preview_qry = ($ccms['preview'] ? '?preview=' . $cfg['authcode'] : '');
+						$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a></span>';
+						$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+
+						$ccms['urlpage']   .= '/' . rm0lead($rsNews->newsID).'-'.$newsTitle;
+						$ccms['pagetitle'] = $rsNews->newsTitle;
+						//$ccms['subheader']  = $row->subheader;
+						$ccms['desc']       = $rsNews->newsContent;
+						//$ccms['keywords']   = $row->keywords;
+						$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+					}
+					?>
 					<h1><?php echo $rsNews->newsTitle; ?></h1>
 					<p><strong><?php echo $rsNews->newsTeaser; ?></strong></p>
 					<p><?php echo $rsNews->newsContent; ?></p>
@@ -178,7 +194,8 @@ if($db->HasRecords())
 					} 
 					?>
 					<p>&laquo; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a> | <a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html"><?php 
-						echo $db->QuerySingleValue("SELECT `pagetitle` FROM `".$cfg['db_prefix']."pages` WHERE `urlpage` = ".MySQL::SQLValue($rsNews->pageID, MySQL::SQLVALUE_TEXT)); 
+						// echo $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($rsNews->pageID, MySQL::SQLVALUE_TEXT)), array('pagetitle')); 
+						echo $ccms['pagetitle'];
 					?></a></p>
 				<?php 
 				} 
@@ -187,7 +204,7 @@ if($db->HasRecords())
 			<hr style="clear:both;"/>
 		<?php
 		}
-		if(empty($id) && $db->RowCount() > $rsCfg->showMessage) 
+		if(empty($id) && $newsCount > $rsCfg->showMessage) 
 		{ 
 		?>
 			<hr/><p style="text-align:center;"><a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a></p>
@@ -197,6 +214,18 @@ if($db->HasRecords())
 	
 	if($do == "all") 
 	{
+		// and augment the breadcrumb trail and other template variables:
+		$preview_qry = ($ccms['preview'] ? '&preview=' . $cfg['authcode'] : '');
+		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a></span>';
+		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+
+		$ccms['urlpage']   .= '?do=all';
+		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['news']['viewarchive'];
+		//$ccms['subheader']  = $row->subheader;
+		//$ccms['desc']       = $rsNews->newsContent;
+		//$ccms['keywords']   = $row->keywords;
+		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+		
 		for ($i=0; $i<$db->RowCount(); $i++) 
 		{ 
 			$rsNews = $db->Row();
@@ -205,9 +234,10 @@ if($db->HasRecords())
 			$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
   			$newsTitle = str_replace($special_chars, "", $newsTitle); 
 			$newsTitle = str_replace(' ','-',$newsTitle); 
+			
 			?>
 	    	
-			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.$rsNews->newsID.'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
+			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
 			<span style="font-size:0.8em;font-style:italic;"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></span>
 	    	<p><?php echo $rsNews->newsTeaser; ?></p>
 		<?php

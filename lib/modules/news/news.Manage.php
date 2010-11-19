@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:	CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -153,7 +153,7 @@ function confirmation()
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
-									<td><input type="checkbox" name="newsID[]" value="<?php echo $rsNews->newsID; ?>" id="newsID"></td>
+									<td><input type="checkbox" name="newsID[]" value="<?php echo rm0lead($rsNews->newsID); ?>" id="newsID"></td>
 								<?php 
 								} 
 								?>
@@ -162,7 +162,7 @@ function confirmation()
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
-									<td><span class="ss_sprite ss_pencil"><a href="news.Write.php?pageID=<?php echo $pageID;?>&amp;newsID=<?php echo $rsNews->newsID; ?>"><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20?'...':null); ?></a></span></td>
+									<td><span class="ss_sprite ss_pencil"><a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20?'...':null); ?></a></span></td>
 								<?php 
 								} 
 								else 
@@ -207,7 +207,7 @@ function confirmation()
 			
 				<h2><?php echo $ccms['lang']['news']['settings']; ?></h2>
 				<?php 
-				if (!$rsCfg = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."cfgnews` WHERE pageID=".MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT)))
+				if (!$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT))))
 					$db->Kill();
 					
 				if ($db->HasRecords())
@@ -275,7 +275,7 @@ function confirmation()
 						<input type="radio" name="show_teaser" <?php echo ($showteaser==0?"checked":null); ?> value="0" id="show_teaser0" />
 					<br/><br/>			
 					<p class="prepend-3">
-						<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.$rsCfg->cfgID.'" id="cfgID" />':null); ?>
+						<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.rm0lead($rsCfg->cfgID).'" id="cfgID" />':null); ?>
 						<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
 						<button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton']; ?></span></button>
 					</p>

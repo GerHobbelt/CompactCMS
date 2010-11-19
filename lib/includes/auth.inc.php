@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
+Revision:   CompactCMS - v 1.4.2
 	
 This file is part of CompactCMS.
 
@@ -54,7 +54,7 @@ if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && Che
 }
 
 // Check for ./install directory
-if(is_dir('../../_install/') && !defined('CCMS_DEVELOPMENT_ENVIRONMENT')) 
+if(is_dir('../../_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 {
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
@@ -112,7 +112,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		{
 			// Select statement: alter the previous condition set:
 			$values['userActive'] = MySQL::SQLValue(true, MySQL::SQLVALUE_BOOLEAN);
-			$row = $db->SelectSingleRowArray($cfg['db_prefix'].'users', $values, null, null, true, null, MYSQL_ASSOC);
+			$row = $db->SelectSingleRowArray($cfg['db_prefix'].'users', $values);
 			if ($db->ErrorNumber()) $db->Kill();
 			
 			if ($db->RowCount() > 1)
