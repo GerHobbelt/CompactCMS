@@ -1507,7 +1507,7 @@ function setLanguage($lang)
 		case 'tr':
 			return "Türk";
 			break;
-		case 'ch':
+		case 'zh': /* Chinese ('simplified' is assumed as we only support 2-char codes here... */
 			return "中文";
 			break;
 		case 'ar':
@@ -1518,6 +1518,9 @@ function setLanguage($lang)
 			break;
 		case 'ko':
 			return "한국어";
+			break;
+		case 'hi': /* Hindi: India */
+			return "हिन्दी";
 			break;
 		case 'pl':
 			return "Polska";
@@ -1534,6 +1537,21 @@ function setLanguage($lang)
 /*
 You may specify a 2-char language code OR a 3-char 'locale' code
 to set up the proper language files and settings.
+
+See also ISO639-2, e.g. http://www.loc.gov/standards/iso639-2/php/code_list.php
+
+Further info can be gathered at these locations:
+
+http://en.wikipedia.org/wiki/Locale
+http://en.wikipedia.org/wiki/BCP_47
+http://tools.ietf.org/rfc/bcp/bcp47.txt
+http://www.w3.org/International/articles/language-tags/Overview.en.php
+http://www.loc.gov/standards/iso639-2/php/code_list.php
+http://www.science.co.il/language/locale-codes.asp
+
+and for /country codes/ (which we don't use here!) there's ISO3166:
+
+http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 */
 function SetUpLanguageAndLocale($language)
 {
@@ -1576,9 +1594,10 @@ function SetUpLanguageAndLocale($language)
 	case 'tr':
 	case 'tur':
 		$language = 'tr'; $locale = 'tur';break;
-	case 'ch':
-	case 'chs':
-		$language = 'ch'; $locale = 'chs';break;
+	case 'zh':
+	case 'zho':
+	case 'chi':
+		$language = 'zh'; $locale = 'zho';break;
 	case 'ar':
 	case 'ara':
 		$language = 'ar'; $locale = 'ara';break;
@@ -1588,6 +1607,9 @@ function SetUpLanguageAndLocale($language)
 	case 'ko':
 	case 'kor':
 		$language = 'ko'; $locale = 'kor';break;
+	case 'hi':
+	case 'hin':
+		$language = 'hi'; $locale = 'hin';break;
 	case 'pl':
 	case 'pol':
 		$language = 'pl'; $locale = 'pol';break;
