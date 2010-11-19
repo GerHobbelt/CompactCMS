@@ -140,7 +140,7 @@ default:
 $elements = explode(',', getGETparam4CommaSeppedFilenames('files'));
 
 // let's speed things up (min = 4 days)
-$offset = 3600 * 120;	
+$offset = 3600 * 24 * 5;	
 $expire = "Expires: " . gmdate("D, d M Y H:i:s", time() + $offset) . " GMT";
 header($expire);
 

@@ -77,7 +77,6 @@ if(!isset($_SESSION['rc1']) || !isset($_SESSION['rc2']))
 
 // Prevent PHP warning by setting default (null) values
 $do_action = getGETparam4IdOrNumber('action');
-$dynlist_sortorder = getGETparam4IdOrNumber('dlorder', $cfg['admin_page_dynlist_order']);
 
 
 // Get permissions
@@ -88,22 +87,35 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 // $modules = $db->SelectArray($cfg['db_prefix'].'modules', array('modActive' => "'1'"));    // [i_a] already collected in sitemap.php 
 
 
-
 $do_update_or_livefilter = (($do_action == "update" && $_SERVER['REQUEST_METHOD'] != "POST") || ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST"));
 
-$filter_pages_name = '';
-$filter_pages_title = '';
-$filter_pages_subheader = '';
 
-$page_selectquery_restriction = '';
 
-if ($do_update_or_livefilter)
+
+// Set the target for PHP processing
+$target_form = getPOSTparam4IdOrNumber('form');
+
+
+/**
+ *
+ * Render the dynamic list with files
+ *
+ */
+if ($do_update_or_livefilter && checkAuth()) 
 {
+	$dynlist_sortorder = getGETparam4IdOrNumber('dlorder', $cfg['admin_page_dynlist_order']);
+	
+	$filter_pages_name = '';
+	$filter_pages_title = '';
+	$filter_pages_subheader = '';
+
+	$page_selectquery_restriction = '';
+
 	$filter_pages_name = (!empty($_SESSION['filter_pages_name']) ? $_SESSION['filter_pages_name'] : '');
 	$filter_pages_title = (!empty($_SESSION['filter_pages_title']) ? $_SESSION['filter_pages_title'] : '');
 	$filter_pages_subheader = (!empty($_SESSION['filter_pages_subheader']) ? $_SESSION['filter_pages_subheader'] : '');
 
-	if ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) 
+	if ($do_action == "livefilter" && $_SERVER['REQUEST_METHOD'] == "POST") 
 	{
 		switch (getPOSTparam4IdOrNumber('part'))
 		{
@@ -148,31 +160,18 @@ if ($do_update_or_livefilter)
 		
 		$page_selectquery_restriction = 'WHERE ' . $page_selectquery_restriction;
 	}
-}
 
+	// Open recordset for sites' pages
+	$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
+	if ($db->ErrorNumber()) $db->Kill();
 
-// Set the target for PHP processing
-$target_form = getPOSTparam4IdOrNumber('form');
-
-
-// Open recordset for sites' pages
-$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
-if ($db->ErrorNumber()) $db->Kill();
-
-// Check whether the recordset is not empty
-if($db->HasRecords()) 
-{
-	/**
-	 *
-	 * Render the dynamic list with files
-	 *
-	 */
-	if ($do_update_or_livefilter && checkAuth()) 
+	// Check whether the recordset is not empty
+	if($db->HasRecords()) 
 	{
 		$i = 0;
 		
 		echo '<table cellpadding="0" cellspacing="0">';
-		
+
 		// Get previously opened DB stream
 		$db->MoveFirst();
 		while (!$db->EndOfSeek()) 
@@ -402,16 +401,31 @@ if($db->HasRecords())
 		</table>
 	<?php 
 	}
-
-		
-	/**
-	 *
-	 * Render the entire menu list
-	 *
-	 */
-	if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) 
+	else
 	{
-		if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
+		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+	}
+}
+	
+
+	
+/**
+ *
+ * Render the entire menu list
+ *
+ */
+if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth()) 
+{
+	$menu_sortorder = getGETparam4IdOrNumber('m_order', 'I12LH0');
+	
+	if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
+	{
+		// Open recordset for sites' pages
+		$db->SelectRows($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
+		if ($db->ErrorNumber()) $db->Kill();
+
+		// Check whether the recordset is not empty
+		if($db->HasRecords()) 
 		{
 			echo '<table class="span-15" cellpadding="0" cellspacing="0">';
 			
@@ -527,12 +541,18 @@ if($db->HasRecords())
 			</table>
 		<?php 
 		} 
-		else 
+		else
 		{
-			echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_delete">'.$ccms['lang']['auth']['featnotallowed'].'</span></p>';
-		} 
+			echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+		}
 	}
+	else 
+	{
+		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_delete">'.$ccms['lang']['auth']['featnotallowed'].'</span></p>';
+	} 
 }
+
+
 
 
 /**
