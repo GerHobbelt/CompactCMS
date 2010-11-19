@@ -100,7 +100,7 @@ if (!defined('BASE_PATH'))
 
 $optimize = array();
 $optimize['css'] = 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
-$optimize['javascript'] = 'JSmin';       // possible values: false, 'JSpack', 'EA-derived', 'JSmin'
+$optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
 
 $cache		= false;
 $cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
@@ -407,30 +407,6 @@ else
 	case 'javascript':
 		switch ($optimize['javascript'])
 		{
-		case 'JSpack':
-			$jspack_encoding = 62; // ~ 'Normal';
-			$jspack_fast_decode = true;
-			$jspack_special_char = false; // we can't be sure only 'local functions' have an underscore prefix
-
-			/*MARKER*/require_once(BASE_PATH. '/lib/includes/js-packer/class.JavaScriptPacker.php');
-			$packer = new JavaScriptPacker($contents, $jspack_encoding, $jspack_fast_decode, $jspack_special_char);
-			$contents = $packer->pack();
-			break;
-			
-		case 'EA-derived':
-			// ripped from the edit_area compressor:
-			//
-			// remove all comments
-			//	(\"(?:[^\"\\]*(?:\\\\)*(?:\\\"?)?)*(?:\"|$))|(\'(?:[^\'\\]*(?:\\\\)*(?:\\'?)?)*(?:\'|$))|(?:\/\/(?:.|\r|\t)*?(\n|$))|(?:\/\*(?:.|\n|\r|\t)*?(?:\*\/|$))
-			$contents= preg_replace("/(\"(?:[^\"\\\\]*(?:\\\\\\\\)*(?:\\\\\"?)?)*(?:\"|$))|(\'(?:[^\'\\\\]*(?:\\\\\\\\)*(?:\\\\\'?)?)*(?:\'|$))|(?:\/\/(?:.|\r|\t)*?(\n|$))|(?:\/\*(?:.|\n|\r|\t)*?(?:\*\/|$))/s", "$1$2$3", $contents);
-			// remove line return, empty line and tabulation
-			$contents= preg_replace('/(( |\t|\r)*\n( |\t)*)+/s', " ", $contents);
-			// add line break before "else" otherwise navigators can't manage to parse the file
-			$contents= preg_replace('/(\b(else)\b)/', "\n$1", $contents);
-			// remove unnecessary spaces
-			$contents= preg_replace('/( |\t|\r)*(;|\{|\}|=|==|\-|\+|,|\(|\)|\|\||&\&|\:)( |\t|\r)*/', "$2", $contents);
-			break;
-
 		case 'JSmin':
 			/*MARKER*/require_once(BASE_PATH. '/lib/includes/rgrove-jsmin/jsmin.php');
 			$contents = JSMin::minify($contents);
