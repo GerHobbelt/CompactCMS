@@ -18,12 +18,20 @@
 
 AddDefaultCharset utf-8
 Options +FollowSymLinks
+
+<IfDefine CCMS_installed>
+
 RewriteEngine On 
 
 ## 
 # Start modification
 # Make sure the RewriteBase variable reflects your file structure
 ##
+
+
+ErrorDocument 403 /index.php?page=403
+ErrorDocument 404 /index.php?page=404
+
 
 # For an installation under root use / (default)
 # For an installation under /ccms use /ccms/
@@ -57,6 +65,8 @@ RewriteRule ^(lib/.+)/([^/]+\.css)$             lib/includes/combine.inc.php?typ
 RewriteRule ^(admin/.+)/([^/]+\.js)$            lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
 RewriteRule ^(admin/.+)/([^/]+\.css)$           lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
 RewriteRule ^sitemap\.xml$                      index.php?page=sitemap [L]
+
+</IfDefine> # CCMS_installed
 
 ##
 # Security measures

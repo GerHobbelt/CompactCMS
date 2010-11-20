@@ -821,11 +821,17 @@ if($nextstep == md5('final') && CheckAuth())
 	if($err==0)
 	{
 		$htaccess   = @file_get_contents(BASE_PATH.'/.htaccess');
-		$newline    = "RewriteBase ".$_SESSION['variables']['rootdir']." "; // 'superfluous' space at the end there to simplify the match, even when moving the setup from /dir/ to /
+		$newpath    = $_SESSION['variables']['rootdir'];
 
 		if(strpos($htaccess, $newline)===false)
 		{
-			$htaccess = preg_replace('/RewriteBase\s+\/.*/', $newline, $htaccess);
+			// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
+			$htaccess = str_replace('<IfDefine CCMS_installed>', '', $htaccess);
+			$htaccess = str_replace('</IfDefine> # CCMS_installed', '', $htaccess);
+
+			// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
+			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.+\/)([^\/]+)$/', '\\1' . $newpath . '\\3', $htaccess);
+			$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
 			if (!$htaccess)
 			{
 				$errors[] = 'Fatal: could not set the RewriteBase in the .htaccess file.';
