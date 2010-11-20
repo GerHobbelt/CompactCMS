@@ -89,7 +89,7 @@ if($nextstep == md5('2') && CheckAuth())
 		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Remember your admin password as it cannot be retrieved</span>
 		<label for="authcode"><span class="ss_sprite ss_textfield_key">Authentication PIN</span></label>
 		<input type="text" class="alt title" name="authcode" maxlenght="5" style="width:300px;" value="<?php
-			echo (empty($_SESSION['variables']['authcode']) ? $_SESSION['variables']['authcode'] . '::' . mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
+			echo (empty($_SESSION['variables']['authcode']) ? mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
 		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</span>
 		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</span>
 		<br class="clear"/>
