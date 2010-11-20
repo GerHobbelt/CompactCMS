@@ -103,7 +103,7 @@ $optimize['css'] = 'csstidy';    // possible values: false, 'csstidy', 'css-comp
 $optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
 
 $cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
-$cachedir	= $cfg['rootdir'] . 'lib/includes/cache';
+$cachedir	= BASE_PATH . '/lib/includes/cache';
 
 $jsdir		= getGETparam4FullFilePath('jsdir');
 if (empty($jsdir)) 
@@ -423,6 +423,21 @@ else
 		break;
 	}
 			
+
+	// Store cache
+	if ($cache) 
+	{
+		if ($fp = @fopen($cachedir . '/' . $cachefile, 'wb')) 
+		{
+			fwrite($fp, $contents);
+			fclose($fp);
+		}
+		else
+		{
+			send_response_status_header(500);
+			die("Failed to write data to cache file: " . $cachedir . '/' . $cachefile);
+		}
+	}
 	
 	// Send Content-Type
 	header("Content-Type: text/" . $type);
@@ -440,16 +455,6 @@ else
 		// Send regular contents
 		header('Content-Length: ' . strlen($contents));
 		echo $contents;
-	}
-
-	// Store cache
-	if ($cache) 
-	{
-		if ($fp = fopen($cachedir . '/' . $cachefile, 'wb')) 
-		{
-			fwrite($fp, $contents);
-			fclose($fp);
-		}
 	}
 }
 
