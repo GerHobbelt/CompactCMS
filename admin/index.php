@@ -118,7 +118,7 @@ function set_filter_msgs(el)
 		?><a id="clockLink" style="text-decoration:none;" class="clock"><span class="ss_sprite ss_clock">&#160;</span></a></p>
 		<div id="notify_res">&#160;
 			<?php 
-			if(!empty($version_recent) && !empty($v) && $cfg['version']===true) 
+			if(!empty($version_recent) && !empty($v) && $cfg['version']) 
 			{ 
 			?>
 				<br/><?php echo $ccms['lang']['backend']['currentversion']." ".$v; ?>. <?php echo $ccms['lang']['backend']['mostrecent']." ".$version_recent; ?>.<br/>

@@ -128,19 +128,19 @@ if (empty($_SESSION['variables']['language']) && !empty($cfg['language']))
 }
 if (empty($_SESSION['variables']['version']) && !empty($cfg['version']))
 {
-	$_SESSION['variables']['version'] = ($cfg['version'] ? 'true' : 'false');
+	$_SESSION['variables']['version'] = !!$cfg['version'];
 }
 if (empty($_SESSION['variables']['iframe']) && !empty($cfg['iframe']))
 {
-	$_SESSION['variables']['iframe'] = ($cfg['iframe'] ? 'true' : 'false');
+	$_SESSION['variables']['iframe'] = !!$cfg['iframe'];
 }
 if (empty($_SESSION['variables']['wysiwyg']) && !empty($cfg['wysiwyg']))
 {
-	$_SESSION['variables']['wysiwyg'] = ($cfg['wysiwyg'] ? 'true' : 'false');
+	$_SESSION['variables']['wysiwyg'] = !!$cfg['wysiwyg'];
 }
 if (empty($_SESSION['variables']['protect']) && !empty($cfg['protect']))
 {
-	$_SESSION['variables']['protect'] = ($cfg['protect'] ? 'true' : 'false');
+	$_SESSION['variables']['protect'] = !!$cfg['protect'];
 }
 if (empty($_SESSION['variables']['authcode']) && !empty($cfg['authcode']))
 {
@@ -185,11 +185,11 @@ if (empty($_SESSION['variables']['admin_page_dynlist_order']) && !empty($cfg['ad
 }
 if (empty($_SESSION['variables']['IN_DEVELOPMENT_ENVIRONMENT']) && !empty($cfg['IN_DEVELOPMENT_ENVIRONMENT']))
 {
-	$_SESSION['variables']['IN_DEVELOPMENT_ENVIRONMENT'] = $cfg['IN_DEVELOPMENT_ENVIRONMENT'];
+	$_SESSION['variables']['IN_DEVELOPMENT_ENVIRONMENT'] = !!$cfg['IN_DEVELOPMENT_ENVIRONMENT'];
 }
 if (empty($_SESSION['variables']['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION']) && !empty($cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION']))
 {
-	$_SESSION['variables']['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'] = $cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'];
+	$_SESSION['variables']['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'] = !!$cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'];
 }
 
 /*

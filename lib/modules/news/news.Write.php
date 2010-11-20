@@ -178,7 +178,7 @@ tinyMCE.init(
 		remove_script_host:true,
 		document_base_url:"../../",
 		<?php 
-		if($cfg['iframe'] === true) 
+		if($cfg['iframe']) 
 		{ 
 		?> 
 		extended_valid_elements:"iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]",

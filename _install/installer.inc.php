@@ -52,8 +52,8 @@ session_start();
 // Set current && additional step
 $nextstep = getPOSTparam4IdOrNumber('do');
 
-$may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] == 'true'); 
-$do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] == 'true'); 
+$may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] != false); 
+$do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] != false); 
 
 
 
@@ -94,15 +94,15 @@ if($nextstep == md5('2') && CheckAuth())
 		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</span>
 		<br class="clear"/>
 		<label for="protect"><input type="checkbox" name="protect" value="true" <?php
-			echo (!empty($_SESSION['variables']['protect']) && $_SESSION['variables']['protect'] == 'true' ? 'checked' : ''); ?> id="protect" /> Password protect the administration</label>
+			echo (!empty($_SESSION['variables']['protect']) && $_SESSION['variables']['protect'] ? 'checked' : ''); ?> id="protect" /> Password protect the administration</label>
 		<label for="version"><input type="checkbox" name="version" value="true"  <?php
-			echo (!empty($_SESSION['variables']['version']) && $_SESSION['variables']['version'] == 'true' ? 'checked' : ''); ?>  id="version" /> Show version information</label>
+			echo (!empty($_SESSION['variables']['version']) && $_SESSION['variables']['version'] ? 'checked' : ''); ?>  id="version" /> Show version information</label>
 		&#160;<span class="ss_sprite ss_bullet_star small quiet">Want to see the latest CCMS version at the dashboard?</span>
 		<label for="iframe"><input type="checkbox" name="iframe" value="true"  <?php
-			echo (!empty($_SESSION['variables']['iframe']) && $_SESSION['variables']['iframe'] == 'true' ? 'checked' : ''); ?> id="iframe" /> Support &amp; allow iframes</label>
+			echo (!empty($_SESSION['variables']['iframe']) && $_SESSION['variables']['iframe'] ? 'checked' : ''); ?> id="iframe" /> Support &amp; allow iframes</label>
 		&#160;<span class="ss_sprite ss_bullet_star small quiet">Can iframes be managed from within the WYSIWYG editor?</span>
 		<label for="wysiwyg"><input type="checkbox" name="wysiwyg" value="true"  <?php
-			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] == 'true' ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
+			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
 		&#160;<span class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</span>
 		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?>	>
 			<input type="checkbox" <?php if ($do_upgrade) { echo 'value="true"'; } ?> name="upgrade" 
@@ -768,7 +768,13 @@ if($nextstep == md5('final') && CheckAuth())
 				$new_val = $cfg[$key];
 			}
 			// Rewrite the previous loaded string
-			if($new_val=="true"||$new_val=="false")
+			if($new_val===true||$new_val===false)
+			{
+				$new_val = ($new_val ? 'true' : 'false');
+				$config_str = "\$cfg['{$key}'] = {$new_val};";
+				$re_str = '/\$cfg\[\''.$key.'\'\]\s+=\s+[^;]+;/';
+			}
+			else if(is_integer($new_val))
 			{
 				$config_str = "\$cfg['{$key}'] = {$new_val};";
 				$re_str = '/\$cfg\[\''.$key.'\'\]\s+=\s+[^;]+;/';
