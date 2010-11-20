@@ -836,7 +836,7 @@ if($nextstep == md5('final') && CheckAuth())
 			$htaccess = str_replace('</IfDefine> # CCMS_installed', '', $htaccess);
 
 			// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
-			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.+\/)([^\/]+)$/', '\\1' . $newpath . '\\3', $htaccess);
+			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
 			$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
 			if (!$htaccess)
 			{
