@@ -611,7 +611,7 @@ tinymce.create('tinymce.util.Dispatcher', {
 
 			return o;
 		},
-	
+
 		toAbsolute : function(u, nh) {
 			var u = new tinymce.util.URI(u, {base_uri : this});
 
@@ -1326,7 +1326,7 @@ tinymce.create('static tinymce.util.XHR', {
 					case 'float':
 						isIE ? s.styleFloat = v : s.cssFloat = v;
 						break;
-					
+
 					default:
 						s[na] = v || '';
 				}
@@ -1438,7 +1438,7 @@ tinymce.create('static tinymce.util.XHR', {
 						}
 
 						break;
-					
+
 					case "shape":
 						e.setAttribute('_mce_style', v);
 						break;
@@ -3533,14 +3533,14 @@ var Sizzle = function(selector, context, results, seed) {
 	if ( context.nodeType !== 1 && context.nodeType !== 9 ) {
 		return [];
 	}
-	
+
 	if ( !selector || typeof selector !== "string" ) {
 		return results;
 	}
 
 	var parts = [], m, set, checkSet, extra, prune = true, contextXML = Sizzle.isXML(context),
 		soFar = selector, ret, cur, pop, i;
-	
+
 	// Reset the position of the chunker regexp (start from head)
 	do {
 		chunker.exec("");
@@ -3548,9 +3548,9 @@ var Sizzle = function(selector, context, results, seed) {
 
 		if ( m ) {
 			soFar = m[3];
-		
+
 			parts.push( m[1] );
-		
+
 			if ( m[2] ) {
 				extra = m[3];
 				break;
@@ -3572,7 +3572,7 @@ var Sizzle = function(selector, context, results, seed) {
 				if ( Expr.relative[ selector ] ) {
 					selector += parts.shift();
 				}
-				
+
 				set = posProcess( selector, set );
 			}
 		}
@@ -3684,7 +3684,7 @@ Sizzle.find = function(expr, context, isXML){
 
 	for ( var i = 0, l = Expr.order.length; i < l; i++ ) {
 		var type = Expr.order[i], match;
-		
+
 		if ( (match = Expr.leftMatch[ type ].exec( expr )) ) {
 			var left = match[1];
 			match.splice(1,1);
@@ -3961,7 +3961,7 @@ var Expr = Sizzle.selectors = {
 		},
 		ATTR: function(match, curLoop, inplace, result, not, isXML){
 			var name = match[1].replace(/\\/g, "");
-			
+
 			if ( !isXML && Expr.attrMap[name] ) {
 				match[1] = Expr.attrMap[name];
 			}
@@ -3987,7 +3987,7 @@ var Expr = Sizzle.selectors = {
 			} else if ( Expr.match.POS.test( match[0] ) || Expr.match.CHILD.test( match[0] ) ) {
 				return true;
 			}
-			
+
 			return match;
 		},
 		POS: function(match){
@@ -4108,18 +4108,18 @@ var Expr = Sizzle.selectors = {
 				case 'only':
 				case 'first':
 					while ( (node = node.previousSibling) )	 {
-						if ( node.nodeType === 1 ) { 
-							return false; 
+						if ( node.nodeType === 1 ) {
+							return false;
 						}
 					}
-					if ( type === "first" ) { 
-						return true; 
+					if ( type === "first" ) {
+						return true;
 					}
 					node = elem;
 				case 'last':
 					while ( (node = node.nextSibling) )	 {
-						if ( node.nodeType === 1 ) { 
-							return false; 
+						if ( node.nodeType === 1 ) {
+							return false;
 						}
 					}
 					return true;
@@ -4129,20 +4129,20 @@ var Expr = Sizzle.selectors = {
 					if ( first === 1 && last === 0 ) {
 						return true;
 					}
-					
+
 					var doneName = match[0],
 						parent = elem.parentNode;
-	
+
 					if ( parent && (parent.sizcache !== doneName || !elem.nodeIndex) ) {
 						var count = 0;
 						for ( node = parent.firstChild; node; node = node.nextSibling ) {
 							if ( node.nodeType === 1 ) {
 								node.nodeIndex = ++count;
 							}
-						} 
+						}
 						parent.sizcache = doneName;
 					}
-					
+
 					var diff = elem.nodeIndex - last;
 					if ( first === 0 ) {
 						return diff === 0;
@@ -4219,7 +4219,7 @@ var makeArray = function(array, results) {
 		results.push.apply( results, array );
 		return results;
 	}
-	
+
 	return array;
 };
 
@@ -4411,7 +4411,7 @@ if ( document.querySelectorAll ) {
 		if ( div.querySelectorAll && div.querySelectorAll(".TEST").length === 0 ) {
 			return;
 		}
-	
+
 		Sizzle = function(query, context, extra, seed){
 			context = context || document;
 
@@ -4422,7 +4422,7 @@ if ( document.querySelectorAll ) {
 					return makeArray( context.querySelectorAll(query), extra );
 				} catch(e){}
 			}
-		
+
 			return oldSizzle(query, context, extra, seed);
 		};
 
@@ -4451,7 +4451,7 @@ if ( document.querySelectorAll ) {
 	if ( div.getElementsByClassName("e").length === 1 ) {
 		return;
 	}
-	
+
 	Expr.order.splice(1, 0, "CLASS");
 	Expr.find.CLASS = function(match, context, isXML) {
 		if ( typeof context.getElementsByClassName !== "undefined" && !isXML ) {
@@ -4539,7 +4539,7 @@ Sizzle.contains = document.compareDocumentPosition ? function(a, b){
 
 Sizzle.isXML = function(elem){
 	// documentElement is verified for cases where it doesn't yet exist
-	// (such as loading iframes in IE - #4833) 
+	// (such as loading iframes in IE - #4833)
 	var documentElement = (elem ? elem.ownerDocument || elem : 0).documentElement;
 	return documentElement ? documentElement.nodeName !== "HTML" : false;
 };
@@ -4866,9 +4866,9 @@ window.tinymce.dom.Sizzle = Sizzle;
 			el = dom.get(t.id);
 
 		tinymce.each(
-				('getPos,getRect,getParent,add,setStyle,getStyle,setStyles,' + 
-				'setAttrib,setAttribs,getAttrib,addClass,removeClass,' + 
-				'hasClass,getOuterHTML,setOuterHTML,remove,show,hide,' + 
+				('getPos,getRect,getParent,add,setStyle,getStyle,setStyles,' +
+				'setAttrib,setAttribs,getAttrib,addClass,removeClass,' +
+				'hasClass,getOuterHTML,setOuterHTML,remove,show,hide,' +
 				'isHidden,setHTML,get').split(/,/)
 			, function(k) {
 				t[k] = function() {
@@ -5051,7 +5051,7 @@ window.tinymce.dom.Sizzle = Sizzle;
 				h += '<span id="__caret">_</span>';
 
 				// Delete and insert new node
-				
+
 				if (r.startContainer == d && r.endContainer ==  d) {
 					// WebKit will fail if the body is empty since the range is then invalid and it can't insert contents
 					d.body.innerHTML = h;
@@ -5525,7 +5525,7 @@ window.tinymce.dom.Sizzle = Sizzle;
 
 		setRng : function(r) {
 			var s, t = this;
-			
+
 			if (!t.tridentSel) {
 				s = t.getSel();
 
@@ -5579,8 +5579,8 @@ window.tinymce.dom.Sizzle = Sizzle;
 					}
 
 					// If the anchor node is a element instead of a text node then return this element
-					if (tinymce.isWebKit && sel.anchorNode && sel.anchorNode.nodeType == 1) 
-						return sel.anchorNode.childNodes[sel.anchorOffset]; 
+					if (tinymce.isWebKit && sel.anchorNode && sel.anchorNode.nodeType == 1)
+						return sel.anchorNode.childNodes[sel.anchorOffset];
 				}
 
 				if (elm && elm.nodeType == 3)
@@ -5720,7 +5720,7 @@ window.tinymce.dom.Sizzle = Sizzle;
 			};
 
 			this.doc = getXML();
-			
+
 			// Since Opera and WebKit doesn't escape > into &gt; we need to do it our self to normalize the output for all browsers
 			this.valid = tinymce.isOpera || tinymce.isWebKit;
 
@@ -6035,8 +6035,8 @@ window.tinymce.dom.Sizzle = Sizzle;
 
 			if (s.fix_table_elements) {
 				t.onPreProcess.add(function(se, o) {
-					// Since Opera will crash if you attach the node to a dynamic document we need to brrowser sniff a specific build
-					// so Opera users with an older version will have to live with less compaible output not much we can do here
+					// Since Opera will crash if you attach the node to a dynamic document we need to browser sniff a specific build
+					// so Opera users with an older version will have to live with less compatible output not much we can do here
 					if (!tinymce.isOpera || opera.buildNumber() >= 1767) {
 						each(t.dom.select('p table', o.node).reverse(), function(n) {
 							var parent = t.dom.getParent(n.parentNode, 'table,p');
@@ -6508,7 +6508,7 @@ window.tinymce.dom.Sizzle = Sizzle;
 						}
 
 						ru = t.findRule(nn);
-						
+
 						// No valid rule for this element could be found then skip it
 						if (!ru) {
 							iv = true;
@@ -7073,89 +7073,89 @@ tinymce.dom.TreeWalker = function(start_node, root_node) {
 		H : 'G|F',
 		G : 'br|span|bdo',
 		F : 'object|applet|img|map|iframe'
-	}, 'script[]' + 
-		'style[]' + 
-		'object[#|param|X|form|a|H|K|N|O|Q]' + 
-		'param[]' + 
-		'p[S]' + 
-		'a[Z]' + 
-		'br[]' + 
-		'span[S]' + 
-		'bdo[S]' + 
-		'applet[#|param|X|form|a|H|K|N|O|Q]' + 
-		'h1[S]' + 
-		'img[]' + 
-		'map[X|form|Q|area]' + 
-		'h2[S]' + 
-		'iframe[#|X|form|a|H|K|N|O|Q]' + 
-		'h3[S]' + 
-		'tt[S]' + 
-		'i[S]' + 
-		'b[S]' + 
-		'u[S]' + 
-		's[S]' + 
-		'strike[S]' + 
-		'big[S]' + 
-		'small[S]' + 
-		'font[S]' + 
-		'basefont[]' + 
-		'em[S]' + 
-		'strong[S]' + 
-		'dfn[S]' + 
-		'code[S]' + 
-		'q[S]' + 
-		'samp[S]' + 
-		'kbd[S]' + 
-		'var[S]' + 
-		'cite[S]' + 
-		'abbr[S]' + 
-		'acronym[S]' + 
-		'sub[S]' + 
-		'sup[S]' + 
-		'input[]' + 
-		'select[optgroup|option]' + 
-		'optgroup[option]' + 
-		'option[]' + 
-		'textarea[]' + 
-		'label[S]' + 
-		'button[#|p|T|div|U|W|table|G|object|applet|img|map|K|N|Q]' + 
-		'h4[S]' + 
-		'ins[#|X|form|a|H|K|N|O|Q]' + 
-		'h5[S]' + 
-		'del[#|X|form|a|H|K|N|O|Q]' + 
-		'h6[S]' + 
-		'div[#|X|form|a|H|K|N|O|Q]' + 
-		'ul[li]' + 
-		'li[#|X|form|a|H|K|N|O|Q]' + 
-		'ol[li]' + 
-		'dl[dt|dd]' + 
-		'dt[S]' + 
-		'dd[#|X|form|a|H|K|N|O|Q]' + 
-		'menu[li]' + 
-		'dir[li]' + 
-		'pre[ZA]' + 
-		'hr[]' + 
-		'blockquote[#|X|form|a|H|K|N|O|Q]' + 
-		'address[S|p]' + 
-		'center[#|X|form|a|H|K|N|O|Q]' + 
-		'noframes[#|X|form|a|H|K|N|O|Q]' + 
-		'isindex[]' + 
-		'fieldset[#|legend|X|form|a|H|K|N|O|Q]' + 
-		'legend[S]' + 
-		'table[caption|col|colgroup|thead|tfoot|tbody|tr]' + 
-		'caption[S]' + 
-		'col[]' + 
-		'colgroup[col]' + 
-		'thead[tr]' + 
-		'tr[th|td]' + 
-		'th[#|X|form|a|H|K|N|O|Q]' + 
-		'form[#|X|a|H|K|N|O|Q]' + 
-		'noscript[#|X|form|a|H|K|N|O|Q]' + 
-		'td[#|X|form|a|H|K|N|O|Q]' + 
-		'tfoot[tr]' + 
-		'tbody[tr]' + 
-		'area[]' + 
-		'base[]' + 
+	}, 'script[]' +
+		'style[]' +
+		'object[#|param|X|form|a|H|K|N|O|Q]' +
+		'param[]' +
+		'p[S]' +
+		'a[Z]' +
+		'br[]' +
+		'span[S]' +
+		'bdo[S]' +
+		'applet[#|param|X|form|a|H|K|N|O|Q]' +
+		'h1[S]' +
+		'img[]' +
+		'map[X|form|Q|area]' +
+		'h2[S]' +
+		'iframe[#|X|form|a|H|K|N|O|Q]' +
+		'h3[S]' +
+		'tt[S]' +
+		'i[S]' +
+		'b[S]' +
+		'u[S]' +
+		's[S]' +
+		'strike[S]' +
+		'big[S]' +
+		'small[S]' +
+		'font[S]' +
+		'basefont[]' +
+		'em[S]' +
+		'strong[S]' +
+		'dfn[S]' +
+		'code[S]' +
+		'q[S]' +
+		'samp[S]' +
+		'kbd[S]' +
+		'var[S]' +
+		'cite[S]' +
+		'abbr[S]' +
+		'acronym[S]' +
+		'sub[S]' +
+		'sup[S]' +
+		'input[]' +
+		'select[optgroup|option]' +
+		'optgroup[option]' +
+		'option[]' +
+		'textarea[]' +
+		'label[S]' +
+		'button[#|p|T|div|U|W|table|G|object|applet|img|map|K|N|Q]' +
+		'h4[S]' +
+		'ins[#|X|form|a|H|K|N|O|Q]' +
+		'h5[S]' +
+		'del[#|X|form|a|H|K|N|O|Q]' +
+		'h6[S]' +
+		'div[#|X|form|a|H|K|N|O|Q]' +
+		'ul[li]' +
+		'li[#|X|form|a|H|K|N|O|Q]' +
+		'ol[li]' +
+		'dl[dt|dd]' +
+		'dt[S]' +
+		'dd[#|X|form|a|H|K|N|O|Q]' +
+		'menu[li]' +
+		'dir[li]' +
+		'pre[ZA]' +
+		'hr[]' +
+		'blockquote[#|X|form|a|H|K|N|O|Q]' +
+		'address[S|p]' +
+		'center[#|X|form|a|H|K|N|O|Q]' +
+		'noframes[#|X|form|a|H|K|N|O|Q]' +
+		'isindex[]' +
+		'fieldset[#|legend|X|form|a|H|K|N|O|Q]' +
+		'legend[S]' +
+		'table[caption|col|colgroup|thead|tfoot|tbody|tr]' +
+		'caption[S]' +
+		'col[]' +
+		'colgroup[col]' +
+		'thead[tr]' +
+		'tr[th|td]' +
+		'th[#|X|form|a|H|K|N|O|Q]' +
+		'form[#|X|a|H|K|N|O|Q]' +
+		'noscript[#|X|form|a|H|K|N|O|Q]' +
+		'td[#|X|form|a|H|K|N|O|Q]' +
+		'tfoot[tr]' +
+		'tbody[tr]' +
+		'area[]' +
+		'base[]' +
 		'body[#|X|form|a|H|K|N|O|Q]'
 	);
 
@@ -7503,7 +7503,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 		postRender : function() {
 			var t = this;
-			
+
 			t.parent();
 
 			// Set pending state
@@ -8479,7 +8479,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 				h1 = DOM.createHTML('span', {'class' : 'mceAction ' + s['class']}, '');
 
 			h += '<td>' + DOM.createHTML('a', {id : t.id + '_action', href : 'javascript:;', 'class' : 'mceAction ' + s['class'], onclick : "return false;", onmousedown : 'return false;', title : s.title}, h1) + '</td>';
-	
+
 			h1 = DOM.createHTML('span', {'class' : 'mceOpen ' + s['class']});
 			h += '<td>' + DOM.createHTML('a', {id : t.id + '_open', href : 'javascript:;', 'class' : 'mceOpen ' + s['class'], onclick : "return false;", onmousedown : 'return false;', title : s.title}, h1) + '</td>';
 
@@ -8951,7 +8951,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 						// All done
 						if (l == co)
-							execCallback(s, 'oninit');					
+							execCallback(s, 'oninit');
 					});
 				}
 			});
@@ -9536,7 +9536,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 				if (isIE || (tinymce.isOpera && parseFloat(opera.version()) >= 9.5))
 					u = 'javascript:(function(){document.open();document.domain="' + document.domain + '";var ed = window.parent.tinyMCE.get("' + t.id + '");document.write(ed.iframeHTML);document.close();ed.setupIframe();})()';
 				else if (tinymce.isOpera)
-					u = 'javascript:(function(){document.open();document.domain="' + document.domain + '";document.close();ed.setupIframe();})()';					
+					u = 'javascript:(function(){document.open();document.domain="' + document.domain + '";document.close();ed.setupIframe();})()';
 			}
 
 			// Create iframe
@@ -9841,7 +9841,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 					if (o.set)
 						o.content = t.execCallback('cleanup_callback', 'insert_to_editor', o.content, o);
 
-					if (o.get)						
+					if (o.get)
 						o.content = t.execCallback('cleanup_callback', 'get_from_editor', o.content, o);
 				});
 			}
@@ -9937,7 +9937,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 					}, 100);
 				}
 			}, 1);
-	
+
 			e = null;
 		},
 
@@ -11347,7 +11347,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 						editor.dom.remove(link, TRUE);
 				}
 			},
-			
+
 			selectAll : function() {
 				var root = dom.getRoot(), rng = dom.createRng();
 
@@ -12624,7 +12624,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 		setControlType : function(n, c) {
 			return this._cls[n.toLowerCase()] = c;
 		},
-	
+
 		destroy : function() {
 			each(this.controls, function(c) {
 				c.destroy();
