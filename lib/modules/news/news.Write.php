@@ -82,8 +82,10 @@ if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>News module</title>
 	
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css" />
+	
 	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../admin/includes/fancyupload/Assets/manager.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../admin/includes/fancyupload/Css/FileManager.css,Additions.css" />
 
 	<!-- TinyMCE JS -->
 	<script type="text/javascript" src="../../../admin/includes/tiny_mce/tiny_mce_gzip.js"></script>	
@@ -92,12 +94,8 @@ if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= 
 	<script type="text/javascript" src="../../includes/js/mootools.js" charset="utf-8"></script>
 	
 	<!-- File uploader JS -->
-	<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/FileManager.js"></script>
-	<script type="text/javascript" src="../../../admin/includes/fancyupload/Language/Language.en.js"></script>
-	<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Additions.js"></script>
-	<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-	<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-	<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader.js"></script>
+	<script type="text/javascript" src="../../../admin/includes/fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>
+	
 	<script type="text/javascript">
 FileManager.TinyMCE=function(options)
 	{
@@ -138,8 +136,6 @@ var Dialog=new Class(
 	});
 	</script>
 		
-	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css" />
-	
 	<!-- TinyMCE -->
 	<script type="text/javascript" src="../../../admin/includes/tiny_mce/tiny_mce_gzip.js"></script>	
 	

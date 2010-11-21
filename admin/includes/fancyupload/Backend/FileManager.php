@@ -57,9 +57,9 @@ class FileManager {
 			'mimeTypesPath' => $path . '/MimeTypes.ini',
 			'dateFormat' => 'j M Y - H:i',
 			'maxUploadSize' => 1024 * 1024 * 3,
-			'upload' => true,
-			'destroy' => true,
-			'safe' => false,
+			'upload' => true,  // false
+			'destroy' => true, // false
+			'safe' => false,   // true
 			'filter' => null
 		), $options);
 		

@@ -118,26 +118,37 @@ else if ($cssdir[0] != '/')
 	$cssdir = $cfg['rootdir'] . $cssdir;
 
 
-	
 // Determine the directory and type we should use
 $type = getGETparam4IdOrNumber('type');
 switch ($type) 
 {
 case 'css':
 	$http_base = path_remove_dot_segments($cssdir);
-	$base = cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH);
+	$base = str_replace('\\','/',cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
 	break;
 case 'javascript':
 	$http_base = path_remove_dot_segments($jsdir);
-	$base = cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH);
+	$base = str_replace('\\','/',cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
 	break;
 default:
 	send_response_status_header(503); // Not Implemented
 	exit;
 };
 
+/*
+This bit allows paths such as '../../../../../../../etc/passwd' to enter the system.
 
-$elements = explode(',', getGETparam4CommaSeppedFilenames('files'));
+We protect against such attacks by making sure the effective path ends up within the
+BASE_PATH subtree (or better).
+*/
+$elements = explode(',', getGETparam4CommaSeppedFullFilePaths('files'));
+
+if (substr($base, 0, strlen(BASE_PATH)) != BASE_PATH) 
+{
+	send_response_status_header(403); // Illegal Access
+	die();
+}
+
 
 // let's speed things up (min = 4 days)
 $offset = 3600 * 24 * 5;	
@@ -146,25 +157,36 @@ header($expire);
 
 // Determine last modification date of the files
 $lastmodified = 0;
-while (list(,$element) = each($elements)) 
+foreach($elements as $element)
 {
-	$path = realpath($base . '/' . $element);
+	$path = str_replace('\\','/',realpath($base . '/' . $element));
 
 	if (($type == 'javascript' && substr($path, -3) != '.js') || 
 		($type == 'css' && substr($path, -4) != '.css')) 
 	{
 		send_response_status_header(403); // Forbidden
-		exit;	
+		die();	
 	}
 
-	if (substr($path, 0, strlen($base)) != $base || !file_exists($path)) 
+	/*
+	The next part makes sure the code is still XSS safe as each of the 
+	generated file paths are checked against the 'base' directory and 
+	will only be allowed when they are part of that subtree.
+	*/
+	if (substr($path, 0, strlen($base)) != $base) 
+	{
+		send_response_status_header(403); // Illegal Access
+		die();
+	}
+	if (!file_exists($path)) 
 	{
 		send_response_status_header(404); // Not Found
-		exit;
+		die();
 	}
 	
 	$lastmodified = max($lastmodified, filemtime($path));
 }
+
 
 // Send Etag hash
 //
@@ -286,7 +308,7 @@ else
 			$my_content = fixup_js($my_content, $http_base);
 			break;
 		}
-		$contents .= "\n\n" . $my_content;
+		$contents .= "\n" . $my_content;
 	}
 
 	// invoke the apropriate optimizer for the given type:

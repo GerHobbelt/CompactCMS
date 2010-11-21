@@ -245,26 +245,26 @@ function filterParam4Filename($value, $def = null)
 
 
 
-function getGETparam4CommaSeppedFilenames($name, $def = null) 
+function getGETparam4CommaSeppedFullFilePaths($name, $def = null) 
 {
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4CommaSeppedFilenames(rawurldecode($_GET[$name]), $def);
+	return filterParam4CommaSeppedFullFilePaths(rawurldecode($_GET[$name]), $def);
 }
 
-function getPOSTparam4CommaSeppedFilenames($name, $def = null) 
+function getPOSTparam4CommaSeppedFullFilePaths($name, $def = null) 
 {
 	if (!isset($_POST[$name]))
 		return $def;
 
-	return filterParam4CommaSeppedFilenames($_POST[$name], $def);
+	return filterParam4CommaSeppedFullFilePaths($_POST[$name], $def);
 }
 
 /**
-As filterParam4Filename(), but also accepts a 'comma' separator
+As filterParam4FullFilePath(), but also accepts a 'comma' separator
 */
-function filterParam4CommaSeppedFilenames($value, $def = null)
+function filterParam4CommaSeppedFullFilePaths($value, $def = null)
 {
 	if (!isset($value))
 		return $def;
@@ -276,7 +276,7 @@ function filterParam4CommaSeppedFilenames($value, $def = null)
 	}
 	for ($i = count($fns); $i-- > 0; )
 	{
-		$fns[$i] = filterParam4Filename($fns[$i], '');
+		$fns[$i] = filterParam4FullFilePath($fns[$i], '');
 	}
 	
 	return implode(',', $fns);
@@ -1687,6 +1687,16 @@ function SetUpLanguageAndLocale($language)
 	else
 	{
 		$cfg['editarea_language'] = 'en';
+	}
+	
+	$fancyupload_langfile = BASE_PATH . '/admin/includes/fancyupload/Language/Language.'.$language.'.js';
+	if (is_file($fancyupload_langfile))
+	{
+		$cfg['fancyupload_language'] = $language;
+	}
+	else
+	{
+		$cfg['fancyupload_language'] = 'en';
 	}
 	
 	$cfg['language'] = $language;

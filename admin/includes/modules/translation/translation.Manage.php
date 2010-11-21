@@ -445,7 +445,7 @@ td.nowrap, th.nowrap
 }
 	</style>
 		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Assets/manager.css" />
+		<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Css/FileManager.css,Additions.css" />
 	
 		<!-- TinyMCE JS -->
 		<script type="text/javascript" src="../../tiny_mce/tiny_mce_gzip.js"></script>	
@@ -454,12 +454,8 @@ td.nowrap, th.nowrap
 		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
 		
 		<!-- File uploader JS -->
-		<script type="text/javascript" src="../../fancyupload/Source/FileManager.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Language/Language.en.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Additions.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Uploader.js"></script>
+		<script type="text/javascript" src="../../fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>
+
 		<script type="text/javascript">
 FileManager.TinyMCE=function(options)
 {

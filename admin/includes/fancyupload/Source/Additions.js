@@ -24,45 +24,47 @@ contains:
 (function(){
 
 Element.implement({
-	
-	appearOn: function(el, opacity, options){
-		opacity = $type(opacity) == 'array' ? [opacity[0] || 1, opacity[1] || 0] : [opacity || 1, 0];
-		
-		this.set({
-			opacity: opacity[1],
-			tween: options || {duration: 200}
-		});
-		
-		$(el).addEvents({
-			mouseenter: this.fade.bind(this, opacity[0]),
-			mouseleave: this.fade.bind(this, opacity[1])
-		});
-		
-		return this;
-	},
-	
+
+		appearOn: function(el) {
+
+			var params = Array.link($A(arguments).erase(arguments[0]), {options: Object.type, opacity: $defined}),
+				opacity = $type(params.opacity) == 'array' ? [params.opacity[0] || 1, params.opacity[1] || 0] : [params.opacity || 1, 0];
+
+			this.set({
+				opacity: opacity[1],
+				tween: params.options || {duration: 500}
+			});
+
+			$$(el).addEvents({
+				mouseenter: this.fade.bind(this, opacity[0]),
+				mouseleave: this.fade.bind(this, opacity[1])
+			});
+
+			return this;
+		},
+
 	center: function(offsets){
 		var scroll = document.getScroll(),
 			offset = document.getSize(),
 			size = this.getSize(),
 			values = {x: 'left', y: 'top'};
-		
+
 		if (!offsets) offsets = {};
-		
+
 		for (var z in values){
 			var style = scroll[z] + (offset[z] - size[z]) / 2 + (offsets[z] || 0);
 			this.setStyle(values[z], style < 10 ? 10 : style);
 		}
-		
+
 		return this;
 	}
-	
+
 });
 
 this.Dialog = new Class({
-	
+
 	Implements: [Options, Events],
-	
+
 	options: {
 		/*onShow: $empty,
 		onOpen: $empty,
@@ -73,10 +75,10 @@ this.Dialog = new Class({
 		buttons: ['confirm', 'decline'],
 		language: {}
 	},
-	
+
 	initialize: function(text, options){
 		this.setOptions(options);
-		
+
 		this.el = new Element('div', {
 			'class': 'dialog dialog-engine-' + Browser.Engine.name + ' dialog-engine-' + Browser.Engine.name + (Browser.Engine.trident ? Browser.Engine.version : ''),
 			opacity: 0,
@@ -84,9 +86,9 @@ this.Dialog = new Class({
 		}).adopt([
 			$type(text) == 'string' ? new Element('div', {text: text}) : text
 		]);
-		
+
 		if (this.options.content) this.el.getElement('div').adopt(this.options.content);
-		
+
 		Array.each(this.options.buttons, function(v){
 			new Element('button', {'class': 'dialog-' + v, text: this.options.language[v]}).addEvent('click', (function(e){
 				if (e) e.stop();
@@ -95,13 +97,13 @@ this.Dialog = new Class({
 				this.destroy();
 			}).bind(this)).inject(this.el);
 		}, this);
-		
+
 		this.overlay = new Overlay({
 			'class': 'overlay overlay-dialog',
 			events: {click: this.fireEvent.bind(this, ['close'])},
 			tween: {duration: 250}
 		});
-		
+
 		this.bound = {
 			scroll: (function(){
 				if (!this.el) this.destroy();
@@ -111,10 +113,10 @@ this.Dialog = new Class({
 				if (e.key == 'esc') this.fireEvent('close').destroy();
 			}).bind(this)
 		};
-		
+
 		this.show();
 	},
-	
+
 	show: function(){
 		this.overlay.show();
 		var self = this.fireEvent('open');
@@ -123,38 +125,38 @@ this.Dialog = new Class({
 			if (button) button.focus();
 			self.fireEvent('show');
 		});
-		
+
 		window.addEvents({
 			scroll: this.bound.scroll,
 			resize: this.bound.scroll,
 			keyup: this.bound.keyesc
 		});
 	},
-	
+
 	destroy: function(){
 		if (this.el) this.el.fade(0).get('tween').chain((function(){
 			this.overlay.destroy();
 			this.el.destroy();
 		}).bind(this));
-		
+
 		window.removeEvent('scroll', this.bound.scroll).removeEvent('resize', this.bound.scroll).removeEvent('keyup', this.bound.keyesc);
 	}
-	
+
 });
 
 this.Overlay = new Class({
-	
+
 	initialize: function(options){
 		this.el = new Element('div', $extend({
 			'class': 'overlay'
 		}, options)).inject(document.body);
 	},
-	
+
 	show: function(){
 		this.objects = $$('object, select, embed').filter(function(el){
 			return el.id == 'SwiffFileManagerUpload' || el.style.visibility == 'hidden' ? false : !!(el.style.visibility = 'hidden');
 		});
-		
+
 		this.resize = (function(){
 			if (!this.el) this.destroy();
 			else this.el.setStyles({
@@ -162,43 +164,43 @@ this.Overlay = new Class({
 				height: document.getScrollHeight()
 			});
 		}).bind(this);
-		
+
 		this.resize();
-		
+
 		this.el.setStyles({
 			opacity: 0,
 			display: 'block'
 		}).get('tween').pause().start('opacity', 0.5);
-		
+
 		window.addEvent('resize', this.resize);
-		
+
 		return this;
 	},
-	
+
 	hide: function(){
 		this.el.fade(0).get('tween').chain((function(){
 			this.revertObjects();
 			this.el.setStyle('display', 'none');
 		}).bind(this));
-		
+
 		window.removeEvent('resize', this.resize);
-		
+
 		return this;
 	},
-	
+
 	destroy: function(){
 		this.revertObjects().el.destroy();
 	},
-	
+
 	revertObjects: function(){
 		if (this.objects && this.objects.length)
 			this.objects.each(function(el){
-				el.style.visibility = 'visible';	
+				el.style.visibility = 'visible';
 			});
-		
+
 		return this;
 	}
-	
+
 });
 
 })();

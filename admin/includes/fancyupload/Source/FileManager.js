@@ -58,12 +58,13 @@ var FileManager = new Class({
 		onPreview: $empty*/
 		directory: '',
 		url: null,
+		baseURL: '',
 		assetBasePath: null,
 		selectable: false,
 		hideOnClick: false,
 		language: 'en'
 	},
-	
+
 	hooks: {
 		show: {},
 		cleanup: {}
@@ -78,7 +79,7 @@ var FileManager = new Class({
 
 		this.language = $unlink(FileManager.Language.en);
 		if (this.options.language != 'en') this.language = $merge(this.language, FileManager.Language[this.options.language]);
-		
+
 		this.container = new Element('div', {'class': 'filemanager-container filemanager-engine-' + Browser.Engine.name + (Browser.Engine.trident ? Browser.Engine.version : '')});
 		this.el = new Element('div', {'class': 'filemanager'}).inject(this.container);
 		this.menu = new Element('div', {'class': 'filemanager-menu'}).inject(this.el);
@@ -111,10 +112,10 @@ var FileManager = new Class({
 			}),
 			'click:relay(li span.fi)': this.relayClick
 		}).inject(this.el);
-		
+
 		this.addMenuButton('create');
 		if (this.options.selectable) this.addMenuButton('open');
-		
+
 		this.info = new Element('div', {'class': 'filemanager-infos', opacity: 0}).inject(this.el);
 
 		var head = new Element('div', {'class': 'filemanager-head'}).adopt([
@@ -134,7 +135,7 @@ var FileManager = new Class({
 			new Element('dt', {text: this.language.dir}),
 			new Element('dd', {'class': 'filemanager-dir'})
 		]).inject(this.info);
-		
+
 		this.preview = new Element('div', {'class': 'filemanager-preview'}).addEvent('click:relay(img.preview)', function(){
 			self.fireEvent('preview', [this.get('src')]);
 		});
@@ -142,7 +143,7 @@ var FileManager = new Class({
 			new Element('h2', {'class': 'filemanager-headline', text: this.language.preview}),
 			this.preview
 		]);
-		
+
 		this.closeIcon = new Element('div', {
 			'class': 'filemanager-close',
 			title: this.language.close,
@@ -165,16 +166,16 @@ var FileManager = new Class({
 			}
 		});
 		this.tips.attach(this.closeIcon.appearOn(this.closeIcon, [1, 0.8]).appearOn(this.el, 0.8));
-		
+
 		this.imageadd = new Asset.image(this.options.assetBasePath + 'add.png', {
 			'class': 'browser-add'
 		}).set('opacity', 0).inject(this.container);
-		
+
 		this.container.inject(document.body);
 		this.overlay = new Overlay(this.options.hideOnClick ? {
 			events: {click: this.hide.bind(this)}
 		} : null);
-		
+
 		this.bound = {
 			keydown: (function(e){
 				if (e.control || e.meta) this.imageadd.fade(1);
@@ -226,7 +227,7 @@ var FileManager = new Class({
 		this.tips.hide();
 		this.browser.empty();
 		this.container.setStyle('display', 'none');
-		
+
 		this.fireHooks('cleanup').fireEvent('hide');
 		window.removeEvent('scroll', this.bound.scroll).removeEvent('resize', this.bound.scroll).removeEvent('keyup', this.bound.keyesc);
 	},
@@ -235,7 +236,7 @@ var FileManager = new Class({
 		e.stop();
 
 		if (!this.Current) return false;
-		
+
 		this.fireEvent('complete', [
 			this.normalize(this.Directory + '/' + this.Current.retrieve('file').name),
 			this.Current.retrieve('file')
@@ -306,7 +307,7 @@ var FileManager = new Class({
 	destroy: function(e, file){
 		e.stop();
 		this.tips.hide();
-		
+
 		var self = this;
 		new Dialog(this.language.destroyfile, {
 			language: {
@@ -343,7 +344,7 @@ var FileManager = new Class({
 	rename: function(e, file){
 		e.stop();
 		this.tips.hide();
-		
+
 		var name = file.name;
 		if (file.mime != 'text/directory') name = name.replace(/\..*$/, '');
 
@@ -431,7 +432,7 @@ var FileManager = new Class({
 				top: 0
 			}).inject(el.retrieve('parent'));
 			el.getElements('img.browser-icon').set('opacity', 0);
-			
+
 			document.removeEvents('keydown', self.bound.keydown).removeEvents('keyup', self.bound.keydown);
 			self.imageadd.fade(0);
 
@@ -483,7 +484,7 @@ var FileManager = new Class({
 
 				if (e.control || e.meta || !droppable) el.setStyles({left: 0, top: 0});
 				if (!droppable && !e.control && !e.meta) return;
-				
+
 				var dir;
 				if (droppable){
 					droppable.addClass('selected').removeClass('droppable');
@@ -533,7 +534,7 @@ var FileManager = new Class({
 			src: this.options.assetBasePath + 'Icons/' + file.icon + '.png',
 			alt: file.mime
 		});
-		
+
 		this.fireHooks('cleanup');
 		this.preview.empty();
 
@@ -618,34 +619,34 @@ var FileManager = new Class({
 		if (this[name]) el.addEvent('click', this[name].bind(this));
 		return el;
 	},
-	
+
 	fireHooks: function(hook){
 		var args = Array.slice(arguments, 1);
 		for(var key in this.hooks[hook]) this.hooks[hook][key].apply(this, args);
 		return this;
 	},
-	
+
 	onRequest: function(){ this.loader.set('opacity', 1); },
 	onComplete: function(){ this.loader.fade(0); },
 	onDialogOpen: $empty,
 	onDialogClose: $empty,
 	onDragComplete: $lambda(false)
-	
+
 });
 
 FileManager.Request = new Class({
-	
+
 	Extends: Request.JSON,
-	
+
 	initialize: function(options, filebrowser){
 		this.parent(options);
-		
+
 		if (filebrowser) this.addEvents({
 			request: filebrowser.onRequest.bind(filebrowser),
 			complete: filebrowser.onComplete.bind(filebrowser)
 		});
 	}
-	
+
 });
 
 FileManager.Language = {};

@@ -1306,7 +1306,7 @@ function confirmation()
 	?>
 		
 		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="./fancyupload/Assets/manager.css" />
+		<link rel="stylesheet" media="all" type="text/css" href="./fancyupload/Css/FileManager.css,Additions.css" />
 	
 		<!-- TinyMCE JS -->
 		<script type="text/javascript" src="./tiny_mce/tiny_mce_gzip.js"></script>	
