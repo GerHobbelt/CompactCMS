@@ -11,8 +11,8 @@
 // +----------------------------------------------------------------------+
 // | getID3() - http://getid3.sourceforge.net or http://www.getid3.org    |
 // +----------------------------------------------------------------------+
-// | Authors: James Heinrich <info�getid3*org>                            |
-// |          Allan Hansen <ah�artemis*dk>                                |
+// | Authors: James Heinrich <infoØgetid3*org>                            |
+// |          Allan Hansen <ahØartemis*dk>                                |
 // +----------------------------------------------------------------------+
 // | getid3.php                                                           |
 // | Main getID3() file.                                                  |
@@ -63,7 +63,7 @@ class getid3
     // Class constants
     const VERSION           = '2.0.0b4';
     const FREAD_BUFFER_SIZE = 16384;                      // Read buffer size in bytes.
-    const ICONV_TEST_STRING = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~�������������������������������� �����������������������������������������������������������������������������������������������';
+    const ICONV_TEST_STRING = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ';
 
 
 
@@ -1492,7 +1492,7 @@ class getid3_lib
             if ($hex) {
                 $return_string .= str_pad(dechex(ord($string{$i})), 2, '0', STR_PAD_LEFT);
             } else {
-                $return_string .= ' '.(ereg("[\x20-\x7E]", $string{$i}) ? $string{$i} : '�');
+                $return_string .= ' '.(ereg("[\x20-\x7E]", $string{$i}) ? $string{$i} : '¤');
             }
             if ($spaces) {
                 $return_string .= ' ';
