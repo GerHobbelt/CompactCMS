@@ -265,8 +265,8 @@ else
 					header("Content-Encoding: " . $encoding);
 				}
 			
-				header("Content-Type: text/" . $type);
-				header("Content-Length: " . filesize($cachedir . '/' . $cachefile));
+				header('Content-Type: text/' . $type . '; charset=UTF-8');
+				header('Content-Length: ' . filesize($cachedir . '/' . $cachefile));
 	
 				fpassthru($fp);
 				fclose($fp);
@@ -462,7 +462,7 @@ else
 	}
 	
 	// Send Content-Type
-	header("Content-Type: text/" . $type);
+	header("Content-Type: text/" . $type . '; charset=UTF-8');
 	
 	if (isset($encoding) && $encoding != 'none') 
 	{
