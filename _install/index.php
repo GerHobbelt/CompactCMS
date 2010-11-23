@@ -271,7 +271,7 @@ if (is_file($filepath . 'config.inc.php') && is_file($filepath . 'compactcms-sql
 	a Viking so visionary as to crave a UNIX' touch? Have it your way then, and may the gods look 
 	favorably upon your soul in the here-on-after. Ta ta.
 	*/
-	$has_uptodate_backup = ($lastmtime > $backup_time);
+	$has_uptodate_backup = ($lastmtime < $backup_time);
 }
 	
 	
