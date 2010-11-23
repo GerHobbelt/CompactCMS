@@ -580,6 +580,15 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 		/* fix opacity for IE: */
 		// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
 		// filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
+		/* 
+		see also why we removed the MSIE filter lines in the CSS file 'originals':
+		
+		http://developer.yahoo.com/performance/rules.html
+		  (section: Avoid Filters)
+		
+		we can add the opacity filters back in through fixup_css() in 
+		the Combiner, as all CSS travels through there anyway.
+		*/
 		break;
 		
 	case 'remove':

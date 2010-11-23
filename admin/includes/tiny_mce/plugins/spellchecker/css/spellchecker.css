@@ -16,8 +16,6 @@
 	left: 0;
 	top: 0;
 	z-index: 100;
-	filter:progid:DXImageTransform.Microsoft.Alpha(style=0, opacity=60);
-	-moz-opacity:0.6;
 	opacity: 0.6;
 	background-color: white;
 }

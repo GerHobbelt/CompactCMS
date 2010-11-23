@@ -533,6 +533,15 @@ div.module
 .spinner  
 {
 	z-index: 9998;
+	/* 
+	see also why we removed the MSIE filter lines in here:
+	
+	http://developer.yahoo.com/performance/rules.html
+	  (section: Avoid Filters)
+	
+	we can add the opacity filters back in through fixup_css() in 
+	the Combiner, as all CSS travels through there anyway.
+	*/
 	opacity: 0.8;	
 	background-color: #fff;
 	
