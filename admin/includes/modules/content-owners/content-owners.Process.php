@@ -105,7 +105,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth())
 		foreach ($_POST['owner'] as $value) 
 		{
 			// Split posted variable
-			$explode = explode("||",$value);
+			$explode = explode('||',$value);
 		
 			// Set variables
 			$userID = filterParam4Number($explode[0]);
@@ -124,7 +124,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth())
 			$users = ltrim($users, '|');
 			
 			$values = array();
-			$values["user_ids"] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
+			$values['user_ids'] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
 		
 			if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 			{

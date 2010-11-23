@@ -620,6 +620,8 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		$values['printable']	= MySQL::SQLValue($printable_pref,MySQL::SQLVALUE_Y_N);
 		$values['published']	= MySQL::SQLValue($published_pref,MySQL::SQLVALUE_Y_N);
 		$values['iscoding']		= MySQL::SQLValue($iscoding_pref,MySQL::SQLVALUE_Y_N);
+		// the default 'owner' is the one who creates the page:
+		$values['user_ids']		= MySQL::SQLValue(intval($_SESSION['ccms_userID']),MySQL::SQLVALUE_TEXT);
 		
 		// Execute the insert
 		$result = $db->TransactionBegin();
