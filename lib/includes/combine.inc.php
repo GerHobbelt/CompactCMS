@@ -98,9 +98,12 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
+
 $optimize = array();
 $optimize['css'] = 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
 $optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
+$optimize['css3'] = 'remove';            // possible values: false, 'remove', 'IE-fix'
+
 
 $cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
 $cachedir	= BASE_PATH . '/lib/includes/cache';
@@ -277,37 +280,9 @@ else
 
 	// Get contents of the files
 	$contents = '';
-	reset($elements);
-	while (list(,$element) = each($elements)) 
+	foreach($elements as $element)
 	{
-		$path = realpath($base . '/' . $element);
-		$my_content = file_get_contents($path);
-		switch ($type)
-		{
-		case 'css':
-			/*
-			Before we go and optimize the CSS (or not), we fix up the CSS for IE7/8/... by adding the 
-			
-					 behavior: url(PIE.php);
-			
-			line in every definition which has a 'border-radius'.
-			
-			We do it this way to ensure all styles are patched correctly; previously this was done by hand in the
-			various CSS files, resulting in quite a few ommisions in the base css files and also the templates' ones.
-			
-			As we now force all CSS+JS requests through here, we can easily fix this kind of oddity very consistently
-			by performing the fix in code, right here.
-			
-			As the result is cached, this effort is only required once. Which would happen at install time when
-			you run the 'cache priming' action, resulting in a fully set up cache when you go 'live'.
-			*/
-			$my_content = fixup_css($my_content, $http_base);
-			break;
-			
-		default:
-			$my_content = fixup_js($my_content, $http_base);
-			break;
-		}
+		$my_content = load_one($type, $http_base, $base, $element);
 		$contents .= "\n" . $my_content;
 	}
 
@@ -520,25 +495,120 @@ function css_mk_abs_path($relpath, $basedir)
 		$abspath = $relpath;
 	}
 		
-	return $delimiter . $abspath . $delimiter;
+	return $abspath;
 }
 
 
 
 /**
-patch/correct CCS3 and other particulars
+patch/correct CCS3 and other particulars, such as 
+'@import flattening', which reduces the number of CSS files to load.
 */
-function fixup_css($contents, $basedir)
+function fixup_css($contents, $http_base, $type, $base, $element)
 {
-	global $cfg;
+	global $cfg, $optimize;
+
+	// make sure the @import statements are on their own lines: easier for us to process them:
+	$prev_content = '';
+	for($idx = strpos($contents, "@import"); $idx !== false; $idx = strpos($contents, "@import"))
+	{
+		// shift non-@import-ing lead off to other buffer, so we're never bothered with it again in this loop: speed!
+		$prev_content .= substr($contents, 0, $idx);
+		
+		$contents = substr($contents, $idx);
+		if (!preg_match('/@import\s+url\(([^)]+)\);?(.*)/s', $contents, $matches))
+		{
+			send_response_status_header(500); // Internal Failure
+			die();
+		}
+		$url = trim($matches[1]);
+		$contents = $matches[2];
+		
+		$delimiter = '';
+		if ($url[0] == "'" || $url[0] == '"')
+		{
+			$url = trim($url, $url[0]);
+		}
+		/*
+		we know the path to the current CSS file; this one is relative to that one, or an absolute path.
+		
+		Only 'flatten' imported CSS which has a RELATIVE path: those are /ours/ :-)
+		*/
+		if ($url[0] != '/' && strpos($url, '://') === false)
+		{
+			/* 
+			a relative path was specified; either as		
+			  url(./relpath)
+			or
+			  url(../relpath)
+			or
+			  url(relpath)
+			  
+			Anyway, prepend the current path to the given file and then discard the ./ and ../ entries in the path.
+			*/
+			$url = $element . '/../' . $url;
+			$url = path_remove_dot_segments($url);
+
+			$imported_content = load_one($type, $http_base, $base, $url);
+			
+			/* 
+			inject imported content into the current buffer to have it (re)processed in the loop:
+			this way we detect and handle nested @import's.
+			*/
+			$contents = "\n" . $imported_content . "\n" . $contents;
+		}
+		else
+		{
+			/* abs @import URL: reconstruct the @import statement and shift it off to the 'done' buffer... */
+			$stmt = "\n@import url(\"" . $url . "\");\n";
+			$prev_content .= $stmt;
+		}
+	}
 	
-	// fix CSS3 border-radius for IE:
-	$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
+	// re-merge contents from both buffers:
+	$contents = $prev_content . $contents;
+	
+	
+	switch ($optimize['css3'])
+	{
+	case 'IE-fix':
+		// fix CSS3 border-radius for IE:
+		$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
 
-	$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+		$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+		
+		/* fix opacity for IE: */
+		// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
+		// filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
+		break;
+		
+	case 'remove':
+		// remove any border-radius alike entry, including the mozilla+webkit specific ones:
+		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s+\w+;?/', '', $contents);
+		
+		// remove -moz-opacity lines and MSIE filter lines:
+		$contents = preg_replace('/\s-moz-opacity:\s+[0-9.];?/', '', $contents);
+		break;
+		
+	default:
+		// keep as-is
+		break;
+	}
 
-	// make all url() paths in there ABSOLUTE:
-	$contents = preg_replace('/\surl\(([^)]+)\)/e', "' url('.css_mk_abs_path('\\1', '$basedir').')'", $contents);
+	
+	/*
+	 make all url() paths in there ABSOLUTE.
+	
+	 As $element MAY contain path bits itself and url()s are relative to the CSS file, i.e. the $element,
+	 we must mix in those possible path bits. The fastest way to accomplish this is to simply
+	 specify a path like 
+	   <path+filename of CSS>/../ 
+	 and let the '..' directory remover do its regular job.
+	*/ 
+	$abspath = $http_base . (substr($http_base, -1, 1) != '/' ? '/' : '') . $element . '/../';
+	$abspath = path_remove_dot_segments($abspath);
+	
+	$contents = preg_replace('/\surl\(([^)]+)\)/e', "' url(\"'.css_mk_abs_path('\\1', '".$abspath."').'\")'", $contents);
 	
 	return $contents;
 }
@@ -548,12 +618,200 @@ function fixup_css($contents, $basedir)
 /**
 patch/correct JS relative paths and other particulars
 */
-function fixup_js($contents, $basedir)
+function fixup_js($contents, $http_base, $type, $base, $element)
 {
 	global $cfg;
-	
+
+	if (strmatch_tail($element, "tiny_mce_ccms.js"))
+	{
+		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $element);
+		$contents .= "\n" . $flattened_content;
+	}
+		
 	return $contents;
 }
 
 
+
+function load_tinyMCE_js($type, $http_base, $base, $element)
+{
+	$mce_basepath = $base . '/' . substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js"));
+	
+	$mce_files = array();
+	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
+	
+	// Add core
+	$mce_files[] = $mce_basepath . "tiny_mce" . $suffix . ".js";
+	// Add core language(s)
+	$languages = array($cfg['tinymce_language']);
+	if ($cfg['tinymce_language'] != 'en')
+	{
+		$languages[] = 'en';
+	}
+	foreach ($languages as $lang)
+	{
+		$mce_files[] = $mce_basepath . "langs/" . $lang . ".js";
+	}
+	// Add themes
+	$themes = array('advanced');
+	foreach ($themes as $theme) 
+	{
+		$mce_files[] = $mce_basepath . "themes/" . $theme . "/editor_template" . $suffix . ".js";
+
+		foreach ($languages as $lang)
+		{
+			$mce_files[] = $mce_basepath . "themes/" . $theme . "/langs/" . $lang . ".js";
+			$mce_files[] = $mce_basepath . "themes/" . $theme . "/langs/" . $lang . "_dlg.js";
+		}
+	}
+	// Add plugins
+	/*
+	available plugins: 
+		advhr,advimage,advlink,advlist,autoresize,autosave,
+		bbcode,
+		contextmenu,
+		directionality,
+		emotions,
+		fullpage,fullscreen,
+		iespell,inlinepopups,insertdatetime,
+		layer,legacyoutput,
+		media,
+		nonbreaking,noneditable,
+		pagebreak,paste,preview,print,
+		safari,save,searchreplace,spellchecker,style,
+		tabfocus,table,template,tinyautosave,
+		visualchars,
+		wordcount,
+		xhtmlxtras,
+	
+	used:
+		advimage,advlink,
+		fullscreen,
+		inlinepopups,
+		media,
+		paste,print,
+		safari,searchreplace,spellchecker,
+		table,tinyautosave,
+		visualchars,
+	*/
+	$mce_plugins = array(
+		'advhr' => 0,
+		'advimage' => 1,
+		'advlink' => 1,
+		'advlist' => 0,
+		'autoresize' => 0,
+		'autosave' => 0,
+		'bbcode' => 0,
+		'contextmenu' => 0,
+		'directionality' => 0,
+		'emotions' => 0,
+		'fullpage' => 0,
+		'fullscreen' => 1,
+		'iespell' => 0,
+		'inlinepopups' => 1,
+		'insertdatetime' => 0,
+		'layer' => 0,
+		'legacyoutput' => 0,
+		'media' => 1,
+		'nonbreaking' => 0,
+		'noneditable' => 0,
+		'pagebreak' => 0,
+		'paste' => 1,
+		'preview' => 0,
+		'print' => 1,
+		'safari' => 1,
+		'save' => 0,
+		'searchreplace' => 1,
+		'spellchecker' => 1,
+		'style' => 0,
+		'tabfocus' => 0,
+		'table' => 1,
+		'template' => 0,
+		'tinyautosave' => 1,
+		'visualchars' => 1,
+		'wordcount' => 0,
+		'xhtmlxtras' => 0
+		);
+	foreach ($mce_plugins as $plugin => $in_use) 
+	{
+		if (!$in_use) continue;
+		
+		$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/editor_plugin" . $suffix . ".js";
+
+		foreach ($languages as $lang)
+		{
+			$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/langs/" . $lang . ".js";
+			$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/langs/" . $lang . "_dlg.js";
+		}
+	}
+
+	// now load all content:
+	$my_content = '';
+	foreach($mce_files as $jsf)
+	{
+		$path = realpath($jsf);
+		if (is_file($path))
+		{
+			$c = file_get_contents($path) . "\n";
+			if ($c !== false)
+			{
+				$my_content .= $c;
+			}
+			else
+			{
+				send_response_status_header(404); // Not Found
+				die();
+			}
+		}
+	}
+
+}
+
+
+/**
+Load the content of the given item.
+
+Note that this function does 'fixup' the loaded content, which MAY result in recursive
+invocation of this function to load each of the dectected sub-items. This way we can easily handle
+'flattening' CSS which uses the @import statement, etc.
+*/
+function load_one($type, $http_base, $base, $element)
+{
+	$path = realpath($base . '/' . $element);
+	
+	$my_content = file_get_contents($path);
+	if ($my_content === false)
+	{
+		send_response_status_header(404); // Not Found
+		die();
+	}
+	
+	switch ($type)
+	{
+	case 'css':
+		/*
+		Before we go and optimize the CSS (or not), we fix up the CSS for IE7/8/... by adding the 
+		
+				 behavior: url(PIE.php);
+		
+		line in every definition which has a 'border-radius'.
+		
+		We do it this way to ensure all styles are patched correctly; previously this was done by hand in the
+		various CSS files, resulting in quite a few ommisions in the base css files and also the templates' ones.
+		
+		As we now force all CSS+JS requests through here, we can easily fix this kind of oddity very consistently
+		by performing the fix in code, right here.
+		
+		As the result is cached, this effort is only required once. Which would happen at install time when
+		you run the 'cache priming' action, resulting in a fully set up cache when you go 'live'.
+		*/
+		$my_content = fixup_css($my_content, $http_base, $type, $base, $element);
+		break;
+		
+	default:
+		$my_content = fixup_js($my_content, $http_base, $type, $base, $element);
+		break;
+	}
+	return $my_content;
+}
 ?>

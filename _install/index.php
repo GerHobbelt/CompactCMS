@@ -362,7 +362,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	<div id="help" class="span-8 colborder">
 		<div id="logo" class="sprite logo"><h1>CompactCMS installation</h1></div>
 		<span class="ss_sprite ss_package_green">&#160;</span><h2 style="display:inline;">Install CompactCMS</h2>
-		<p>Welcome to the installation wizard of CompactCMS. This wizard will guide you through the five steps required to get CCMS to work on your server. Installing CompactCMS will not take more than five minutes of your time.</p>
+		<p>Welcome to the installation wizard of CompactCMS. This wizard will guide you through the five steps required to get CCMS to work on your server.
+		Installing CompactCMS will not take more than five minutes of your time.</p>
 		<span class="ss_sprite ss_tick"></span><h2 style="display:inline;">What steps to expect</h2>
 		<ol>
 			<li><strong>Environment</strong><br/><em>Tell CCMS where your installation is located and what language to speak</em></li>
@@ -372,7 +373,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 			<li><strong>Done!</strong><br/><em>CCMS saves all of your settings and preferences</em></li>
 		</ol>
 		<p>If you have any questions, suggestions or perhaps even praise; be sure to <a href="http://www.compactcms.nl/contact.html?subject=My installation feedback" target="_blank" title="Send me an e-mail">let me know</a>!</p>
-		<p>Cheers!<br/><em>Xander</em>.</p>
+		<p>Cheers!<br/><em>Xander</em></p>
 	</div>
 	<div class="span-9">
 		<?php
@@ -381,7 +382,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		?>
 		<div class="error">
 			<h1>Outdated backup or inproper restore preparation</h1>
-			<p>It turns out you have</p>
+			<p>It turns out you have:</p>
 			<ol>
 				<li><p>either not performed a backup prior to running this installer.</p>
 					<p>More specifically, we have found that certain existing 
