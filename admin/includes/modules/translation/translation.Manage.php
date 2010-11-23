@@ -620,7 +620,7 @@ function confirmation()
 	{
 		try
 		{
-			parent.MochaUI.closeWindow(parent.$('sys-perm_ccms'));
+			parent.MochaUI.closeWindow(parent.$('sys-tran_ccms'));
 		}
 		catch(e)
 		{
