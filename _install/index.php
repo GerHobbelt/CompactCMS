@@ -305,26 +305,32 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<script type="text/javascript" charset="utf-8">
 			window.addEvent('domready', function() {
 				// Process steps
-				$('installFrm').addEvent('submit', function(install) {
-					new Event(install).stop();
+				var frm = $('installFrm');
+				
+				/* form may NOT exist when the update check has detected an outdated restore SQLdump or config.inc.php file */
+				if (frm)
+				{
+					frm.addEvent('submit', function(install) {
+						new Event(install).stop();
+							
+						var install_div = $('install');
+						var scroll = new Fx.Scroll(window, {wait: false, duration: 500, transition: Fx.Transitions.Quad.easeInOut});
 						
-					var install_div = $('install');
-					var scroll = new Fx.Scroll(window, {wait: false, duration: 500, transition: Fx.Transitions.Quad.easeInOut});
-					
-					new Request.HTML({
-						method: 'post',
-						url: './installer.inc.php',
-						update: install_div,
-						onRequest:  function() { 
-							install_div.empty().addClass('loading');
-						}, 
-						onComplete: function() {
-							install_div.removeClass('loading');
-							scroll.toElement('install-wrapper');
-							build_tips();
-						}
-					}).send($('installFrm'));
-				});
+						new Request.HTML({
+							method: 'post',
+							url: './installer.inc.php',
+							update: install_div,
+							onRequest:  function() { 
+								install_div.empty().addClass('loading');
+							}, 
+							onComplete: function() {
+								install_div.removeClass('loading');
+								scroll.toElement('install-wrapper');
+								build_tips();
+							}
+						}).send(frm);
+					});
+				}
 
 				build_tips();
 			});			
