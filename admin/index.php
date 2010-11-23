@@ -169,7 +169,7 @@ function set_filter_msgs(el)
 				if($_SESSION['ccms_userLevel']>=4 && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 				{ 
 				?>
-					<li><span class="ss_sprite ss_group_key"><a id="sys-perm" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['translation']; ?></a></span></li>
+					<li><span class="ss_sprite ss_group_key"><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['translation']; ?></a></span></li>
 				<?php 
 				} 
 				?>
