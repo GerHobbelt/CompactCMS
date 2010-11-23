@@ -1293,6 +1293,7 @@ function confirmation()
 		catch(e)
 		{
 		}
+		return true;
 	}
 	else
 	{

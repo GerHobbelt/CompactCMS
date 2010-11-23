@@ -207,20 +207,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 function confirmation()
 {
 	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	if(answer)
-	{
-		try
-		{
-			return true;
-		}
-		catch(e)
-		{
-		}
-	}
-	else
-	{
-		return false;
-	}
+	return !!answer;
 }
 
 function confirm_regen()

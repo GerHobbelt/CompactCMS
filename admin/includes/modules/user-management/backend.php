@@ -79,20 +79,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 function confirmation()
 {
 	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	if(answer)
-	{
-		try
-		{
-			return true;
-		}
-		catch(e)
-		{
-		}
-	}
-	else
-	{
-		return false;
-	}
+	return !!answer;
 }
 	</script>
 	<script type="text/javascript" charset="utf-8">

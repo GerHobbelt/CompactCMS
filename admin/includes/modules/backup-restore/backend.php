@@ -74,25 +74,10 @@ if ($perm['manageModBackup'] <= 0 || !checkAuth())
 function confirmation()
 {
 	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	if(answer)
-	{
-		try
-		{
-			return true;
-		}
-		catch(e)
-		{
-		}
-	}
-	else
-	{
-		return false;
-	}
+	return !!answer;
 }
 
-window.addEvent(
-	'domready',
-	function()
+window.addEvent('domready', function()
 	{
 		$('create-arch').addEvent('click', function()
 			{
