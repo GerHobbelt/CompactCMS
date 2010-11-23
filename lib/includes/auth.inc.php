@@ -210,5 +210,46 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 </div>
 <p class="quiet small" style="text-align:center;">&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
 
+<script type="text/javascript" charset="utf-8">
+	/* 
+	make sure we are NOT loaded in a [i]frame (~ MochaUI window) 
+	
+	code bit taken from mootools 'domready' internals; rest derived from
+	  http://tjkdesign.com/articles/frames/4.asp#breaking
+	*/
+	var isFramed = false;
+	// Thanks to Rich Dougherty <http://www.richdougherty.com/>
+	try 
+	{
+		isFramed = (window.frameElement != null);
+	} 
+	catch(e){}
+	/* another way to detect placement in a frame/iframe */
+	try 
+	{
+		var f = (top != self);
+		if (f) isFramed = true;
+	} 
+	catch(e){}
+	/* and for those rare occasions where the login screen is (inadvertedly) loaded through an AJAX load into a <div> or other in the current document: */
+	try 
+	{
+		var f = (self.location.indexOf("<?php echo $_SERVER['PHP_SELF']; ?>") < 0);
+		if (f) isFramed = true;
+	} 
+	catch(e){}
+
+	if (isFramed) 
+	{
+		if (typeof top.location.replace == "function")
+		{
+			top.location.replace("<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>");
+		}
+		else
+		{
+			top.location.href = "<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>";
+		}
+	}
+</script>
 </body>
 </html>
