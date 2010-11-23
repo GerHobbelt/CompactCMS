@@ -77,10 +77,13 @@ if($do == "logout")
 	if (ini_get("session.use_cookies")) 
 	{
 		$params = session_get_cookie_params();
-		setcookie(session_name(), '', time() - 42000,
-			$params["ccms_userID"], $params["domain"],
-			$params["secure"], $params["httponly"]
-		);
+		if (!empty($params["ccms_userID"]))
+		{
+			setcookie(session_name(), '', time() - 42000,
+				$params["ccms_userID"], $params["domain"],
+				$params["secure"], $params["httponly"]
+			);
+		}
 	}
 	
 	// Generate a new session_id
