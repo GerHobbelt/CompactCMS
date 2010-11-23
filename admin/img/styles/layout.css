@@ -533,10 +533,7 @@ div.module
 .spinner  
 {
 	z-index: 9998;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
-	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
 	opacity: 0.8;	
-	-moz-opacity: 0.8;
 	background-color: #fff;
 	
     display:block;

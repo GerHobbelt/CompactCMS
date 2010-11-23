@@ -41,10 +41,7 @@ div.mochaToolbarWrapper.bottom {border: 0;border-bottom: 1px solid #d9d9d9;}
 	width: 3px;
 	height: 3px;
 	z-index: 2;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* IE8 */		
-	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0); /* IE6 and 7*/
 	opacity: .0;	
-	-moz-opacity: .0;
 	overflow: hidden;
 	font-size: 1px; /* For IE6 */
 }
