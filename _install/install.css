@@ -28,7 +28,6 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************** */
 
 @import url('../admin/img/styles/base.css');
-/* @import url('../admin/img/styles/liquid.css'); */
 @import url('../admin/img/styles/layout.css');
 @import url('../admin/img/styles/sprite.css');
 
@@ -42,14 +41,15 @@ table
 	line-height:0.95;
 } 
 
-.small
-{
-	font-size:0.8em;
-}
 .signal_upgrade_mode
 {
 	font-weight: bold;
 	color: #f00;
+}
+
+h1
+{
+	font-size: 2em;
 }
 
 /* LOGIN && INSTALL === */

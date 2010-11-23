@@ -103,35 +103,42 @@ function set_filter_msgs(el)
 
 <body id="desktop">
 <div id='pageWrapper'><?php /* <-- required to ensure there are proper scrollbars in the MochaUI 'desktop' */ ?>
-<div class="container">
+<div class="container-25">
 	<?php // Top bar including status block ?>
 	<div id="logo" class="sprite logo span-5 colborder">
 		<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
 		<p><span class="ss_sprite ss_world"><?php echo $cfg['sitename']; ?></span></p>
 	</div>
-	<div id="notify" class="sprite notify span-12">
-		<p><?php 
+	<div id="notify" class="span-13">
+	<div class="rounded-border">
+		<p>
+		<?php 
 		if($cfg['protect'])
 		{
-			?><span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout"><?php echo $ccms['lang']['backend']['logout']; ?></a></span><?php 
+		?>
+			<span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout"><?php echo $ccms['lang']['backend']['logout']; ?></a></span>
+		<?php 
 		} 
-		?><a id="clockLink" style="text-decoration:none;" class="clock"><span class="ss_sprite ss_clock">&#160;</span></a></p>
-		<div id="notify_res">&#160;
+		?>
+		<a id="clockLink" style="text-decoration:none;" class="clock"><span class="ss_sprite ss_clock">&#160;</span></a></p>
+		<div id="notify_icon">&#160;</div>
+		<div id="notify_res">
 			<?php 
 			if(!empty($version_recent) && !empty($v) && $cfg['version']) 
 			{ 
 			?>
-				<br/><?php echo $ccms['lang']['backend']['currentversion']." ".$v; ?>. <?php echo $ccms['lang']['backend']['mostrecent']." ".$version_recent; ?>.<br/>
-				<br/>
-				<div style="font-weight: bold; text-align: center;"> <?php echo $ccms['lang']['backend']['versionstatus']." ".$version; ?></div>
+				<p><?php echo $ccms['lang']['backend']['currentversion']." ".$v; ?>. <?php echo $ccms['lang']['backend']['mostrecent']." ".$version_recent; ?>.</p>
+				<p class="versionstatus"><?php echo $ccms['lang']['backend']['versionstatus']." ".$version; ?></p>
 			<?php 
 			} 
 			else 
-				echo "<br/>".$ccms['lang']['system']['error_versioninfo']; 
+				echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>'; 
 			?>
 		</div>
 	</div>
+	</div>
 	<div id="advanced" class="prepend-1 span-5 last">
+	<div class="rounded-border">
 		<h2><span class="ss_sprite ss_user_red"><?php echo $ccms['lang']['backend']['hello']; ?></span> <?php echo $_SESSION['ccms_userFirst']; ?></h2>
 		<div id="advanced_res">
 			<ul>
@@ -175,6 +182,7 @@ function set_filter_msgs(el)
 				?>
 			</ul>
 		</div>
+	</div>
 	</div>
 
 	<?php 
@@ -261,7 +269,7 @@ function set_filter_msgs(el)
 	if($_SESSION['ccms_userLevel']>=$perm['manageMenu']) 
 	{ 
 	?>
-	<div id="menudepth" class="span-16">
+	<div id="menudepth" class="span-16 last">
 	<fieldset>
 		<legend><span class="ss_sprite ss_text_list_bullets">&#160;</span> <a class="toggle" rel="menu_wrapper" href="#"><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
 		<div id="menu_wrapper">
@@ -348,7 +356,7 @@ function set_filter_msgs(el)
 					} 
 					?>
 				</th>
-				<th class="span-5" style="text-align: right;">&#160;</th>
+				<th class="span-5 last" style="text-align: right;">&#160;</th>
 			</tr>
 		</table>
 		<div id="dyn_list">

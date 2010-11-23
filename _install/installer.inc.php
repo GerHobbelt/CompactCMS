@@ -81,37 +81,38 @@ if($nextstep == md5('2') && CheckAuth())
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
 
-		<label for="userPass"><span class="ss_sprite ss_lock">Administrator password</span><br/><a href="#" class="small ss_sprite ss_arrow_refresh" onclick="randomPassword(8);">Auto generate a safe password</a></label>
+		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password<br/>
+			<a href="#" class="small ss_sprite ss_arrow_refresh" onclick="randomPassword(8);">Auto generate a safe password</a></label>
 		<input type="text" class="alt title" name="userPass" maxlenght="5" onkeyup="passwordStrength(this.value)" style="width:300px;" value="" id="userPass" />
 		<div class="clear center">
 			<div id="passwordStrength" class="strength0"></div>
 		</div>
-		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Remember your admin password as it cannot be retrieved</span>
-		<label for="authcode"><span class="ss_sprite ss_textfield_key">Authentication PIN</span></label>
+		<p class="ss_sprite ss_bullet_star small quiet clear">Remember your admin password as it cannot be retrieved</p>
+		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN</label>
 		<input type="text" class="alt title" name="authcode" maxlenght="5" style="width:300px;" value="<?php
 			echo (empty($_SESSION['variables']['authcode']) ? mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
-		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</span>
-		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</span>
-		<br class="clear"/>
+		<p class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</p>
+		<p class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</p>
+		
 		<label for="protect"><input type="checkbox" name="protect" value="true" <?php
 			echo (!empty($_SESSION['variables']['protect']) && $_SESSION['variables']['protect'] ? 'checked' : ''); ?> id="protect" /> Password protect the administration</label>
 		<label for="version"><input type="checkbox" name="version" value="true"  <?php
 			echo (!empty($_SESSION['variables']['version']) && $_SESSION['variables']['version'] ? 'checked' : ''); ?>  id="version" /> Show version information</label>
-		&#160;<span class="ss_sprite ss_bullet_star small quiet">Want to see the latest CCMS version at the dashboard?</span>
+		<p class="ss_sprite ss_bullet_star small quiet">Want to see the latest CCMS version at the dashboard?</p>
 		<label for="iframe"><input type="checkbox" name="iframe" value="true"  <?php
 			echo (!empty($_SESSION['variables']['iframe']) && $_SESSION['variables']['iframe'] ? 'checked' : ''); ?> id="iframe" /> Support &amp; allow iframes</label>
-		&#160;<span class="ss_sprite ss_bullet_star small quiet">Can iframes be managed from within the WYSIWYG editor?</span>
+		<p class="ss_sprite ss_bullet_star small quiet">Can iframes be managed from within the WYSIWYG editor?</p>
 		<label for="wysiwyg"><input type="checkbox" name="wysiwyg" value="true"  <?php
 			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
-		&#160;<span class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</span>
-		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?>	>
+		<p class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</p>
+		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?> >
 			<input type="checkbox" <?php if ($do_upgrade) { echo 'value="true"'; } ?> name="upgrade" 
 			<?php if ($may_upgrade) { echo 'checked'; } else { echo 'disabled="disabled"'; } ?> id="upgrade" /> Perform an 
-			<span class="ss_sprite ss_help" title="When and how can we upgrade? :: 
+				<span class="ss_sprite_16 ss_help" title="When and how can we upgrade? :: 
 						<ul>
 						<li>
 							<p>You can perform an upgrade when you have <strong>made a backup of your site</strong>: this installer will automatically detect this and consequently enable the 'upgrade' tickbox.</p>
-							<p><span class='small'>(assuming you have created the backup with a running version of CompactCMS 1.4.2 or later)</span></p>
+							<p class='small'>(assuming you have created the backup with a running version of CompactCMS 1.4.2 or later)</p>
 						</li>
 						<li>
 							<p>Note that you can also <strong>restore an existing site</strong> by taking its backup and extracting the contents of the backup (zip archive) 
@@ -119,22 +120,23 @@ if($nextstep == md5('2') && CheckAuth())
 							<p>This will result in the backed-up content to be placed in the <file><?php echo $dir; ?>content/</file> directory 
 							and the <file>config.inc.php</file> and <file>compactcms-sqldump.sql</file> files are available in the web site's restore directory
 							<file><?php echo $dir; ?>media/files/ccms-restore/</file> .</p>
-							<p><span class='small'>(This is assuming you have created the backup with a running version of CompactCMS 1.4.2 or later; if your backup
+							<p class='small'>(This is assuming you have created the backup with a running version of CompactCMS 1.4.2 or later; if your backup
 							originates from an earlier version of CompactCMS, you will have to move the extracted content to the appropriate spots and possibly
 							recover your original config.inc.php some other way as those versions did not include that file in the backups. Consult the 
-							CompactCMS forum for assistance.)</span></p>
+							CompactCMS forum for assistance.)</p>
 							<p>Subsequently running this install wizard will result in auto-detection of such a restore operation and enable the 'upgrade' tickbox for you.</p>
-							">
-				&#160;<strong>upgrade</strong>
-			</span>
-			</label>
-		&#160;<span class="ss_sprite ss_bullet_star small <?php if (!$may_upgrade) { echo 'quiet'; } ?>">Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></span>
+						</li>
+						</ul> ">
+				&#160;</span>
+			<strong>upgrade</strong>
+		</label>
+		<p class="ss_sprite ss_bullet_star small <?php if (!$may_upgrade) { echo 'quiet'; } ?>">Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></p>
 
-		<p class="span-8 right">
-			<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
-			<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
+		<p class="right">
+			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
+			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</p>
+		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
 
 <?php
 } // Close step two

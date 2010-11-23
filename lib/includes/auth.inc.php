@@ -180,14 +180,14 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	</head>
 <body>
 
-<div id="login-wrapper" class="container">
+<div id="login-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">
 		<div id="logo" class="sprite logo"><h1>CompactCMS administration</h1></div>
 		<span class="ss_sprite ss_door_open">&#160;</span><h2 style="display:inline;"><?php echo $ccms['lang']['login']['login']; ?></h2>
 		<?php echo $ccms['lang']['login']['welcome'];?>
 	</div>
 	
-	<div id="login" class="span-9">
+	<div id="login" class="span-9 last">
 		<?php 
 		if(!empty($_SESSION['logmsg'])) 
 		{ 

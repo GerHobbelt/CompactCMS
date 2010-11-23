@@ -18,8 +18,8 @@ body, html, table, form, textarea{
 
 #result{
 	z-index: 4; 
-	overflow-x: auto;
-	overflow-y: scroll;
+	overflow-x: auto;  /* not CSS2.1 */
+	overflow-y: scroll;  /* not CSS2.1 */
 	border-top: solid #888 1px;
 	border-bottom: solid #888 1px;
 	position: relative;

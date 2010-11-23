@@ -300,6 +300,9 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<title>CompactCMS Installation</title>
 		<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 		<link rel="stylesheet" type="text/css" href="./install.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
+		<![endif]-->
 		<script type="text/javascript" src="../lib/includes/js/mootools.js" charset="utf-8"></script>
 		<script type="text/javascript" src="../admin/includes/modules/user-management/passwordcheck.js" charset="utf-8"></script>
 		<script type="text/javascript" charset="utf-8">
@@ -356,15 +359,15 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	</head>
 <body>
 
-<p>&#160;</p>
-
-<div id="install-wrapper" class="container">
+<div id="install-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">
-		<div id="logo" class="sprite logo"><h1>CompactCMS installation</h1></div>
-		<span class="ss_sprite ss_package_green">&#160;</span><h2 style="display:inline;">Install CompactCMS</h2>
+		<div id="logo" class="sprite logo">
+			<h1>CompactCMS installation</h1>
+		</div>
+		<h2><span class="ss_sprite_16 ss_package_green">&#160;</span>Install CompactCMS</h2>
 		<p>Welcome to the installation wizard of CompactCMS. This wizard will guide you through the five steps required to get CCMS to work on your server.
 		Installing CompactCMS will not take more than five minutes of your time.</p>
-		<span class="ss_sprite ss_tick"></span><h2 style="display:inline;">What steps to expect</h2>
+		<h2><span class="ss_sprite_16 ss_tick">&#160;</span>What steps to expect</h2>
 		<ol>
 			<li><strong>Environment</strong><br/><em>Tell CCMS where your installation is located and what language to speak</em></li>
 			<li><strong>Preferences</strong><br/><em>Indicate how you prefer your CCMS</em></li>
@@ -375,13 +378,13 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<p>If you have any questions, suggestions or perhaps even praise; be sure to <a href="http://www.compactcms.nl/contact.html?subject=My installation feedback" target="_blank" title="Send me an e-mail">let me know</a>!</p>
 		<p>Cheers!<br/><em>Xander</em></p>
 	</div>
-	<div class="span-9">
+	<div class="span-9 last">
 		<?php
 		if ($has_prepped_restore && !$has_uptodate_backup)
 		{
 		?>
 		<div class="error">
-			<h1>Outdated backup or inproper restore preparation</h1>
+			<h1><span class="ss_sprite_16 ss_error">&#160;</span>Outdated backup or inproper restore preparation</h1>
 			<p>It turns out you have:</p>
 			<ol>
 				<li><p>either not performed a backup prior to running this installer.</p>
@@ -468,15 +471,17 @@ if (empty($_SESSION['variables']['do_upgrade']))
 				?>
 					<p>The details below have been filled-out based on information readily available. Please confirm these settings, select your language and click proceed.</p>
 					
-					<label for="sitename"><span class="ss_sprite ss_pencil">Site name</span></label><input type="text" class="alt title" name="sitename" style="width:300px;" value="<?php echo (!isset($_SESSION['variables']['sitename'])?ucfirst(preg_replace("/^www\./", "", $_SERVER['HTTP_HOST'])):$_SESSION['variables']['sitename']);?>" id="sitename" />
+					<label for="sitename"><span class="ss_sprite_16 ss_pencil">&#160;</span>Site name</label>
+					<input type="text" class="alt title" name="sitename" value="<?php echo (!isset($_SESSION['variables']['sitename'])?ucfirst(preg_replace("/^www\./", "", $_SERVER['HTTP_HOST'])):$_SESSION['variables']['sitename']);?>" id="sitename" />
+					<br/>
 					
-					<label for="rootdir"><span class="ss_sprite ss_application_osx_terminal">Web root directory</span></label>
-					<input type="text" class="alt title" name="rootdir" style="width:300px;" autofocus value="<?php echo $rootdir;?>" id="rootdir" />
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</span>
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Must include trailing slash!</span>
+					<label for="rootdir"><span class="ss_sprite_16 ss_application_osx_terminal">&#160;</span>Web root directory</label>
+					<input type="text" class="alt title" name="rootdir" autofocus value="<?php echo $rootdir;?>" id="rootdir" />
+					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</p>
+					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>Must include trailing slash!</p>
 					
-					<label for="language"><span class="ss_sprite ss_comments">CCMS backend language</span></label>
-					<select name="language" class="title" style="padding:5px 10px;width:300px;" id="language" size="1">
+					<label for="language"><span class="ss_sprite_16 ss_comments">&#160;</span>CCMS backend language</label>
+					<select name="language" class="title" id="language" size="1">
 						<?php 
 						// Get current languages
 						$s = (isset($_SESSION['variables']['language'])?$_SESSION['variables']['language']:'en');
@@ -498,27 +503,27 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					<p>Whenever a chmod() command failes through standard procedures, the installer can try to execute the chmod() command over FTP. This requires you to submit your FTP details and full path of your CCMS installation. Any of the data entered below will <strong>never</strong> be saved by the installer.</p>
 					
 					<label for="ftp_host">FTP host</label>
-					<input type="text" class="alt title" name="ftp_host" style="width:300px;" value="" id="ftp_host"/>
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Often www.domain.ext or ftp.domain.ext</span>
-					
+					<input type="text" class="alt title" name="ftp_host" value="" id="ftp_host"/>
+					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>Often www.domain.ext or ftp.domain.ext</p>
+					<br/>
 					<label for="ftp_user">FTP username</label>
-					<input type="text" class="alt title" name="ftp_user" style="width:300px;" value="" id="ftp_user"/>
-					
+					<input type="text" class="alt title" name="ftp_user" value="" id="ftp_user"/>
+					<br/>
 					<label for="ftp_pass">FTP password</label>
-					<input type="password" class="title" name="ftp_pass" style="width:300px;" value="" id="ftp_pass"/>
-					
+					<input type="password" class="title" name="ftp_pass" value="" id="ftp_pass"/>
+					<br/>
 					<label for="ftp_path">Installation path</label>
-					<input type="text" class="alt title" name="ftp_path" style="width:300px;" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">CCMS will try to auto-find this using the default value above</span>
+					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
+					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
 					
 					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 				<?php 
 				} 
 				?>
 				
-				<p class="span-8 right">
-					<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-					<span class="ss_sprite ss_cancel"><a href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>">Cancel</a></span>
+				<p class="right">
+					<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
+					<a class="button" href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 				</p>
 			</fieldset>
 		</form>
