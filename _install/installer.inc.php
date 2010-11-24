@@ -80,14 +80,13 @@ if($nextstep == md5('2') && CheckAuth())
 	
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
-
 		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password<br/>
 			<a href="#" class="small ss_sprite ss_arrow_refresh" onclick="randomPassword(8);">Auto generate a safe password</a></label>
-		<input type="text" class="alt title" name="userPass" maxlenght="5" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
+		<input type="text" class="alt title" name="userPass" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
 		<div id="passwordStrength" class="strength0"></div>
 		<p class="ss_sprite ss_bullet_star small quiet clear">Remember your admin password as it cannot be retrieved</p>
 		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN</label>
-		<input type="text" class="alt title" name="authcode" maxlenght="5" value="<?php
+		<input type="text" class="alt title" name="authcode" value="<?php
 			echo (empty($_SESSION['variables']['authcode']) ? mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
 		<p class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</p>
 		<p class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</p>
@@ -137,6 +136,8 @@ if($nextstep == md5('2') && CheckAuth())
 		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
 
 <?php
+
+	exit();
 } // Close step two
 
 // Step three
@@ -186,6 +187,8 @@ if($nextstep == md5('3') && CheckAuth())
 		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
 
 <?php
+
+	exit();
 } // Close step three
 
 // Step four
@@ -203,9 +206,6 @@ if($nextstep == md5('4') && CheckAuth())
 
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$db_host,$db_user,$db_pass,$db_name,$db_prefix);
-
-	// Define alternative table row color
-	$alt_row = "#CDE6B3";
 
 	//
 	// Check for current chmod(); we only are interesting in whether these files and directories are readable and writeable:
@@ -267,7 +267,7 @@ if($nextstep == md5('4') && CheckAuth())
 		?>
 		<h2><span class="ss_sprite_16 ss_computer">&#160;</span>Environment</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Sitename</th>
 				<td><?php echo $_SESSION['variables']['sitename'];?></td>
 			</tr>
@@ -275,7 +275,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Root directory</th>
 				<td><?php echo $_SESSION['variables']['rootdir'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Language</th>
 				<td><?php echo $_SESSION['variables']['language'];?></td>
 			</tr>
@@ -283,7 +283,7 @@ if($nextstep == md5('4') && CheckAuth())
 
 		<h2><span class="ss_sprite_16 ss_cog">&#160;</span>Preferences</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Version Check</th>
 				<td><?php echo ($_SESSION['variables']['version'] ? 'yes' : '---');?></td>
 			</tr>
@@ -291,7 +291,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Iframes Allowed</th>
 				<td><?php echo ($_SESSION['variables']['iframe'] ? 'yes' : '---');?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Visual editor</th>
 				<td><?php echo ($_SESSION['variables']['wysiwyg'] ? 'yes' : '---');?></td>
 			</tr>
@@ -299,7 +299,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">User authentication</th>
 				<td><?php echo ($_SESSION['variables']['protect'] ? 'yes' : '---');?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Administrator password</th>
 				<td> *** </td>
 			</tr>
@@ -307,7 +307,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Authentication PIN</th>
 				<td><?php echo $_SESSION['variables']['authcode'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Install Type</th>
 				<td><?php 
 				if ($_SESSION['variables']['do_upgrade'])
@@ -329,7 +329,7 @@ if($nextstep == md5('4') && CheckAuth())
 		
 		<h2><span class="ss_sprite_16 ss_database">&#160;</span>Database details</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Database host</th>
 				<td><?php echo $_SESSION['variables']['db_host'];?></td>
 			</tr>
@@ -337,7 +337,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Database username</th>
 				<td><?php echo $_SESSION['variables']['db_user'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Database password</th>
 				<td> *** </td>
 			</tr>
@@ -345,7 +345,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Database name</th>
 				<td><?php echo $_SESSION['variables']['db_name'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Database table prefix</th>
 				<td><?php echo $_SESSION['variables']['db_prefix'];?></td>
 			</tr>
@@ -364,6 +364,8 @@ if($nextstep == md5('4') && CheckAuth())
 		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 
 <?php
+
+	exit();
 } // Close step four
 
 /**
@@ -933,6 +935,8 @@ if($nextstep == md5('final') && CheckAuth())
 		</div>
 	<?php
 	}
+
+	exit();
 } // Close final processing
 
 ?>

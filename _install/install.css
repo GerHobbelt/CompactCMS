@@ -52,6 +52,13 @@ h1
 	font-size: 2em;
 }
 
+/* removed from the PHP code: styled now */
+tr.altcolor
+{
+	background-color: #CDE6B3;
+}
+
+
 
 /* LOGIN && INSTALL === */
 

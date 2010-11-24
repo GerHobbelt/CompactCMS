@@ -338,8 +338,14 @@ input[type="text"]
 	width: 200px;
 }
 */
-button {margin-right: 15px;}
-optgroup option {padding-left: 10px;}
+button 
+{
+	margin-right: 15px;
+}
+optgroup option 
+{
+	padding-left: 10px;
+}
 #f_de 
 {
 	width: 200px;
@@ -416,6 +422,9 @@ pre.small
 	line-height: 17px;
 	background-image: url('../pre_bg_small.gif');
 }
+/*
+use a hard width to make sure FF3 adds a scrollbar instead of growing the box 
+*/
 #installFrm pre
 {
 	width: 300px; 
@@ -471,35 +480,52 @@ div.tip-text {
 
 /* === 1. CORE === */
 /* LOGIN && INSTALL === */
-#login-wrapper{
+#login-wrapper
+{
 	/* width:750px;  -- use the blueprint CSS containers! */
 	background-color:#E6F5D6;
 	border:10px solid #90D244;
 	border-radius: 10px;
 	padding:10px;
 }
-#install-wrapper{
+#install-wrapper
+{
 	/* width:750px;  -- use the blueprint CSS containers! */
 	background-color:#E6F5D6;
 	border:10px solid #90D244;
 	border-radius: 10px;
 	padding:10px;
 }
-#loginFrm label {display: block;}
+#loginFrm label 
+{
+	display: block;
+}
 #installFrm label 
 {
 	display: block;
 	margin-top:10px;
 }
-#login-wrapper h2, #install-wrapper h2 {font-size:1.2em;border-bottom:solid 1px #90D244;}
+#login-wrapper h2, #install-wrapper h2 
+{
+	font-size:1.2em;
+	border-bottom:solid 1px #90D244;
+}
 .loginMsg, .installMsg 
 {
 	background-color:#e5d7ee;
 	background-color:rgba(229,215,238,0.8);
 	margin-bottom:15px;
 }
-#install.loading {display:block;height:300px;background:transparent url('../spinner.gif') no-repeat 50% 50%;}
-#install {margin-top:10px;}
+#install.loading 
+{
+	display:block;
+	height:300px;
+	background:transparent url('../spinner.gif') no-repeat 50% 50%;
+}
+#install 
+{
+	margin-top:10px;
+}
 
 /* === 1. CORE === */
 /* === MODULES === */
@@ -560,8 +586,15 @@ div.module
 	padding: 1px;
 	text-align:center;
 }
-.thumbview:hover{background-color:#E6F2D9;border:solid #A5D611 3px;}
-.albumbox img{border:1px solid #000;}
+.thumbview:hover
+{
+	background-color:#E6F2D9;
+	border:solid #A5D611 3px;
+}
+.albumbox img
+{
+	border:1px solid #000;
+}
 
 /* === BACKUPS === */
 #no-delete-action 

@@ -244,7 +244,7 @@ div.append-bottom, .append-bottom {
 .box {
   padding: 1.5em;
   margin-bottom: 1.5em;
-  background: #e5eCf9;
+  background: #E6F5D6; /* CCMS default background green */
 }
 
 /* Use this to create a horizontal ruler across a column. */

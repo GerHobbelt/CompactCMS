@@ -98,7 +98,7 @@ th,td,caption { padding: 4px 10px 4px 5px; }
  */
 tbody tr:nth-child(even) td, 
 tbody tr.even td  { 
-	background: #e5ecf9; 
+	background: #E6F5D6; /* CCMS default background green */
 }
 tfoot       { font-style: italic; }
 caption     { background: #eee; }
