@@ -55,6 +55,7 @@ $nextstep = getPOSTparam4IdOrNumber('do');
 $may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] != false); 
 $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] != false); 
 
+$dump_queries_n_stuff_in_devmode = false;
 
 
 /**
@@ -134,7 +135,6 @@ if($nextstep == md5('2') && CheckAuth())
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
 		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
-
 <?php
 
 	exit();
@@ -185,7 +185,6 @@ if($nextstep == md5('3') && CheckAuth())
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
 		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
-
 <?php
 
 	exit();
@@ -362,7 +361,6 @@ if($nextstep == md5('4') && CheckAuth())
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
 		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
-
 <?php
 
 	exit();
@@ -596,7 +594,7 @@ if($nextstep == md5('final') && CheckAuth())
 		{
 			$log[] = "Database structure and data successfully imported";
 		}
-		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && $dump_queries_n_stuff_in_devmode)
 		{
 ?>
 			<h2>Database Initialization</h2>
@@ -819,10 +817,14 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 		else
 		{
+			if ($dump_queries_n_stuff_in_devmode)
+			{
 ?>
-			<h2>config.inc.php Configuration Values - after modification</h2>
-			<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
+				<h2>config.inc.php Configuration Values - after modification</h2>
+				<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
 <?php
+			}
+			
 			$log[] = "Successfully wrote the new configuration values in the config.inc.php file";
 		}
 	}
@@ -879,10 +881,14 @@ if($nextstep == md5('final') && CheckAuth())
 				}
 				else
 				{
+					if ($dump_queries_n_stuff_in_devmode)
+					{
 ?>
-					<h2>.htaccess Rewrite Rules - after modification</h2>
-					<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
+						<h2>.htaccess Rewrite Rules - after modification</h2>
+						<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
 <?php
+					}
+					
 					$log[] = "Successfully rewrote the .htaccess file";
 				}
 			}
