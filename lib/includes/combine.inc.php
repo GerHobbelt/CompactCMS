@@ -101,7 +101,7 @@ if (!defined('BASE_PATH'))
 
 $optimize = array();
 $optimize['css'] = false; // 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
-$optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
+$optimize['javascript'] = false; // 'JSmin';       // possible values: false, 'JSmin'
 $optimize['css3'] = 'remove';            // possible values: false, 'remove', 'browser-fix'
 
 

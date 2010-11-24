@@ -190,12 +190,9 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 					<div>
 					<label><?php echo $ccms['lang']['users']['active']; ?></label>
 						<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="userActive" <?php echo ($row->userActive==1?"checked='CHECKED'":null); ?> value="1" id="userActive1" />	
-						
-						<img src="../../../img/spacer.gif" height="10" width="50" alt=" "/>
-						
-						<label for="userActive0" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="userActive" class="validate-one-required" <?php echo ($row->userActive==0?"checked='CHECKED'":null); ?> value="0" id="userActive0" />
+						<input type="radio" name="userActive" <?php echo ($row->userActive?'checked="checked"':null); ?> value="1" id="userActive1" />	
+						<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
+						<input type="radio" name="userActive" class="validate-one-required" <?php echo (!$row->userActive?'checked="checked"':null); ?> value="0" id="userActive0" />
 					</div>
 					<hr class="space"/>		
 				

@@ -240,26 +240,26 @@ function confirmation()
 					<label><?php echo $ccms['lang']['news']['showauthor']; ?></label>
 						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
 						<label style="display:inline;" for="show_author1"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="author" <?php echo ($showauth!=0?"checked":null); ?> value="1" id="author1" />
+						<input type="radio" name="author" <?php echo ($showauth!=0?'checked="checked"':null); ?> value="1" id="author1" />
 							<img src="../../../admin/img/spacer.gif" height="10" width="50" alt=" "/>
 						<label style="display:inline;" for="show_author0"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="author" <?php echo ($showauth==0?"checked":null); ?> value="0" id="author0" />
+						<input type="radio" name="author" <?php echo ($showauth==0?'checked="checked"':null); ?> value="0" id="author0" />
 					<br/><br/>
 					<label><?php echo $ccms['lang']['news']['showdate']; ?></label>
 						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
 						<label style="display:inline;" for="show_modified1"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="show_modified" <?php echo ($showdate!=0?"checked":null); ?> value="1" id="show_modified1" />
+						<input type="radio" name="show_modified" <?php echo ($showdate!=0?'checked="checked"':null); ?> value="1" id="show_modified1" />
 							<img src="../../../admin/img/spacer.gif" height="10" width="50" alt=" "/>
 						<label style="display:inline;" for="show_modified0"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="show_modified" <?php echo ($showdate==0?"checked":null); ?> value="0" id="show_modified0" />
+						<input type="radio" name="show_modified" <?php echo ($showdate==0?'checked="checked"':null); ?> value="0" id="show_modified0" />
 					<br/><br/>
 					<label><?php echo $ccms['lang']['news']['showteaser']; ?></label>
 						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
 						<label style="display:inline;" for="show_teaser1"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="show_teaser" <?php echo ($showteaser!=0?"checked":null); ?> value="1" id="show_teaser1" />
+						<input type="radio" name="show_teaser" <?php echo ($showteaser!=0?'checked="checked"':null); ?> value="1" id="show_teaser1" />
 							<img src="../../../admin/img/spacer.gif" height="10" width="50" alt=" "/>
 						<label style="display:inline;" for="show_modified0"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="show_teaser" <?php echo ($showteaser==0?"checked":null); ?> value="0" id="show_teaser0" />
+						<input type="radio" name="show_teaser" <?php echo ($showteaser==0?'checked="checked"':null); ?> value="0" id="show_teaser0" />
 					<br/><br/>			
 					<p class="prepend-3">
 						<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.rm0lead($rsCfg->cfgID).'" id="cfgID" />':null); ?>

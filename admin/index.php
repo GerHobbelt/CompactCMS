@@ -140,7 +140,7 @@ function set_filter_msgs(el)
 		</div>
 	</div>
 	</div>
-	<div id="advanced" class="prepend-1 span-6 last clearfix">
+	<div id="advanced" class="prepend-1 span-6 last">
 	<div class="rounded-border">
 		<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
 		<div id="advanced_res">
@@ -187,8 +187,12 @@ function set_filter_msgs(el)
 		</div>
 	</div>
 	</div>
+	
+<!--[if lt IE 7]>
+<hr class="clear space" />
+<![endif]-->
 
-	<div id="createnew" class="span-9 clear-left">
+	<div id="createnew" class="span-9">
 	<?php 
 	
 	// Start main management section 
@@ -245,20 +249,30 @@ function set_filter_msgs(el)
 				
 				<div id="editor-options">
 					<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
-					<?php echo $ccms['lang']['backend']['yes']; ?>: <input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
-					<?php echo $ccms['lang']['backend']['no']; ?>: <input type="radio" id="f_pr2" name="printable" value="N" />
-					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span><br/>
-					<label style="clear:both; margin-top: 6px;"><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
-					<?php echo $ccms['lang']['backend']['yes']; ?>: <input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
-					<?php echo $ccms['lang']['backend']['no']; ?>: <input type="radio" style="margin-top: 10px;" id="f_pu2" name="published" value="N" />
-					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span><br/>
-					<label style="clear:both; margin-top: 3px;"><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
-					<?php echo $ccms['lang']['backend']['yes']; ?>: <input type="radio" id="f_cod" name="iscoding" value="Y" />  
-					<?php echo $ccms['lang']['backend']['no']; ?>: <input type="radio" style="margin-top: 10px;" id="f_co2" checked="checked" name="iscoding" value="N" />
-					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span><br/>
+					<label for="f_pr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+						<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
+					<label for="f_pr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+						<input type="radio" id="f_pr2" name="printable" value="N" />
+					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
+					<br class="clear"/>
+					<label><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
+					<label for="f_pu1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+						<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
+					<label for="f_pu2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+						<input type="radio" id="f_pu2" name="published" value="N" />
+					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
+					<br class="clear"/>
+					<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
+					<label for="f_cod" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+						<input type="radio" id="f_cod" name="iscoding" value="Y" />  
+					<label for="f_co2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+						<input type="radio" id="f_co2" checked="checked" name="iscoding" value="N" />
+					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
+				</div>
+				<div class="right">
+					<button type="submit" id="addbtn" name="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 				</div>
 				<input type="hidden" name="form" value="create" />
-				<div class="right"><button type="submit" id="addbtn" name="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button></div>
 			</div>
 		</form>	
 		</div>
@@ -303,9 +317,9 @@ function set_filter_msgs(el)
 			<hr class="space"/>
 
 			<div class="right">
-				<input type="hidden" name="form" value="menuorder" />
 				<button type="submit" name="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 			</div>
+			<input type="hidden" name="form" value="menuorder" />
 		</form>	
 		</div>
 	</fieldset>
@@ -397,7 +411,9 @@ function set_filter_msgs(el)
 				} 
 				else 
 				{
-					echo '<th class="span-11">&#160;</th>'; 
+				?>
+					<th class="span-11">&#160;</th>
+				<?php 
 				}
 				?>
 				<th class="span-2"><div style="background-color: #CDE6B3; text-align: center;"><span class="ss_sprite_16 ss_accept">&#160;</span><?php echo $ccms['lang']['backend']['active']; ?></div></th>
@@ -447,7 +463,10 @@ if (0)
 
 	<?php // Footer block ?>
 	<div id="footer" class="span-25">
-		<div class="prepend-11 span-11 colborder">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl">CompactCMS.nl</a>. <?php echo $ccms['lang']['system']['message_rights']; ?>.<br/><em><?php echo $ccms['lang']['backend']['gethelp']; ?></em></div>
+		<div class="prepend-11 span-11 colborder">
+			&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl">CompactCMS.nl</a>. <?php echo $ccms['lang']['system']['message_rights']; ?>.<br/>
+			<em><?php echo $ccms['lang']['backend']['gethelp']; ?></em>
+		</div>
 		<div class="span-1 last"><a href="http://twitter.com/compactcms" class="sprite twittlogo" title="Follow at Twitter"></a></div>
 		<div style="margin-top: 10px;" class="prepend-13 span-12">
 			<span class="sprite ff" title="<?php echo $ccms['lang']['system']['message_compatible']; ?> Firefox"></span>

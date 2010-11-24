@@ -221,13 +221,22 @@ next column, or to pull it into the previous column.  */
 /* Regular clearing
    apply to column that should drop below previous ones. */
 
-.clear { clear:both; }
+.clear-left { clear:left; }
+.clear-right { clear:right; }
 
 /* --------------------------------------------------------- */
 
 
-.block {border:3px solid #B3E813; padding: 10px;}
-.page-break {page-break-before:always;}
+.block 
+{
+	border:3px solid #B3E813; 
+	padding: 10px;
+}
+
+.page-break 
+{
+	page-break-before:always;
+}
 /*
 ::selection{background:#c3effd;color:#000;}
 ::-moz-selection{background:#c3effd;color:#000;}
@@ -274,27 +283,30 @@ input[type="text"], input[type="password"]
 {
 	margin:0.2em 0;
 }
-input.text, input.title,
-textarea 
+input.text, input.title, textarea 
 {
 	margin:0.2em 0;
 }
+/*
+The new default from blueprint CSS is more sensible
+
 textarea 
 {
 	height: 150px;
 }
+*/
 input.text,
 input.title   { padding: 3px; }
 textarea      { padding: 3px; }
 
 select.text 
 {
-	width: 210px;
+	/* width: 210px;   -- use the span-x classes! */
 	padding: 3px;
 }
 select.title   
 { 
-	width: 300px; 
+	/* width: 300px;   -- use the span-x classes! */
 	padding: 3px; 
 }
 select.text, select.title
@@ -371,3 +383,7 @@ label,select,.pointer
 
 
 
+.redbox
+{
+	border: 1px solid red;
+}

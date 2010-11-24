@@ -76,10 +76,30 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
 	<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
-function confirmation()
+function confirmation_delete()
 {
 	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
 	return !!answer;
+}
+
+function confirmation()
+{
+	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
+	if(answer)
+	{
+		try
+		{
+			parent.MochaUI.closeWindow(parent.$('sys-usr_ccms'));
+		}
+		catch(e)
+		{
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 	</script>
 	<script type="text/javascript" charset="utf-8">
@@ -185,7 +205,7 @@ window.addEvent('domready',function()
 				if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 				{ 
 				?>
-					<button type="submit" onclick="return confirmation();" name="deleteUser"><span class="ss_sprite ss_user_delete"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
+					<button type="submit" onclick="return confirmation_delete();" name="deleteUser"><span class="ss_sprite ss_user_delete"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
 				<?php 
 				} 
 				?>
@@ -199,7 +219,8 @@ window.addEvent('domready',function()
 			{ 
 			?>
 				<form action="../../process.inc.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">
-					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label><input type="text" class="minLength:3 text" name="user" value="" id="userName" />
+					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label>
+					<input type="text" class="minLength:3 text" name="user" value="" id="userName" />
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/><a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a></label><input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear center">
 						<div id="passwordStrength" class="strength0"></div><br/>
@@ -235,12 +256,16 @@ window.addEvent('domready',function()
 					</select>
 					<div>
 					<label><?php echo $ccms['lang']['users']['active']; /* [i_a] and make sure either yes or no are selected to begin with; pick 'no' as the default here */ ?></label>
-						<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label><input type="radio" class="validate-one-required" name="userActive" value="1" id="userActive1" />	
-						<img src="../../../img/spacer.gif" height="10" width="50" alt=" "/>
-						<label for="userActive0" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label><input type="radio" name="userActive" value="0" id="userActive0" "checked" />
+						<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
+							<input type="radio" class="validate-one-required" name="userActive" value="1" id="userActive1" />
+						<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
+							<input type="radio" name="userActive" value="0" id="userActive0" checked="checked" />
 					</div>
 					<hr class="space"/>
-					<p class="right"><button type="submit"><span class="ss_sprite ss_user_add"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button></p>
+					<div class="right">
+						<button type="submit"><span class="ss_sprite ss_user_add"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button>
+						<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					</div>
 				</form>
 			<?php 
 			} 

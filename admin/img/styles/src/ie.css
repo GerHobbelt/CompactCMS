@@ -62,7 +62,12 @@ legend { margin-top:-0.2em; margin-bottom:1em; margin-left:-0.5em; }
 textarea { overflow:auto; }
 
 /* Makes labels behave correctly in IE 6 and 7 */
-label { vertical-align:middle; position:relative; top:-0.25em; }
+label 
+{ 
+	vertical-align:middle; 
+	/* position:relative;     -- this screws up the Fx.hide in IE7/IE6 */
+	top:-0.25em; 
+}
 
 /* Fixes rule that IE 6 ignores */
 /*
@@ -73,12 +78,29 @@ input.text, input.title, textarea { background-color:#fff; border:1px solid #bbb
 input.text:focus, input.title:focus { border-color:#666; }
 input.text, input.title, textarea, select { margin:0.5em 0; }
 */
-input.checkbox, input.radio { position:relative; top:.25em; }
+input.checkbox, input.radio 
+{ 
+	position:relative; 
+	top:.25em; 
+}
 
 /* Fixes alignment of inline form elements */
 form.inline div, form.inline p { vertical-align:middle; }
 form.inline input.checkbox, form.inline input.radio,
-form.inline input.button, form.inline button {
+form.inline input.button, form.inline button 
+{
   margin:0.5em 0;
 }
-button, input.button { position:relative;top:0.25em; }
+button, input.button 
+{ 
+	/* position:relative;     -- this screws up the Fx.hide in IE7/IE6 */
+	top:0.25em; 
+}
+
+/*
+table th, td
+{
+	height: 18px;
+}
+*/
+

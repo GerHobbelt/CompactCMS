@@ -54,6 +54,19 @@ h1
 
 
 
+/*
+these reside within a span-9 div:
+*/
+#installFrm input.title, #installFrm input.text
+{
+	width: 310px;
+}
+#installFrm select
+{
+	width: 320px;
+}
+
+
 /* LOGIN && INSTALL === */
 
 /*

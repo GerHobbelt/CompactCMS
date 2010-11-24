@@ -96,7 +96,9 @@ th,td,caption { padding: 4px 10px 4px 5px; }
 	You can zebra-stripe your tables in outdated browsers by adding 
 	the class "even" to every other table row. 
  */
-tbody tr:nth-child(even) td, 
+/*
+tbody tr:nth-child(even) td,     -- clashes with our tables with subtables (e.g. dyn_list): we need to undo this to correctly style such a subtable; it's way easier to just remove this and go the 'explicit class' way */
+*/
 tbody tr.even td  { 
 	background: #E6F5D6; /* CCMS default background green */
 }

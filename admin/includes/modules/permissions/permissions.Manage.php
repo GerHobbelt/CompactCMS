@@ -150,21 +150,21 @@ function confirmation()
 						echo '<tr>';
 					}  
 					?>
-						<th><?php echo (!empty($comments) ? "<abbr title=\"$comments\">$columnName</abbr>" : $columnName); ?></th>
+						<th><?php echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); ?></th>
 						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?"checked":null); ?> value="0" id="<?php echo $columnName; ?>">
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?'checked="checked"':null); ?> value="0" id="<?php echo $columnName; ?>">
 						</td>
 						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?"checked":null); ?> value="1" id="<?php echo $columnName; ?>">
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?'checked="checked"':null); ?> value="1" id="<?php echo $columnName; ?>">
 						</td>
 						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?"checked":null); ?> value="2" id="<?php echo $columnName; ?>">
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?'checked="checked"':null); ?> value="2" id="<?php echo $columnName; ?>">
 						</td>
 						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?"checked":null); ?> value="3" id="<?php echo $columnName; ?>">
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?'checked="checked"':null); ?> value="3" id="<?php echo $columnName; ?>">
 						</td>
 						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?"checked":null); ?> value="4" id="<?php echo $columnName; ?>">
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?'checked="checked"':null); ?> value="4" id="<?php echo $columnName; ?>">
 						</td>
 					</tr>
 					<?php 

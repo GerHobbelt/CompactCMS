@@ -170,7 +170,7 @@ function confirmation()
 						*/
 						if (in_array(rm0lead($users[$ar2]['userID']), $users_owning_page))
 						{
-							echo 'checked';
+							echo 'checked="checked"';
 						}
 						?> value="<?php echo rm0lead($users[$ar2]['userID']).'||'.rm0lead($pages[$i]['page_id']);?>" id="<?php echo $i.'_'.$ar2;?>" />
 						</span></label>
@@ -185,6 +185,9 @@ function confirmation()
 		</tr>
 		</table>
 		<hr/>
-		<p class="right"><button type="submit"><span class="ss_sprite ss_disk">Save</span></button><span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span></p>
+		<div class="right">
+			<button type="submit"><span class="ss_sprite ss_disk">Save</span></button>
+			<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+		</div>
 		</form>
 	</div>
