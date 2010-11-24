@@ -462,7 +462,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		else
 		{
 		?>
-		<form action="" method="post" id="installFrm">
+		<form action="javascript:;" method="post" id="installFrm">
 			<fieldset id="install" style="border:none;" class="none">
 				<legend class="installMsg"><?php echo (!$do_ftp_chmod ? 'Step 1 - Knowing the environment' : 'FTP - Setting permissions right');?></legend>
 				<?php 
@@ -477,8 +477,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					
 					<label for="rootdir"><span class="ss_sprite_16 ss_application_osx_terminal">&#160;</span>Web root directory</label>
 					<input type="text" class="alt title" name="rootdir" autofocus value="<?php echo $rootdir;?>" id="rootdir" />
-					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</p>
-					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>Must include trailing slash!</p>
+					<p class="ss_sprite ss_bullet_star small quiet">When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</p>
+					<p class="ss_sprite ss_bullet_star small quiet">Must include trailing slash!</p>
 					
 					<label for="language"><span class="ss_sprite_16 ss_comments">&#160;</span>CCMS backend language</label>
 					<select name="language" class="title" id="language" size="1">
@@ -504,8 +504,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					
 					<label for="ftp_host">FTP host</label>
 					<input type="text" class="alt title" name="ftp_host" value="" id="ftp_host"/>
-					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>Often www.domain.ext or ftp.domain.ext</p>
-					<br/>
+					<p class="ss_sprite ss_bullet_star small quiet">Often www.domain.ext or ftp.domain.ext</p>
 					<label for="ftp_user">FTP username</label>
 					<input type="text" class="alt title" name="ftp_user" value="" id="ftp_user"/>
 					<br/>
@@ -514,17 +513,17 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					<br/>
 					<label for="ftp_path">Installation path</label>
 					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
-					<p class="small quiet"><span class="ss_sprite ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
+					<p class="ss_sprite ss_bullet_star small quiet">CCMS will try to auto-find this using the default value above</p>
 					
 					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 				<?php 
 				} 
 				?>
 				
-				<p class="right">
+				<div class="right">
 					<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
 					<a class="button" href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
-				</p>
+				</div>
 			</fieldset>
 		</form>
 		<?php

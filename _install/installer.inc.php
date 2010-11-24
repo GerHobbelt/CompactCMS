@@ -83,13 +83,11 @@ if($nextstep == md5('2') && CheckAuth())
 
 		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password<br/>
 			<a href="#" class="small ss_sprite ss_arrow_refresh" onclick="randomPassword(8);">Auto generate a safe password</a></label>
-		<input type="text" class="alt title" name="userPass" maxlenght="5" onkeyup="passwordStrength(this.value)" style="width:300px;" value="" id="userPass" />
-		<div class="clear center">
-			<div id="passwordStrength" class="strength0"></div>
-		</div>
+		<input type="text" class="alt title" name="userPass" maxlenght="5" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
+		<div id="passwordStrength" class="strength0"></div>
 		<p class="ss_sprite ss_bullet_star small quiet clear">Remember your admin password as it cannot be retrieved</p>
 		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN</label>
-		<input type="text" class="alt title" name="authcode" maxlenght="5" style="width:300px;" value="<?php
+		<input type="text" class="alt title" name="authcode" maxlenght="5" value="<?php
 			echo (empty($_SESSION['variables']['authcode']) ? mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
 		<p class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</p>
 		<p class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</p>
@@ -132,10 +130,10 @@ if($nextstep == md5('2') && CheckAuth())
 		</label>
 		<p class="ss_sprite ss_bullet_star small <?php if (!$may_upgrade) { echo 'quiet'; } ?>">Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></p>
 
-		<p class="right">
+		<div class="right">
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
-		</p>
+		</div>
 		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
 
 <?php
@@ -161,26 +159,31 @@ if($nextstep == md5('3') && CheckAuth())
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$version,$iframe,$wysiwyg,$protect,$userPass,$authcode,$do_upgrade);
 ?>
 	<legend class="installMsg">Step 3 - Collecting your database details</legend>
-		<label for="db_host"><span class="ss_sprite ss_server_database">Database host</span></label><input type="text" class="alt title" name="db_host" style="width:300px;" value="<?php
+		<label for="db_host"><span class="ss_sprite_16 ss_server_database">&#160;</span>Database host</label>
+		<input type="text" class="alt title" name="db_host" value="<?php
 			echo (empty($_SESSION['variables']['db_host']) ? 'localhost' : $_SESSION['variables']['db_host']); ?>" id="db_host" />
-		<br class="clear"/>
-		<label for="db_user"><span class="ss_sprite ss_drive_user">Database username</span></label><input type="text" class="alt title" name="db_user" style="width:300px;" value="<?php
+		<br/>
+		<label for="db_user"><span class="ss_sprite_16 ss_drive_user">&#160;</span>Database username</label>
+		<input type="text" class="alt title" name="db_user" value="<?php
 			echo (empty($_SESSION['variables']['db_user']) ? '' : $_SESSION['variables']['db_user']); ?>" id="db_user" />
-		<br class="clear"/>
-		<label for="db_pass"><span class="ss_sprite ss_drive_key">Database password</span></label><input type="password" class="title" name="db_pass" style="width:300px;" value="<?php
+		<br/>
+		<label for="db_pass"><span class="ss_sprite_16 ss_drive_key">&#160;</span>Database password</label>
+		<input type="password" class="title" name="db_pass" value="<?php
 			echo (empty($_SESSION['variables']['db_pass']) ? '' : $_SESSION['variables']['db_pass']); ?>" id="db_pass" />
-		<br class="clear"/>
-		<label for="db_name"><span class="ss_sprite ss_database">Database name</span></label><input type="text" class="alt title" name="db_name" style="width:300px;" value="<?php
+		<br>
+		<label for="db_name"><span class="ss_sprite_16 ss_database">&#160;</span>Database name</label>
+		<input type="text" class="alt title" name="db_name" value="<?php
 			echo (empty($_SESSION['variables']['db_name']) ? 'compactcms' : $_SESSION['variables']['db_name']); ?>" id="db_name" />
-		<br class="clear"/>
-		<label for="db_prefix"><span class="ss_sprite ss_database_table">Database table prefix</span></label><input type="text" class="alt title" name="db_prefix" style="width:300px;" value="<?php
+		<br/>
+		<label for="db_prefix"><span class="ss_sprite_16 ss_database_table">&#160;</span>Database table prefix</label>
+		<input type="text" class="alt title" name="db_prefix" value="<?php
 			echo (empty($_SESSION['variables']['db_prefix']) ? 'ccms_' : $_SESSION['variables']['db_prefix']); ?>" id="db_prefix" />
 
-		<p class="span-8 right">
-			<button name="submit" type="submit"><span class="ss_sprite ss_information">To confirmation</span></button>
-			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
-			<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
-		</p>
+		<div class="right">
+			<button name="submit" type="submit"><span class="ss_sprite_16 ss_information">&#160;</span>To confirmation</button>
+			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
+		</div>
+		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
 
 <?php
 } // Close step three
@@ -239,15 +242,17 @@ if($nextstep == md5('4') && CheckAuth())
 		if(count($chfile) == 0) 
 		{ 
 		?>
-			<p class="center"><span class="ss_sprite ss_tick"><em>All files are already correctly chmod()'ed</em></span></p>
+			<p class="center"><span class="ss_sprite_16 ss_tick">&#160;</span><em>All files are already correctly chmod()'ed</em></p>
 		<?php 
 		} 
 		
 		if(ini_get('safe_mode') || count($chfile) > 0)
 		{ 
 		?>
-			<span class="ss_sprite ss_exclamation">&#160;</span><h2 style="display:inline;">Warning</h2>
-			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the <a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
+			<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span>Warning</h2>
+			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> 
+			for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the 
+			<a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
 			<span>&rarr; <em>Files that still require chmod():</em></span>
 			<ul>
 				<?php 
@@ -260,7 +265,7 @@ if($nextstep == md5('4') && CheckAuth())
 		<?php 
 		} 
 		?>
-		<span class="ss_sprite ss_computer">&#160;</span><h2 style="display:inline;">Environment</h2>
+		<h2><span class="ss_sprite_16 ss_computer">&#160;</span>Environment</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr style="background-color: <?php echo $alt_row; ?>;">
 				<th width="55%" scope="row">Sitename</th>
@@ -275,8 +280,8 @@ if($nextstep == md5('4') && CheckAuth())
 				<td><?php echo $_SESSION['variables']['language'];?></td>
 			</tr>
 		</table>
-		<br class="clear"/>
-		<span class="ss_sprite ss_cog">&#160;</span><h2 style="display:inline;">Preferences</h2>
+
+		<h2><span class="ss_sprite_16 ss_cog">&#160;</span>Preferences</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr style="background-color: <?php echo $alt_row; ?>;">
 				<th width="55%" scope="row">Version Check</th>
@@ -321,8 +326,8 @@ if($nextstep == md5('4') && CheckAuth())
 				?></td>
 			</tr>
 		</table>
-		<br class="clear"/>
-		<span class="ss_sprite ss_database">&#160;</span><h2 style="display:inline;">Database details</h2>
+		
+		<h2><span class="ss_sprite_16 ss_database">&#160;</span>Database details</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<tr style="background-color: <?php echo $alt_row; ?>;">
 				<th width="55%" scope="row">Database host</th>
@@ -348,15 +353,15 @@ if($nextstep == md5('4') && CheckAuth())
 
 		<hr noshade="noshade" />
 		<p class="quiet">
-			<strong><span class="ss_sprite ss_exclamation">Please note</span></strong><br/>
+			<strong><span class="ss_sprite_16 ss_exclamation">&#160;</span>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
 
-		<p class="span-8 right">
-			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite ss_accept">Install <strong>CompactCMS</strong></span></button>
-			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
-			<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
-		</p>
+		<div class="right">
+			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite_16 ss_accept">&#160;</span>Install <strong>CompactCMS</strong></button>
+			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
+		</div>
+		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 
 <?php
 } // Close step four
@@ -592,15 +597,13 @@ if($nextstep == md5('final') && CheckAuth())
 		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		{
 ?>
-			<div id="configinc_display" >
-				<h2>Database Initialization</h2>
-				<pre class="small"><?php
-					foreach($sqldump as $line)
-					{
-						echo htmlspecialchars($line);
-					}
-				?></pre>
-			</div>
+			<h2>Database Initialization</h2>
+			<pre class="small"><?php
+				foreach($sqldump as $line)
+				{
+					echo htmlspecialchars($line);
+				}
+			?></pre>
 <?php
 		}
 
@@ -815,10 +818,8 @@ if($nextstep == md5('final') && CheckAuth())
 		else
 		{
 ?>
-			<div id="configinc_display" >
-				<h2>config.inc.php Configuration Values - after modification</h2>
-				<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
-			</div>
+			<h2>config.inc.php Configuration Values - after modification</h2>
+			<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
 <?php
 			$log[] = "Successfully wrote the new configuration values in the config.inc.php file";
 		}
@@ -877,10 +878,8 @@ if($nextstep == md5('final') && CheckAuth())
 				else
 				{
 ?>
-					<div id="htaccess_display" >
-						<h2>.htaccess Rewrite Rules - after modification</h2>
-						<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
-					</div>
+					<h2>.htaccess Rewrite Rules - after modification</h2>
+					<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
 <?php
 					$log[] = "Successfully rewrote the .htaccess file";
 				}
@@ -896,29 +895,21 @@ if($nextstep == md5('final') && CheckAuth())
 		unset($_SESSION['variables']); 
 		?>
 		<h2>Process results</h2>
-		<p>
-			<?php
-			while (list($key,$value) = each($log)) 
-			{
-				echo '<span class="ss_sprite ss_accept">'.$value.'</span><br />';
-			} 
-			?>
-		</p>
-	<?php 
+		<?php
+		while (list($key,$value) = each($log)) 
+		{
+			echo '<p><span class="ss_sprite_16 ss_accept">&#160;</span>'.$value.'</p>';
+		} 
 	} 
 	if(isset($errors)) 
 	{ 
 	?>
 		<h2>Errors &amp; warnings</h2>
-		<p>
-			<?php
-			while (list($key,$value) = each($errors)) 
-			{
-				echo '<span class="ss_sprite ss_exclamation">'.$value.'</span><br />';
-			} 
-			?>
-		</p>
-	<?php 
+		<?php
+		while (list($key,$value) = each($errors)) 
+		{
+			echo '<p><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$value.'</p>';
+		} 
 	} 
 	
 	if($err==0) 
@@ -928,7 +919,7 @@ if($nextstep == md5('final') && CheckAuth())
 		<p>The installation has been successful! You should now follow the steps below, to get you started.</p>
 		<ol>
 			<li>Delete the <em>./_install</em> directory</li>
-			<li><a href="../admin/">Login</a> using username <span class="ss_sprite ss_user_red"><strong>admin</strong></span></li>
+			<li><a href="../admin/">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
 			<li>Change your password through the back-end</li>
 			<li><a href="http://www.compactcms.nl/contact.html" target="_blank">Let me know</a> how you like CompactCMS!</li>
 		</ol>
@@ -936,7 +927,11 @@ if($nextstep == md5('final') && CheckAuth())
 	} 
 	else 
 	{
-		echo '<a href="index.php">Retry setting the variables</a>'; 
+	?>
+		<div class="right">
+			<a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a>
+		</div>
+	<?php
 	}
 } // Close final processing
 

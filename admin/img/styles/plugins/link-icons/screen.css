@@ -25,16 +25,16 @@ a[href$=".rdf"], a[href^="aim:"] {
 }
 
 /* External links */
-a[href^="http:"]          { background-image: url(external.png); }
-a[href^="mailto:"]        { background-image: url(email.png); }
-a[href^="http:"]:visited  { background-image: url(visited.png); }
+a[href^="http:"]          { background-image: url(icons/external.png); }
+a[href^="mailto:"]        { background-image: url(icons/email.png); }
+a[href^="http:"]:visited  { background-image: url(icons/visited.png); }
 
 /* Files */
-a[href$=".pdf"]   { background-image: url(pdf.png); }
-a[href$=".doc"]   { background-image: url(doc.png); }
-a[href$=".xls"]   { background-image: url(xls.png); }
+a[href$=".pdf"]   { background-image: url(icons/pdf.png); }
+a[href$=".doc"]   { background-image: url(icons/doc.png); }
+a[href$=".xls"]   { background-image: url(icons/xls.png); }
 
 /* Misc */
 a[href$=".rss"],
-a[href$=".rdf"]   { background-image: url(feed.png); }
-a[href^="aim:"]   { background-image: url(im.png); }
+a[href$=".rdf"]   { background-image: url(icons/feed.png); }
+a[href^="aim:"]   { background-image: url(icons/im.png); }

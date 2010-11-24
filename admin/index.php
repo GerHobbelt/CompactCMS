@@ -105,22 +105,25 @@ function set_filter_msgs(el)
 <div id='pageWrapper'><?php /* <-- required to ensure there are proper scrollbars in the MochaUI 'desktop' */ ?>
 <div class="container-25">
 	<?php // Top bar including status block ?>
-	<div id="logo" class="sprite logo span-5 colborder">
-		<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
-		<p><span class="ss_sprite ss_world"><?php echo $cfg['sitename']; ?></span></p>
+	<div id="logo" class="span-5 colborder">
+		<div id="logo" class="sprite logo">
+			<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
+		</div>
+		<p><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
 	</div>
-	<div id="notify" class="span-13">
+	<div id="notify" class="span-12">
 	<div class="rounded-border">
-		<p>
-		<?php 
-		if($cfg['protect'])
-		{
-		?>
-			<span class="ss_sprite ss_door_open right"><a href="./includes/security.inc.php?do=logout"><?php echo $ccms['lang']['backend']['logout']; ?></a></span>
-		<?php 
-		} 
-		?>
-		<a id="clockLink" style="text-decoration:none;" class="clock"><span class="ss_sprite ss_clock">&#160;</span></a></p>
+		<div class="header">
+			<?php 
+			if($cfg['protect'])
+			{
+			?>
+				<a class="right span-6" href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
+			<?php 
+			} 
+			?>
+			<a id="clockLink" class="clock"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
+		</div>
 		<div id="notify_icon">&#160;</div>
 		<div id="notify_res">
 			<?php 
@@ -137,46 +140,46 @@ function set_filter_msgs(el)
 		</div>
 	</div>
 	</div>
-	<div id="advanced" class="prepend-1 span-5 last">
+	<div id="advanced" class="prepend-1 span-6 last">
 	<div class="rounded-border">
-		<h2><span class="ss_sprite ss_user_red"><?php echo $ccms['lang']['backend']['hello']; ?></span> <?php echo $_SESSION['ccms_userFirst']; ?></h2>
+		<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
 		<div id="advanced_res">
 			<ul>
 				<?php 
 				if($_SESSION['ccms_userLevel']>=4) 
 				{ 
 				?>
-					<li><span class="ss_sprite ss_group_key"><a id="sys-perm" href="./includes/modules/permissions/permissions.Manage.php" rel="<?php echo $ccms['lang']['backend']['permissions']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['permissions']; ?></a></span></li>
+					<li><a id="sys-perm" href="./includes/modules/permissions/permissions.Manage.php" rel="<?php echo $ccms['lang']['backend']['permissions']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['permissions']; ?></a></li>
 				<?php 
 				} 
 				if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
 				{ 
 				?>
-					<li><span class="ss_sprite ss_folder_user "><a id="sys-pow" href="./includes/modules/content-owners/content-owners.Manage.php" rel="<?php echo $ccms['lang']['backend']['contentowners']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['contentowners']; ?></a></span></li>
+					<li><a id="sys-pow" href="./includes/modules/content-owners/content-owners.Manage.php" rel="<?php echo $ccms['lang']['backend']['contentowners']; ?>" class="tabs"><span class="ss_sprite_16 ss_folder_user">&#160;</span><?php echo $ccms['lang']['backend']['contentowners']; ?></a></li>
 				<?php 
 				} 
 				if($perm['manageTemplate']>0 && $_SESSION['ccms_userLevel']>=$perm['manageTemplate'])  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
 				{ 
 				?>
-					<li><span class="ss_sprite ss_color_swatch"><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></span></li>
+					<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
 				<?php 
 				} 
 				// if($perm['manageUsers']>0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
 				{ 
 				?>
-					<li><span class="ss_sprite ss_group"><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></span></li>
+					<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
 				<?php 
 				} 
 				if($perm['manageModBackup']>0 /* && $_SESSION['ccms_userLevel']>=$perm['manageModBackup'] */ ) 
 				{ 
 				?>
-					<li><span class="ss_sprite ss_drive_disk"><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><?php echo $ccms['lang']['backup']['createhd'];?></a></span></li>
+					<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
 				<?php 
 				} 
 				if($_SESSION['ccms_userLevel']>=4 && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 				{ 
 				?>
-					<li><span class="ss_sprite ss_group_key"><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><?php echo $ccms['lang']['backend']['translation']; ?></a></span></li>
+					<li><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['translation']; ?></a></li>
 				<?php 
 				} 
 				?>
@@ -195,26 +198,26 @@ function set_filter_msgs(el)
 	?>
 	<div id="createnew" class="span-9">
 	<fieldset>
-		<legend><span class="ss_sprite ss_add">&#160;</span><a class="toggle" rel="form_wrapper" href="#"><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
+		<legend><a class="toggle" rel="form_wrapper" href="#"><span class="ss_sprite_16 ss_add">&#160;</span><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
 		<div id="form_wrapper">
 		<form method="post" id="addForm" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 			<p><?php echo $ccms['lang']['backend']['createtip']; ?></p>
 			<div id="fields">
 				<label for="urlpage"><?php echo $ccms['lang']['forms']['filename']; ?></label> 
 				<input class="required minLength:3 text" type="text" id="urlpage" name="urlpage" />
-				<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['filename']; ?>">&#160;</span><br/>
+				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['filename']; ?>">&#160;</span><br/>
 				
 				<label for="f_pt"><?php echo $ccms['lang']['forms']['pagetitle']; ?></label>
 				<input class="required minLength:3 text" type="text" id="f_pt" name="pagetitle" />
-				<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle']; ?>">&#160;</span><br/>
+				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle']; ?>">&#160;</span><br/>
 				
 				<label for="f_sh"><?php echo $ccms['lang']['forms']['subheader']; ?></label> 
 				<input class="required minLength:3 text" type="text" id="f_sh" name="subheader" />
-				<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['subheader']; ?>">&#160;</span><br/>
+				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['subheader']; ?>">&#160;</span><br/>
 				
 				<label for="f_de"><?php echo $ccms['lang']['forms']['description']; ?></label>
 				<textarea class="required minLength:3" id="f_de" name="description" rows="4" cols="30"></textarea>
-				<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['description']; ?>">&#160;</span><br/>
+				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['description']; ?>">&#160;</span><br/>
 				
 				<?php 
 				// Modules
@@ -234,7 +237,8 @@ function set_filter_msgs(el)
 						} 
 						?>
 					</optgroup>
-				</select>&#160;<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['module']; ?>">&#160;</span><br/>
+				</select>
+				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['module']; ?>">&#160;</span><br/>
 				<?php 
 				} 
 				?>
@@ -243,18 +247,18 @@ function set_filter_msgs(el)
 					<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
 					<?php echo $ccms['lang']['backend']['yes']; ?>: <input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
 					<?php echo $ccms['lang']['backend']['no']; ?>: <input type="radio" id="f_pr2" name="printable" value="N" />
-					<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span><br/>
+					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span><br/>
 					<label style="clear:both; margin-top: 6px;"><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
 					<?php echo $ccms['lang']['backend']['yes']; ?>: <input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
 					<?php echo $ccms['lang']['backend']['no']; ?>: <input type="radio" style="margin-top: 10px;" id="f_pu2" name="published" value="N" />
-					<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span><br/>
+					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span><br/>
 					<label style="clear:both; margin-top: 3px;"><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
 					<?php echo $ccms['lang']['backend']['yes']; ?>: <input type="radio" id="f_cod" name="iscoding" value="Y" />  
 					<?php echo $ccms['lang']['backend']['no']; ?>: <input type="radio" style="margin-top: 10px;" id="f_co2" checked="checked" name="iscoding" value="N" />
-					<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span><br/>
+					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span><br/>
 				</div>
 				<input type="hidden" name="form" value="create" />
-				<div class="right"><button type="submit" id="addbtn" name="submit"><span class="ss_sprite ss_wand"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button></div>
+				<div class="right"><button type="submit" id="addbtn" name="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button></div>
 			</div>
 		</form>	
 		</div>
@@ -271,17 +275,17 @@ function set_filter_msgs(el)
 	?>
 	<div id="menudepth" class="span-16 last">
 	<fieldset>
-		<legend><span class="ss_sprite ss_text_list_bullets">&#160;</span> <a class="toggle" rel="menu_wrapper" href="#"><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
+		<legend><a class="toggle" rel="menu_wrapper" href="#"><span class="ss_sprite_16 ss_text_list_bullets">&#160;</span><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
 		<div id="menu_wrapper">
 		<p><?php echo $ccms['lang']['backend']['ordertip']; ?></p>
 		<form method="post" id="menuForm" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 			<table class="span-15" id="table_menu">
 			<tr>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['menutitle']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['menuid']; ?>"></span></th>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['template']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['template']; ?>"></span></th>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['toplevel']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['toplevel']; ?>"></span></th>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['sublevel']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['sublevel']; ?>"></span></th>
-				<th class="span-1-1"><?php echo $ccms['lang']['backend']['linktitle']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['activelink']; ?>"></span></th>
+				<th class="span-2"><?php echo $ccms['lang']['backend']['menutitle']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['menuid']; ?>">&#160;</span></th>
+				<th class="span-2"><?php echo $ccms['lang']['backend']['template']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['template']; ?>">&#160;</span></th>
+				<th class="span-2"><?php echo $ccms['lang']['backend']['toplevel']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['toplevel']; ?>">&#160;</span></th>
+				<th class="span-2"><?php echo $ccms['lang']['backend']['sublevel']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['sublevel']; ?>">&#160;</span></th>
+				<th class="span-1-1"><?php echo $ccms['lang']['backend']['linktitle']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['activelink']; ?>">&#160;</span></th>
 				<th class="span-4"><?php echo $ccms['lang']['forms']['pagetitle']; ?></th>
 			</tr>
 			</table>
@@ -292,9 +296,8 @@ function set_filter_msgs(el)
 
 			<div class="right">
 				<input type="hidden" name="form" value="menuorder" />
-				<button type="submit" name="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
+				<button type="submit" name="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 			</div>
-
 		</form>	
 		</div>
 	</fieldset>
@@ -323,24 +326,24 @@ function set_filter_msgs(el)
 	?>
 	<div id="manage" class="span-25">
 	<fieldset>
-		<legend><span class="ss_sprite ss_folder_database">&#160;</span><a class="toggle" rel="filelist_wrapper" href="#"><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
+		<legend><a class="toggle" rel="filelist_wrapper" href="#"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
 		<div id="filelist_wrapper">
 		<p><?php echo $ccms['lang']['backend']['currentfiles']; ?></p>
 		<form action="index.php" id="delete">
 		<table id="table_manage">
 			<tr>
 				<th style="padding-left: 5px;" class="span-1"></th>
-				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="center span-2-1"><?php echo $ccms['lang']['forms']['printable']; ?> <span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
+				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="center span-2-1"><?php echo $ccms['lang']['forms']['printable']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
 				<th class="center span-2">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
 					{ 
 						echo $ccms['lang']['forms']['published']; 
 						?> 
-						<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
+						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
 					<?php 
 					} 
 					?>
@@ -351,7 +354,7 @@ function set_filter_msgs(el)
 					{ 
 						echo $ccms['lang']['forms']['iscoding']; 
 						?> 
-						<span class="ss_sprite ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
+						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
 					<?php 
 					} 
 					?>
@@ -372,15 +375,17 @@ function set_filter_msgs(el)
 					<th class="span-11" style="text-align: left;">
 						<input type="hidden" name="form" value="delete" />
 						<input type="hidden" id="ad_msg01" value="<?php echo $ccms['lang']['backend']['confirmdelete']; ?>" />
-						<button type="submit" name="btn_del"><span class="ss_sprite ss_bin_empty"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
+						<button type="submit" name="btn_del"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
 					</th>
 				<?php 
 				} 
 				else 
+				{
 					echo '<th class="span-11">&#160;</th>'; 
+				}
 				?>
-				<th class="span-2"><div style="background-color: #CDE6B3; text-align: center;"><span class="ss_sprite ss_accept"><?php echo $ccms['lang']['backend']['active']; ?></span></div></th>
-				<th class="span-2"><div style="background-color: #F2D9DE; text-align: center;"><span class="ss_sprite ss_stop"><?php echo $ccms['lang']['backend']['disabled']; ?></span></div></th>
+				<th class="span-2"><div style="background-color: #CDE6B3; text-align: center;"><span class="ss_sprite_16 ss_accept">&#160;</span><?php echo $ccms['lang']['backend']['active']; ?></div></th>
+				<th class="span-2"><div style="background-color: #F2D9DE; text-align: center;"><span class="ss_sprite_16 ss_stop">&#160;</span><?php echo $ccms['lang']['backend']['disabled']; ?></div></th>
 			</tr>
 		</table>
 		</form>
@@ -388,7 +393,7 @@ function set_filter_msgs(el)
 	</fieldset>
 	</div>
 
-	<div id='debugMsg' class="span-25" style="visibility: visible; opacity: 1;" >&#160;
+	<div id='debugMsg' class="span-25">
 
 <?php
 

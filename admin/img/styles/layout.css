@@ -120,34 +120,47 @@ Make sure the admin content has a scrollbar when needed. Override body+html:over
 	padding: 10px;
 	min-height: 45px;
 }
-#notify.loading {background: #EED9BA url('../spinner.gif') no-repeat 50% 70%;}
-#notify span.right 
+a#clockLink
+{
+	text-decoration: none;
+}
+#notify.loading 
+{
+	background: #EED9BA url('../spinner.gif') no-repeat 50% 70%;
+}
+#notify a.right 
 {
 	/* undo the p .right BluePrint CSS rule as well! */
-	margin: 0 200px 0 0;
-	padding-left: 20px;
+	/* margin: 0 200px 0 0; */
+	/* padding-left: 20px; */
+	text-align:left;
 }
 .printloading {background: url('../saving.gif') no-repeat 50% 70%;}
 fieldset 
 { 
 	padding: 0 10px 10px 10px;
 	margin-bottom: 10px;
-	background: #E6F5D6;
+	/* background-color: #E6F5D6; */
 	border: 3px solid #90D244;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 legend, .loginMsg, .installMsg 
 {
+	/*
+	See also:
+	  http://css-tricks.com/rgba-browser-support/
+	  http://css-tricks.com/non-transparent-elements-inside-transparent-elements/
+	  http://css-tricks.com/ie-background-rgb-bug/
+	
+	This assumes the .legend class should NOT propagate the opacity setting.
+	*/
+	background-color: #C9D3D9;
 	background-color: rgba(201,211,217,0.2);
 	font-size:1.1em;
 	font-weight: bold;
-	margin: 0 15px;
-	padding: 0.4em 1em;
+	margin: 0 10px;
+	padding: 0.4em 0.7em; /* no more as Install Step #3 has a text that otherwise will make the fieldset ever so slightly run over the div width */
 	border: 2px solid #9DAFBB;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 
@@ -184,40 +197,59 @@ a.edit, a.editinplace:hover
 
 /* === 1. CORE === */
 /* === STATUS BARS === */
-#logo {
+#logo 
+{
 	/* height: 100px; */
 	padding-top: 10px;
 	/* margin: 5px 20px; -- nukes the blueprint layout */
 	display: block;
 	height: 57px;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 /* #logo{display:block;height:77px} */
-.logo {background-position: 0 -228px;}
-#logo h1 {display: none;}
-#logo p {text-align:center;margin-top: 75px;font-weight: bold;}
-.twittlogo {display:block;width:26px;height:25px;background-position: 0 -199px;}
+.logo 
+{
+	background-position: 0 -228px;
+}
+#logo h1 
+{
+	display: none;
+}
+#logo p 
+{
+	text-align:center;
+	margin-top: 75px;
+	font-weight: bold;
+}
+.twittlogo 
+{
+	display:block;
+	width:26px;
+	height:25px;
+	background-position: 0 -199px;
+}
 #notify .rounded-border 
 {
 	background-color: #EED9BA;
 	border: 2px solid #C7892E;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	min-height: 95px;
 	margin: 0;
 	padding: 0;
-	text-align: left;
+	text-align: left; 
 }
-.notify{background-position: 0 -510px;}
+.notify
+{
+	background-position: 0 -510px;
+}
 #notify_icon
 {
 	background: url('../ccms-sprite.png') no-repeat 100% 50%;
-	background-position: 0 -500px;
-	height: 95px;
+	background-position: 0 -510px;
+	height: 65px;
 	width: 65px;
+	float:left;
+	margin-top: 20px;
 }
 /*
 IE6 fix:
@@ -233,11 +265,9 @@ IE6 fix:
 	margin: 0;
 	padding: 0;
 	border: 2px solid #9E65D7;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
-#notify p, #advanced h2 
+#notify .header, #advanced .header
 {
 	background: #DFB77C;
 	margin: 0;
@@ -247,23 +277,28 @@ IE6 fix:
 	font-size: 1em;
 	text-align: center;
 }
+#advanced .header
+{
+	background: #C6A5E9;
+	border-bottom-color: #E5D6F5;
+}
+#notify_res 
+{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
 #notify_res p
 {
-	background-color: #EED9BA;
+	/* background-color: #EED9BA; */
 	font-variant: normal;
 	text-align: left;
-	border-bottom: 0;
+	/* border-bottom: 0; */
 }
 #notify_res p.versionstatus
 {
 	font-weight: bold;
 	text-align: center;
-	padding: 20px 0 20px 0;
-}
-#advanced h2
-{
-	background: #C6A5E9;
-	border-bottom-color: #E5D6F5;
+	padding: 20px 0 0 0;
 }
 #advanced ul
 {
@@ -364,16 +399,26 @@ optgroup option {padding-left: 10px;}
 }
 
 /* === CODING PRE-TAG === */
-pre {
+pre 
+{
 	font-size: 12px;
 	padding: 0 5px;
 	margin: 5px;
 	background: #f0f0f0 url('../pre_bg.gif') repeat left top;
 	border: 1px solid #ccc;
-	line-height: 18px;
-	width: 95%;
+	width: 95%; /* WARNING: to make sure the scrollbars show up, you'll need to style your <pre> with a FIXED WIDTH IN PIXELS. With just this 95% width, FF3 will expand the box and break the layout */
 	overflow: auto;
-	overflow-y: hidden; /* not CSS2.1 */
+	/* overflow-y: hidden; -- not CSS2.1; we don't want to hide, we want a scrollbar, if we need one */
+}
+pre.small
+{
+	font-size: 9px;
+	line-height: 17px;
+	background-image: url('../pre_bg_small.gif');
+}
+#installFrm pre
+{
+	width: 300px; 
 }
 
 /* === 1. CORE === */
@@ -392,8 +437,6 @@ div.ss_help
 	border-right: 5px solid #F7D5D5;
 	border-top: 5px solid #F7D5D5;
 	border-bottom: 5px solid #EFAAAB;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 /* for large tip boxes, i.e. boxes with lots of content: */
@@ -407,8 +450,6 @@ div.ss_help_large
 	border-right: 5px solid #F7D5D5;
 	border-top: 5px solid #F7D5D5;
 	border-bottom: 5px solid #EFAAAB;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 div.tip-title {
@@ -418,8 +459,6 @@ div.tip-title {
 	color: #FFFFFF;
 	padding: 5px;
 	background: #DB7075;
-	-webkit-border-radius: 20px;
-	-moz-border-radius: 20px;
 	border-radius: 20px;
 }
 div.tip-text {
@@ -436,8 +475,6 @@ div.tip-text {
 	/* width:750px;  -- use the blueprint CSS containers! */
 	background-color:#E6F5D6;
 	border:10px solid #90D244;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	padding:10px;
 }
@@ -445,15 +482,22 @@ div.tip-text {
 	/* width:750px;  -- use the blueprint CSS containers! */
 	background-color:#E6F5D6;
 	border:10px solid #90D244;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	padding:10px;
 }
 #loginFrm label {display: block;}
-#installFrm label {display: block;margin-top:10px;}
+#installFrm label 
+{
+	display: block;
+	margin-top:10px;
+}
 #login-wrapper h2, #install-wrapper h2 {font-size:1.2em;border-bottom:solid 1px #90D244;}
-.loginMsg, .installMsg {background-color:rgba(229,215,238,0.8);margin-bottom:15px;}
+.loginMsg, .installMsg 
+{
+	background-color:#e5d7ee;
+	background-color:rgba(229,215,238,0.8);
+	margin-bottom:15px;
+}
 #install.loading {display:block;height:300px;background:transparent url('../spinner.gif') no-repeat 50% 50%;}
 #install {margin-top:10px;}
 
@@ -480,8 +524,6 @@ div.module
 	background-color:#e6f5d6;
 	border:1px solid #9ACC66;
 	text-align:center;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 .module h2 
@@ -583,8 +625,6 @@ div.warning
 	margin-bottom:1em;
 	border:2px solid #FBC2C4;
 
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 .warning h1,.warning h2 
@@ -596,8 +636,6 @@ div.warning
 	border:2px solid #FBC2C4;
 	color:#8a1f11;
 	text-align:center;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 .warning h2 
@@ -608,3 +646,5 @@ div.warning
 {
 	padding:2px .8em;
 }
+
+

@@ -102,7 +102,7 @@ if (!defined('BASE_PATH'))
 $optimize = array();
 $optimize['css'] = false; // 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
 $optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
-$optimize['css3'] = 'remove';            // possible values: false, 'remove', 'IE-fix'
+$optimize['css3'] = 'remove';            // possible values: false, 'remove', 'browser-fix'
 
 
 $cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
@@ -571,7 +571,7 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 	
 	switch ($optimize['css3'])
 	{
-	case 'IE-fix':
+	case 'browser-fix':
 		// fix CSS3 border-radius for IE:
 		$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
 
@@ -580,6 +580,8 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 		/* fix opacity for IE: */
 		// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
 		// filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
+		// filter:alpha(opacity=80); 
+		// -ms-filter:'alpha(opacity=80)';
 		/* 
 		see also why we removed the MSIE filter lines in the CSS file 'originals':
 		
@@ -589,14 +591,20 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 		we can add the opacity filters back in through fixup_css() in 
 		the Combiner, as all CSS travels through there anyway.
 		*/
+		
+		// FireFox/Chrome fixes
+		//-webkit-border-radius: 5px;
+		//-moz-border-radius: 5px;
 		break;
 		
 	case 'remove':
 		// remove any border-radius alike entry, including the mozilla+webkit specific ones:
 		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s+\w+;?/', '', $contents);
 		
-		// remove -moz-opacity lines and MSIE filter lines:
-		$contents = preg_replace('/\s-moz-opacity:\s+[0-9.];?/', '', $contents);
+		// remove -moz/khtml-opacity lines and MSIE filter lines:
+		$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*[Aa]lpha\([^)]+\)[\'"]?\s*;?/', '', $contents);
+		$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', '', $contents);
+		$contents = preg_replace('/\sopacity:\s*[0-9.]+;?/', '', $contents);
 		break;
 		
 	default:
