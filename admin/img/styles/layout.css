@@ -97,6 +97,7 @@ blueprint CSS calls this 'last':
 {
 	margin-top: 10px;
 }
+
 .ff{display:inline-block;width:80px;height:15px;background-position: 0 0;}
 .ie{display:inline-block;width:80px;height:15px;background-position: 0 -20px;}
 .opera{display:inline-block;width:80px;height:15px;background-position: 0 -40px;}
@@ -681,3 +682,45 @@ div.warning
 }
 
 
+
+
+.center-text
+{
+	text-align: center;
+}
+.right-text
+{
+	text-align: right;
+}
+.signal-coding
+{
+	color:#8F0000;
+	font-weight:bold;
+}
+
+/*
+table layout
+*/
+tr.unpub_altrgb
+{
+	background-color: #F2D9DE;
+}
+tr.altrgb
+{
+	background-color: #E6F2D9;
+}
+tr.unpub
+{
+	background-color: #EBC6CD;
+}
+
+/* removed from the PHP code: styled now */
+tr.altcolor
+{
+	background-color: #CDE6B3;
+}
+
+td.leftpad-2
+{
+	padding-left:2px;
+}

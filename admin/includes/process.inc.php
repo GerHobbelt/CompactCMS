@@ -198,18 +198,18 @@ if ($do_update_or_livefilter && checkAuth())
 				{
 					if($row->published === "N") 
 					{
-						echo '<tr style="background-color: #F2D9DE;">';
+						echo '<tr class="unpub_altrgb">';
 					} 
 					else 
 					{
-						echo '<tr style="background-color: #E6F2D9;">';
+						echo '<tr class="altrgb">';
 					}
 				} 
 				else 
 				{ 
 					if($row->published === "N") 
 					{
-						echo '<tr style="background-color: #EBC6CD;">';
+						echo '<tr class="unpub">';
 					} 
 					else 
 					{
@@ -217,7 +217,7 @@ if ($do_update_or_livefilter && checkAuth())
 					}
 				} 
 				?>
-				<td style="padding-left:2px;" class="span-1">
+				<td class="span-1 leftpad-2">
 				<?php 
 				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
 				{ 
@@ -242,7 +242,7 @@ if ($do_update_or_livefilter && checkAuth())
 				<td class="span-6">
 					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
-				<td class="span-2" style="text-align: center;">
+				<td class="span-2 center-text">
 					<a href="#" id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 						if($row->printable == "Y")
 						{ 
@@ -254,7 +254,7 @@ if ($do_update_or_livefilter && checkAuth())
 						}
 						?></a>
 				</td>
-				<td class="span-2" style="text-align: center;">
+				<td class="span-2 center-text">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
 					{ 
@@ -273,7 +273,7 @@ if ($do_update_or_livefilter && checkAuth())
 					} 
 					?>
 				</td>
-				<td class="span-2" style="text-align: center;">
+				<td class="span-2 center-text">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
 					{ 
@@ -282,7 +282,16 @@ if ($do_update_or_livefilter && checkAuth())
 						if($row->module=="editor") 
 						{ 
 						?>
-							<a href="#" id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php if($row->iscoding == "Y") { echo "<span style=\"color:#8F0000;font-weight:bold;\">".$ccms['lang']['backend']['yes']."</span>"; } else echo $ccms['lang']['backend']['no']; ?></a>
+							<a href="#" id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+							if($row->iscoding == "Y") 
+							{ 
+								echo '<span class="signal-coding">'.$ccms['lang']['backend']['yes'].'</span>'; 
+							} 
+							else 
+							{
+								echo $ccms['lang']['backend']['no']; 
+							}
+							?></a>
 						<?php 
 						} 
 						else 
@@ -297,7 +306,7 @@ if ($do_update_or_livefilter && checkAuth())
 				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
 				{ 
 				?>
-					<td class="span-5 last" style="text-align: right;">
+					<td class="span-5 last right-text">
 						<a id="<?php echo $row->urlpage;?>" href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" rel="Edit <?php echo $row->urlpage.'.html';?>" class="tabs sprite edit"><?php echo $ccms['lang']['backend']['editpage']; ?></a> | <a href="../<?php echo ($row->urlpage!="home")?$row->urlpage.'.html?preview='.$cfg['authcode']:'?preview='.$cfg['authcode']; ?>" class="external"><?php echo $ccms['lang']['backend']['previewpage']; ?></a>&#160;
 					</td>
 				<?php 
@@ -305,7 +314,7 @@ if ($do_update_or_livefilter && checkAuth())
 				else 
 				{ 
 				?>
-					<td class="span-5 last" style="text-align: right;">
+					<td class="span-5 last right-text">
 						<div style="margin: 2px;"><span class="ss_sprite ss_exclamation" title="<?php echo $ccms['lang']['backend']['restrictpage']; ?>"></span> <?php echo $ccms['lang']['backend']['restrictpage'];?></div>
 					</td>
 				<?php 
@@ -318,22 +327,22 @@ if ($do_update_or_livefilter && checkAuth())
 				{
 					if($row->published === "N") 
 					{
-						echo "<tr style=\"background-color: #F2D9DE;\">";
+						echo '<tr class="unpub_altrgb">';
 					} 
 					else     
 					{
-						echo "<tr style=\"background-color: #E6F2D9;\">";
+						echo '<tr class="altrgb">';
 					}
 				} 
 				else 
 				{ 
 					if($row->published === "N") 
 					{
-						echo "<tr style=\"background-color: #EBC6CD;\">";
+						echo '<tr class="unpub">';
 					} 
 					else 
 					{
-						echo "<tr>"; 
+						echo '<tr>'; 
 					}
 				} 
 				?>
@@ -347,7 +356,7 @@ if ($do_update_or_livefilter && checkAuth())
 				}
 				?>
 				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
-				<td colspan="2" style="text-align: right; padding-right:5px;">
+				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php 
 					if($row->module=="editor" && !empty($row->toplevel)) 
 					{ 
@@ -441,11 +450,11 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 				$isEven = !($i % 2);
 				if($isEven != '1') 
 				{
-					echo "<tr style=\"background-color: #CDE6B3;\">";
+					echo '<tr class="altcolor">';
 				} 
 				else 
 				{ 
-					echo "<tr>"; 
+					echo '<tr>'; 
 				} 
 				$pageIdAsStr = rm0lead($row->page_id); // empty cannot be; rm0lead() makes sure zero is actually "0"
 				?>

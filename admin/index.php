@@ -140,7 +140,7 @@ function set_filter_msgs(el)
 		</div>
 	</div>
 	</div>
-	<div id="advanced" class="prepend-1 span-6 last">
+	<div id="advanced" class="prepend-1 span-6 last clearfix">
 	<div class="rounded-border">
 		<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
 		<div id="advanced_res">
@@ -188,6 +188,7 @@ function set_filter_msgs(el)
 	</div>
 	</div>
 
+	<div id="createnew" class="span-9 clear-left">
 	<?php 
 	
 	// Start main management section 
@@ -196,7 +197,6 @@ function set_filter_msgs(el)
 	if($_SESSION['ccms_userLevel']>=$perm['managePages']) 
 	{ 
 	?>
-	<div id="createnew" class="span-9">
 	<fieldset>
 		<legend><a class="toggle" rel="form_wrapper" href="#"><span class="ss_sprite_16 ss_add">&#160;</span><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
 		<div id="form_wrapper">
@@ -263,17 +263,25 @@ function set_filter_msgs(el)
 		</form>	
 		</div>
 	</fieldset>
-	</div>
 	<?php 
 	} 
+	else
+	{
+	?>
+		<p class="ss_sprite ss_warning"><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+	<?php 
+	} 
+	?>
+	</div>
 
-		
+	<div id="menudepth" class="span-16 last">
+	<?php 
+
 	// Manage menu depths & languages 
 	
 	if($_SESSION['ccms_userLevel']>=$perm['manageMenu']) 
 	{ 
 	?>
-	<div id="menudepth" class="span-16 last">
 	<fieldset>
 		<legend><a class="toggle" rel="menu_wrapper" href="#"><span class="ss_sprite_16 ss_text_list_bullets">&#160;</span><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
 		<div id="menu_wrapper">
@@ -301,9 +309,17 @@ function set_filter_msgs(el)
 		</form>	
 		</div>
 	</fieldset>
-	</div>
 	<?php 
 	} 
+	else
+	{
+	?>
+		<p class="ss_sprite ss_warning"><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+	<?php 
+	} 
+	?>
+	</div>
+	<?php 
 	
 
 		
