@@ -342,9 +342,13 @@ if (empty($_SESSION['variables']['do_upgrade']))
 			{
 				// Tips links
 				$$('span.ss_help').each(function(element,index) {  
-					var content = element.get('title').split('::');  
-					element.store('tip:title', content[0]);  
-					element.store('tip:text', content[1]);  
+					var t = element.get('title');
+					if (t)
+					{
+						var content = t.split('::');
+						element.store('tip:title', content[0]);
+						element.store('tip:text', content[1]);
+					}
 				});  
 			  
 				// Create the tooltips  
