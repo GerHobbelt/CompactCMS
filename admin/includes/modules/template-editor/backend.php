@@ -117,8 +117,9 @@ editAreaLoader.init(
 		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
 		syntax:"html"
 	});
-</script>
-		<script type="text/javascript">
+
+	
+	
 function confirmation()
 {
 	var answer=confirm(<?php echo"'".$ccms['lang']['editor']['confirmclose']."'";?>);
@@ -141,7 +142,7 @@ function confirmation()
 </script>
 	</head>
 <body>
-	<div class="module">
+	<div class="module" id="template-editor">
 
 		<?php 
 		if($chstatus==0) 
@@ -232,21 +233,19 @@ function confirmation()
 		
 			<textarea id="content" name="content" style="height:400px;width:100%;color:#000;"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
 			
-			<p>
-				<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
+			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
+			<div class="right">
 				<?php 
 				if($chstatus > 0) 
 				{ 
 				?>
-					<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
+					<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 				<?php 
 				}  
 				?>
-				<span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span>
-			</p>
-			
+				<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
 		</form>
-	
 	</div>
 </body>
 </html>

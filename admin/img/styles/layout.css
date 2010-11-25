@@ -779,13 +779,13 @@ div.warning
 }
 .warning h1,.warning h2 
 {
-	font-size:1.2em;
-	padding:2px 5px;
+	font-size: 1.2em;
+	padding: 2px 5px;
 	margin: 0;
-	background-color:#FBE3E4;
-	border:2px solid #FBC2C4;
-	color:#8a1f11;
-	text-align:center;
+	background-color: #FBE3E4;
+	border: 2px solid #FBC2C4;
+	color: #8a1f11;
+	text-align: center;
 	border-radius: 5px;
 }
 .warning h2 
@@ -810,8 +810,8 @@ div.warning
 }
 .signal-coding
 {
-	color:#8F0000;
-	font-weight:bold;
+	color: #8F0000;
+	font-weight: bold;
 }
 
 /*
@@ -838,7 +838,7 @@ tr.altcolor
 
 td.leftpad-2
 {
-	padding-left:2px;
+	padding-left: 2px;
 }
 
 
@@ -862,6 +862,51 @@ form#delete
 {
 	overflow: hidden;
 }
+
+
+
+#content-owners table th
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#content-owners table td
+{
+	height: 18px;
+}
+#content-owners table td.pagename
+{
+	padding-left: 2px;
+	border-right: solid #AD8CCF 2px;
+}
+#content-owners table td.altrgb
+{
+	background-color: #EAF3E2;
+}
+#content-owners table td.regrgb
+{
+	background-color: #fff;
+}
+#content-owners .hover
+{
+	height: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+#content-owners .hover:hover
+{
+	border:solid 2px red;
+	/* compensate for the thicker border: */
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+#content-owners table td.center
+{
+	text-align: center;
+}
+
+
+
+
 
 
 

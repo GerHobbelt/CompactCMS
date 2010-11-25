@@ -119,7 +119,7 @@ function confirmation()
 		?>
 	</div>
 
-	<div>
+	<div id="content-owners">
 		<h2><span class="ss_sprite ss_group_gear"><?php echo $ccms['lang']['owners']['header']; ?></span></h2>
 		<p><?php echo $ccms['lang']['owners']['explain']; ?></p>
 		<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
@@ -130,7 +130,7 @@ function confirmation()
 			for ($ar1=0; $ar1<count($users); $ar1++)
 			{
 			?>
-				<th class="center span-2" style="border-bottom:solid #AD8CCF 2px;">
+				<th class="center span-2">
 					<span class="ss_sprite ss_user_<?php echo ($users[$ar1]['userLevel']>=4?'suit':'green'); ?>"><?php echo $users[$ar1]['userFirst'].' '.substr($users[$ar1]['userLast'],0,1); ?>.</span>
 				</th>
 			<?php
@@ -144,40 +144,40 @@ function confirmation()
 
 		?>
 			<tr>
-			<td class="span-4" style="padding-left:2px;background-color:<?php echo ($i%2!=1?'#EAF3E2;':'#fff;'); ?>border-right:solid #AD8CCF 2px;">
+			<td class="span-4 pagename <?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
 				<span class="ss_sprite ss_page_white_world"><?php echo $pages[$i]['urlpage']; ?>.html</span>
 			</td>
-				<?php
-				for ($ar2=0; $ar2<count($users); $ar2++)
-				{
-				?>
-					<td class="hover center">
-						<label for="<?php echo $i.'_'.$ar2;?>"><span>
-						<input type="checkbox" name="owner[]"
-						<?php
-						/*
-						* This code is a security issue of another kind: user
-						* ownership settings will OVERLAP for certain users
-						* when their IDs are substrings, e.g. user #1 will
-						* have everything user #11 has as well.
-						*
-						*   if(strstr($pages[$i]['user_ids'], $users[$ar2]['userID'])!==false)
-						*
-						* Hence the code is replaced with an explode plus
-						* array scan. Another way to solve would be padding
-						* the rights string with leading and trailing '||'
-						* and then regex matching against "/||$userid||/".
-						*/
-						if (in_array(rm0lead($users[$ar2]['userID']), $users_owning_page))
-						{
-							echo 'checked="checked"';
-						}
-						?> value="<?php echo rm0lead($users[$ar2]['userID']).'||'.rm0lead($pages[$i]['page_id']);?>" id="<?php echo $i.'_'.$ar2;?>" />
-						</span></label>
-					</td>
-				<?php
-				}
-				?>
+			<?php
+			for ($ar2=0; $ar2<count($users); $ar2++)
+			{
+			?>
+				<td class="hover center">
+					<label for="<?php echo $i.'_'.$ar2;?>"><span>
+					<input type="checkbox" name="owner[]"
+					<?php
+					/*
+					* This code is a security issue of another kind: user
+					* ownership settings will OVERLAP for certain users
+					* when their IDs are substrings, e.g. user #1 will
+					* have everything user #11 has as well.
+					*
+					*   if(strstr($pages[$i]['user_ids'], $users[$ar2]['userID'])!==false)
+					*
+					* Hence the code is replaced with an explode plus
+					* array scan. Another way to solve would be padding
+					* the rights string with leading and trailing '||'
+					* and then regex matching against "/||$userid||/".
+					*/
+					if (in_array(rm0lead($users[$ar2]['userID']), $users_owning_page))
+					{
+						echo 'checked="checked"';
+					}
+					?> value="<?php echo rm0lead($users[$ar2]['userID']).'||'.rm0lead($pages[$i]['page_id']);?>" id="<?php echo $i.'_'.$ar2;?>" />
+					</span></label>
+				</td>
+			<?php
+			}
+			?>
 			</tr>
 		<?php
 		}
@@ -187,7 +187,7 @@ function confirmation()
 		<hr/>
 		<div class="right">
 			<button type="submit"><span class="ss_sprite ss_disk">Save</span></button>
-			<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 		</div>
 		</form>
 	</div>

@@ -66,6 +66,17 @@ if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !Chec
 }
 
 
+
+// Get the number of users; this is used to dimension some user management window(s); also count INactive users!
+$user_count = $db->SelectSingleValue($cfg['db_prefix'].'users', null, 'COUNT(userID)');
+if ($db->ErrorNumber()) 
+	$db->Kill();
+$total_page_count = $db->SelectSingleValue($cfg['db_prefix'].'pages', null, 'COUNT(page_id)');
+if ($db->ErrorNumber()) 
+	$db->Kill();
+
+
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
@@ -98,6 +109,14 @@ function set_filter_msgs(el)
 	el.msg_add = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['add']))."'"; ?>;
 }
 
+function get_admin_user_count()
+{
+	return <?php printf("%d", $user_count); ?>;
+}
+function get_total_page_count()
+{
+	return <?php printf("%d", $total_page_count); ?>;
+}
 </script>
 </head>
 
