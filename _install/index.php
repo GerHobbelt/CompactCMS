@@ -303,7 +303,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<!--[if IE]>
 			<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
 		<![endif]-->
-		<script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../lib/includes/js/mootools-core.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../lib/includes/js/mootools-more.js" charset="utf-8"></script>
 		<script type="text/javascript" src="../admin/includes/modules/user-management/passwordcheck.js" charset="utf-8"></script>
 		<script type="text/javascript" charset="utf-8">
 			window.addEvent('domready', function() {
