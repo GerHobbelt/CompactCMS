@@ -74,7 +74,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Permissions module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 
 	<!-- Confirm close -->
 	<script type="text/javascript">
@@ -173,7 +173,10 @@ function confirmation()
 				?>
 			</table>
 			<hr />
-			<p class="right"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> <span class="ss_sprite ss_cross"><a href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span></p>
+			<div class="right">
+				<button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> 
+				<a class="button" href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
 		</form>
 	<?php
 	} 

@@ -1454,7 +1454,7 @@ editAreaLoader.init(
 	<?php 
 	} 
 	?>
-	<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
 	</head>
 	
 	<body>
@@ -1540,7 +1540,7 @@ if($do_action == "save-changes" && checkAuth())
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 	<head>
 		<title>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></title>
-		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css" />
+		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
 	</head>
 
 	<body>

@@ -176,7 +176,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>CompactCMS Administration</title>
 		<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
-		<link rel="stylesheet" type="text/css" href="../../admin/img/styles/base.css,layout.css,sprite.css" />
+		<link rel="stylesheet" type="text/css" href="../../admin/img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
 	</head>
 <body>
 

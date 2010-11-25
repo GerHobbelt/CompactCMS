@@ -331,7 +331,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 								install_div.removeClass('loading');
 								scroll.toElement('install-wrapper');
 								build_tips();
-								alert('loaded!');
+								//alert('loaded!');
 							}
 						}).send(frm);
 					});

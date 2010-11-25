@@ -37,7 +37,7 @@ function show($foo)
 
 <p>link: <a href="/c/admin/includes/fancyupload/dummy.js,Source/FileManager.js,Language/Language.en.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"> same: multiple js, now without the ../ bits inside the URL</a>
 
-<p>link: <a href="/c/admin/img/styles/base.css,layout.css,editor.css,sprite.css"> /c/admin/img/styles/base.css,layout.css,editor.css,sprite.css</a> -- when combiner is configured to NOT run CSS minification, 
+<p>link: <a href="/c/admin/img/styles/base.css,layout.css,editor.css,sprite.css,last_minute_fixes.css"> /c/admin/img/styles/base.css,layout.css,editor.css,sprite.css,last_minute_fixes.css</a> -- when combiner is configured to NOT run CSS minification, 
          the comments should exhibit that the encoding is indeed UTF-8: no screwed-up names in there, 
          e.g. the 'Based on work by' comment line
 

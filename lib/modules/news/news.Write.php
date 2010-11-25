@@ -82,7 +82,7 @@ if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>News module</title>
 	
-	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	
 	<!-- File uploader styles -->
 	<link rel="stylesheet" media="all" type="text/css" href="../../../admin/includes/fancyupload/Css/FileManager.css,Additions.css" />

@@ -1088,6 +1088,17 @@ http://nadeausoftware.com/node/79
 */
 function path_remove_dot_segments($path)
 {
+	// make sure the split is still safe when the 'path' is either a Windows path or a URL:
+	$root = '';
+	$q = '';
+	$count = preg_match('/^([^:]+)(:\/+)([^?]*)(\?.*)$/s', $path, $matches);
+	if ($count)
+	{
+		$root = $matches[1] . $matches[2];
+		$path = $matches[3];
+		$q = $matches[4];
+	}
+	
     // multi-byte character explode
     $inSegs  = preg_split('!/!u', $path);
     $outSegs = array();
@@ -1106,7 +1117,7 @@ function path_remove_dot_segments($path)
     // // compare last multi-byte character against '/'
     // if ($outPath != '/' && (mb_strlen($path)-1) == mb_strrpos($path, '/', 'UTF-8'))
     //     $outPath .= '/';
-    return $outPath;
+    return $root . $outPath . $q;
 }
 
 
@@ -1290,6 +1301,51 @@ function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
 
 
 
+
+
+/**
+Append pieces of a path together. Each part (argument) is treated as a directory or filename/filepath, so an extra '/' is
+included between elements, where necessary (i.e. if the previous element didn't end on a '/').
+
+NOTES:
+
+Path elements get their Windows '\\' converted to '/' for free.
+
+Return FALSE when the argument list is empty
+
+
+SECURITY NOTICE / WARNING:
+
+1) if you suspect read attacks like fetching '/etc/passwd' might arrive at the doorstep
+   of this one, then MAKE SURE to check the acceptability of the generated path!
+
+2) does *NOT* clean up the generated path!
+
+*/
+function merg_path_elems( /* ... */ )
+{
+	if(func_num_args() == 0) 
+	{
+		return false;
+	}
+	
+	$path = str_replace("\\", '/', func_get_arg(0));
+	
+	for($i = 1; $i < func_num_args(); $i++) 
+	{
+		$part = str_replace("\\", '/', func_get_arg($i));
+		if (empty($part)) continue;
+		
+		if (substr($path, -1, 1) != '/') $path .= '/';
+		// strip off leading '/' of any subpart!
+		if ($part[1] == '/') $part = substr($part, 1);
+		
+		$path .= $part;
+	}
+	
+	// return path_remove_dot_segments($path);
+	return $path;
+}
 
 
 

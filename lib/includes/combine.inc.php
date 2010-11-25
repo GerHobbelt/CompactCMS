@@ -98,6 +98,8 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
+define('COMBINER_DEV_DUMP_OUTPUT', true); // dump generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
+
 
 $optimize = array();
 $optimize['css'] = false; // 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
@@ -120,6 +122,9 @@ if (empty($cssdir))
 else if ($cssdir[0] != '/') 
 	$cssdir = $cfg['rootdir'] . $cssdir;
 
+$http_root = $cfg['rootdir'];
+$root = str_replace('\\','/',cvt_abs_http_path2realpath($http_root, $cfg['rootdir'], BASE_PATH));
+	
 
 // Determine the directory and type we should use
 $type = getGETparam4IdOrNumber('type');
@@ -176,7 +181,7 @@ foreach($elements as $element)
 	generated file paths are checked against the 'base' directory and 
 	will only be allowed when they are part of that subtree.
 	*/
-	if (substr($path, 0, strlen($base)) != $base) 
+	if (substr($path, 0, strlen($root)) != $root) 
 	{
 		send_response_status_header(403); // Illegal Access
 		die();
@@ -282,7 +287,7 @@ else
 	$contents = '';
 	foreach($elements as $element)
 	{
-		$my_content = load_one($type, $http_base, $base, $element);
+		$my_content = load_one($type, $http_base, $base, $root, $element);
 		$contents .= "\n" . $my_content;
 	}
 
@@ -435,6 +440,22 @@ else
 			die("Failed to write data to cache file: " . $cachedir . '/' . $cachefile);
 		}
 	}
+
+	if (COMBINER_DEV_DUMP_OUTPUT && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+	{
+		$dump_filename = str2VarOrFileName($_GET['files']);
+		
+		if ($fp = @fopen($cachedir . '/' . $dump_filename, 'wb')) 
+		{
+			fwrite($fp, $contents);
+			fclose($fp);
+		}
+		else
+		{
+			send_response_status_header(500);
+			die("Failed to write data to development diagnostics dump file: " . $cachedir . '/' . $dump_filename);
+		}
+	}
 	
 	// Send Content-Type
 	header("Content-Type: text/" . $type . '; charset=UTF-8');
@@ -486,13 +507,14 @@ function css_mk_abs_path($relpath, $basedir)
 		  
 		Anyway, prepend the path with the absolute path to the given file and then discard the ./ and ../ entries in the path.
 		*/
-		$abspath = $basedir . (substr($basedir, -1, 1) != '/' ? '/' : '') . $relpath;
+		$abspath = merg_path_elems($basedir, $relpath);
 		$abspath = path_remove_dot_segments($abspath);
 	}
 	else
 	{
-		// don't modify
+		// don't modify, but bash out any lingering '../' parts in there to prevent illegal access outside DocumentRoot
 		$abspath = $relpath;
+		$abspath = path_remove_dot_segments($abspath);
 	}
 		
 	return $abspath;
@@ -504,7 +526,7 @@ function css_mk_abs_path($relpath, $basedir)
 patch/correct CCS3 and other particulars, such as 
 '@import flattening', which reduces the number of CSS files to load.
 */
-function fixup_css($contents, $http_base, $type, $base, $element)
+function fixup_css($contents, $http_base, $type, $base, $root, $element)
 {
 	global $cfg, $optimize;
 
@@ -546,10 +568,17 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 			  
 			Anyway, prepend the current path to the given file and then discard the ./ and ../ entries in the path.
 			*/
-			$url = $element . '/../' . $url;
-			$url = path_remove_dot_segments($url);
-
-			$imported_content = load_one($type, $http_base, $base, $url);
+			//echo "<pre>@import\n";
+			if (0)
+			{
+			echo "<pre>@import: $type, $http_base, \n$base, \n$root, $url, $element";
+			$rfn = merg_path_elems($base, $element, '../', $url);
+			echo "<pre>makes: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
+			$rfn = path_remove_dot_segments($rfn);
+			echo "<pre>makes 2: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
+			}
+			
+			$imported_content = load_one($type, $http_base, $base, $root, $url);
 			
 			/* 
 			inject imported content into the current buffer to have it (re)processed in the loop:
@@ -593,18 +622,19 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 		*/
 		
 		// FireFox/Chrome fixes
-		//-webkit-border-radius: 5px;
-		//-moz-border-radius: 5px;
+		//-webkit-border-radius: 5px [5px 5px 5px];
+		//-moz-border-radius: 5px [5px 5px 5px];
+		//border-radius: 5px [5px 5px 5px];
 		break;
 		
 	case 'remove':
 		// remove any border-radius alike entry, including the mozilla+webkit specific ones:
-		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s+\w+;?/', '', $contents);
+		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
 		
 		// remove -moz/khtml-opacity lines and MSIE filter lines:
-		$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*[Aa]lpha\([^)]+\)[\'"]?\s*;?/', '', $contents);
-		$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', '', $contents);
-		$contents = preg_replace('/\sopacity:\s*[0-9.]+;?/', '', $contents);
+		$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*[Aa]lpha\([^)]+\)[\'"]?\s*;?/', ' ', $contents);
+		$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+		$contents = preg_replace('/\sopacity:\s*[0-9.]+;?/', ' ', $contents);
 		break;
 		
 	default:
@@ -622,7 +652,7 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 	   <path+filename of CSS>/../ 
 	 and let the '..' directory remover do its regular job.
 	*/ 
-	$abspath = $http_base . (substr($http_base, -1, 1) != '/' ? '/' : '') . $element . '/../';
+	$abspath = merg_path_elems($http_base, $element, '../');
 	$abspath = path_remove_dot_segments($abspath);
 	
 	$contents = preg_replace('/\surl\(([^)]+)\)/e', "' url(\"'.css_mk_abs_path('\\1', '".$abspath."').'\")'", $contents);
@@ -635,13 +665,13 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 /**
 patch/correct JS relative paths and other particulars
 */
-function fixup_js($contents, $http_base, $type, $base, $element)
+function fixup_js($contents, $http_base, $type, $base, $root, $element)
 {
 	global $cfg;
 
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
-		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $element);
+		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element);
 		$contents .= "\n" . $flattened_content;
 	}
 		
@@ -650,9 +680,9 @@ function fixup_js($contents, $http_base, $type, $base, $element)
 
 
 
-function load_tinyMCE_js($type, $http_base, $base, $element)
+function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 {
-	$mce_basepath = $base . '/' . substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js"));
+	$mce_basepath = merg_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
 	
 	$mce_files = array();
 	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
@@ -786,17 +816,35 @@ function load_tinyMCE_js($type, $http_base, $base, $element)
 
 
 /**
-Load the content of the given item.
+Load the content of the given item. ($element MUST be an absolute path!)
 
 Note that this function does 'fixup' the loaded content, which MAY result in recursive
 invocation of this function to load each of the dectected sub-items. This way we can easily handle
 'flattening' CSS which uses the @import statement, etc.
 */
-function load_one($type, $http_base, $base, $element)
+function load_one($type, $http_base, $base, $root, $element)
 {
-	$path = realpath($base . '/' . $element);
+	$uri = path_remove_dot_segments($base . '/' . $element);
+	$path = str_replace("\\", '/', realpath($uri)); /* Windows can handle '/' so we're OK with the replace here; makes strpos() below work on all platforms */
 	
-	$my_content = file_get_contents($path);
+	/*
+	only allow a load when the CSS/JS is indeed within document-root: 
+	
+	as path_remove_dot_segments() will remove ALL '../' directory bits, any attempt to grab, say,
+	  ../../../../../../../../../etc/passwd
+	will fail as path_remove_dot_segments() will have DAMAGED the path and $element
+	does not point within the $root path any more!
+	*/
+	$my_content = null;
+	if (is_file($path) && strpos($path, $root) === 0)
+	{
+		//echo "<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root);
+		$my_content = file_get_contents($path);
+	}
+	else
+	{
+		die("<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root));
+	}
 	if ($my_content === false)
 	{
 		send_response_status_header(404); // Not Found
@@ -822,11 +870,11 @@ function load_one($type, $http_base, $base, $element)
 		As the result is cached, this effort is only required once. Which would happen at install time when
 		you run the 'cache priming' action, resulting in a fully set up cache when you go 'live'.
 		*/
-		$my_content = fixup_css($my_content, $http_base, $type, $base, $element);
+		$my_content = fixup_css($my_content, $http_base, $type, $base, $root, $element);
 		break;
 		
 	default:
-		$my_content = fixup_js($my_content, $http_base, $type, $base, $element);
+		$my_content = fixup_js($my_content, $http_base, $type, $base, $root, $element);
 		break;
 	}
 	return $my_content;

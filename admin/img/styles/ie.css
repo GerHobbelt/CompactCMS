@@ -84,4 +84,23 @@ table th, td
 }
 
 
+/*
+Only IE7 shows a horizon scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
+
+Here we tweak the margin to make that useless scrollbar disappear at that resolution.
+
+We only nibble 1px off the right side to keep the (useful!) vertical scrollbar from looking damaged.
+
+Tested on a Dutch XP SP3 Win32 + KB's installed up to Nov/2010, default setup, + IE7 installed, otherwise empty.
+*/
+*:first-child+html #pageWrapper /* IE7 only? Turns out the '*:first-child+html' hack also seems to affect IE6 */
+{
+	margin-right: -1px;
+	margin-left: -5px;
+}
+* html #pageWrapper /* IE6 */
+{
+	margin-right: 0;
+	margin-left: 0;
+}
 

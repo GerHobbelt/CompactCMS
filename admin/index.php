@@ -75,7 +75,7 @@ if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !Chec
 	<title>CompactCMS Administration</title>
 	<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 	<link rel="icon" type="image/ico" href="../media/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="img/styles/base.css,layout.css,editor.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="img/styles/base.css,layout.css,editor.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
 		<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>

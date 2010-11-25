@@ -33,7 +33,7 @@
 .span-21 { width: 87%; }
 .span-22 { width: 91%; }
 .span-23 { width: 95%; }
-.span-24 { width: 100%; margin-right: 0; }
+.span-24 { width: 100%; /* margin-right: 0;  -- always use 'last' for this */ }
 
 .span-1>div, .span-2>div, .span-3>div, .span-4>div,
 .span-5>div, .span-6>div, .span-7>div, .span-8>div,

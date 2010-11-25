@@ -53,6 +53,13 @@ RewriteBase /
 # Various rewrite rules
 ##
 
+
+RewriteCond    %{REQUEST_FILENAME}  -f
+RewriteRule    ^(.*\.htmx)$          $1  [L]
+RewriteCond    %{REQUEST_FILENAME}  -f
+RewriteRule    ^(.*\.csx)$           $1  [L]
+
+
 RewriteRule ^([^/]*)/([^/]*)\.html$             index.php?page=$1&id=$2 [QSA,L]
 RewriteRule ^([^/]*)/([^/]*)\.print$            index.php?page=$1&id=$2&printing=Y [QSA,L]
 RewriteRule ^([^/]+)\.html$                     index.php?page=$1 [QSA,L]
