@@ -68,7 +68,7 @@ if ($perm['manageModBackup'] <= 0 || !checkAuth())
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Back-up &amp; Restore module</title>
-		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
 		<script type="text/javascript" charset="utf-8">
 function confirmation()
@@ -372,7 +372,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 			if ($show_warn_about_partial_backup)
 			{
 			?>
-				<div class="warning error center">
+				<div class="warning error center left-text clear">
 					<h2><?php echo $mediawarning[0]; ?></h2>
 					<?php
 					foreach ($mediawarning[1] as $line)

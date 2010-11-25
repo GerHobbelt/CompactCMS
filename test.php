@@ -41,7 +41,7 @@ function show($foo)
          the comments should exhibit that the encoding is indeed UTF-8: no screwed-up names in there, 
          e.g. the 'Based on work by' comment line
 
-<p>link: <a href="/c/lib/includes/js/mootools.js,common.js,mocha.js"> /c/lib/includes/js/mootools.js,common.js,mocha.js </a>
+<p>link: <a href="/c/lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js"> /c/lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js </a>
 
 <p>link: <a href="/c/_install/install.css"> /c/_install/install.css </a> -- should NEVER be processed by the RewriteEngine!
 

@@ -96,11 +96,3 @@ button, input.button
 	/* position:relative;     -- this screws up the Fx.hide in IE7/IE6 */
 	top:0.25em; 
 }
-
-/*
-table th, td
-{
-	height: 18px;
-}
-*/
-

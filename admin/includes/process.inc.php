@@ -436,7 +436,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 		// Check whether the recordset is not empty
 		if($db->HasRecords()) 
 		{
-			echo '<table class="span-15" cellpadding="0" cellspacing="0">';
+			echo '<table class="span-15 last" cellpadding="0" cellspacing="0">';
 			
 			$i = 0;
 			// Get previously opened DB stream
@@ -459,7 +459,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 				$pageIdAsStr = rm0lead($row->page_id); // empty cannot be; rm0lead() makes sure zero is actually "0"
 				?>
 					<td class="span-2">
-						<select class="span-2" name="menuid[<?php echo $pageIdAsStr; ?>]">
+						<select class="span-2 last" name="menuid[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Menu">
 								<?php 
 								$y = 1; 
@@ -475,7 +475,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 						</select>
 					</td>
 					<td class="span-2">
-						<select class="span-2" name="template[<?php echo $pageIdAsStr; ?>]">
+						<select class="span-2 last" name="template[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
 								<?php 
 								$x = 0; 
@@ -490,8 +490,8 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">&#160;
-						<select class="span-2" name="toplevel[<?php echo $pageIdAsStr; ?>]">
+					<td class="span-2">
+						<select class="span-2 last" name="toplevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Toplevel">
 								<?php 
 								$z = 1; 
@@ -507,7 +507,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 						</select>
 					</td>
 					<td class="span-2">
-						<select class="span-2" name="sublevel[<?php echo $pageIdAsStr; ?>]">
+						<select class="span-2 last" name="sublevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Sublevel">
 								<?php 
 								$y = 0; 
@@ -538,7 +538,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 						} 
 						?>
 					</td>
-					<td class="span-4">
+					<td class="span-4 last">
 						<?php echo $row->urlpage; ?><em>(.html)</em>
 						<input type="hidden" name="pageid[]" value="<?php echo $pageIdAsStr; ?>" id="pageid"/>
 					</td>
@@ -1324,7 +1324,7 @@ function confirmation()
 		<script type="text/javascript" src="./tiny_mce/tiny_mce_gzip.js"></script>	
 		
 		<!-- Mootools library -->
-		<script type="text/javascript" src="../../lib/includes/js/mootools.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 		
 		<!-- File uploader JS -->
 		<script type="text/javascript" src="./fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>

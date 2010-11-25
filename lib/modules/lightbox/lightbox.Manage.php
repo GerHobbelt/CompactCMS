@@ -193,7 +193,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Lightbox module</title>
 	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,uploader.css" />
-	<script type="text/javascript" src="../../includes/js/mootools.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../../includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 	<?php 
 	// prevent JS errors when permissions don't allow uploading (and all the rest)
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 

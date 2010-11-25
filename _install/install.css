@@ -65,13 +65,42 @@ these reside within a span-9 div:
 {
 	width: 320px;
 }
+#installFrm legend
+{
+	/*
+	Hack to make Chrome respect at least /some/ margin:
+	
+	See also:
+	
+	http://stackoverflow.com/questions/2568591
+	https://bugs.webkit.org/show_bug.cgi?id=35981
+	
+	-webkit-margin-bottom-collapse: separate;     <-- doesn't work at all Chrome / Opera 
+	
+	Since we're in the installer, we can't use the Combiner+Browscap to produce
+	browser-customized CSS yet... so we don't do nothing about it for now. 
+	Too much hassle.
+	
+	#installFrm fieldset > p:first-of-type
+	{
+		padding-top: 10px;
+		border: 1px red solid;
+	}
+
+	This works for Opera and Chrome, but then FF3/IE8 are burdened,
+	so forget it. Screw Chrome. Screw Opera. They'ld have to wait until 
+	we can run Combiner+Browscap backend CSS customization.
+	*/
+}
 
 
-/* LOGIN && INSTALL === */
+
+
+
+/* === INSTALL === */
+
 
 /*
-#logo{display:block;height:77px}
-#logo h1{display:none;}
 #install-wrapper{
 	width:750px;
 	background-color:#E6F5D6;

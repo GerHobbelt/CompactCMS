@@ -80,7 +80,7 @@ if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !Chec
 		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
 		<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>
 	<![endif]-->
-	<script type="text/javascript" src="../lib/includes/js/mootools.js,common.js,mocha.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
 window.addEvent('domready',function()
 	{
@@ -105,7 +105,7 @@ function set_filter_msgs(el)
 <div id='pageWrapper'><?php /* <-- required to ensure there are proper scrollbars in the MochaUI 'desktop' */ ?>
 <div class="container-25">
 	<?php // Top bar including status block ?>
-	<div id="logo" class="span-5 colborder">
+	<div id="logo-div" class="span-5 colborder">
 		<div id="logo" class="sprite logo">
 			<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
 		</div>
@@ -301,14 +301,14 @@ function set_filter_msgs(el)
 		<div id="menu_wrapper">
 		<p><?php echo $ccms['lang']['backend']['ordertip']; ?></p>
 		<form method="post" id="menuForm" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-			<table class="span-15" id="table_menu">
+			<table class="span-15 last" id="table_menu">
 			<tr>
 				<th class="span-2"><?php echo $ccms['lang']['backend']['menutitle']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['menuid']; ?>">&#160;</span></th>
 				<th class="span-2"><?php echo $ccms['lang']['backend']['template']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['template']; ?>">&#160;</span></th>
 				<th class="span-2"><?php echo $ccms['lang']['backend']['toplevel']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['toplevel']; ?>">&#160;</span></th>
 				<th class="span-2"><?php echo $ccms['lang']['backend']['sublevel']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['sublevel']; ?>">&#160;</span></th>
 				<th class="span-1-1"><?php echo $ccms['lang']['backend']['linktitle']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['activelink']; ?>">&#160;</span></th>
-				<th class="span-4"><?php echo $ccms['lang']['forms']['pagetitle']; ?></th>
+				<th class="span-4 last"><?php echo $ccms['lang']['forms']['pagetitle']; ?></th>
 			</tr>
 			</table>
 			<div id="menuFields">

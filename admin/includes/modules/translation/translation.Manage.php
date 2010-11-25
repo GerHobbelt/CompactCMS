@@ -451,7 +451,7 @@ td.nowrap, th.nowrap
 		<script type="text/javascript" src="../../tiny_mce/tiny_mce_gzip.js"></script>	
 		
 		<!-- Mootools library -->
-		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 		
 		<!-- File uploader JS -->
 		<script type="text/javascript" src="../../fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>

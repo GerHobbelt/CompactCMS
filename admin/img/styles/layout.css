@@ -28,9 +28,25 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ************************************************************ */
 
 /* === 0. MISC === */
+
+/*
+It turns out not only IE8 but also Chrome & Opera need this to make the overview in step #4 stay close together vertically.
+
+Harmless for FF3.
+*/
+table th, table td
+{
+	height: 18px;
+	line-height: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+
 a.external 
 {
-	background: url('../ccms-sprite.png') no-repeat 100% 50%;
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
 	background-position: 0 -159px;
 	padding: 0 0 0 13px;
 }
@@ -44,35 +60,43 @@ THANK YOU, David Hammond! I'm glad I finally found that page. !@#$%^ MSIE!
 */
 * html a.external
 {
-	background: url('../ccms-sprite.gif') no-repeat 100% 50%;
+	background-image: url('../ccms-sprite.gif');
 }
 
 
 .sprite
 {
-	background: url('../ccms-sprite.png') no-repeat top left;
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
 }
 /*
 IE6 fix:
 */
 * html .sprite
 {
-	background: url('../ccms-sprite.gif') no-repeat top left;
+	background-image: url('../ccms-sprite.gif');
+	background-repeat: no-repeat;
 }
 
 .sprite-hover:hover
 {
-	background: url('../ccms-sprite.png') no-repeat top left;
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
 }
 /*
 IE6 fix:
 */
 * html .sprite-hover:hover
 {
-	background: url('../ccms-sprite.gif') no-repeat top left;
+	background-image: url('../ccms-sprite.gif');
+	background-repeat: no-repeat;
 }
 
-.info{background-position: 0 -178px;padding: 0 0 0 20px;}
+.info
+{
+	background-position: 0 -178px;
+	padding: 0 0 0 20px;
+}
 
 /* === 1. CORE === */
 /* === LAY-OUT === */
@@ -137,13 +161,28 @@ a#clockLink
 	text-align:left;
 }
 .printloading {background: url('../saving.gif') no-repeat 50% 70%;}
-fieldset 
+#desktop fieldset 
 { 
 	padding: 0 10px 10px 10px;
 	margin-bottom: 10px;
-	/* background-color: #E6F5D6; */
+	background-color: #E6F5D6; 
+	/* 
+	^^^^ thanks to the negative margin of the <legend> the background shows above 
+	     the border for IE8/IE7/IE6; the only way to fix it that (that I can see) is 
+	     assign a background image with repeat-x for those ones only.
+	*/
 	border: 3px solid #90D244;
 	border-radius: 10px;
+}
+legend, .loginMsg, .installMsg 
+{
+	background-color: #F4F6F7; /* <-- effective color with opacity applied to white BG for color #C9D3D9; */
+	font-size:1.1em;
+	font-weight: bold;
+	margin: 0 10px;
+	padding: 0.4em 0.7em; /* no more as Install Step #3 has a text that otherwise will make the fieldset ever so slightly run over the div width */
+	border: 2px solid #9DAFBB;
+	border-radius: 5px;
 }
 legend, .loginMsg, .installMsg 
 {
@@ -154,15 +193,10 @@ legend, .loginMsg, .installMsg
 	  http://css-tricks.com/ie-background-rgb-bug/
 	
 	This assumes the .legend class should NOT propagate the opacity setting.
+	
+	Turns out you must put this in a separate scope to make the color fallback work as expected.
 	*/
-	background-color: #C9D3D9;
 	background-color: rgba(201,211,217,0.2);
-	font-size:1.1em;
-	font-weight: bold;
-	margin: 0 10px;
-	padding: 0.4em 0.7em; /* no more as Install Step #3 has a text that otherwise will make the fieldset ever so slightly run over the div width */
-	border: 2px solid #9DAFBB;
-	border-radius: 5px;
 }
 
 /* === 1. CORE === */
@@ -180,10 +214,32 @@ legend, .loginMsg, .installMsg
 	min-height: 30px;
 	height: auto;
 }
+#table_menu
+{
+	margin-left: 4px; /* compensate for the 4px border of the table below us to make things align properly */
+}
 #menuFields 
 { 
 	border: #9ACC66 4px solid; 
 }
+/*
+make sure all padding of the TH/TD for the menu table is GONE, as the TDs carry same-width SELECT elements:
+*/
+#menuFields table th, #menuFields table td
+{ 
+	/*
+	also reduce the interline padding: top/bottom=0
+	*/
+	padding: 0;
+}
+/*
+further reduction of the vertical spacing:
+*/
+#menuFields select
+{
+	margin: 0.25em 0;
+}
+
 a.editinplace
 {
 	background-position: 0 100px;
@@ -210,6 +266,11 @@ a.edit, a.editinplace:hover
 /* #logo{display:block;height:77px} */
 .logo 
 {
+	/* display: inline; */
+	height: 16px;
+	overflow: hidden;
+	padding-left: 20px;
+
 	background-position: 0 -228px;
 }
 #logo h1 
@@ -245,7 +306,8 @@ a.edit, a.editinplace:hover
 }
 #notify_icon
 {
-	background: url('../ccms-sprite.png') no-repeat 100% 50%;
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
 	background-position: 0 -510px;
 	height: 65px;
 	width: 65px;
@@ -257,7 +319,8 @@ IE6 fix:
 */
 * html #notify_icon
 {
-	background: url('../ccms-sprite.gif') no-repeat 100% 50%;
+	background-image: url('../ccms-sprite.gif');
+	background-repeat: no-repeat;
 }
 
 #advanced .rounded-border 
@@ -389,8 +452,8 @@ We 'solve' this in a more generic way as we need to style all the input/textarea
 #editor-options label
 {
 	/* clear: both;   -- done by the <br> in the HTML */
-	margin-top: -2px; /* pull up the baseline so it aligns with the rest (yes/no radios) */
-	border: 1px solid blue;
+	/* margin-top: -2px; */ /* pull up the baseline so it aligns with the rest (yes/no radios) */
+	vertical-align: baseline;
 }
 #editor-options label.yesno
 {
@@ -563,8 +626,12 @@ div.tip-text {
 .loginMsg, .installMsg 
 {
 	background-color:#e5d7ee;
-	background-color:rgba(229,215,238,0.8);
 	margin-bottom:15px;
+}
+/* rgba() in a separate scope so IE6/IE7 can run with the basic color instead. */
+.loginMsg, .installMsg 
+{
+	background-color:rgba(229,215,238,0.8); /* is rejected for IE6/IE7; they'll use the rgb color defined above instead */
 }
 #install.loading 
 {
