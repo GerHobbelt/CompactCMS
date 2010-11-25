@@ -365,7 +365,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	</head>
 <body>
 
-<noscript class="noscript">
+<noscript class="noscript" id="noscript">
 	<h1>Your browser does not support JavaScript</h1>
 	<h2>... or has JavaScript disabled.</h2>
 	<p>Both the CompactCMS installer (i.e. this page) and the CompactCMS administration pages require JavaScript 
@@ -377,7 +377,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	<hr class="space" />
 </noscript>
 
-<div id="install-wrapper" class="container-18">
+<div id="install-wrapper" class="container-18" style="display:none;" >
 	<div id="help" class="span-8 colborder">
 		<div id="logo" class="sprite logo">
 			<h1>CompactCMS installation</h1>
@@ -549,6 +549,12 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		?>
 	</div>
 </div>
+
+<script>
+document.getElementById("noscript").style.display = "none";
+document.getElementById("install-wrapper").style.display = "block";
+</script>
+
 <p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
 
 </body>
