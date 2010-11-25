@@ -229,15 +229,18 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	/* another way to detect placement in a frame/iframe */
 	try 
 	{
-		var f = (top != self);
+		var f = (top != this);
 		if (f) isFramed = true;
 	} 
 	catch(e){}
 	/* and for those rare occasions where the login screen is (inadvertedly) loaded through an AJAX load into a <div> or other in the current document: */
 	try 
 	{
-		var f = (self.location.indexOf("<?php echo $_SERVER['PHP_SELF']; ?>") < 0);
-		if (f) isFramed = true;
+		if (this.location && this.location.href)
+		{
+			var f = (this.location.href.indexOf("<?php echo $_SERVER['PHP_SELF']; ?>") < 0);
+			if (f) isFramed = true;
+		}
 	} 
 	catch(e){}
 
