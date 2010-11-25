@@ -118,12 +118,12 @@ window.addEvent('domready',function()
 	<script type="text/javascript" src="passwordcheck.js" charset="utf-8"></script>
 </head>
 <body>
-	<div class="module">
+	<div class="module" id="user-management">
 		<div class="center <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">#&160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -131,7 +131,7 @@ window.addEvent('domready',function()
 		<div class="span-16 colborder">
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
 			<form action="../../process.inc.php?action=delete-user" method="post" accept-charset="utf-8">
-				<table border="0" cellspacing="5" cellpadding="5">
+				<table border="0" cellspacing="2" cellpadding="2">
 					<tr>
 						<th>&#160;</th>
 						<th><?php echo $ccms['lang']['users']['user']; ?></th>
@@ -154,7 +154,7 @@ window.addEvent('domready',function()
 						// Define $isEven for alternate table coloring
 						if($i % 2 != 1) 
 						{
-							echo '<tr style="background-color: #E6F2D9;">';
+							echo '<tr class="altrgb">';
 						} 
 						else 
 						{ 
@@ -180,7 +180,7 @@ window.addEvent('domready',function()
 							if($_SESSION['ccms_userID']==rm0lead($row['userID']) || ($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers'] && $_SESSION['ccms_userLevel']>=$row['userLevel'])) 
 							{ 
 							?>
-								<span class="ss_sprite ss_user_edit"><a href="user.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><?php echo $row['userName']; ?></a></span>
+								<a href="user.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><span class="ss_sprite_16 ss_user_edit">&#160;</span><?php echo $row['userName']; ?></a>
 							<?php 
 							} 
 							else 
@@ -190,10 +190,10 @@ window.addEvent('domready',function()
 							?>
 							</td>
 							<td><?php echo substr($row['userFirst'],0,1); ?>. <?php echo $row['userLast']; ?></td>
-							<td><span class="ss_sprite ss_email"><a href="mailto:<?php echo $row['userEmail']; ?>"><?php echo $row['userEmail']; ?></a></span></td>
+							<td><a href="mailto:<?php echo $row['userEmail']; ?>"><span class="ss_sprite ss_email">&#160;</span><?php echo $row['userEmail']; ?></a></td>
 							<td><?php echo ($row['userActive']==1 ? $ccms['lang']['backend']['yes'] : $ccms['lang']['backend']['no']); ?></td>
 							<td><?php echo $row['userLevel']; ?></td>
-							<td><?php echo date('d-m-\'y',strtotime($row['userLastlog'])); ?></td>
+							<td class="nowrap"><?php echo date('d-m-\'y',strtotime($row['userLastlog'])); ?></td>
 						</tr>
 						<?php 
 						$i++; 
@@ -205,14 +205,14 @@ window.addEvent('domready',function()
 				if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 				{ 
 				?>
-					<button type="submit" onclick="return confirmation_delete();" name="deleteUser"><span class="ss_sprite ss_user_delete"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
+					<button type="submit" onclick="return confirmation_delete();" name="deleteUser"><span class="ss_sprite_16 ss_user_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
 				<?php 
 				} 
 				?>
 			</form>
 		</div>
 		
-		<div class="span-6">
+		<div class="span-6" id="create-user">
 			<h2><?php echo $ccms['lang']['users']['createuser']; ?></h2>
 			<?php 
 			if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
@@ -221,13 +221,20 @@ window.addEvent('domready',function()
 				<form action="../../process.inc.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">
 					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label>
 					<input type="text" class="minLength:3 text" name="user" value="" id="userName" />
-					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/><a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a></label><input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="userPass" value="" id="userPass" />
-					<div class="clear center">
-						<div id="passwordStrength" class="strength0"></div><br/>
+					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/>
+						<a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
+					</label>
+					<input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="userPass" value="" id="userPass" />
+					<div class="clear center strength0" id="passwordStrength">
+						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
 					</div>
-					<label for="userFirstname"><?php echo $ccms['lang']['users']['firstname']; ?></label><input type="text" class="required text" name="userFirstname" value="" id="userFirstname" />
-					<label for="userLastname"><?php echo $ccms['lang']['users']['lastname']; ?></label><input type="text" class="required text" name="userLastname" value="" id="userLastname" />
-					<label for="userEmail"><?php echo $ccms['lang']['users']['email']; ?></label><input type="text" class="required validate-email text" name="userEmail" value="" id="userEmail" />
+					</br class="clear"/>
+					<label for="userFirstname"><?php echo $ccms['lang']['users']['firstname']; ?></label>
+						<input type="text" class="required text" name="userFirstname" value="" id="userFirstname" />
+					<label for="userLastname"><?php echo $ccms['lang']['users']['lastname']; ?></label>
+						<input type="text" class="required text" name="userLastname" value="" id="userLastname" />
+					<label for="userEmail"><?php echo $ccms['lang']['users']['email']; ?></label>
+						<input type="text" class="required validate-email text" name="userEmail" value="" id="userEmail" />
 					
 					<hr class="space"/>
 					<label for="userLevel"><?php echo $ccms['lang']['users']['userlevel']; ?></label>
@@ -255,11 +262,11 @@ window.addEvent('domready',function()
 						?>
 					</select>
 					<div>
-					<label><?php echo $ccms['lang']['users']['active']; /* [i_a] and make sure either yes or no are selected to begin with; pick 'no' as the default here */ ?></label>
-						<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-							<input type="radio" class="validate-one-required" name="userActive" value="1" id="userActive1" />
-						<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
-							<input type="radio" name="userActive" value="0" id="userActive0" checked="checked" />
+						<label><?php echo $ccms['lang']['users']['active']; /* [i_a] and make sure either yes or no are selected to begin with; pick 'no' as the default here */ ?></label>
+							<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
+								<input type="radio" class="validate-one-required" name="userActive" value="1" id="userActive1" />
+							<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
+								<input type="radio" name="userActive" value="0" id="userActive0" checked="checked" />
 					</div>
 					<hr class="space"/>
 					<div class="right">

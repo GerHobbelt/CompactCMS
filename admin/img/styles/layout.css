@@ -673,6 +673,8 @@ div.module
 {
 	font-size:1em;
 }
+
+
 .hover
 {
 	height:32px;
@@ -683,6 +685,9 @@ div.module
 	border:solid 2px #618CBD;
 	background-color:#E2EAF3;
 }
+
+
+
 
 /* === USER MANAGEMENT === */
 #passwordStrength{height:10px;display:block;float:left;}
@@ -905,6 +910,88 @@ form#delete
 }
 
 
+
+
+
+/*
+remember that 'create-user' is a <div> in a 'liquid' layout!
+*/
+#create-user input.text
+{
+	width: 98%;
+}
+#create-user select
+{
+	width: 99%;
+}
+/* prevent the 'buttons' from wrapping too early: */
+#create-user button
+{
+	margin-left: 0;
+}
+#create-user .button
+{
+	margin-right: 0;
+}
+/*
+The 'password strength' bar in a liquid design is just like a 'liquid two column design':
+
+we have one part floating left, the other right, and we make sure both occupy the entire 
+height available to them.
+
+The trick here is that the color remains in the parent, and the right-most 'column' is
+resized to 'erase' that color again.
+
+To make the liquid layout work for this strength bar, we must 'resize' BOTH left and right
+column so both keep a total of width=100%.
+
+NOTE: to compensate for testing with borders and IE vs. FF calculation mishaps, we keep
+      the total at 99% instead of 100%!
+	  
+	  IE6 has a bit of a drawing issue as it doesn't give the second column a real 100%
+	  height; this cannot be remedied by giving it a 100.1% height; instead, putting
+	  some actual content in each column (a non-breaking space) resolves the issue!
+*/
+#create-user #passwordStrength 
+{ 
+	width: 100%; 
+	height: 10px;
+	line-height: 10px; /* <-- needed for IE6 to ensure the bar is /thin/ instead of some thick block! */
+}
+#create-user #passwordStrength #pws1
+{
+	height: 100%;
+	float: left;
+	margin: 0;
+	/* border: 1px solid red; */
+}
+#create-user #passwordStrength #pws2
+{
+	background-color: #fff;
+	height: 100%;
+	float: right;
+	margin: 0;	
+	/* border: 1px solid blue; */
+}
+#create-user .strength0 #pws1{width: 59%;}
+#create-user .strength1 #pws1{width: 20%;}
+#create-user .strength2 #pws1{width: 40%;}
+#create-user .strength3 #pws1{width: 60%;}
+#create-user .strength4 #pws1{width: 80%;}
+#create-user .strength5 #pws1{width: 99%;}
+#create-user .strength0 #pws2{width: 40.1%;}
+#create-user .strength1 #pws2{width: 79.1%;}
+#create-user .strength2 #pws2{width: 59.1%;}
+#create-user .strength3 #pws2{width: 39.1%;}
+#create-user .strength4 #pws2{width: 19.1%;}
+#create-user .strength5 #pws2{width: .1%;}
+
+
+
+.nowrap 
+{
+	white-space: nowrap; 
+}
 
 
 
