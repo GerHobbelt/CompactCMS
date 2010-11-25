@@ -96,6 +96,34 @@ these reside within a span-9 div:
 
 
 
+noscript, .noscript
+{
+	border: 10px solid red;
+	background-color: #fee;
+	padding: 20px;
+	width: 70%;
+	/* max-width: 1000px; */
+	margin: 10px auto;
+}
+
+noscript p, .noscript p
+{
+	font-size: 1.2em;
+	text-indent: 0;
+	margin-top: 20px;
+	text-align: left;
+}
+noscript h1, .noscript h1, noscript h2, .noscript h2
+{
+	font-size: 2.5em;
+	text-align: center;
+	color: #300;
+}
+noscript h2, .noscript h2
+{
+	font-size: 1.8em;
+}
+
 
 
 /* === INSTALL === */

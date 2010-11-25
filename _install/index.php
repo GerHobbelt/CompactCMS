@@ -365,6 +365,18 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	</head>
 <body>
 
+<noscript class="noscript">
+	<h1>Your browser does not support JavaScript</h1>
+	<h2>... or has JavaScript disabled.</h2>
+	<p>Both the CompactCMS installer (i.e. this page) and the CompactCMS administration pages require JavaScript 
+	to be enabled in your browser.</p>
+	<p>If, for any reason, you cannot or may not enable JavaScript in your browser (or alternatively, change or 
+	upgrade to another browser that <em>does</em> support JavaScript), then regretably you cannot install nor
+	manage your CompactCMS web site from this location.</p>
+	
+	<hr class="space" />
+</noscript>
+
 <div id="install-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">
 		<div id="logo" class="sprite logo">
