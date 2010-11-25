@@ -862,3 +862,11 @@ form#delete
 {
 	overflow: hidden;
 }
+
+
+
+body
+{
+  background-image: url(src/grid10.png);
+  background-repeat: repeat;
+}
