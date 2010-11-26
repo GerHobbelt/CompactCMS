@@ -71,10 +71,39 @@ if ($perm['manageModBackup'] <= 0 || !checkAuth())
 		<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 		<script type="text/javascript" charset="utf-8">
-function confirmation()
+function confirmation_delete()
 {
 	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
 	return !!answer;
+}
+
+	
+function confirmation()
+{
+	var answer=confirm(<?php echo"'".$ccms['lang']['editor']['confirmclose']."'";?>);
+	if(answer)
+	{
+		try
+		{
+			parent.MochaUI.closeWindow(parent.$('sys-tmp_ccms'));
+		}
+		catch(e)
+		{
+			if (typeof top.location.replace == "function")
+			{
+				top.location.replace("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>");
+			}
+			else
+			{
+				top.location.href = "<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>";
+			}
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 window.addEvent('domready', function()
@@ -276,11 +305,11 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 
 	if (empty($error))
 	{
-		echo "<div class=\"module success center\"><p>".$ccms['lang']['backend']['newfilecreated'].", <a href=\"../../../../media/files/$backupName\">".strtolower($ccms['lang']['backup']['download'])."</a>.</p></div>"; 
+		echo "<div class=\"module success center-text\"><p>".$ccms['lang']['backend']['newfilecreated'].", <a href=\"../../../../media/files/$backupName\">".strtolower($ccms['lang']['backup']['download'])."</a>.</p></div>"; 
 	}
 	else
 	{
-		echo "<div class=\"module error center\">\n";
+		echo "<div class=\"module error center-text\">\n";
 		foreach($error as $msg)
 		{
 			echo "<p>".msg."</p>\n";
@@ -302,7 +331,7 @@ if($do=="delete" && $btn_delete=="dodelete" && checkAuth())
 		// Only if current user has the rights
 		if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
 		{
-			echo "<div class=\"module notice center\">";
+			echo "<div class=\"module notice center-text\">";
 			foreach ($_POST['file'] as $value) 
 			{
 				$value = filterParam4Filename($value); // strips any slashes as well, so attacks like '../../../../../../../../../etc/passwords' won't pass
@@ -320,12 +349,12 @@ if($do=="delete" && $btn_delete=="dodelete" && checkAuth())
 		} 
 		else 
 		{
-			echo "<div class=\"module error center\">".$ccms['lang']['auth']['featnotallowed']."</div>";
+			echo "<div class=\"module error center-text\">".$ccms['lang']['auth']['featnotallowed']."</div>";
 		}
 	} 
 	else 
 	{
-		echo "<div class=\"module error center\">".$ccms['lang']['system']['error_selection']."</div>";
+		echo "<div class=\"module error center-text\">".$ccms['lang']['system']['error_selection']."</div>";
 	}
 }
 
@@ -362,7 +391,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 
 ?>
 	
-		<div class="span-6 colborder">
+		<div class="span-8 colborder">
 			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
 			<p><?php echo $ccms['lang']['backup']['explain'];?></p>
 			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8">
@@ -372,7 +401,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 			if ($show_warn_about_partial_backup)
 			{
 			?>
-				<div class="warning error center left-text clear">
+				<div class="warning error left-text clear">
 					<h2><?php echo $mediawarning[0]; ?></h2>
 					<?php
 					foreach ($mediawarning[1] as $line)
@@ -389,7 +418,8 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 		<div class="span-16 last">
 		<h2><?php echo $ccms['lang']['backup']['currenthd'];?></h2>
 			<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
-				<table border="0" cellspacing="5" cellpadding="5">
+				<div class="table_inside">
+				<table border="0" cellspacing="2" cellpadding="2">
 					<tr>
 						<?php 
 						if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
@@ -413,7 +443,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 								// Alternate rows
 								if($i%2 != 1) 
 								{
-									echo '<tr style="background-color: #E6F2D9;">';
+									echo '<tr class="altrgb">';
 								} 
 								else 
 								{ 
@@ -427,7 +457,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 								echo "\n";
 								echo '<td>'.$file.'</td>';
 								echo "\n";
-								echo '<td><span class="ss_sprite ss_package_green"><a href="../../../../media/files/'.$file.'" title="'.$file.'">'.$ccms['lang']['backup']['download'].'</a></span></td>';
+								echo '<td><a href="../../../../media/files/'.$file.'" title="'.$file.'"><span class="ss_sprite_16 ss_package_green">&#160;</span>'.$ccms['lang']['backup']['download'].'</a></td>';
 								echo "\n</tr>\n";
 								$i++;
 							} 
@@ -436,24 +466,33 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 					}
 					?>
 				</table>
+				</div>
 			<?php 
 			if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
 			{
 				if($i>0) 
 				{ 
 				?>
-					<p><button type="submit" onclick="return confirmation();" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
+					<div>
+						<button type="submit" onclick="return confirmation_delete();" name="btn_delete" value="dodelete"><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></button>
+						<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					</div>
 				<?php   
 				} 
 				else 
+				{
 					echo $ccms['lang']['system']['noresults'];
+				}
 			} 
 			else 
 			{
 			?>
 				<div id="no-delete-action">
-					<h2><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></h2>
+					<h2><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></h2>
 					<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+				</div>
+				<div class="right">
+					<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 				</div>
 			<?php
 			}

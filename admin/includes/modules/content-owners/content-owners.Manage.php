@@ -123,14 +123,15 @@ function confirmation()
 		<h2><span class="ss_sprite ss_group_gear"><?php echo $ccms['lang']['owners']['header']; ?></span></h2>
 		<p><?php echo $ccms['lang']['owners']['explain']; ?></p>
 		<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
-		<table border="0" cellspacing="5" cellpadding="5">
+		<div class="table_inside">
+		<table border="0" cellspacing="2" cellpadding="2">
 		<tr>
-			<th><span class="ss_sprite ss_arrow_down"><?php echo $ccms['lang']['owners']['pages']; ?></span> \ <span class="ss_sprite ss_arrow_right"><?php echo $ccms['lang']['owners']['users']; ?></span></th>
+			<th class="span-4"><span class="ss_sprite_16 ss_arrow_down">&#160;</span><?php echo $ccms['lang']['owners']['pages']; ?> \ <span class="ss_sprite_16 ss_arrow_right">&#160;</span><?php echo $ccms['lang']['owners']['users']; ?></th>
 			<?php
 			for ($ar1=0; $ar1<count($users); $ar1++)
 			{
 			?>
-				<th class="center span-2">
+				<th class="center-text span-2">
 					<span class="ss_sprite ss_user_<?php echo ($users[$ar1]['userLevel']>=4?'suit':'green'); ?>"><?php echo $users[$ar1]['userFirst'].' '.substr($users[$ar1]['userLast'],0,1); ?>.</span>
 				</th>
 			<?php
@@ -151,7 +152,7 @@ function confirmation()
 			for ($ar2=0; $ar2<count($users); $ar2++)
 			{
 			?>
-				<td class="hover center">
+				<td class="hover center-text">
 					<label for="<?php echo $i.'_'.$ar2;?>"><span>
 					<input type="checkbox" name="owner[]"
 					<?php
@@ -184,7 +185,7 @@ function confirmation()
 		?>
 		</tr>
 		</table>
-		<hr/>
+		</div>
 		<div class="right">
 			<button type="submit"><span class="ss_sprite ss_disk">Save</span></button>
 			<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>

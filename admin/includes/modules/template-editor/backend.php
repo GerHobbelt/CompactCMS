@@ -131,6 +131,14 @@ function confirmation()
 		}
 		catch(e)
 		{
+			if (typeof top.location.replace == "function")
+			{
+				top.location.replace("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>");
+			}
+			else
+			{
+				top.location.href = "<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>";
+			}
 		}
 		return true;
 	}
@@ -152,14 +160,14 @@ function confirmation()
 		<?php 
 		} 
 		?>	
-		<div class="span-13">
+		<div class="span-15">
 			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
 		</div>
 		
-		<div class="span-8 right">
+		<div class="span-10 right last">
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" id="changeTmp" method="get" class="right" accept-charset="utf-8">
-				<label for="template" style="display:inline;"><?php echo $ccms['lang']['backend']['template'];?></label>
-				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
+				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
+				<select class="text onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
 					<?php
 					$x = 0; 
 					while($x<count($template)) 

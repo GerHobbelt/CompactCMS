@@ -97,19 +97,10 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 </head>
 
 <body>
-	<div class="module">
-		<div class="center <?php echo $status; ?>">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
-			} 
-			?>
-		</div>
-		
-		<p class="clear right"><span class="ss_sprite ss_arrow_undo"><a href="backend.php"><?php echo $ccms['lang']['backend']['tooverview']; ?></a></span></p>
-		
-		<?php // Check authority 
+	<div class="module" id="edit-user-details">
+
+		<?php 
+		// Check authority 
 		if($perm['manageUsers']==0 || $_SESSION['ccms_userLevel']<$perm['manageUsers'] || $row->userLevel>$_SESSION['ccms_userLevel']) 
 		{
 			if($_SESSION['ccms_userID']!=$userID) 
@@ -119,18 +110,39 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		} 
 		?>
 		
-		<div class="span-13 colborder">
+		<div class="center <?php echo $status; ?>">
+			<?php 
+			if(!empty($status_message)) 
+			{ 
+				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+			} 
+			?>
+		</div>
+		
+<!-- looks better without this one...
+
+		<div class="right">
+			<a href="backend.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
+		</div>
+-->
+		
+		<div class="span-15 colborder">
 			<h2><?php echo $ccms['lang']['users']['editdetails']; ?></h2>
 			<form action="../../process.inc.php?action=edit-user-details" id="userDetailForm" method="post" accept-charset="utf-8">
-				<label><?php echo $ccms['lang']['users']['username']; ?></label><span style="display:block;height:30px;"><?php echo $row->userName; ?></span>
-				<label for="first"><?php echo $ccms['lang']['users']['firstname']; ?></label><input type="text" class="required text" name="first" value="<?php echo $row->userFirst; ?>" id="first" />
-				<label for="last"><?php echo $ccms['lang']['users']['lastname']; ?></label><input type="text" class="required text" name="last" value="<?php echo $row->userLast; ?>" id="last" />
-				<label for="email"><?php echo $ccms['lang']['users']['email']; ?></label><input type="text" class="required validate-email text" name="email" value="<?php echo $row->userEmail; ?>" id="email" />
+				<label><?php echo $ccms['lang']['users']['username']; ?></label>
+					<span style="display:block;height:30px;"><?php echo $row->userName; ?></span>
+				<label for="first"><?php echo $ccms['lang']['users']['firstname']; ?></label>
+					<input type="text" class="required text" name="first" value="<?php echo $row->userFirst; ?>" id="first" />
+				<label for="last"><?php echo $ccms['lang']['users']['lastname']; ?></label>
+					<input type="text" class="required text" name="last" value="<?php echo $row->userLast; ?>" id="last" />
+				<label for="email"><?php echo $ccms['lang']['users']['email']; ?></label>
+					<input type="text" class="required validate-email text" name="email" value="<?php echo $row->userEmail; ?>" id="email" />
 				
 				<input type="hidden" name="userID" value="<?php echo $row->userID; ?>" id="userID" />
-				<p class="span-6 right"><button type="submit"><span class="ss_sprite ss_user_edit"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button></p>
+				<div class="right">
+					<button type="submit"><span class="ss_sprite_16 ss_user_edit">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button>
+				</div>
 			</form>
-			
 		</div>
 		
 		<div class="span-9">
@@ -141,14 +153,22 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			<h2><?php echo $ccms['lang']['users']['editpassword']; ?></h2>
 			<div class="prepend-1">
 				<form action="../../process.inc.php?action=edit-user-password" id="userPassForm" method="post" accept-charset="utf-8">
-					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/><a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a></label><input type="text" onkeyup="passwordStrength(this.value)" style="width:200px;" class="required minLength:6 text" name="userPass" value="" id="userPass" />
-					<div class="clear center">
-						<div id="passwordStrength" class="strength0"></div><br/>
+					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?>
+						<br/>
+						<a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
+					</label>
+					<input type="text" onkeyup="passwordStrength(this.value)" class="required minLength:6 text" name="userPass" value="" id="userPass" />
+					<div class="clear strength0" id="passwordStrength">
+						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
 					</div>
-					<label for="cpass"><?php echo $ccms['lang']['users']['cpassword']; ?></label><input type="password" style="width:200px;" class="validate-match matchInput:'userPass' matchName:'Password' required minLength:6 text" name="cpass" value="" id="cpass" />
+					</br class="clear"/>
+					<label for="cpass"><?php echo $ccms['lang']['users']['cpassword']; ?></label>
+						<input type="password" class="validate-match matchInput:'userPass' matchName:'Password' required minLength:6 text" name="cpass" value="" id="cpass" />
 					
 					<input type="hidden" name="userID" value="<?php echo $row->userID; ?>" id="userID" />
-					<p class="span-6 right"><button type="submit"><span class="ss_sprite ss_key"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button></p>
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_key">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button>
+					</div>
 				</form>
 			</div>
 			
@@ -188,28 +208,39 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 					</select>
 					<hr class="space"/>
 					<div>
-					<label><?php echo $ccms['lang']['users']['active']; ?></label>
-						<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="userActive" <?php echo ($row->userActive?'checked="checked"':null); ?> value="1" id="userActive1" />	
-						<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="userActive" class="validate-one-required" <?php echo (!$row->userActive?'checked="checked"':null); ?> value="0" id="userActive0" />
+						<label><?php echo $ccms['lang']['users']['active']; ?></label>
+							<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
+							<input type="radio" name="userActive" <?php echo ($row->userActive?'checked="checked"':null); ?> value="1" id="userActive1" />	
+							<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
+							<input type="radio" name="userActive" class="validate-one-required" <?php echo (!$row->userActive?'checked="checked"':null); ?> value="0" id="userActive0" />
 					</div>
 					<hr class="space"/>		
 				
 					<input type="hidden" name="userID" value="<?php echo $row->userID; ?>" id="userID" />
-					<p class="span-6 right"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button></p>
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button>
+					</div>
 				</form>
 			</div>
-			<?php } else echo $ccms['lang']['auth']['featnotallowed']; ?>
+			<?php 
+			} 
+			else 
+			{
+				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
+			?>
 		</div>
 		
-		<p class="clear right"><span class="ss_sprite ss_arrow_undo"><a href="backend.php"><?php echo $ccms['lang']['backend']['tooverview']; ?></a></span></p>
-	
+		<div class="clear right">
+			<a href="backend.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
+		</div>
 	</div>
 </body>
 </html>
 <?php 
 } 
 else 
+{
 	die("No external access to file");
+}
 ?>

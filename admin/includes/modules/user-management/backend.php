@@ -93,6 +93,14 @@ function confirmation()
 		}
 		catch(e)
 		{
+			if (typeof top.location.replace == "function")
+			{
+				top.location.replace("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>");
+			}
+			else
+			{
+				top.location.href = "<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>";
+			}
 		}
 		return true;
 	}
@@ -128,9 +136,10 @@ window.addEvent('domready',function()
 			?>
 		</div>
 		
-		<div class="span-16 colborder">
+		<div class="span-18 colborder">
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
 			<form action="../../process.inc.php?action=delete-user" method="post" accept-charset="utf-8">
+				<div class="table_inside">
 				<table border="0" cellspacing="2" cellpadding="2">
 					<tr>
 						<th>&#160;</th>
@@ -200,6 +209,7 @@ window.addEvent('domready',function()
 					} 
 					?>
 				</table>
+				</div>
 				<hr class="space"/>
 				<?php 
 				if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
@@ -212,7 +222,7 @@ window.addEvent('domready',function()
 			</form>
 		</div>
 		
-		<div class="span-6" id="create-user">
+		<div class="span-6 last" id="create-user">
 			<h2><?php echo $ccms['lang']['users']['createuser']; ?></h2>
 			<?php 
 			if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
@@ -225,7 +235,7 @@ window.addEvent('domready',function()
 						<a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
 					</label>
 					<input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="userPass" value="" id="userPass" />
-					<div class="clear center strength0" id="passwordStrength">
+					<div class="clear strength0" id="passwordStrength">
 						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
 					</div>
 					</br class="clear"/>

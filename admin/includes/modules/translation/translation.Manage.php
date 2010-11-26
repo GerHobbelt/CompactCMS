@@ -635,7 +635,7 @@ function confirmation()
 	</script>	
 </head>
 <body>
-<div class="module">
+<div class="module" id="translation-assist">
 	<?php 
 	// (!) Only administrators can change these values
 	if($_SESSION['ccms_userLevel']>=4) 
@@ -657,7 +657,6 @@ function googleTranslateElementInit()
 	<?php
 	}
 	?>
-
 		<div class="center <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
@@ -679,7 +678,7 @@ function googleTranslateElementInit()
 	{
 	?>
 		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
-		<table border="0" cellspacing="5" cellpadding="5" name="i18n-list" id="i18n-list">
+		<table border="0" cellspacing="2" cellpadding="2" name="i18n-list" id="i18n-list">
 			<tr>
 				<th class="span-4 nowrap"><em>Item</em></th>
 				<th class="span-21">Text</th>
@@ -694,7 +693,10 @@ function googleTranslateElementInit()
 		
 		<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
 		
-		<p class="right"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> <span class="ss_sprite ss_cross"><a href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span></p>
+		<div class="right">
+			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
+			<a class="button" href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+		</div>
 	</form>
 	<?php
 	}

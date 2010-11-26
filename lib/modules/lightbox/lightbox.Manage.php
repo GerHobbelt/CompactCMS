@@ -199,12 +199,9 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 	{
 	?>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/FancyUpload2.js"></script>
+		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js"></script>
 		<script type="text/javascript" charset="utf-8">
-function confirmation()
+function confirmation_delete()
 {
 	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
 	return !!answer;
@@ -238,7 +235,7 @@ function confirm_regen()
 	?>
 </head>
 <body>
-	<div class="module">
+	<div class="module" id="lightbox-management">
 		<div class="center <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
@@ -248,7 +245,7 @@ function confirm_regen()
 			?>
 		</div>
 		
-		<div class="span-14 colborder">
+		<div class="span-16 colborder">
 		<?php 
 		// more secure: only allow showing specific albums if they are in the known list; if we change that set any time later, this code will not let undesirable items slip through
 		$album = getGETparam4Filename('album');
@@ -258,7 +255,8 @@ function confirm_regen()
 		?>
 			<form action="lightbox.Process.php?action=del-album" method="post" accept-charset="utf-8">
 				<h2><?php echo $ccms['lang']['album']['currentalbums']; ?></h2>
-				<table border="0" cellspacing="5" cellpadding="5">
+				<div class="table_inside">
+				<table border="0" cellspacing="2" cellpadding="2">
 					<?php 
 					if(count($albums) > 0) 
 					{ 
@@ -312,7 +310,7 @@ function confirm_regen()
 				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']&&count($albums)>0) 
 				{ 
 				?>
-					<button type="submit" onclick="return confirmation();" name="deleteAlbum"><span class="ss_sprite ss_bin_empty"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
+					<button type="submit" onclick="return confirmation_delete();" name="deleteAlbum"><span class="ss_sprite ss_bin_empty"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
 				<?php 
 				} 
 				?>
@@ -356,7 +354,7 @@ function confirm_regen()
 			{ 
 				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox'])
 				{
-					echo '<a onclick="return confirmation();" href="lightbox.Process.php?album=' . $album . '&amp;image=' . $value . '&amp;action=del-image" title="' . $ccms['lang']['backend']['delete'] . ': ' . $value . '">';
+					echo '<a onclick="return confirmation_delete();" href="lightbox.Process.php?album=' . $album . '&amp;image=' . $value . '&amp;action=del-image" title="' . $ccms['lang']['backend']['delete'] . ': ' . $value . '">';
 				} 
 
 				echo '<img src="' . $imagethumbs[$key] . '" class="thumbview" alt="Thumbnail of ' . $value . '" ' . $imginfo[$key]['style'] . ' />';
@@ -374,8 +372,7 @@ function confirm_regen()
 		?>
 		</div>
 	
-		<div class="span-8">
-			
+		<div class="span-8 last">
 		<?php 
 		if(empty($album)) 
 		{ 
@@ -530,12 +527,12 @@ function confirm_regen()
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
-			?>
-			</div>
-		<?php 
+			}
 		} 
 		?>
+		</div>
 			
 		<div id="lightbox-pending" class="lightbox-spinner-bg">
 			<p class="loading-img" ><?php echo $ccms['lang']['album']['please_wait']; ?></p>

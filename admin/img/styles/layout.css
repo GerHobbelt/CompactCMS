@@ -710,7 +710,7 @@ div.module
 }
 .thumbview:hover
 {
-	background-color:#E6F2D9;
+	background-color: #E6F2D9;
 	border:solid #A5D611 3px;
 }
 .albumbox img
@@ -904,10 +904,21 @@ form#delete
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
-#content-owners table td.center
+
+
+
+
+
+#template-editor #changeTmp label 
 {
-	text-align: center;
+	display: inline;
 }
+#template-editor #changeTmp select
+{
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 
 
 
@@ -915,21 +926,23 @@ form#delete
 
 /*
 remember that 'create-user' is a <div> in a 'liquid' layout!
+
+same goes for #edit-user-details, which sits in a subpage of the user management.
 */
-#create-user input.text
+#create-user input.text, #edit-user-details input.text
 {
 	width: 98%;
 }
-#create-user select
+#create-user select, #edit-user-details select
 {
 	width: 99%;
 }
 /* prevent the 'buttons' from wrapping too early: */
-#create-user button
+#create-user button, #edit-user-details button
 {
 	margin-left: 0;
 }
-#create-user .button
+#create-user .button, #edit-user-details .button
 {
 	margin-right: 0;
 }
@@ -951,21 +964,23 @@ NOTE: to compensate for testing with borders and IE vs. FF calculation mishaps, 
 	  IE6 has a bit of a drawing issue as it doesn't give the second column a real 100%
 	  height; this cannot be remedied by giving it a 100.1% height; instead, putting
 	  some actual content in each column (a non-breaking space) resolves the issue!
+
+PLUS: same password strength liquid layout story again for #edit-user-details
 */
-#create-user #passwordStrength 
+#create-user #passwordStrength, #edit-user-details #passwordStrength
 { 
 	width: 100%; 
 	height: 10px;
 	line-height: 10px; /* <-- needed for IE6 to ensure the bar is /thin/ instead of some thick block! */
 }
-#create-user #passwordStrength #pws1
+#create-user #passwordStrength #pws1, #edit-user-details #passwordStrength #pws1
 {
 	height: 100%;
 	float: left;
 	margin: 0;
 	/* border: 1px solid red; */
 }
-#create-user #passwordStrength #pws2
+#create-user #passwordStrength #pws2, #edit-user-details #passwordStrength #pws2
 {
 	background-color: #fff;
 	height: 100%;
@@ -973,18 +988,84 @@ NOTE: to compensate for testing with borders and IE vs. FF calculation mishaps, 
 	margin: 0;	
 	/* border: 1px solid blue; */
 }
-#create-user .strength0 #pws1{width: 59%;}
-#create-user .strength1 #pws1{width: 20%;}
-#create-user .strength2 #pws1{width: 40%;}
-#create-user .strength3 #pws1{width: 60%;}
-#create-user .strength4 #pws1{width: 80%;}
-#create-user .strength5 #pws1{width: 99%;}
-#create-user .strength0 #pws2{width: 40.1%;}
-#create-user .strength1 #pws2{width: 79.1%;}
-#create-user .strength2 #pws2{width: 59.1%;}
-#create-user .strength3 #pws2{width: 39.1%;}
-#create-user .strength4 #pws2{width: 19.1%;}
-#create-user .strength5 #pws2{width: .1%;}
+#create-user .strength0 #pws1, #edit-user-details .strength0 #pws1
+{
+	width: 99%;
+}
+#create-user .strength1 #pws1, #edit-user-details .strength1 #pws1
+{
+	width: 20%;
+}
+#create-user .strength2 #pws1, #edit-user-details .strength2 #pws1
+{
+	width: 40%;
+}
+#create-user .strength3 #pws1, #edit-user-details .strength3 #pws1
+{
+	width: 60%;
+}
+#create-user .strength4 #pws1, #edit-user-details .strength4 #pws1
+{
+	width: 80%;
+}
+#create-user .strength5 #pws1, #edit-user-details .strength5 #pws1
+{
+	width: 99%;
+}
+#create-user .strength0 #pws2, #edit-user-details .strength0 #pws2
+{
+	width: 40.1%;
+}
+#create-user .strength1 #pws2, #edit-user-details .strength1 #pws2
+{
+	width: 79.1%;
+}
+#create-user .strength2 #pws2, #edit-user-details .strength2 #pws2
+{
+	width: 59.1%;
+}
+#create-user .strength3 #pws2, #edit-user-details .strength3 #pws2
+{
+	width: 39.1%;
+}
+#create-user .strength4 #pws2, #edit-user-details .strength4 #pws2
+{
+	width: 19.1%;
+}
+#create-user .strength5 #pws2, #edit-user-details .strength5 #pws2
+{
+	width: .1%;
+}
+
+
+
+
+
+
+
+#refresh_everytin_form button
+{
+	margin: 0 auto;
+	width: 50%;    /* without the 'width', the button is NOT placed center, despite the 'auto' margin! */
+	float: none;
+}
+
+
+
+
+/*
+Because tables can only shrink so much and laptop/PC displays aren't always HDready ;-)
+you may find a few liquid layout situations where the table 'overflows' into the next column
+of the liquid layout.
+
+To prevent this from happening (screwing the display hopelessly), we just allow a table,
+when in dire need, to add a horizontal scrollbar.
+*/
+.module form div.table_inside
+{
+	overflow-x: auto;
+}
+
 
 
 
