@@ -110,7 +110,7 @@ function confirmation()
 <body>
 	<div class="module">
 
-	<div class="center <?php echo $status; ?>">
+	<div class="center-text <?php echo $status; ?>">
 		<?php
 		if(!empty($status_message))
 		{
