@@ -867,6 +867,16 @@ form#delete
 {
 	overflow: hidden;
 }
+/*
+and the other victims of layout: 
+
+the backup management page...
+*/
+form#create-arch, form#delete-arch
+{
+	overflow: hidden;
+	height: 1%;				/* IE6 needs this */
+}
 
 
 
@@ -1049,6 +1059,13 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 	width: 50%;    /* without the 'width', the button is NOT placed center, despite the 'auto' margin! */
 	float: none;
 }
+
+
+
+
+
+
+
 
 
 

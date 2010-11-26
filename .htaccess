@@ -55,7 +55,7 @@ RewriteBase /
 
 
 RewriteCond    %{REQUEST_FILENAME}  -f
-RewriteRule    ^(.*\.htmx)$          $1  [L]
+RewriteRule    ^(.*\.html)$          $1  [L]
 RewriteCond    %{REQUEST_FILENAME}  -f
 RewriteRule    ^(.*\.csx)$           $1  [L]
 

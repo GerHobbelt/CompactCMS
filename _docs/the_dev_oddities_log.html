@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Bloody Hell</title>
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/base.css" />
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/liquid.css" />
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/layout.css" />
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/sprite.css" />
+<link rel="stylesheet" type="text/css" href="./documentation.css" />
+<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
+	<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/last_minute_fixes.css" />
+<style type="text/css">
+.light_up_editing {
+	color: #FF0000;
+}
+.style1 {
+	font-family: "Palatino Linotype";
+}
+</style>
+<script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js" charset="utf-8"></script>
+</head>
+
+<body>
+<div id="the_oddities_log">
+<h1 class="center-text">Bloody Hell, I should keep a log of this <em>shit</em>!</h1>
+<p>So I do now. It&#39;s simply way too, ah, odd, what you come across when testing 
+a CMS on multiple browsers while doing development. Currently (Q4 2010) I&#39;m 
+working on a nice little nifty CMS (CompactCMS) and doing the things I do, I&#39;ve 
+had already quite a surprises this last month (after I went from plugging 
+security gaps to actively turning the bugger into something I would truly like 
+to present to folks who want &#39;a website&#39;).</p>
+<p>But this is not about that, this is about surprises during development, so 
+without further ado, here&#39;s about the creepy things I ran into.</p>
+<h1 class="center-text">WTF #x+1 : form <code>&lt;input type=&quot;submit&quot;&gt;</code> buttons in IE7 don&#39;t send 
+the &#39;value&#39; but their inner HTML 
+instead</h1>
+<p>Take the CCMS backup admin page. It didn&#39;t work in IE7, but did quite well in 
+IE8 and FF3. So after another hour of agony I stopped blaming, once again, my 
+JavaScript skills and browser oddities there and instead did the rational thing 
+when a JavaScript mootools spinner is not showing up, but the server says the 
+POST was done: plonk this bit into the receiving page to see what goes wrong in 
+the backend, that being the important part of the failure collection:</p>
+<blockquote>
+<pre>&lt;?php
+if (1)  // &lt;-- Just my trick to quickly turn a whole chunk of code on or off.
+        //     Did my &#39;C&#39; roots (#if 0 ... #endif) show through? <span class="ss_sprite ss_emoticon_evilgrin">&#160;</span>
+{
+	global $ccms;
+	global $cfg;
+
+	echo &#39;&lt;h1&gt;My Code&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;\nbtn_backup = $btn_backup\ndo = $do\nbtn_delete = $btn_delete\n&quot;;
+	echo &quot;&lt;/pre&gt;&quot;;
+	echo &#39;&lt;h1&gt;$_SERVER&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;&quot;;
+	var_dump($_SERVER);
+	echo &quot;&lt;/pre&gt;&quot;;
+	echo &#39;&lt;h1&gt;$_ENV&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;&quot;;
+	var_dump($_ENV);
+	echo &quot;&lt;/pre&gt;&quot;;
+	echo &#39;&lt;h1&gt;$_SESSION&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;&quot;;
+	var_dump($_SESSION);
+	echo &quot;&lt;/pre&gt;&quot;;
+	echo &#39;&lt;h1&gt;$_POST&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;&quot;;
+	var_dump($_POST);
+	echo &quot;&lt;/pre&gt;&quot;;
+	echo &#39;&lt;h1&gt;$_GET&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;&quot;;
+	var_dump($_GET);
+	echo &quot;&lt;/pre&gt;&quot;;
+	echo &#39;&lt;h1&gt;$cfg&lt;/h1&gt;&#39;;
+	echo &quot;&lt;pre&gt;&quot;;
+	var_dump($cfg);
+	echo &quot;&lt;/pre&gt;&quot;;
+}
+?&gt;</pre>
+</blockquote>
+<p>and see what the top bit gets me under IE8:</p>
+<blockquote>
+<h1>My Code</h1>
+<pre>btn_backup = 
+do = delete
+btn_delete = dodelete
+</pre>
+</blockquote>
+<p>while under IE7 it says:</p>
+<blockquote>
+<h1>My Code</h1>
+<pre>btn_backup = _SPAN_class_ss_sprite_ss_package_add_Create_SPAN_
+do = backup
+btn_delete = 
+</pre>
+</blockquote>
+<p>WTF?</p>
+<p>Well, see the relevant raw entries then:</p>
+<p class="large">IE8</p>
+<blockquote>
+<h1>$_POST</h1>
+<pre>array(1) {
+  [&quot;btn_delete&quot;]=&gt;
+  string(8) &quot;dodelete&quot;
+}
+</pre>
+<h1>$_GET</h1>
+<pre>array(1) {
+  [&quot;do&quot;]=&gt;
+  string(6) &quot;delete&quot;
+}
+</pre>
+</blockquote>
+<p class="large">IE7</p>
+<blockquote>
+<h1>$_POST</h1>
+<pre>array(1) {
+  [&quot;btn_backup&quot;]=&gt;
+  string(53) &quot;<span class="ss_sprite ss_package_add">Create!</span>&quot;
+}
+</pre>
+<h1>$_GET</h1>
+<pre>array(1) {
+  [&quot;do&quot;]=&gt;
+  string(6) &quot;backup&quot;
+}
+</pre>
+</blockquote>
+<p>Note the cute inclusion of that sprite in there, by the way. The button is 
+sending the entire <code>innerHTML</code> across instead of the <code>value</code>! 
+WTF again.</p>
+<p>The PHP form code doesn&#39;t look suspicious:</p>
+<blockquote>
+<pre>?&gt;
+&lt;div class=&quot;right&quot;&gt;
+&lt;button type=&quot;submit&quot; 
+        onclick=&quot;return confirmation_delete();&quot; 
+        name=&quot;btn_delete&quot; 
+        <strong>value=&quot;dodelete&quot;</strong>&gt;
+  <strong>&lt;span class=&quot;ss_sprite_16 ss_package_delete&quot;&gt;&amp;#160;&lt;/span&gt;&lt;?php echo $ccms[&#39;lang&#39;][&#39;backend&#39;][&#39;delete&#39;];?&gt;</strong>
+&lt;/button&gt;
+&lt;a class=&quot;button&quot; href=&quot;../../../../IE_sink.php&quot; onClick=&quot;confirmation();&quot; title=&quot;&lt;?php echo $ccms[&#39;lang&#39;][&#39;editor&#39;][&#39;cancelbtn&#39;]; ?&gt;&quot;&gt;
+  &lt;span class=&quot;ss_sprite_16 ss_cross&quot;&gt;&amp;#160;&lt;/span&gt;&lt;?php echo $ccms[&#39;lang&#39;][&#39;editor&#39;][&#39;cancelbtn&#39;]; ?&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+&lt;?php 
+</pre>
+</blockquote>
+<p>Cool with me. (The <code>confirmation_delete()</code> JavaScript call would ask the 
+obnoxious &#39;are you sure?&#39; question and then return <dfn>true</dfn> or
+<dfn>false</dfn>, so no worries 
+there.</p>
+<p>In fact, the way out here is allowing everything in our backend like this (we 
+do validate the session and counter hacking attempts through the session-based 
+<code>authCheck()</code> anyway, so we&#39;re allowed a little flexibility here<span class="style1">—I 
+don&#39;t have to <em>like</em> it though</span>):</p>
+<p class="large">old PHP code:</p>
+<blockquote>
+<pre>$btn_delete = getPOSTparam4IdOrNumber(&#39;btn_delete&#39;);
+if($do==&quot;delete&quot; &amp;&amp; <span class="light_up_editing">$btn_delete==&quot;dodelete&quot;</span>) 
+{
+</pre>
+</blockquote>
+<p class="large">new PHP code:</p>
+<blockquote>
+<pre>$btn_delete = getPOSTparam4IdOrNumber(&#39;btn_delete&#39;);
+if($do==&quot;delete&quot; &amp;&amp; <span class="light_up_editing">!empty($btn_delete)</span>)
+{
+</pre>
+</blockquote>
+
+<p>And now apply that a zillion times to all the other backend bits which rely 
+on the button sending the <code>value</code> property... <em>I&#39;ll blow that for 
+a dollar!</em></p>
+<h1>Bingo! The IE6 background-color versus float:left / float:right 
+disappearance trick! </h1>
+<p>Got another occurrence of this crappy behaviour in the backup management 
+module: the &lt;h2&gt; title is completely gone, while the text of the warning message 
+shows up, but the background does not:</p>
+<p>relevant CSS:</p>
+<pre>&nbsp;</pre>
+<p>HTML</p>
+<pre id="line1">&lt;/<span class="end-tag">head</span>&gt;&lt;<span class="start-tag">body</span>&gt;
+&lt;<span class="start-tag">div</span><span class="attribute-name"> id</span>=<span class="attribute-value">&quot;backup-module&quot; </span><span class="attribute-name">class</span>=<span class="attribute-value">&quot;module&quot;</span>&gt;
+	&lt;<span class="start-tag">div</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;span-8 colborder&quot;</span>&gt;
+		&lt;<span class="start-tag">h2</span>&gt;Create new back-up&lt;/<span class="end-tag">h2</span>&gt;
+		&lt;<span class="start-tag">p</span>&gt;To prevent possible loss of data due to whatever external event, it&#39;s wise to create back-ups of your files regularly.&lt;/<span class="end-tag">p</span>&gt;
+		&lt;<span class="start-tag">form</span><span class="attribute-name"> id</span>=<span class="attribute-value">&quot;create-arch&quot; </span><span class="attribute-name">action</span>=<span class="attribute-value">&quot;/c/admin/includes/modules/backup-restore/backend.php?do=backup&quot; </span><span class="attribute-name">method</span>=<span class="attribute-value">&quot;post&quot; </span><span class="attribute-name">accept-charset</span>=<span class="attribute-value">&quot;utf-8&quot; </span><span class="light_up_editing">class=&quot;clearfix&quot;</span>&gt;
+			&lt;<span class="start-tag">button</span><span class="attribute-name"> type</span>=<span class="attribute-value">&quot;submit&quot; </span><span class="attribute-name">name</span>=<span class="attribute-value">&quot;btn_backup&quot; </span><span class="attribute-name">value</span>=<span class="attribute-value">&quot;dobackup&quot;</span>&gt;&lt;<span class="start-tag">span</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;ss_sprite ss_package_add&quot;</span>&gt;Create!&lt;/<span class="end-tag">span</span>&gt;&lt;/<span class="end-tag">button</span>&gt;
+		&lt;/<span class="end-tag">form</span>&gt;
+		&lt;<span class="start-tag">div</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;warning error left-text </span><span class="light_up_editing">clear</span><span class="attribute-value">&quot;</span>&gt;
+			&lt;<span class="start-tag">h2</span>&gt;Warning&lt;/<span class="end-tag">h2</span>&gt;
+			&lt;<span class="start-tag">p</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;left&quot;</span>&gt;Please be aware that your &lt;<span class="start-tag">dfn</span>&gt;lightbox&lt;/<span class="end-tag">dfn</span>&gt; albums&#39; images are &lt;<span class="start-tag">strong</span>&gt;not&lt;/<span class="end-tag">strong</span>&gt; backed up! &lt;/<span class="end-tag">p</span>&gt;
+			&lt;<span class="start-tag">p</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;left&quot;</span>&gt;The album descriptions &lt;<span class="start-tag">strong</span>&gt;are&lt;/<span class="end-tag">strong</span>&gt;, but the images themselves and their thumbnails are &lt;<span class="start-tag">strong</span>&gt;not included in these backups&lt;/<span class="end-tag">strong</span>&gt;. &lt;/<span class="end-tag">p</span>&gt;
+			&lt;<span class="start-tag">p</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;left&quot;</span>&gt;If you want backups of those, then you will need to confer with your site administrator about an additional backup system to help you backup and restore these (possibly large) file collections.&lt;/<span class="end-tag">p</span>&gt;
+		&lt;/<span class="end-tag">div</span>&gt;
+	&lt;/<span class="end-tag">div</span>&gt;
+	&lt;<span class="start-tag">div</span><span class="attribute-name"> class</span>=<span class="attribute-value">&quot;span-16 last&quot;</span>&gt;
+		&lt;<span class="start-tag">h2</span>&gt;Available back-ups&lt;/<span class="end-tag">h2</span>&gt;
+		...&nbsp;</pre>
+		
+		<p>Turns out the info at
+		<a href="http://www.dracos.co.uk/code/ie6-css-bug/">
+		http://www.dracos.co.uk/code/ie6-css-bug/</a> is right, but note that 
+		you shouldn&#39;t limit yourself to tweaking just the parent to make it have 
+		hasLayout; you may also need to tweak the grandparent, like I had to do.</p>
+<p>The thing that made me try that was the fact that running a backup did also 
+move that warning message into the proper place, the difference being another 
+added &lt;div&gt; at the top where the feedback message appears.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</div>
+<p>&nbsp;</p>
+</body>
+</html>

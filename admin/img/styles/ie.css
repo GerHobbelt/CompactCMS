@@ -111,3 +111,30 @@ Tested on a Dutch XP SP3 Win32 + KB's installed up to Nov/2010, default setup, +
 
 
 
+/*
+This is needed so IE6 at least the warning message INSIDE the red/rose warning box.
+
+It is NOT enough to make the warning div show where it SHOULD be.
+*/
+#media-warning 
+{
+	zoom: 1;
+}
+/*
+THIS is required to make the backup screen place that warning DIV properly within
+the parent .span-8.
+
+So the info at
+
+http://www.dracos.co.uk/code/ie6-css-bug/
+
+is close. But one must not limit oneself to only tweaking the PARENT, the GRANDPARENT
+may need hasLayout as well!
+*/
+#backup-module
+{
+	zoom: 1;
+}
+
+
+

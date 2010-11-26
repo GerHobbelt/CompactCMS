@@ -1455,11 +1455,13 @@ editAreaLoader.init(
 	} 
 	?>
 	<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../img/styles/ie.css" />
+	<![endif]-->
 	</head>
 	
 	<body>
 	<div class="module">
-		
 		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
 		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
 		
@@ -1468,13 +1470,12 @@ editAreaLoader.init(
 			<br/>
 				<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
 				<input type="input" class="text" style="height:30px; width:98%;" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
-			<p>
 				<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
+			<div class="right">
 				<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
-				<span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span>
-			</p>
+				<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
 		</form>
-		
 	</div>
 	</body>
 	</html>
@@ -1574,11 +1575,10 @@ if($do_action == "save-changes" && checkAuth())
 			<p>
 				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $cfg['authcode'];?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>		
 			</p>
-			<p>
-				<span class="ss_sprite ss_arrow_undo"><a href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><?php echo $ccms['lang']['editor']['backeditor']; ?></a></span>&nbsp;&nbsp;&nbsp;
-				<span class="ss_sprite ss_cross"><a href="#" onClick="parent.MochaUI.closeWindow(parent.$('<?php echo $name; ?>_ccms'));" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><?php echo $ccms['lang']['editor']['closewindow']; ?></a></span>
-			</p>
-			
+			<div>
+				<a href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
+				<a href="#" onClick="parent.MochaUI.closeWindow(parent.$('<?php echo $name; ?>_ccms'));" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['closewindow']; ?></a>
+			</div>
 		</div>
 	</body>
 	</html>

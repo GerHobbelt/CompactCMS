@@ -75,6 +75,9 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>News module</title>
 	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
+	<![endif]-->
 	<script type="text/javascript" charset="utf-8">
 function confirmation()
 {

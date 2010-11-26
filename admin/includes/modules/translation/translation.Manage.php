@@ -446,6 +446,9 @@ td.nowrap, th.nowrap
 	</style>
 		<!-- File uploader styles -->
 		<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Css/FileManager.css,Additions.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<![endif]-->
 	
 		<!-- TinyMCE JS -->
 		<script type="text/javascript" src="../../tiny_mce/tiny_mce_gzip.js"></script>	

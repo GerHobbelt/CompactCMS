@@ -87,6 +87,10 @@ if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= 
 	<!-- File uploader styles -->
 	<link rel="stylesheet" media="all" type="text/css" href="../../../admin/includes/fancyupload/Css/FileManager.css,Additions.css" />
 
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
+	<![endif]-->
+	
 	<!-- TinyMCE JS -->
 	<script type="text/javascript" src="../../../admin/includes/tiny_mce/tiny_mce_gzip.js"></script>	
 	

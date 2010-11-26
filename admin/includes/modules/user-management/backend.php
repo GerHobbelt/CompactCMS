@@ -74,6 +74,9 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Manage users</title>
 	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+	<![endif]-->
 	<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
 function confirmation_delete()

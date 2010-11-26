@@ -632,6 +632,9 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
 		
 		// remove -moz/khtml-opacity lines and MSIE filter lines:
+		//
+		// note that these damage the looks of mochaUI: AJAX windows turn up with a green border and red corners.
+		// It's because a few mochaUI styles specify a 'opacity: 0;' to make them invisible.
 		$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*[Aa]lpha\([^)]+\)[\'"]?\s*;?/', ' ', $contents);
 		$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
 		$contents = preg_replace('/\sopacity:\s*[0-9.]+;?/', ' ', $contents);
