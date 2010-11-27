@@ -275,7 +275,7 @@ class Python:
 		<div class="span-10 right last">
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" id="changeTmp" method="get" class="right" accept-charset="utf-8">
 				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
-				<select class="text onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
+				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
 					<?php
 					$x = 0; 
 					while($x<count($template)) 
