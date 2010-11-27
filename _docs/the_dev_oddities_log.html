@@ -22,6 +22,10 @@
 .style1 {
 	font-family: "Palatino Linotype";
 }
+.style2 {
+	color: #FF0000;
+	text-decoration: line-through;
+}
 </style>
 <script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js" charset="utf-8"></script>
 </head>
@@ -213,8 +217,97 @@ shows up, but the background does not:</p>
 <p>The thing that made me try that was the fact that running a backup did also 
 move that warning message into the proper place, the difference being another 
 added &lt;div&gt; at the top where the feedback message appears.</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+<h1>JavaScript : why your onsubmit / onclick actions don&#39;t work like they should</h1>
+<p>Found out the hard way<span class="style1">—the only way when I again succumb 
+to the prevalent &#39;common sense&#39; out there and forego reading the reference 
+manual front to back; in this case the ECMA spec plus a few other</span> choice 
+bits. (See also the the_goto_guy.js script for code and 
+further reading):</p>
+<p>IE6 in strict mode<span class="style1">—</span>which is the default 
+	setting on a clean install, so you&#39;ll find this on otherwise &#39;pristine&#39;, yet 
+	old, machines<span class="style1">—is not the only one who performs a 
+	&#39;double action&#39; for HTML / JS like this (it seems to work like this 
+	on all browsers I tested up to now: latest Chrome, Opera, FireFox and the 
+	various MSIE&#39;s: 6, 7 and 8):</span></p>
+	<p class="large">JavaScript:</p>
+	<pre>
+&lt;script type=&quot;text/javascript&quot;&gt;
+function confirmation()
+{
+	var answer=confirm(&#39;&lt;?php echo $ccms[&#39;lang&#39;][&#39;editor&#39;][&#39;confirmclose&#39;]; ?&gt;&#39;);
+	if(answer)
+	{
+		try
+		{
+			parent.MochaUI.closeWindow(parent.$(&#39;sys-usr_ccms&#39;));
+		}
+		catch(e)
+		{
+		}
+	}
+	else
+	{
+		<strong>return false;</strong>
+	}
+}
+&lt;/script&gt;	</pre>
+<p class="large">HTML</p>
+<pre>&lt;a class=&quot;button&quot; <strong>href=&quot;../index.php&quot; onClick=&quot;confirmation();&quot;</strong> title=&quot;...&quot;&gt;Going down, Mr. Tyler?&lt;/a&gt;</pre>
+<p>which means when such a 'page' is opened in a separate tab instead (heck, I 
+can right-click and &#39;Open in a new tab&#39;, can&#39;t I?) and hence the mochaUI parent will not be there and the resulting fault is caught in the try/catch, things may look good, but 
+<strong><em>notice that this function does not return a value explicitly for every execution path</em></strong>: not when the mochaUI is loaded, nor when it isn't.</p>
+<h2>Now you <em>may</em> think things are hunky dory, but they are <em>not</em></h2>
+	<p>It's just your tests having missed this one, because what actually happens is that the function returns a '<code>undefined</code>' as an 
+	<em>implied return value</em> and the browser picks this value... <strong>no, wait! not even close!</strong> Because you've been stacking 
+	coding sloppers like a 
+	Saturday night high-roller is stacking chips in the casino: as the onSubmit / onClick 
+	action code itself does not return the value returned by the function does the browser see an 'undefined' as result 
+	<em>all the time</em>. And what was 
+	<a href="http://www.mapbender.org/JavaScript_pitfalls:_null,_false,_undefined,_NaN">
+	that JavaScript pitfall</a> again? Yeah, '<code>undefined</code>' as one of the == equality comparison arguments will 
+	<em>always</em> produce a <code>false</code> as an evaluation answer, no matter what you put on the other side. And that is apparently what a lot of browsers do internally after 
+	<strong>having run the onsubmit/onclick action: no return means </strong>
+	<em><strong>yes</strong></em>. So the href=... / action=... part of that link or button / form will be executed as well. With a bit of 'luck' you did this to one of your forms and now you end up with anything ranging from 'odd behaviour' to double entries in your database: two records created for the price of one click.</p>
+<p>Which puts a whole 'nuther meaning to 'two for one'.</p>
+<p>The corrected code:</p>
+<p class="large">JavaScript:</p>
+	<pre>
+&lt;script type=&quot;text/javascript&quot;&gt;
+function confirmation()
+{
+	var answer=confirm(&#39;&lt;?php echo $ccms[&#39;lang&#39;][&#39;editor&#39;][&#39;confirmclose&#39;]; ?&gt;&#39;);
+	if(answer)
+	{
+		try
+		{
+			return <span class="light_up_editing">(true !== </span>parent.MochaUI.closeWindow(parent.$(&#39;sys-usr_ccms&#39;))<span class="light_up_editing">)</span>;<span class="light_up_editing"> // when it fails, mochaUI doesn&#39;t always seem to return &#39;false&#39; either...
+</span>		}
+		catch(e)
+		{
+		}
+<span class="light_up_editing">		// answer == true, so we&#39;re going to &#39;fall back&#39; to the coded href= action here...
+</span>	}
+<span class="light_up_editing">	<strong>return answer;</strong>
+</span>}
+&lt;/script&gt;	</pre>
+<p class="large">HTML</p>
+<pre>&lt;a class=&quot;button&quot; <strong>href=&quot;../index.php&quot; onClick=&quot;<span class="light_up_editing">return </span>confirmation();&quot;</strong> title=&quot;...&quot;&gt;Going down, Mr. Tyler?&lt;/a&gt;</pre>
+<p><strong>The Moral of this Story? </strong>Sloppy coding, like Rock &amp; Roll, will never die.</p>
+<p class="small quiet">But then it&#39;s late at night and I&#39;m feeling sarcastic.</p>
+<p>By the way: an alternative &#39;hack&#39; that may be viable in particular 
+circumstances, e.g. when coding AJAX driven &lt;form&gt;s and not wanting to be 
+bothered by some line of code crashing the JavaScript interpreter and leaving 
+your submit click in unfaithful hands, is to do away with the href= / action= 
+attribute entirely. Now the browser won&#39;t know what to do when your JavaScript 
+doesn&#39;t deliver like intended:</p>
+<p class="large">HTML</p>
+<pre>&lt;a class=&quot;button&quot; <span class="style2">href=&quot;../index.php&quot;</span> <strong>onClick=&quot;<span>return </span>confirmation();&quot;</strong> title=&quot;...&quot;&gt;Going down, Mr. Tyler?&lt;/a&gt;
+...or...
+&lt;form <span class="style2">action=&quot;Process.php&quot;</span> method=&quot;post&quot; accept-charset=&quot;utf-8&quot; <strong>onsubmit=&quot;return </strong><strong>refresh_adminmain();&quot;</strong>&gt;...&lt;/form&gt;</pre>
+<p><strong>i.e.</strong></p>
+<pre>&lt;a class=&quot;button&quot; <strong> onClick=&quot;<span>return </span>confirmation();&quot;</strong> title=&quot;...&quot;&gt;Going down, Mr. Tyler?&lt;/a&gt;
+...or...
+&lt;form  method=&quot;post&quot; accept-charset=&quot;utf-8&quot; <strong>onsubmit=&quot;return </strong><strong>refresh_adminmain();&quot;</strong>&gt;...&lt;/form&gt;</pre>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>

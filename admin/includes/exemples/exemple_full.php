@@ -41,7 +41,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT',
 // Define default location
 if (!defined('BASE_PATH'))
 {
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
 	define('BASE_PATH', $base);
 }
 
@@ -95,33 +95,22 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Template Editing module</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<link rel="stylesheet" type="text/css" href="../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 		<!--[if IE]>
-			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+			<link rel="stylesheet" type="text/css" href="../../img/styles/ie.css" />
 		<![endif]-->
 <?php
 
 // TODO: call edit_area_compressor.php only from the combiner: combine.inc.php when constructing the edit_area.js file for the first time.
 
 ?>
-		<script language="Javascript" type="text/javascript" src="../../edit_area/edit_area_full.js"></script>
+	<script language="Javascript" type="text/javascript" src="../edit_area/edit_area_full.js"></script>
 		<script type="text/javascript">
 		// initialisation
-editAreaLoader.init(
-	{
-		id:"content",
-		start_highlight:true,
-		allow_resize:'both',
-		allow_toggle:true,
-		word_wrap:true,
-		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
-		syntax:"html"
-	});
-		
 		editAreaLoader.init({
 			id: "example_1"	// id of the textarea to transform		
 			,start_highlight: true	// if start with highlight
@@ -214,7 +203,7 @@ editAreaLoader.init(
 		
 		function open_file1()
 		{
-			var new_file= {id: "to\\ é # € to", text: "$authors= array();\n$news= array();", syntax: 'php', title: 'beautiful title'};
+			var new_file= {id: "to\\ Ã© # â‚¬ to", text: "$authors= array();\n$news= array();", syntax: 'php', title: 'beautiful title'};
 			editAreaLoader.openFile('example_2', new_file);
 		}
 		
@@ -226,7 +215,7 @@ editAreaLoader.init(
 		
 		function close_file1()
 		{
-			editAreaLoader.closeFile('example_2', "to\\ é # € to");
+			editAreaLoader.closeFile('example_2', "to\\ Ã© # â‚¬ to");
 		}
 		
 		function toogle_editable(id)
@@ -244,7 +233,7 @@ function confirmation()
 	{
 		try
 		{
-			parent.MochaUI.closeWindow(parent.$('sys-tmp_ccms'));
+			parent.MochaUI.closeWindow(parent.$('sys-bck_ccms'));
 		}
 		catch(e)
 		{
@@ -265,11 +254,8 @@ function confirmation()
 	}
 }
 </script>
-	</head>
+</head>
 <body>
-	<div class="module" id="template-editor">
-
-
 <h2>EditArea examples</h2>
 <p>Retrieve EditArea on <a href='http://sourceforge.net/projects/editarea'>sourceforge</a> or on 
 	my personal <a href='http://www.cdolivet.com/index.php?page=editArea'>website</a>.
@@ -279,6 +265,7 @@ function confirmation()
 		<legend>Example 1</legend>
 		<p>Test in English with php syntax, highlighted, toggle enabled, word-wrap enabled, resize enabled and default toolbar. Also offer the possibility to switch on/off the readonly mode.</p>
 		<textarea id="example_1" style="height: 350px; width: 100%;" name="test_1">
+<?php	
 	$authors	= array();
 	$news		= array();
 	/* this is a long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long comment for showing word-wrap feature */
@@ -306,6 +293,7 @@ function confirmation()
 	
 	}
 	printf("</table>");
+?>
 		</textarea>
 		<p>Custom controls:<br />
 			<input type='button' onclick='alert(editAreaLoader.getValue("example_1"));' value='get value' />
@@ -388,7 +376,7 @@ import Blender
  
 class Python:
 	# Instancie un objet
-	# cls = la classe Python et non pas l'object instancié
+	# cls = la classe Python et non pas l'object instanciÃ©
 	def __new__(cls):
 		pass
 	
@@ -400,131 +388,24 @@ class Python:
 	def __del__(self):
 		print "Pourquoi tant de haine ?"
 	
-	# Utilisé pour : "len(p)"
+	# UtilisÃ© pour : "len(p)"
 	def __len__(self):
 		return len(self.items)
 	
-	# Utilisé pour : "p[x]"
+	# UtilisÃ© pour : "p[x]"
 	def __getitem__(self, key):
 		return self.items[key]
 	
-	# Utilisé pour : "x in p"
+	# UtilisÃ© pour : "x in p"
 	def __contains__(self, value):
 		return (value in self.items)
 	
-	# Utilisé pour : "for x in p"
+	# UtilisÃ© pour : "for x in p"
 	def __iter__(self):
 		for x in self.items:
 			yield x
 </textarea>
 	</fieldset>
 </form>
-
-
-
-
-		<?php 
-		if($chstatus==0) 
-		{ 
-		?>
-			<p class="error center"><?php echo $ccms['lang']['template']['nowrite']; ?></p>
-		<?php 
-		} 
-		?>	
-		<div class="span-15">
-			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
-		</div>
-		
-		<div class="span-10 right last">
-			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" id="changeTmp" method="get" class="right" accept-charset="utf-8">
-				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
-				<select class="text onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
-					<?php
-					$x = 0; 
-					while($x<count($template)) 
-					{ 
-					?>
-						<optgroup label="<?php echo ucfirst($template[$x]); ?>">
-							<option <?php echo ($get_temp==$template[$x].".tpl.html") ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>.tpl.html"><?php echo ucfirst($template[$x]).': '.strtolower($ccms['lang']['backend']['template']); ?></option>
-							<?php 
-							
-							// Get CSS and other text-editable files which are part of the engine
-							$cssfiles = array();
-							if ($handle = opendir($dir_temp.$template[$x].'/')) 
-							{
-								while (false !== ($file = readdir($handle))) 
-								{
-							        if ($file != "." && $file != "..")
-									{
-										switch (strtolower(substr($file, strrpos($file, '.') + 1)))
-										{
-										case 'css':
-										case 'js':
-										case 'php':
-										case 'html':
-										case 'txt':
-											$cssfiles[$x][] = $file;
-											break;
-											
-										default:
-											// don't list image files and such
-											break;
-										}
-							        }
-							    }
-							    closedir($handle);
-							}
-							
-							foreach ($cssfiles[$x] as $css) 
-							{ 
-							?>
-								<option <?php echo ($get_temp==$template[$x].'/'.$css) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x].'/'.$css; ?>"><?php echo ucfirst($template[$x]).': '.$css; ?></option>
-							<?php 
-							} 
-							?>
-						</optgroup>
-					<?php 
-					$x++; 
-				} 
-				?>
-				</select>
-			</form>
-		</div>
-		<hr class="space"/>
-		
-		<?php 
-		/*
-		??? ALWAYS saying 'settings saved' instead of the attached message in the old code? Must've been a bug...
-		
-		Changed to mimic the layout in the other files...
-		*/                 
-		?>                              
-		<div class="center <?php echo $status; ?>">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
-			} 
-			?>
-		</div>
-		
-		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
-		
-			<textarea id="content" name="content" style="height:400px;width:100%;color:#000;"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
-			
-			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
-			<div class="right">
-				<?php 
-				if($chstatus > 0) 
-				{ 
-				?>
-					<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
-				<?php 
-				}  
-				?>
-				<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
-			</div>
-		</form>
-	</div>
 </body>
 </html>

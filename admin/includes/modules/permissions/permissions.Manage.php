@@ -83,35 +83,17 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	<script type="text/javascript">
 function refresh_adminmain()
 {
-	if (typeof top.location.replace == "function")
-	{
-		top.location.replace("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>");
-	}
-	else
-	{
-		top.location.href = "<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>";
-	}
+	return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", null);
 }
 
 function confirmation()
 {
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-perm_ccms'));
-		}
-		catch(e)
-		{
-			refresh_adminmain();
-		}
-		return true;
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-perm_ccms');
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 
@@ -129,7 +111,7 @@ function confirmation()
 			{
 			?>
 				<p><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['must_refresh']; ?></p>
-				<form action="../../../IE_sink.php" id="refresh_everytin_form" onsubmit="refresh_adminmain(); return false;">
+				<form id="refresh_everytin_form" onsubmit="return refresh_adminmain();">
 					<button type="submit"><span class="ss_sprite_16  ss_arrow_refresh">&#160;</span><?php echo $ccms['lang']['backend']['reload_admin_screen']; ?></button>
 				</form>
 			<?php

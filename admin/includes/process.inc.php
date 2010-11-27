@@ -1438,7 +1438,7 @@ tinyMCE.init(
 	else 
 	{ 
 	?>
-		<script type="text/javascript" src="./edit_area/edit_area_compressor.php"></script>
+		<script type="text/javascript" src="./edit_area/edit_area_full.js"></script>
 		<script type="text/javascript">
 editAreaLoader.init(
 	{

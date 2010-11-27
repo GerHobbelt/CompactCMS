@@ -124,8 +124,8 @@ function get_total_page_count()
 <div id='pageWrapper'><?php /* <-- required to ensure there are proper scrollbars in the MochaUI 'desktop' */ ?>
 <div class="container-25">
 	<?php // Top bar including status block ?>
-	<div id="logo-div" class="span-5 colborder">
-		<div id="logo" class="sprite logo">
+	<div id="logo" class="span-5 colborder">
+		<div class="sprite logo">
 			<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
 		</div>
 		<p><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
@@ -267,27 +267,32 @@ function get_total_page_count()
 				?>
 				
 				<div id="editor-options">
-					<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
-					<label for="f_pr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
-						<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
-					<label for="f_pr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
-						<input type="radio" id="f_pr2" name="printable" value="N" />
-					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
-					<br class="clear"/>
-					<label><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
-					<label for="f_pu1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
-						<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
-					<label for="f_pu2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
-						<input type="radio" id="f_pu2" name="published" value="N" />
-					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
-					<br class="clear"/>
-					<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
-					<label for="f_cod" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
-						<input type="radio" id="f_cod" name="iscoding" value="Y" />  
-					<label for="f_co2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
-						<input type="radio" id="f_co2" checked="checked" name="iscoding" value="N" />
-					<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
+					<div class="clearfix span-8 redbox">
+						<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
+						<label for="f_pr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+							<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
+						<label for="f_pr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+							<input type="radio" id="f_pr2" name="printable" value="N" />
+						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
+					</div>
+					<div class="clearfix span-8 redbox">
+						<label><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
+						<label for="f_pu1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+							<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
+						<label for="f_pu2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+							<input type="radio" id="f_pu2" name="published" value="N" />
+						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
+					</div>
+					<div class="clearfix span-8 redbox">
+						<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
+						<label for="f_cod" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+							<input type="radio" id="f_cod" name="iscoding" value="Y" />  
+						<label for="f_co2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+							<input type="radio" id="f_co2" checked="checked" name="iscoding" value="N" />
+						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
+					</div>
 				</div>
+
 				<div class="right">
 					<button type="submit" id="addbtn" name="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 				</div>

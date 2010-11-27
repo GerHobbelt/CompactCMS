@@ -480,7 +480,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		else
 		{
 		?>
-		<form action="javascript:;" method="post" id="installFrm">
+		<form method="post" id="installFrm">
 			<fieldset id="install" style="border:none;" class="none">
 				<legend class="installMsg"><?php echo (!$do_ftp_chmod ? 'Step 1 - Knowing the environment' : 'FTP - Setting permissions right');?></legend>
 				<?php 
