@@ -97,9 +97,10 @@ th,td,caption { padding: 4px 10px 4px 5px; }
 	the class "even" to every other table row. 
  */
 /*
-tbody tr:nth-child(even) td,     -- clashes with our tables with subtables (e.g. dyn_list): we need to undo this to correctly style such a subtable; it's way easier to just remove this and go the 'explicit class' way */
+tbody tr:nth-child(even) td,     -- clashes with our tables with subtables (e.g. dyn_list): we need to undo this to correctly style such a subtable; it's way easier to just remove this and go the 'explicit class' way 
 */
-tbody tr.even td  { 
+tbody tr.even td  
+{ 
 	background: #E6F5D6; /* CCMS default background green */
 }
 tfoot       { font-style: italic; }
