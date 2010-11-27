@@ -34,7 +34,7 @@ button {
   overflow:visible;
   padding:4px 10px 3px 7px;   /* IE6 */
   margin-top: 0.6em\9;		  /* IE8 and below */
-  *margin-top: 0.4em;         /* IE7 and below */
+  *margin-top: 0.51em;         /* IE7 and below */
 }
 a.button {
   padding-bottom: 4px\9;      /* IE8 and below */
