@@ -879,6 +879,45 @@ form#create-arch, form#delete-arch
 
 
 
+#permission-manager table th
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#permission-manager table td
+{
+	height: 18px;
+}
+#permission-manager table th.permission-name
+{
+	padding-left: 2px;
+	border-right: solid #AD8CCF 2px;
+	border-bottom: 0;
+}
+#permission-manager table td.altrgb
+{
+	background-color: #EAF3E2;
+}
+#permission-manager table td.regrgb
+{
+	background-color: #fff;
+}
+#permission-manager .hover
+{
+	height: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+#permission-manager .hover:hover
+{
+	border:solid 2px red;
+	/* compensate for the thicker border: */
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+
+
+
 #content-owners table th
 {
 	border-bottom: solid #AD8CCF 2px;
@@ -887,10 +926,12 @@ form#create-arch, form#delete-arch
 {
 	height: 18px;
 }
-#content-owners table td.pagename
+#content-owners table th.pagename
 {
 	padding-left: 2px;
 	border-right: solid #AD8CCF 2px;
+	border-bottom: 0;
+	font-weight: normal;
 }
 #content-owners table td.altrgb
 {

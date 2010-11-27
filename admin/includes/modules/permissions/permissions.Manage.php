@@ -78,27 +78,6 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
 	<![endif]-->
-
-	<!-- Confirm close -->
-	<script type="text/javascript">
-function refresh_adminmain()
-{
-	return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", null);
-}
-
-function confirmation()
-{
-	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
-	if(answer)
-	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-perm_ccms');
-	}
-	return false;
-}
-
-
-
-	</script>	
 </head>
 <body>
 <div class="module" id="permission-manager">
@@ -130,7 +109,7 @@ function confirmation()
 		<p><?php echo $ccms['lang']['permission']['explain']; ?></p>
 		<form action="permissions.Process.php" method="post" accept-charset="utf-8">
 			<div class="table_inside">
-			<table border="0" cellspacing="2" cellpadding="2">
+			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<th class="span-5"><em><?php echo $ccms['lang']['permission']['target']; ?></em></th>
 					<th class="span-4 center-text"><?php echo $ccms['lang']['backend']['disabled']; ?></th>
@@ -148,30 +127,33 @@ function confirmation()
 				$columns = $db->GetColumnComments($cfg['db_prefix'].'cfgpermissions');
 				foreach ($columns as $columnName => $comments) 
 				{
-					if($i%2 != 1) 
-					{
-						echo '<tr style="background-color: #E6F2D9;">';
-					} 
-					else 
-					{ 
-						echo '<tr>';
-					}  
 					?>
-						<th><?php echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); ?></th>
-						<td class="center-text">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?'checked="checked"':null); ?> value="0" id="<?php echo $columnName; ?>">
+					<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
+						<th class="permission-name"><?php echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); ?></th>
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?'checked="checked"':null); ?> value="0">
+							</label>
 						</td>
-						<td class="center-text">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?'checked="checked"':null); ?> value="1" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?'checked="checked"':null); ?> value="1">
+							</label>
 						</td>
-						<td class="center-text">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?'checked="checked"':null); ?> value="2" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?'checked="checked"':null); ?> value="2">
+							</label>
 						</td>
-						<td class="center-text">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?'checked="checked"':null); ?> value="3" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?'checked="checked"':null); ?> value="3">
+							</label>
 						</td>
-						<td class="center-text">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?'checked="checked"':null); ?> value="4" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?'checked="checked"':null); ?> value="4">
+							</label>
 						</td>
 					</tr>
 					<?php 
@@ -182,7 +164,7 @@ function confirmation()
 			</div>
 			<div class="right">
 				<button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> 
-				<a class="button" href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 			</div>
 		</form>
 	<?php
@@ -193,5 +175,22 @@ function confirmation()
 	}
 	?>
 </div>
+<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
+<script type="text/javascript">
+function refresh_adminmain()
+{
+	return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", null);
+}
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-perm_ccms');
+	}
+	return false;
+}
+</script>	
 </body>
 </html>

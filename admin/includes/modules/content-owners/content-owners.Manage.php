@@ -79,39 +79,16 @@ if (!is_array($users)) $db->Kill();
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-		<title>Page-owners</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-		<!--[if IE]>
-			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
-		<![endif]-->
-
-		<!-- Confirm close -->
-		<script type="text/javascript">
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
-	if(answer)
-	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-pow_ccms'));
-		}
-		catch(e)
-		{
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-		</script>
-	</head>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>Page-owners</title>
+	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+	<![endif]-->
+</head>
 <body>
-	<div class="module">
+	<div class="module" id="content-owners">
 
 	<div class="center-text <?php echo $status; ?>">
 		<?php
@@ -122,12 +99,11 @@ function confirmation()
 		?>
 	</div>
 
-	<div id="content-owners">
-		<h2><span class="ss_sprite ss_group_gear"><?php echo $ccms['lang']['owners']['header']; ?></span></h2>
-		<p><?php echo $ccms['lang']['owners']['explain']; ?></p>
-		<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
-		<div class="table_inside">
-		<table border="0" cellspacing="2" cellpadding="2">
+	<h2><span class="ss_sprite ss_group_gear"><?php echo $ccms['lang']['owners']['header']; ?></span></h2>
+	<p><?php echo $ccms['lang']['owners']['explain']; ?></p>
+	<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
+	<div class="table_inside">
+		<table cellspacing="0" cellpadding="0">
 		<tr>
 			<th class="span-4"><span class="ss_sprite_16 ss_arrow_down">&#160;</span><?php echo $ccms['lang']['owners']['pages']; ?> \ <span class="ss_sprite_16 ss_arrow_right">&#160;</span><?php echo $ccms['lang']['owners']['users']; ?></th>
 			<?php
@@ -147,8 +123,8 @@ function confirmation()
 			$users_owning_page = explode('||', $pages[$i]['user_ids']);
 
 		?>
-			<tr>
-			<td class="span-4 pagename <?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
+			<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
+			<th class="span-4 pagename">
 				<span class="ss_sprite ss_page_white_world"><?php echo $pages[$i]['urlpage']; ?>.html</span>
 			</td>
 			<?php
@@ -156,7 +132,7 @@ function confirmation()
 			{
 			?>
 				<td class="hover center-text">
-					<label for="<?php echo $i.'_'.$ar2;?>"><span>
+					<label>
 					<input type="checkbox" name="owner[]"
 					<?php
 					/*
@@ -177,7 +153,7 @@ function confirmation()
 						echo 'checked="checked"';
 					}
 					?> value="<?php echo rm0lead($users[$ar2]['userID']).'||'.rm0lead($pages[$i]['page_id']);?>" id="<?php echo $i.'_'.$ar2;?>" />
-					</span></label>
+					</label>
 				</td>
 			<?php
 			}
@@ -188,10 +164,24 @@ function confirmation()
 		?>
 		</tr>
 		</table>
-		</div>
-		<div class="right">
-			<button type="submit"><span class="ss_sprite ss_disk">Save</span></button>
-			<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
-		</div>
-		</form>
 	</div>
+	<div class="right">
+		<button type="submit"><span class="ss_sprite ss_disk">Save</span></button>
+		<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+	</div>
+	</form>
+	</div>
+	<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
+	<script type="text/javascript">
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-pow_ccms');
+	}
+	return false;
+}
+	</script>
+</body>
+</html>

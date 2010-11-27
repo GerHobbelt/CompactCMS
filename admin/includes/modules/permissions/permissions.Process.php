@@ -108,7 +108,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST) && checkAuth())
 	{
 		$e->croak();
 	}
+	exit();
 } 
-else 
-	die("No external access to file");
+
+die("No external access to file");
 ?>
