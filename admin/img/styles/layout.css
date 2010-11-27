@@ -968,7 +968,23 @@ form#create-arch, form#delete-arch
 	margin-top: 0;
 	margin-bottom: 0;
 }
+#template-editor textarea
+{
+	height:400px;
+	width:99%;
+	color:#000;
+	margin-left: 0;
+	margin-right: 0;
+}
 
+/*
+hack to make sure that the extra checkmark label generated/injected by edit_Area renders correctly 
+*/
+#EditAreaArroundInfos_content label
+{
+	float: none;
+	display: inline;
+}
 
 
 

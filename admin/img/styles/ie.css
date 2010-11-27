@@ -138,3 +138,35 @@ may need hasLayout as well!
 
 
 
+
+
+/*
+If you do not FORCE the outer <div> in the template ditor to hasLayout, then IE7/IE6[*]
+GOES ABSOLUTELY HONKIN' TOOTIN' MENTAL placing the edit_Area control in there: it keeps 
+blinking the dreaded hourglass and you're ab-so-lu-te-ly SOL because you don't get to see, 
+not edit the contents in the <textarea>. Instead, you get the '|' text cursor placed 
+somewhere near the top of your screen.
+
+I !@#$%^&* hate MSIE!
+																	Ger Hobbelt
+																	
+This took quite a while to find out, because I hadn't expected the outer div to cause this
+problem (my agony over the backup management page yesterday should've taught me a lesson, 
+but no-o-o-o-o-o-o-o...); what made 'everything work' was pasting the original edit_Area
+example code in there; after that it was a matter of slowly stripping away JS and HTML 
+until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuckin'-ha!																	
+
+[*] generally, it would be IE6 going mental most of the time, but I've had occasions
+    during this trial where IE6 did fine while IE7 took over wrecking the joint. So the
+	hasLayout hack is magnimoniously delivered to the both of 'em.
+*/
+*:first-child+html #template-editor /* IE7 only */
+{
+	zoom: 1; /* force hasLayout */
+}
+* html #template-editor /* IE6 */
+{
+	zoom: 1; /* force hasLayout */
+}
+
+
