@@ -79,9 +79,24 @@
 #dock {
 	background: #E3E3E3;
 }
-.dockTab {
+.dockTab 
+{
 	font: 0.825em "Verdana", arial, sans-serif;
-	background: url(../mochaui/dock-tabs.png) left top no-repeat;
+	/*
+	background-image: url(../mochaui/dock-tabs.png) !important;
+	background-image: url(../mochaui/dock-tabs.gif);
+	*/
+	background-image: url(../mochaui/dock-tabs.png); /* good for IE6 too; don't need transparancy for this one! */
+	background-position: left top;
+	background-repeat: no-repeat;
+	width: 190px; 
+}
+.dockText 
+{ 
+	font-weight: bold;
+	padding-left: 22px; /* make sure the text does not obliterate the 'icon' embedded in our dock-tabs.png/dock-tabs.gif */
+	padding-right: 5px;
+	width: 168px; /* 190 - 22@left - 5@right = ... */
 }
 
 
