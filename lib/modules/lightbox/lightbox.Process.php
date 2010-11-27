@@ -88,7 +88,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
 			$dest = BASE_PATH.'/media/albums/'.$album_name;
 			if(!is_dir($dest)) 
 			{
-				if(@mkdir($dest)&&@mkdir($dest.'/_thumbs')&&@fopen($dest.'/info.txt', "w")) 
+				if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w")) 
 				{
 					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
 					exit();
@@ -113,7 +113,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
 	} 
 	else 
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
 	}
 }
 
@@ -144,7 +145,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 					{
 						if ($object != "." && $object != "..") 
 						{
-							if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object); else unlink($dir."/".$object);
+							if (filetype($dir."/".$object) == "dir") 
+							{
+								rrmdir($dir."/".$object); 
+							}
+							else 
+							{
+								unlink($dir."/".$object);
+							}
 						}
 					}
 					reset($objects);
@@ -180,7 +188,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
+	}
 }
 
 /**
@@ -226,7 +237,10 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed']).'&album='.$album));
+		exit();
+	}
 }
 
 /**
@@ -267,7 +281,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
+	}
 }
 
 /**
@@ -311,57 +328,111 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	// Validation
 	$error 		= false;
 	$error_code = 0;
+	$size       = false; // init to prevent PHP errors about unknown vars further down
 
-	if (!isset($_FILES['Filedata']) || !is_uploaded_file($_FILES['Filedata']['tmp_name'])) 
+	$uploadedfile = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['tmp_name']) ? filterParam4FullFilePath($_FILES['Filedata']['tmp_name']) : null);
+	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? filterParam4Filename($_FILES['Filedata']['name']) : null);
+	// Set file and get file extension
+	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
+	$extension = (!empty($extension['extension']) ? strtolower($extension['extension']) : '');
+
+	if (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)) 
 	{
 		$error = 'Invalid Upload';
-		$error_code = $_FILES['Filedata']['tmp_name'];
+		$error_code = $uploadedfile;
 	}
 	
-	if (!$error && !($size = @getimagesize($_FILES['Filedata']['tmp_name']) ) ) 
+	if (empty($error) && !($size = @getimagesize($uploadedfile))) 
 	{
 		$error = 'Please upload only images, no other files are supported.';
-		$error_code = $_FILES['Filedata']['tmp_name'];
+		$error_code = $uploadedfile;
 	}
 	
-	if (!$error && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
+	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
 	{
 		$error = 'Please upload only images of type JPEG, GIF or PNG.';
 		$error_code = $size[2];
 	}
 	
-	if (!$error && ($size[0] < 50) || ($size[1] < 50)) 
+	if (empty($error) && (($size[0] < 50) || ($size[1] < 50)))  // braces for proper evaluation precedence!!
 	{
 		$error = 'Please upload an image bigger than 50px.';
 		$error_code = $size[0] . ':' . $size[1];
 	}
 	
-	// Set file and get file extension
-	$uploadedfile	= $_FILES['Filedata']['tmp_name'];
-	$extension		= strtolower(substr($_FILES['Filedata']['name'], strrpos($_FILES['Filedata']['name'], '.') + 1));
-	
-	// Do resize    
-	if($extension=="jpg" || $extension=="jpeg") 
+	$src = false;
+	if (empty($error)) 
 	{
-		$src = @imagecreatefromjpeg($uploadedfile);
-	} 
-	elseif($extension=="png") 
-	{
-		$src = @imagecreatefrompng($uploadedfile);
-	} 
-	else 
-	{
-		$src = @imagecreatefromgif($uploadedfile);
+		// Do resize    
+		switch ($extension)
+		{
+		case 'jpg':
+		case 'jpeg':
+			$src = @imagecreatefromjpeg($uploadedfile);
+			break;
+			
+		case 'png':
+			$src = @imagecreatefrompng($uploadedfile);
+			break;
+			
+		case 'gif':
+			$src = @imagecreatefromgif($uploadedfile);
+			break;
+			
+		default:
+			$error = 'Unsupported file format.';
+			$error_code = $uploadedfile . ' : ' . $extension;
+			break;
+		}
 	}
-	if ($src == false)
+	
+	if (empty($error) && $src == false)
 	{
 		$error = 'Internal error.';
 		$error_code = $uploadedfile . ' : ' . $extension;
 	}
 	
-	if (!$error)
+	if (empty($error))
 	{
-		list($width,$height)=getimagesize($uploadedfile);
+		$imginf = getimagesize($uploadedfile);
+		if (!is_array($imginf))
+		{
+			$error = 'Invalid or severely corrupt image file.';
+			$error_code = $uploadedfile;
+		}
+		else
+		{
+			// make sure image type matches extension:
+			$ok = false;
+			switch ($extension)
+			{
+			case 'jpg':
+			case 'jpeg':
+				$ok = ($imginf[3] == IMAGETYPE_JPEG);
+				break;
+				
+			case 'png':
+				$ok = ($imginf[3] == IMAGETYPE_PNG);
+				break;
+				
+			case 'gif':
+				$ok = ($imginf[3] == IMAGETYPE_GIF);
+				break;
+				
+			default:
+				break;
+			}
+			if (!$ok)
+			{
+				$error = 'File type does not match extension or corrupt file.';
+				$error_code = $uploadedfile;
+			}
+		}
+	}
+	if (empty($error))
+	{
+		$width = $imginf[0];
+		$height = $imginf[1];
 		
 		$aspect_ratio = (floatval($height)/floatval($width));
 		
@@ -398,23 +469,29 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 		imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
 		
 		// Save newly generated versions
-		$thumbnail	= $dest.'/_thumbs/'. $_FILES['Filedata']['name'];
-		$original	= $dest.'/'.$_FILES['Filedata']['name'];
+		$thumbnail	= $dest.'/_thumbs/'. $target_filename;
+		$original	= $dest.'/'.$target_filename;
 		
-		if($extension=="jpg" || $extension=="jpeg") 
+		switch ($extension)
 		{
+		case 'jpg':
+		case 'jpeg':
 			imagejpeg($tmp, $original, 100);
 			imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
-		} 
-		elseif($extension=="png") 
-		{
+			break;
+			
+		case 'png':
 			imagepng($tmp, $original, 9);
 			imagepng($tmp_t, $thumbnail, 9);
-		} 
-		else 
-		{
+			break;
+			
+		case 'gif':
 			imagegif($tmp, $original);
 			imagegif($tmp_t, $thumbnail);
+			break;
+			
+		default:
+			break;
 		}
 		
 		imagedestroy($tmp);
@@ -422,7 +499,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	}
 	
 	// Check for errors
-	if ($error) 
+	if (!empty($error)) 
 	{
 		$return = array(
 			'status' => '0',
@@ -434,8 +511,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	{
 		$return = array(
 			'status' => '1',
-			'name' => $_FILES['Filedata']['name'],
-			'src' => $dest.'/'.$_FILES['Filedata']['name']
+			'name' => $target_filename,
+			'src' => $dest.'/'.$target_filename
 		);
 		// Our processing, we get a hash value from the file
 		$return['hash'] = md5_file($return['src']);
@@ -497,21 +574,30 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 			{
 				if(is_file($dest.'/'.$f)) 
 				{
-					$extension = strtolower(substr($f, strrpos($f, '.') + 1));
+					$extension = pathinfo($f, PATHINFO_EXTENSION);
+					$extension = (!empty($extension['extension']) ? strtolower($extension['extension']) : '');
+
 					$uploadedfile = $dest . '/' . $f;
 					
 					// Do resize
-					if($extension=="jpg" || $extension=="jpeg") 
+					switch ($extension)
 					{
+					case 'jpg':
+					case 'jpeg':
 						$src = imagecreatefromjpeg($uploadedfile);
-					} 
-					elseif($extension=="png") 
-					{
+						break;
+						
+					case 'png':
 						$src = imagecreatefrompng($uploadedfile);
-					} 
-					else 
-					{
+						break;
+						
+					case 'gif':
 						$src = imagecreatefromgif($uploadedfile);
+						break;
+						
+					default:
+						// skip all other file formats
+						continue;
 					}
 						 
 					list($width,$height)=getimagesize($uploadedfile);
@@ -573,17 +659,23 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 					
 					@unlink($thumbnail);
 					
-					if($extension=="jpg" || $extension=="jpeg" ) 
+					switch ($extension)
 					{
+					case 'jpg':
+					case 'jpeg':
 						imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
-					} 
-					elseif($extension=="png") 
-					{
+						break;
+						
+					case 'png':
 						imagepng($tmp_t, $thumbnail, 9);
-					} 
-					else 
-					{
+						break;
+						
+					case 'gif':
 						imagegif($tmp_t, $thumbnail);
+						break;
+						
+					default:
+						break;
 					}
 					
 					imagedestroy($tmp_t);
@@ -600,7 +692,10 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
+	}
 }
 
 ?>
