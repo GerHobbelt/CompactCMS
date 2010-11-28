@@ -482,6 +482,20 @@ if (0)
 	echo "</pre>";
 }
 
+/*
+require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+
+$bc = new Browscap(BASE_PATH . '/lib/includes/cache');
+$bc->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+$bc = $bc->getBrowser();
+*/
+if (1)
+{
+	echo '<h1>$bc</h1>';
+	echo "<pre>";
+	var_dump($bc);
+	echo "</pre>";
+}
 ?>
 	</div>
 

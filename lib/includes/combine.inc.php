@@ -143,6 +143,23 @@ default:
 	exit;
 };
 
+
+
+require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+
+$client_browser = new Browscap(BASE_PATH . '/lib/includes/cache');
+$client_browser->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+$client_browser = $client_browser->getBrowser();
+
+if (0)
+{
+	echo '<h1>$client_browser</h1>';
+	echo "<pre>";
+	var_dump($client_browser);
+	echo "</pre>";
+}
+
+
 /*
 This bit allows paths such as '../../../../../../../etc/passwd' to enter the system.
 
@@ -523,13 +540,207 @@ function css_mk_abs_path($relpath, $basedir)
 
 
 /**
+Filter the CSS based on sniffed browser capacilities: this way we can deliver nicely compliant CSS files to
+the browsers that can handle them and feed 'browser hacked' content to MSIE et al.
+
+After all, not everything can be easily remedied in a separate MSIE-only 'conditional comment'ed individual
+CSS file...
+
+The relevant 'markers' are comments which start with '::' without any leading whitespace. The expression 
+which follows it is of the format:
+
+	operator brand [version] ['|' operator brand [version] ]+ ['::' further comment]
+	
+where 'operand' can be any of the comparison operators '==', '<', '>', '>=', '<=', '!=', the 'brand' is
+name of the browser as per browscap and the (optional!) version is compared as a floating point number
+of the format: major.minor
+
+The whitespace between 'brand' and 'version' is optional: 'brand' is assumed to stop at the first occurrence
+of a decimal digit.
+
+When you wish to add a comment here for human perusal, you may do so after the double colon '::'.
+
+You may combine multiple conditions by separating them with '|' pipe symbols; these conditions are, of course,
+treated as a boolean-OR combined set.
+
+The 'marker' comment filter is applied per line by default. The only time such markers apply to the ENTIRE CLASS
+DEFINITION is when the marker is FOLLOWED by a '{' open curly brace: this implies that the entire scope block
+will be kept or removed, depending on the outcome of the browser check.
+
+Returns the filtered CSS.
+
+
+WARNING: 
+
+it is assumed such a marker comment is the last thing on the current line. We do NOT wish to cope with 'minified'
+CSS here, so you'd better make sure the CSS is spread across multiple lines, i.e. CSS code formatting for
+/human perusal/ is what we accept/assume as input.
+
+you may feed this function 'minified' CSS, but then it will only play nice IFF you also have ensured there's not
+even a single occurrence of the 'filter marker' (comment start plus double colon) in there! In that case it's
+  output <- input
+and we're done.
+
+
+IMPORTANT NOTE:
+
+This filter system is *NOT* meant to remove the 'CSS hacks' from the CSS source files (heck, the fact alone 
+that the installer will be using those CSS files as well, while we (the Combiner) have NOT been turned on yet
+through the RewriteRules is reason enough to keep them in there), but the reason for this filter is rather to
+rid CSS output of such CSS hacks for compliant browsers, which would report quite a few of them as the errors
+that they may be.
+In short, reason #1 for this filter code is to shut up Firefox and Opera about errors in the CSS being fed
+to them.
+
+A nice side effect that is not to be sneezed at is the fact that we can now also 'condition' CSS for those
+brosers as we now have something similar to a 'server side conditional comment' approach. 
+
+Ooooooh... shiny!
+*/
+function filter_css4browser($contents, $http_base, $type, $base, $root, $element, $client_browser)
+{
+	$prev_content = '';
+	for($idx = strpos($contents, "/*::"); $idx !== false; $idx = strpos($contents, "/*::"))
+	{
+		// shift non-conditional lead off to other buffer, so we're never bothered with it again in this loop: speed!
+		$chunk = substr($contents, 0, $idx);
+		$nlidx = strrpos($chunk, "\n");
+		if ($nlidx === false)
+		{
+			// start of contents: assume we're on the first line!
+			$nlidx = -1;
+		}
+		// clip just AFTER the previous NL: anything before that does not concern us any more...
+		$nlidx = $idx - strlen($chunk) + $nlidx + 1;
+		$prev_content .= substr($contents, 0, $nlidx);
+		
+		$contents = substr($contents, $nlidx);
+		$eol = strcspn($contents, "\n");
+		$this_line = substr($contents, 0, $eol);
+		
+		$contents = substr($contents, $eol);
+		if (!preg_match('/^(.*)\/\*\:\:\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*(|\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*)*(::.*)?\*\/\s*$/', $this_line, $matches))
+		{
+			// illegal format: report this and fail dramatically
+			send_response_status_header(500); 
+			die("Illegal filter condition string: " . $this_line);
+		}
+		
+		$pass_css = true;
+		
+		$css = $matches[1];
+		$match_count = count($matches);
+		$comment = $matches[$match_count - 1];
+		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
+		$extra_first_step = 1;
+		for ($i = 2; $i < $match_count - 1 /* discount the last one: the trailing comment */; $i++)
+		{
+			$op = $matches[$i++];
+			$brand = trim($matches[$i++]);
+			$b_v_set = !empty($matches[$i]);
+			$b_version = floatval($matches[$i++]);
+			$i++; // skip the minor version match
+			$i += $extra_first_step; // move to the next of a combined set (if there are any more conditions in there)
+			$extra_first_step = 0;
+			
+			// perform check, set $pass_css=false when there's a match
+			//echo "<pre>check: ($op) ($brand) ($b_version)\n";
+			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
+			/*
+			we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
+			but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
+			
+			On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
+			stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an 
+			entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
+			past the second '.' dot in there.
+			*/
+			if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
+			{
+				// illegal format: report this and fail dramatically
+				send_response_status_header(500); 
+				die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
+			}
+			$sniffed_version = floatval($vmp[1]);
+			$vchk = $sniffed_version - $b_version;
+			//echo "\n<pre>browser says: " . $client_browser->Browser . " " . $client_browser->Version;
+			//echo "\n<pre>we want: " . $op . " " . $brand . " " . $b_version;
+			//echo "\n<pre>we got: gotcha = $gotcha, sniffed = $sniffed_version, vchk = $vchk, b_v_set = $b_v_set";
+			
+			switch ($op)
+			{
+			default:
+				// illegal format: report this and fail dramatically
+				send_response_status_header(500); 
+				die("Illegal filter comparison operator: " . $this_line);
+			
+			case '!=':
+				$pass_css = !($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+				
+			case '==':
+				$pass_css = ($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+				
+			case '>=':
+				$pass_css = ($gotcha && (!$b_v_set || $vchk >= 0));
+				break;
+				
+			case '>':
+				$pass_css = ($gotcha && (!$b_v_set || $vchk > 0));
+				break;
+				
+			case '<':
+				$pass_css = ($gotcha && (!$b_v_set || $vchk < 0));
+				break;
+				
+			case '<=':
+				$pass_css = ($gotcha && (!$b_v_set || $vchk <= 0));
+				break;
+			}
+			//echo "\n<pre>#### Verdict: " . ($pass_css ? "FILTER" : "PASS") . "\n";
+		}
+		
+		if (!$pass_css)
+		{
+			// filter line... or CSS block? When the next non-whitespace item is a '{' we'll need to ditch the entire block
+			if (preg_match('/^\s*(\{[^}]*\})(.*)$/s', $contents, $matches))
+			{
+				// bingo! CSS block!
+				$contents = $matches[2];
+				// removed!  <snip> Just like that! :-)
+			}
+			/*
+			else: single line: just go on with the rest and see what needs to be done there in the next round.
+			      The current line has already been stripped off the contents, so we're good to go.
+			*/
+		}
+		else
+		{
+			// we must keep the current line/block:
+			$prev_content .= $this_line;
+		}
+	}
+	
+	// re-merge contents from both buffers:
+	$contents = $prev_content . $contents;
+	
+	return $contents;
+}
+
+
+
+
+/**
 patch/correct CCS3 and other particulars, such as 
 '@import flattening', which reduces the number of CSS files to load.
 */
 function fixup_css($contents, $http_base, $type, $base, $root, $element)
 {
-	global $cfg, $optimize;
+	global $cfg, $optimize, $client_browser;
 
+	$contents = filter_css4browser($contents, $http_base, $type, $base, $root, $element, $client_browser);
+	
 	// make sure the @import statements are on their own lines: easier for us to process them:
 	$prev_content = '';
 	for($idx = strpos($contents, "@import"); $idx !== false; $idx = strpos($contents, "@import"))
@@ -645,7 +856,6 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		break;
 	}
 
-	
 	/*
 	 make all url() paths in there ABSOLUTE.
 	

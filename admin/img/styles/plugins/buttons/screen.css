@@ -32,22 +32,23 @@ a.button, button {
 button {
   width:auto;
   overflow:visible;
-  padding:4px 10px 3px 7px;   /* IE6 */
-  margin-top: 0.6em\9;		  /* IE8 and below */
-  *margin-top: 0.51em;         /* IE7 and below */
+  padding:4px 10px 3px 7px;     /* IE6 ? */
+  margin-top: 0.6em\9;          /*:: <= IE8 */
+  *margin-top: 0.51em;          /*:: <= IE7 */
 }
 a.button {
-  padding-bottom: 4px\9;      /* IE8 and below */
+  padding-bottom: 4px\9;        /*:: <= IE8 */
 }
 button[type] {
-  padding:4px 10px 5px 7px;   /* Firefox */
-  line-height:17px;           /* Safari */
+  padding:4px 10px 5px 7px;     /* Firefox */
+  line-height:17px;             /* Safari */
 }
-*:first-child+html button[type] /* IE7 */
+*:first-child+html button[type]     /*:: == IE7 */
 {
   padding:4px 10px 3px 7px;   
 }
-button img, a.button img{
+button img, a.button img
+{
   margin:0 3px -3px 0 !important;
   padding:0;
   border:none;
