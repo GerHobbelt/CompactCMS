@@ -64,14 +64,14 @@ RewriteRule ^([^/]*)/([^/]*)\.html$             index.php?page=$1&id=$2 [QSA,L]
 RewriteRule ^([^/]*)/([^/]*)\.print$            index.php?page=$1&id=$2&printing=Y [QSA,L]
 RewriteRule ^([^/]+)\.html$                     index.php?page=$1 [QSA,L]
 RewriteRule ^([^/]+)\.print$                    index.php?page=$1&printing=Y [QSA,L]
-RewriteRule ^lib/includes/js/([^/]+\.js)$       lib/includes/combine.inc.php?type=javascript&files=$1 [L]
-RewriteRule ^admin/img/styles/([^/]+\.css)$     lib/includes/combine.inc.php?type=css&files=$1 [L]    
+RewriteRule ^lib/includes/js/([^/]+\.js)$       lib/includes/combine.inc.php?type=javascript&files=$1 [QSA,L]
+RewriteRule ^admin/img/styles/([^/]+\.css)$     lib/includes/combine.inc.php?type=css&files=$1 [QSA,L]    
 # pull EVERY OTHER JS/CSS file through combine as well: that's our generic cacher/compressor/optimizer
-RewriteRule ^(lib/[^,]+)/([^/,]+\.js(,.+)?)$    lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
-RewriteRule ^(lib/[^,]+)/([^/,]+\.css(,.+)?)$   lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
-RewriteRule ^(admin/[^,]+)/([^/,]+\.js(,.+)?)$  lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
-RewriteRule ^(admin/[^,]+)/([^/,]+\.css(,.+)?)$ lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
-RewriteRule ^sitemap\.xml$                      index.php?page=sitemap [L]
+RewriteRule ^(lib/[^,]+)/([^/,]+\.js(,.+)?)$    lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [QSA,L]
+RewriteRule ^(lib/[^,]+)/([^/,]+\.css(,.+)?)$   lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [QSA,L]
+RewriteRule ^(admin/[^,]+)/([^/,]+\.js(,.+)?)$  lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [QSA,L]
+RewriteRule ^(admin/[^,]+)/([^/,]+\.css(,.+)?)$ lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [QSA,L]
+RewriteRule ^sitemap\.xml$                      index.php?page=sitemap [QSA,L]
 
 </IfDefine> # CCMS_installed
 

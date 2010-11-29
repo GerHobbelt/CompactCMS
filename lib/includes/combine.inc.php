@@ -144,6 +144,9 @@ default:
 };
 
 
+$extra_JS_callback = getGETparam4IdOrNumber('cb');
+
+
 
 require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
 
@@ -425,6 +428,12 @@ else
 		
 	case 'js':
 	case 'javascript':
+		// make sure to paste the callback invocation at the end:
+		if (!empty($extra_JS_callback))
+		{
+			$contents .= "\n\nif (typeof window.$extra_JS_callback == 'function')\n{\n //alert('invoking $extra_JS_callback');\n window.$extra_JS_callback();\n}\n";
+		}
+		
 		switch ($optimize['javascript'])
 		{
 		case 'JSmin':

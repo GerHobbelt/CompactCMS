@@ -126,6 +126,17 @@ noscript h2, .noscript h2
 
 
 
+
+
+
+.log 
+{
+	font: 10pt Consolas, Monaco, fixed;
+	width: 100%;
+}
+
+
+
 /* === INSTALL === */
 
 

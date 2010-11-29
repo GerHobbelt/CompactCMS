@@ -303,65 +303,6 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<!--[if IE]>
 			<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
 		<![endif]-->
-		<script type="text/javascript" src="../lib/includes/js/mootools-core.js" charset="utf-8"></script>
-		<script type="text/javascript" src="../lib/includes/js/mootools-more.js" charset="utf-8"></script>
-		<script type="text/javascript" src="../admin/includes/modules/user-management/passwordcheck.js" charset="utf-8"></script>
-		<script type="text/javascript" charset="utf-8">
-			window.addEvent('domready', function() {
-				// Process steps
-				var frm = $('installFrm');
-				
-				/* form may NOT exist when the update check has detected an outdated restore SQLdump or config.inc.php file */
-				if (frm)
-				{
-					frm.addEvent('submit', function(install) {
-						new Event(install).stop();
-							
-						var install_div = $('install');
-						var scroll = new Fx.Scroll(window, {wait: false, duration: 500, transition: Fx.Transitions.Quad.easeInOut});
-						
-						new Request.HTML({
-							method: 'post',
-							url: './installer.inc.php',
-							update: install_div,
-							onRequest:  function() { 
-								install_div.empty().addClass('loading');
-							}, 
-							onComplete: function() {
-								install_div.removeClass('loading');
-								scroll.toElement('install-wrapper');
-								build_tips();
-								//alert('loaded!');
-							}
-						}).send(frm);
-					});
-				}
-
-				build_tips();
-			});			
-			
-			function build_tips()
-			{
-				// Tips links
-				$$('span.ss_help').each(function(element,index) {  
-					var t = element.get('title');
-					if (t)
-					{
-						var content = t.split('::');
-						element.store('tip:title', content[0]);
-						element.store('tip:text', content[1]);
-					}
-				});  
-			  
-				// Create the tooltips  
-				var tipz = new Tips('.ss_help',{  
-					className: 'ss_help_large',  
-					fixed: true,  
-					hideDelay: 50,  
-					showDelay: 50  
-				}); 
-			}
-		</script>
 	</head>
 <body>
 
@@ -550,12 +491,58 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	</div>
 </div>
 
-<script>
-document.getElementById("noscript").style.display = "none";
-document.getElementById("install-wrapper").style.display = "block";
-</script>
+<div>
+  <textarea id="jslog" class="log">
+  </textarea>
+</div>
+
 
 <p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
+
+<script type="text/javascript" charset="utf-8">
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../lib/includes/js/mootools-core.js',
+	'../lib/includes/js/mootools-more.js',
+	'../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running',
+	'install.js'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+}
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+
+function ccms_combiner_running()
+{
+	alert("the Combiner is already running; you are installing over an existing installation! :-)");
+}
+
+/* now show the correct DIV, as we do have JavaScript up & running */
+document.getElementById("noscript").style.display = "none";
+document.getElementById("install-wrapper").style.display = "block";
+
+if (typeof window.ccms_lazyload_setup_GHO == 'function')
+{
+	//alert('2');
+}
+
+</script>
+<script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
+
 
 </body>
 </html>
