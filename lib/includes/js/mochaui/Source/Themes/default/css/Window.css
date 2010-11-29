@@ -48,7 +48,16 @@ div.mochaToolbarWrapper.bottom { border: 0; border-bottom: 1px solid #d9d9d9; }
 .mochaContentWrapper { /* Has a fixed height and scrollbars if required. */ font-size: 12px; overflow: auto; background: #fff; }
 .mochaContent { padding: 10px 12px; }
 .mochaWindowFooter { height: 26px; padding-left: 20px; padding-top:1px; }
-.mocha .handle { position: absolute; background: #0f0; width: 3px; height: 3px; z-index: 2; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* IE8 */ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /* IE6 and 7*/ opacity: .0; -moz-opacity: .0; overflow: hidden; font-size: 1px; /* For IE6 */ }
+.mocha .handle 
+{ 
+	position: absolute; background: #0f0; width: 3px; height: 3px; z-index: 2; 
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /*:: == IE8 */ 
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /*:: <= IE7 :: IE6 and 7 */ 
+	opacity: .0; 
+	-moz-opacity: .0; /*:: == Firefox */
+	overflow: hidden; 
+	font-size: 1px; /*:: == IE6 :: For IE6 */ 
+}
 .mocha .corner { /* Corner resize handles */ width: 10px; height: 10px; background: #f00; }
 .mocha .cornerSE { /* Bottom right resize handle */ width: 20px; height: 20px; background: #fefefe; /* This is the color of the visible resize handle */ }
 .mocha.css3 .cornerSE { background: transparent; border-color: transparent white white transparent; border-style: solid; border-width: 5px; height: 0; margin: 2px; opacity: 1; width: 0; }
@@ -70,10 +79,23 @@ div.mochaToolbarWrapper.bottom { border: 0; border-bottom: 1px solid #d9d9d9; }
 .mochaSpinner { display: none; position: absolute; bottom: 5px; left: 6px; width: 16px; height: 16px; background: url(../images/spinner.gif) no-repeat; }
 .mochaIframe { width: 100%; }
 /* Fix for IE6 select z-index issue */
-.zIndexFix { display: block; position: absolute; top: 0; left: 0; z-index: -1; filter: mask(); width: 100px; height: 100px; border: 1px solid transparent; }
+.zIndexFix { display: block; position: absolute; top: 0; left: 0; z-index: -1; filter: mask(); width: 100px; height: 100px; border: 1px solid transparent; }                           /*:: <= IE6 */
 /* Viewport overlays
 ---------------------------------------------------------------- */
-#modalOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; background: #000; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* IE8 */ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /* IE6 and 7*/ opacity: 0; -moz-opacity: 0; z-index: 10000; }
+#modalOverlay 
+{ 
+	display: none; 
+	position: fixed; 
+	top: 0; 
+	left: 0; 
+	width: 100%; 
+	background: #000; 
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /*:: == IE8 */ 
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /*:: <= IE7 :: IE6 and 7 */ 
+	opacity: 0; 
+	-moz-opacity: 0; /*:: == Firefox */
+	z-index: 10000; 
+}
 /* Fix for IE6 select z-index issue */
 #modalFix { display: none; position: absolute; top: 0; left: 0; width: 100%; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* IE8 */ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /* IE6 and 7*/ opacity: 0; -moz-opacity: 0; z-index: 9999; }
 
@@ -95,11 +117,22 @@ div.mochaToolbarWrapper.bottom { border: 0; border-bottom: 1px solid #d9d9d9; }
 .mocha.css3.no-canvas { border: none; }
 .mochaCss3Shadow { background-color: #333; }
 .mocha.no-canvas .mochaTitlebar { background: #e5e5e5; }
-.mocha.css3 .mochaTitlebar { background-image: -moz-linear-gradient(top, #fafafa, #e5e5e5); /* FF3.6+ */ background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fafafa), color-stop(1, #e5e5e5)); /* Saf4+ */ -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fafafa', EndColorStr='#e5e5e5')"; /* IE8, IE9? */ }
+.mocha.css3 .mochaTitlebar 
+{ 
+	background-image: -moz-linear-gradient(top, #fafafa, #e5e5e5); /*:: >= Firefox 3.6 :: FF3.6+ */ 
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fafafa), color-stop(1, #e5e5e5)); /*:: >= Safari 4.0 :: Saf4+ */ 
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fafafa', EndColorStr='#e5e5e5')"; /*:: >= IE8 :: IE8, IE9? */ 
+}
 .mocha.transparent .mochaTitlebar h3 { color: #fff; display: none; }
 .mocha.transparent .mochaContentWrapper { background: transparent; }
 .mocha.notification { background: #cedff2; }
-.mocha.notification .mochaTitlebar { -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* IE8 */ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /* IE6 and 7*/ opacity: .0; -moz-opacity: 0; }
+.mocha.notification .mochaTitlebar 
+{
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /*:: == IE8 */ 
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 0); /*:: <= IE7 :: IE6 and 7 */ 
+	opacity: .0; 
+	-moz-opacity: 0; 
+}
 .mocha.notification .mochaContentBorder { border-width: 0px; }
 .mocha.notification .mochaContentWrapper { text-align: center; font-size: 12px; font-weight: bold; background: transparent; }
 

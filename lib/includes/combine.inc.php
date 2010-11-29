@@ -87,7 +87,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT',
 // Define default location
 if (!defined('BASE_PATH'))
 {
-	$base = str_replace('\\','/',dirname(dirname(dirname(__FILE__))));
+	$base = str_replace('\\', '/', dirname(dirname(dirname(__FILE__))));
 	define('BASE_PATH', $base);
 }
 
@@ -123,7 +123,7 @@ else if ($cssdir[0] != '/')
 	$cssdir = $cfg['rootdir'] . $cssdir;
 
 $http_root = $cfg['rootdir'];
-$root = str_replace('\\','/',cvt_abs_http_path2realpath($http_root, $cfg['rootdir'], BASE_PATH));
+$root = str_replace('\\', '/', cvt_abs_http_path2realpath($http_root, $cfg['rootdir'], BASE_PATH));
 	
 
 // Determine the directory and type we should use
@@ -132,11 +132,11 @@ switch ($type)
 {
 case 'css':
 	$http_base = path_remove_dot_segments($cssdir);
-	$base = str_replace('\\','/',cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
+	$base = str_replace('\\', '/', cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
 	break;
 case 'javascript':
 	$http_base = path_remove_dot_segments($jsdir);
-	$base = str_replace('\\','/',cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
+	$base = str_replace('\\', '/', cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
 	break;
 default:
 	send_response_status_header(503); // Not Implemented
@@ -168,6 +168,7 @@ BASE_PATH subtree (or better).
 */
 $elements = explode(',', getGETparam4CommaSeppedFullFilePaths('files'));
 
+
 if (substr($base, 0, strlen(BASE_PATH)) != BASE_PATH) 
 {
 	send_response_status_header(403); // Illegal Access
@@ -184,7 +185,7 @@ header($expire);
 $lastmodified = 0;
 foreach($elements as $element)
 {
-	$path = str_replace('\\','/',realpath($base . '/' . $element));
+	$path = str_replace('\\', '/', realpath($base . '/' . $element));
 
 	if (($type == 'javascript' && substr($path, -3) != '.js') || 
 		($type == 'css' && substr($path, -4) != '.css')) 
@@ -630,7 +631,7 @@ function filter_css4browser($contents, $http_base, $type, $base, $root, $element
 		
 		$css = $matches[1];
 		$match_count = count($matches);
-		$comment = $matches[$match_count - 1];
+		$comment = trim($matches[$match_count - 1]);
 		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
 		$extra_first_step = 1;
 		for ($i = 2; $i < $match_count - 1 /* discount the last one: the trailing comment */; $i++)
@@ -642,9 +643,15 @@ function filter_css4browser($contents, $http_base, $type, $base, $root, $element
 			$i++; // skip the minor version match
 			$i += $extra_first_step; // move to the next of a combined set (if there are any more conditions in there)
 			$extra_first_step = 0;
+			if ($i > 6 && empty($op) && empty($brand) && !$b_v_set)
+			{
+				// an empty match of the '| op brand version' set: happens when there's a comment at the end -- skip this entry
+				continue;
+			}
 			
 			// perform check, set $pass_css=false when there's a match
-			//echo "<pre>check: ($op) ($brand) ($b_version)\n";
+			//echo "<pre>check: ($op) ($brand) ($b_version) ($this_line) ($comment)\n";
+			//echo "<pre>matches: \n"; var_dump($matches);
 			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
 			/*
 			we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
@@ -672,6 +679,7 @@ function filter_css4browser($contents, $http_base, $type, $base, $root, $element
 			default:
 				// illegal format: report this and fail dramatically
 				send_response_status_header(500); 
+				echo "\n<pre>contents = $contents";
 				die("Illegal filter comparison operator: " . $this_line);
 			
 			case '!=':

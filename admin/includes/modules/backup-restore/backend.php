@@ -424,7 +424,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 				?>
 					<div class="right">
 						<button type="submit" onclick="return confirmation_delete();" name="btn_delete" value="dodelete"><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></button>
-						<a class="button" href="../../../../IE_sink.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 					</div>
 				<?php   
 				} 
@@ -441,7 +441,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 					<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
 				</div>
 				<div class="right">
-					<a class="button" href="../../../../IE_sink.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 				</div>
 			<?php
 			}

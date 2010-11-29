@@ -1122,8 +1122,67 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 
 
 
+#edit-page textarea#content
+{
+	height:345px;
+	width:100%;
+	color:#000;
+}
 
 
+
+
+
+#news-manager div#show-author label, #news-manager div#show-date label, #news-manager div#show-teaser label
+{
+	display: inline;
+	padding-left: 20%;
+	padding-right: 1%;
+}
+
+
+
+
+
+#comment-manager table tr.head0 th
+{
+	border-top: solid #AD8CCF 1px;
+}
+#comment-manager table tr.head0 th.rowspan2
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#comment-manager table tr.head1 th
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#comment-manager table tr.head1 th
+{
+	border-top: dotted #AD8CCF 1px;
+}
+#comment-manager table tr.row1 td
+{
+	border-top: dotted #AD8CCF 1px;
+}
+#comment-manager .hover
+{
+	padding-top: 2px;
+	padding-bottom: 2px;
+	vertical-align: top;
+}
+#comment-manager .hover label
+{
+	width: 100%;
+	height: 100%;
+	margin: 0;
+}
+#comment-manager .hover:hover
+{
+	border:solid 2px red;
+	/* compensate for the thicker border: */
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
 
 
 /*

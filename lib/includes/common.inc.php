@@ -1528,64 +1528,102 @@ function is_writable_ex($path)
 
 
 
-// Set friendly local names languages
-function setLanguage($lang) 
-{
-	switch ($lang) 
-	{
-		case 'en':
-			return "English";
-			break;
-		case 'nl':
-			return "Nederlands";
-			break;
-		case 'de':
-			return "Deutsch";
-			break;
-		case 'it':
-			return "italiano";
-			break;
-		case 'ru':
-			return "русский";
-			break;
-		case 'sv':
-			return "svenska";
-			break;
-		case 'fr':
-			return "français";
-			break;
-		case 'es':
-			return "español (castellano)";
-			break;
-		case 'pr':
-			return "Português";
-			break;
-		case 'tr':
-			return "Türk";
-			break;
-		case 'zh': /* Chinese ('simplified' is assumed as we only support 2-char codes here... */
-			return "中文";
-			break;
-		case 'ar':
-			return "العربية";
-			break;
-		case 'ja':
-			return "日本";
-			break;
-		case 'ko':
-			return "한국어";
-			break;
-		case 'hi': /* Hindi: India */
-			return "हिन्दी";
-			break;
-		case 'pl':
-			return "Polska";
-			break;
+/**
+Return an array:
 
-		default:
-			return $lang;
-			break;
+["name"] - friendly local name for the language
+["lang"] - language code - 2 characters
+["locale"] - locale code - 3 characters
+*/
+function setLanguage($language) 
+{
+	switch ($language) 
+	{
+	default:	/* fallback: English */
+	case 'en':
+	case 'eng':
+		$language = 'en'; $locale = 'eng';
+		$name = "English";
+		break;
+	case 'de':
+	case 'deu':
+		$language = 'de'; $locale = 'deu';
+		$name = "Deutsch";
+		break;
+	case 'it':
+	case 'ita':
+		$language = 'it'; $locale = 'ita';
+		$name = "italiano";
+		break;
+	case 'nl':
+	case 'nld':
+		$language = 'nl'; $locale = 'nld';
+		$name = "Nederlands";
+		break;
+	case 'ru':
+	case 'rus':
+		$language = 'ru'; $locale = 'rus';
+		$name = "русский";
+		break;
+	case 'sv':
+	case 'sve':
+		$language = 'sv'; $locale = 'sve';
+		$name = "svenska";
+		break;
+	case 'fr':
+	case 'fra':
+		$language = 'fr'; $locale = 'fra';
+		$name = "français";
+		break;
+	case 'es':
+	case 'esp':
+		$language = 'es'; $locale = 'esp';
+		$name = "español (castellano)";
+		break;
+	case 'pt':
+	case 'por':
+		$language = 'pt'; $locale = 'por';
+		$name = "Português";
+		break;
+	case 'tr':
+	case 'tur':
+		$language = 'tr'; $locale = 'tur';
+		$name = "Türk";
+		break;
+	case 'zh': /* Chinese ('simplified' is assumed as we only support 2-char codes here... */
+	case 'zho':
+	case 'chi':
+		$language = 'zh'; $locale = 'zho';
+		$name = "中文";
+		break;
+	case 'ar':
+	case 'ara':
+		$language = 'ar'; $locale = 'ara';
+		$name = "العربية";
+		break;
+	case 'ja':
+	case 'jpn':
+		$language = 'ja'; $locale = 'jpn';
+		$name = "日本";
+		break;
+	case 'ko':
+	case 'kor':
+		$language = 'ko'; $locale = 'kor';
+		$name = "한국어";
+		break;
+	case 'hi': /* Hindi: India */
+	case 'hin':
+		$language = 'hi'; $locale = 'hin';
+		$name = "हिन्दी";
+		break;
+	case 'pl':
+	case 'pol':
+		$language = 'pl'; $locale = 'pol';
+		$name = "Polska";
+		break;
 	}
+
+	return array('name' => $name, 'lang' => $language, 'locale' => $locale);
 }
 
 
@@ -1617,59 +1655,9 @@ function SetUpLanguageAndLocale($language)
 	// Translate 2 character code to setlocale compliant code
 	//
 	// ALSO fix the 2-char language code if it is unknown (security + consistancy measure)!
-	switch ($language) 
-	{
-	default:
-	case 'en':
-	case 'eng':
-		$language = 'en'; $locale = 'eng';break;
-	case 'de':
-	case 'deu':
-		$language = 'de'; $locale = 'deu';break;
-	case 'it':
-	case 'ita':
-		$language = 'it'; $locale = 'ita';break;
-	case 'nl':
-	case 'nld':
-		$language = 'nl'; $locale = 'nld';break;
-	case 'ru':
-	case 'rus':
-		$language = 'ru'; $locale = 'rus';break;
-	case 'sv':
-	case 'sve':
-		$language = 'sv'; $locale = 'sve';break;
-	case 'fr':
-	case 'fra':
-		$language = 'fr'; $locale = 'fra';break;
-	case 'es':
-	case 'esp':
-		$language = 'es'; $locale = 'esp';break;
-	case 'pr':
-	case 'por':
-		$language = 'pr'; $locale = 'por';break;
-	case 'tr':
-	case 'tur':
-		$language = 'tr'; $locale = 'tur';break;
-	case 'zh':
-	case 'zho':
-	case 'chi':
-		$language = 'zh'; $locale = 'zho';break;
-	case 'ar':
-	case 'ara':
-		$language = 'ar'; $locale = 'ara';break;
-	case 'ja':
-	case 'jpn':
-		$language = 'ja'; $locale = 'jpn';break;
-	case 'ko':
-	case 'kor':
-		$language = 'ko'; $locale = 'kor';break;
-	case 'hi':
-	case 'hin':
-		$language = 'hi'; $locale = 'hin';break;
-	case 'pl':
-	case 'pol':
-		$language = 'pl'; $locale = 'pol';break;
-	}
+	$a = setLanguage($language);
+	$language = $a['lang'];
+	$locale = $a['locale'];
 
 	// Either select the specified language file or fall back to English
 	$langfile = BASE_PATH . '/lib/languages/'.$language.'.inc.php';
@@ -1768,7 +1756,7 @@ Collect the available languages (translations) and return those in an array.
 function GetAvailableLanguages()
 {
 	$sl = array();
-	if ($handle = opendir('../lib/languages')) 
+	if ($handle = opendir(BASE_PATH . '/lib/languages')) 
 	{
 		while (false !== ($file = readdir($handle))) 
 		{
@@ -1777,6 +1765,11 @@ function GetAvailableLanguages()
 			{
 				$f = substr($file,0,strpos($file, '.'));
 				$sl[$f] = setLanguage($f);
+				// making sure language support is indeed in sync in code and definition files:
+				if ($sl[$f]['lang'] != $f)
+				{
+					die("CCMS code has not been updated to support language: language code=" . $f);
+				}
 			}
 		}
 	}

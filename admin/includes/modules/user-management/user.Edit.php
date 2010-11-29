@@ -113,11 +113,11 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		} 
 		?>
 		
-		<div class="center <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#150;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -148,7 +148,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			</form>
 		</div>
 		
-		<div class="span-9">
+		<div class="span-9 last">
 			<?php 
 			if($_SESSION['ccms_userID']==$row->userID||($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']&&$_SESSION['ccms_userLevel']>=$row->userLevel)) 
 			{ 
@@ -158,7 +158,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 				<form action="../../process.inc.php?action=edit-user-password" id="userPassForm" method="post" accept-charset="utf-8">
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?>
 						<br/>
-						<a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
+						<a class="small ss_sprite ss_bullet_key" onclick="randomPassword(8); return false;"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
 					</label>
 					<input type="text" onkeyup="passwordStrength(this.value)" class="required minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">

@@ -89,35 +89,7 @@ if ($db->ErrorNumber())
 	<link rel="stylesheet" type="text/css" href="img/styles/base.css,layout.css,editor.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
-		<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>
 	<![endif]-->
-	<script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js" charset="utf-8"></script>
-	<script type="text/javascript" charset="utf-8">
-window.addEvent('domready',function()
-	{
-		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
-		{
-			new FormValidator($('addForm')); 
-		}
-	});
-	
-function set_filter_msgs(el)
-{
-	/* add language dependent texts to the relevant elements: */
-	el.msg_edit = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['edit_remove']))."'"; ?>;
-	el.msg_showing = <?php echo "'".str_replace("'", "\\'", $ccms['lang']['forms']['filter_showing'])."'"; ?>;
-	el.msg_add = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['add']))."'"; ?>;
-}
-
-function get_admin_user_count()
-{
-	return <?php printf("%d", $user_count); ?>;
-}
-function get_total_page_count()
-{
-	return <?php printf("%d", $total_page_count); ?>;
-}
-</script>
 </head>
 
 <body id="desktop">
@@ -482,15 +454,14 @@ if (0)
 	echo "</pre>";
 }
 
-/*
-require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
-
-$bc = new Browscap(BASE_PATH . '/lib/includes/cache');
-$bc->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
-$bc = $bc->getBrowser();
-*/
 if (1)
 {
+	require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+
+	$bc = new Browscap(BASE_PATH . '/lib/includes/cache');
+	$bc->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+	$bc = $bc->getBrowser();
+
 	echo '<h1>$bc</h1>';
 	echo "<pre>";
 	var_dump($bc);
@@ -526,5 +497,35 @@ if (1)
 		</div>
 	</div>
 	
+	<!--[if IE]>
+		<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>
+	<![endif]-->
+	<script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+window.addEvent('domready',function()
+	{
+		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
+		{
+			new FormValidator($('addForm')); 
+		}
+	});
+	
+function set_filter_msgs(el)
+{
+	/* add language dependent texts to the relevant elements: */
+	el.msg_edit = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['edit_remove']))."'"; ?>;
+	el.msg_showing = <?php echo "'".str_replace("'", "\\'", $ccms['lang']['forms']['filter_showing'])."'"; ?>;
+	el.msg_add = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['add']))."'"; ?>;
+}
+
+function get_admin_user_count()
+{
+	return <?php printf("%d", $user_count); ?>;
+}
+function get_total_page_count()
+{
+	return <?php printf("%d", $total_page_count); ?>;
+}
+</script>
 </body>
 </html>

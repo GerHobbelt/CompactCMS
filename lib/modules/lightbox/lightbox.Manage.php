@@ -192,58 +192,18 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Lightbox module</title>
-	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css,uploader.css" />
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,uploader.css,last_minute_fixes.css" />
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
 	<![endif]-->
-	<script type="text/javascript" src="../../includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
-	<?php 
-	// prevent JS errors when permissions don't allow uploading (and all the rest)
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
-	{
-	?>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js"></script>
-		<script type="text/javascript" charset="utf-8">
-function confirmation_delete()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	return !!answer;
-}
-
-function confirm_regen()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmthumbregen']; ?>');
-	if(answer)
-	{
-		try
-		{
-			$('lightbox-pending').setStyle('visibility', 'visible');
-			return true;
-		}
-		catch(e)
-		{
-			$('lightbox-pending').setStyle('visibility', 'hidden');
-			return false;
-		}
-	}
-	else
-	{
-		$('lightbox-pending').setStyle('visibility', 'hidden');
-		return false;
-	}
-}
-		</script>
-	<?php
-	}
-	?>
 </head>
 <body>
 	<div class="module" id="lightbox-management">
-		<div class="center <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -338,18 +298,18 @@ function confirm_regen()
 			} 
 			?>
 			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
-			<div class="clear right">
+			<div class="clearfix right">
 			<?php
 			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
 			{
 			?>
-				<span class="ss_sprite ss_arrow_in"><a onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
-				<?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
-				</a></span>
+				<a class="button" onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
+					<span class="ss_sprite_16 ss_arrow_in">&#160;</span><?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
+				</a>
 			<?php
 			}
 			?>
-			<span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php"><?php echo $ccms['lang']['album']['albumlist']; ?></a></span>
+			<a class="button" href="lightbox.Manage.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?></a>
 			</div>
 			<div>
 			<?php 
@@ -541,5 +501,45 @@ function confirm_regen()
 			<p class="loading-img" ><?php echo $ccms['lang']['album']['please_wait']; ?></p>
 		</div>
 	</div>
+	<script type="text/javascript" src="../../includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
+	<?php 
+	// prevent JS errors when permissions don't allow uploading (and all the rest)
+	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	{
+	?>
+		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js"></script>
+		<script type="text/javascript" charset="utf-8">
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+function confirm_regen()
+{
+	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmthumbregen']; ?>');
+	if(answer)
+	{
+		try
+		{
+			$('lightbox-pending').setStyle('visibility', 'visible');
+			return true;
+		}
+		catch(e)
+		{
+			$('lightbox-pending').setStyle('visibility', 'hidden');
+			return false;
+		}
+	}
+	else
+	{
+		$('lightbox-pending').setStyle('visibility', 'hidden');
+		return false;
+	}
+}
+		</script>
+	<?php
+	}
+	?>
 </body>
 </html>

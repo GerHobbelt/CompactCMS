@@ -507,7 +507,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 						foreach($lcoll as $lcode => $ldesc)
 						{
 							$c = ($lcode == $s ? 'selected="selected"' : null);
-							echo '<option value="'.$lcode.'" '.$c.'>'.$ldesc.'</option>';
+							echo '<option value="'.$lcode.'" '.$c.'>'.$ldesc['name'].'</option>';
 						}
 						?>   	
 					</select>

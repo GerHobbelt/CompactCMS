@@ -309,7 +309,6 @@ $ccms['lang']['guestbook']['rating']	= "Rating";
 $ccms['lang']['guestbook']['avatar']	= "Gravatar.com user avatar";
 $ccms['lang']['guestbook']['wrote']		= "wrote";
 $ccms['lang']['guestbook']['manage']	= "Manage reactions";
-$ccms['lang']['guestbook']['delentry']	= "Delete this entry";
 $ccms['lang']['guestbook']['sendmail']	= "E-mail author";
 $ccms['lang']['guestbook']['removed'] 	= "has been removed from the database.";
 $ccms['lang']['guestbook']['name'] 		= "Your name";
@@ -323,6 +322,9 @@ $ccms['lang']['guestbook']['posted']	= "Your comment has been posted!";
 $ccms['lang']['guestbook']['success']	= "Thank you";
 $ccms['lang']['guestbook']['error']		= "Failures &amp; Rejections";
 $ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
+$ccms['lang']['guestbook']['author']	= "Author";
+$ccms['lang']['guestbook']['date']		= "Date";
+$ccms['lang']['guestbook']['host']		= "IP address";
 
 
       /* ### OBSOLETED ENTRIES ### */

@@ -1289,39 +1289,47 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 	<head>
 		<title>CompactCMS - <?php echo $ccms['lang']['editor']['editorfor']." ".$name; ?></title>
-		<script type="text/javascript">
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
-	if(answer)
-	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('<?php echo $name; ?>_ccms'));
-		}
-		catch(e)
-		{
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-</script>
-		
+		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<?php 
 	// Load TinyMCE (compressed for faster loading) 
 	if($cfg['wysiwyg'] && $iscoding != 'Y')
 	{
 	?>
-		
 		<!-- File uploader styles -->
 		<link rel="stylesheet" media="all" type="text/css" href="./fancyupload/Css/FileManager.css,Additions.css" />
+	<?php 
+	} 
+	// else : load Editarea for code editing
+	?>
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../img/styles/ie.css" />
+	<![endif]-->
+	</head>
 	
+	<body>
+	<div class="module" id="edit-page">
+		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
+		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
+		
+		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<!--<br/>-->
+			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
+			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
+			<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
+			<div class="right">
+				<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
+				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
+		</form>
+	</div>
+	<?php 
+	// Load TinyMCE (compressed for faster loading) 
+	if($cfg['wysiwyg'] && $iscoding != 'Y')
+	{
+	?>
 		<!-- TinyMCE JS -->
-		<script type="text/javascript" src="./tiny_mce/tiny_mce_gzip.js"></script>	
+		<script type="text/javascript" src="./tiny_mce/tiny_mce_ccms.js"></script>	
 		
 		<!-- Mootools library -->
 		<script type="text/javascript" src="../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
@@ -1370,21 +1378,9 @@ var Dialog=new Class(
 			this.overlay.el.setStyle('zIndex',400009);
 		}
 	});
-</script>
-		
-		<!-- GZ version of TinyMCE -->
-		<script type="text/javascript">	
-tinyMCE_GZ.init(
-	{
-		plugins:'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		themes:'advanced',
-		<?php echo "languages: '".$cfg['tinymce_language']."',"; ?>
-		disk_cache:true,
-		debug:false
-	});
-		</script>
-		
-		<script type="text/javascript">
+
+
+	
 tinyMCE.init(
 	{
 		mode:"textareas",
@@ -1434,9 +1430,10 @@ tinyMCE.init(
 		</script>
 
 	<?php 
-	} // End TinyMCE. Start load Editarea for code editing
+	} 
 	else 
 	{ 
+		// Alternative to tinyMCE: load Editarea for code editing
 	?>
 		<script type="text/javascript" src="./edit_area/edit_area_full.js"></script>
 		<script type="text/javascript">
@@ -1454,32 +1451,23 @@ editAreaLoader.init(
 	<?php 
 	} 
 	?>
-	<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../img/styles/ie.css" />
-	<![endif]-->
-	</head>
-	
-	<body>
-	<div class="module">
-		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
-		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
-		
-		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
-			<textarea id="content" name="content" style="height:345px;width:100%;color:#000;"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
-			<br/>
-				<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
-				<input type="input" class="text" style="height:30px; width:98%;" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
-				<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
-			<div class="right">
-				<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
-				<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
-			</div>
-		</form>
-	</div>
+	<script type="text/javascript" src="../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
+	<script type="text/javascript">
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $name; ?>_ccms');
+	}
+	return false;
+}
+	</script>
 	</body>
 	</html>
 <?php 
+
+	exit();
 }
 
  /**
@@ -1541,7 +1529,7 @@ if($do_action == "save-changes" && checkAuth())
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 	<head>
 		<title>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></title>
-		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	</head>
 
 	<body>

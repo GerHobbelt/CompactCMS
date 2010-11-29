@@ -95,7 +95,13 @@ class CcmsAjaxFbException extends Exception
 	{
 		if (!empty(self::$feedback_url))
 		{
-			header('Location: ' . makeAbsoluteURI(self::$feedback_url . '?status=error&msg='.rawurlencode($this->message) . $this->extra_url_query_data));
+			$extraq = $this->extra_url_query_data;
+			if (!empty($extraq))
+			{
+				$extraq .= '&';
+			}
+
+			header('Location: ' . makeAbsoluteURI(self::$feedback_url . '?' . $extraq . 'status=error&msg=' . rawurlencode($this->message)));
 			exit();
 		}
 		// if we get here, this exception class hasn't been set up according to requirements. Barf a hairball.

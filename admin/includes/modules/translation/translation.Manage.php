@@ -438,28 +438,96 @@ if ($do == 'update')
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Translation module</title>
 	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<style type="text/css">
-td.nowrap, th.nowrap
-{
-	 white-space: nowrap;
-}
-	</style>
-		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Css/FileManager.css,Additions.css" />
-		<!--[if IE]>
-			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
-		<![endif]-->
+	<!-- File uploader styles -->
+	<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Css/FileManager.css,Additions.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+	<![endif]-->
+</head>
+<body>
+<div class="module" id="translation-assist">
+	<?php 
+	// (!) Only administrators can change these values
+	if($_SESSION['ccms_userLevel']>=4) 
+	{
+	?>
+	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
 	
-		<!-- TinyMCE JS -->
-		<script type="text/javascript" src="../../tiny_mce/tiny_mce_gzip.js"></script>	
-		
-		<!-- Mootools library -->
-		<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
-		
-		<!-- File uploader JS -->
-		<script type="text/javascript" src="../../fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>
+		<div id="google_translate_element"></div>
+		<script>
+function googleTranslateElementInit() 
+{
+	new google.translate.TranslateElement({
+			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
+			layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
+		}, 'google_translate_element');
+}
+		</script>
+		<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+	<?php
+	}
+	?>
+		<div class="center <?php echo $status; ?>">
+			<?php 
+			if(!empty($status_message)) 
+			{ 
+				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
+				if ($status != 'error' && 0)  
+				{
+					echo '<br/><span class="ss_sprite ss_exclamation">'.$ccms['lang']['backend']['must_refresh'].'</span>'; 
+				}
+			} 
+			?>
+		</div>
 
-		<script type="text/javascript">
+		<h2><?php echo $ccms['lang']['translation']['header']; ?></h2>
+	<?php 
+
+	// (!) Only administrators can change these values
+	if($_SESSION['ccms_userLevel']>=4) 
+	{
+	?>
+		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
+		<table border="0" cellspacing="0" cellpadding="0" name="i18n-list" id="i18n-list">
+			<tr>
+				<th class="span-4 nowrap"><em>Item</em></th>
+				<th class="span-21">Text</th>
+			</tr>
+			<?php
+			$i18n_arr = collect_translations('en'); /* $to_lang */
+			show_all_translations($i18n_arr['lang']);
+			?>
+		</table>
+		<hr />
+		<p>Copy and paste the entire page into the edit box below; we will sort it out...</p>
+		
+		<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
+		
+		<div class="right">
+			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
+			<a class="button" href=="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+		</div>
+	</form>
+	<?php
+	}
+	else 
+	{
+		die($ccms['lang']['auth']['featnotallowed']);
+	}
+	?>
+</div>
+<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
+
+<!-- TinyMCE JS -->
+<script type="text/javascript" src="../../tiny_mce/tiny_mce_ccms.js"></script>	
+
+<!-- Mootools library -->
+<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
+
+<!-- File uploader JS -->
+<script type="text/javascript" src="../../fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>
+
+<script type="text/javascript">
 FileManager.TinyMCE=function(options)
 {
 	return function(field,url,type,win)
@@ -500,21 +568,11 @@ var Dialog=new Class(
 			this.overlay.el.setStyle('zIndex',400009);
 		}
 	});
-</script>
-		
-		<!-- GZ version of TinyMCE -->
-		<script type="text/javascript">	
-tinyMCE_GZ.init(
-	{
-		plugins:'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		themes:'advanced',
-		<?php echo "languages: '".$cfg['tinymce_language']."',"; ?>
-		disk_cache:true,
-		debug:false
-	});
-		</script>
-		
-		<script type="text/javascript">
+
+
+
+
+	
 tinyMCE.init(
 	{
 		mode:"textareas",
@@ -561,27 +619,28 @@ tinyMCE.init(
 				};
 			})
 	});
-		</script>
 
 		
 		
 		
 		
-	<!-- Confirm close -->
-	<script type="text/javascript">
-window.addEvent('domready', function(){
-	
-	function editin_init() {
-		$$('.liveedit').each(function(el) {
-			
-			el.addEvent('click',function() {
+	/* Confirm close */
+window.addEvent('domready', function()
+{
+	function editin_init() 
+	{
+		$$('.liveedit').each(function(el) 
+		{
+			el.addEvent('click',function() 
+			{
 				el.set('class','liveedit2');
 				var before = el.get('html').trim();
 				el.set('html','');
 				
 				var input = new Element('textarea', { 'wrap':'soft', 'class':'textarea', 'text':before });
 				
-				input.addEvent('click', function (e) {
+				input.addEvent('click', function (e) 
+				{
 					e.stop();
 					return;
 				});
@@ -590,7 +649,8 @@ window.addEvent('domready', function(){
 				input.inject(el).select();
 				
 				//add blur event to input
-				input.addEvent('blur', function() {
+				input.addEvent('blur', function() 
+				{
 					//get value, place it in original element
 					val = input.get('value').trim();
 					el.set('text',val);
@@ -618,96 +678,13 @@ window.addEvent('domready', function(){
 	
 function confirmation()
 {
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-tran_ccms'));
-		}
-		catch(e)
-		{
-		}
-		return true;
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tran_ccms');
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
-	</script>	
-</head>
-<body>
-<div class="module" id="translation-assist">
-	<?php 
-	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4) 
-	{
-	?>
-	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
-	
-		<div id="google_translate_element"></div>
-		<script>
-function googleTranslateElementInit() 
-{
-	new google.translate.TranslateElement({
-			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
-			layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
-		}, 'google_translate_element');
-}
-		</script>
-		<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-	<?php
-	}
-	?>
-		<div class="center <?php echo $status; ?>">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
-				if ($status != 'error' && 0)  
-				{
-					echo '<br/><span class="ss_sprite ss_exclamation">'.$ccms['lang']['backend']['must_refresh'].'</span>'; 
-				}
-			} 
-			?>
-		</div>
-
-		<h2><?php echo $ccms['lang']['translation']['header']; ?></h2>
-	<?php 
-
-	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4) 
-	{
-	?>
-		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
-		<table border="0" cellspacing="2" cellpadding="2" name="i18n-list" id="i18n-list">
-			<tr>
-				<th class="span-4 nowrap"><em>Item</em></th>
-				<th class="span-21">Text</th>
-			</tr>
-			<?php
-			$i18n_arr = collect_translations('en'); /* $to_lang */
-			show_all_translations($i18n_arr['lang']);
-			?>
-		</table>
-		<hr />
-		<p>Copy and paste the entire page into the edit box below; we will sort it out...</p>
-		
-		<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
-		
-		<div class="right">
-			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
-			<a class="button" href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
-		</div>
-	</form>
-	<?php
-	}
-	else 
-	{
-		die($ccms['lang']['auth']['featnotallowed']);
-	}
-	?>
-</div>
+</script>	
 </body>
 </html>

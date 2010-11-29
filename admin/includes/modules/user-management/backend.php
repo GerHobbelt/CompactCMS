@@ -77,56 +77,6 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
 	<![endif]-->
-	<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
-	<script type="text/javascript" charset="utf-8">
-function confirmation_delete()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	return !!answer;
-}
-
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
-	if(answer)
-	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-usr_ccms'));
-		}
-		catch(e)
-		{
-			if (typeof top.location.replace == "function")
-			{
-				top.location.replace("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>");
-			}
-			else
-			{
-				top.location.href = "<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>";
-			}
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-	</script>
-	<script type="text/javascript" charset="utf-8">
-window.addEvent('domready',function()
-	{
-		new FormValidator($('addUser'),
-		{
-			onFormValidate:function(passed,form,event)
-			{
-				if(passed)
-					form.submit();
-			}
-		});
-	});
-	</script>
-	<script type="text/javascript" src="passwordcheck.js" charset="utf-8"></script>
 </head>
 <body>
 	<div class="module" id="user-management">
@@ -235,9 +185,9 @@ window.addEvent('domready',function()
 					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label>
 					<input type="text" class="minLength:3 text" name="user" value="" id="userName" />
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/>
-						<a href="#" class="small ss_sprite ss_bullet_key" onclick="randomPassword(8);"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
+						<a class="small ss_sprite ss_bullet_key" onclick="randomPassword(8); return false;"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
 					</label>
-					<input type="text" onkeyup="passwordStrength(this.value)" class="minLength:6 text" name="userPass" value="" id="userPass" />
+					<input type="text" onkeyup="passwordStrength(this.value);" class="minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">
 						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
 					</div>
@@ -284,15 +234,52 @@ window.addEvent('domready',function()
 					<hr class="space"/>
 					<div class="right">
 						<button type="submit"><span class="ss_sprite ss_user_add"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button>
-						<a class="button" href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 					</div>
 				</form>
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
 			?>
 		</div>
 	</div>	
+	<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-usr_ccms');
+	}
+	return false;
+}
+
+
+
+
+
+window.addEvent('domready',function()
+	{
+		new FormValidator($('addUser'),
+		{
+			onFormValidate:function(passed,form,event)
+			{
+				if(passed)
+					form.submit();
+			}
+		});
+	});
+	</script>
+	<script type="text/javascript" src="passwordcheck.js" charset="utf-8"></script>
 </body>
 </html>
