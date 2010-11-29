@@ -305,9 +305,19 @@ if ($do_update_or_livefilter && checkAuth())
 				// Check for restrictions
 				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
 				{ 
+					$preview_checkcode = md5('preview' . $cfg['authcode']);
+					
 				?>
 					<td class="span-5 last right-text">
-						<a id="<?php echo $row->urlpage;?>" href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" rel="Edit <?php echo $row->urlpage.'.html';?>" class="tabs sprite edit"><?php echo $ccms['lang']['backend']['editpage']; ?></a> | <a href="../<?php echo ($row->urlpage!="home")?$row->urlpage.'.html?preview='.$cfg['authcode']:'?preview='.$cfg['authcode']; ?>" class="external"><?php echo $ccms['lang']['backend']['previewpage']; ?></a>&#160;
+						<a id="<?php echo $row->urlpage;?>" 
+							href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" 
+							rel="Edit <?php echo $row->urlpage.'.html';?>" 
+							class="tabs sprite edit"
+						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
+						| 
+						<a href="../<?php echo ($row->urlpage!="home") ? $row->urlpage . '.html?preview=' . $preview_checkcode : '?preview=' . $preview_checkcode; ?>" 
+							class="external"
+						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
 					</td>
 				<?php 
 				} 
@@ -1558,10 +1568,12 @@ if($do_action == "save-changes" && checkAuth())
 				<p><?php echo file_get_contents($filename); ?></p>
 			<?php 
 			} 
+			
+			$preview_checkcode = md5('preview' . $cfg['authcode']);
 			?>
 			<hr/>
 			<p>
-				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $cfg['authcode'];?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>		
+				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $preview_checkcode;?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>
 			</p>
 			<div>
 				<a href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>

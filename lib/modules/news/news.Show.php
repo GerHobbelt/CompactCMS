@@ -162,7 +162,8 @@ if($db->HasRecords())
 					if ($i == 0)
 					{
 						// and augment the breadcrumb trail and other template variables:
-						$preview_qry = ($ccms['preview'] ? '?preview=' . $cfg['authcode'] : '');
+						$preview_checkcode = md5('preview' . $cfg['authcode']);
+						$preview_qry = ($ccms['preview'] ? '?preview=' . $preview_checkcode : '');
 						$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a></span>';
 						$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
 
@@ -215,7 +216,8 @@ if($db->HasRecords())
 	if($do == "all") 
 	{
 		// and augment the breadcrumb trail and other template variables:
-		$preview_qry = ($ccms['preview'] ? '&preview=' . $cfg['authcode'] : '');
+		$preview_checkcode = md5('preview' . $cfg['authcode']);
+		$preview_qry = ($ccms['preview'] ? '&preview=' . $preview_checkcode : '');
 		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a></span>';
 		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
 

@@ -48,7 +48,7 @@ This config file is only loaded /once/ during regular web site operation.
 $cfg['sitename']    = "";           // Your site name - this will show in the front-end, e.g. "CompactCMS"
 $cfg['language']    = "en";         // Select the language of your (front-end) website - en, nl, de, es.
 $cfg['rootdir']     = "/";          // The root directory where CCMS is installed under, must include trailing slash ('/').
-$cfg['authcode']    = "";           // Add ?preview=X (where X is your authcode) to your address bar to preview unpublished items, e.g. "12345". 
+$cfg['authcode']    = "";           // The salt for the user password hashes and preview authorization code. Add ?preview=X (where X is your authcode-based hash) to your address bar to preview unpublished items. 
 
 // Detailed configuration. By default shouldn't need adjusting.
 $cfg['version']     = true;         // Check for the latest CompactCMS version [true/false]

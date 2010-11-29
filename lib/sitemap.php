@@ -112,7 +112,15 @@ $ccms['pagereq'] = $pagereq;
 $ccms['printing'] = getGETparam4boolYN('printing', 'N');
 
 $preview = getGETparam4IdOrNumber('preview');
-$preview = ($preview == $cfg['authcode']);
+if (!empty($preview))
+{
+	$preview_checkcode = md5('preview' . $cfg['authcode']);
+	$preview = ($preview == $preview_checkcode);
+}
+else
+{
+	$preview = false;
+}
 $ccms['preview'] = $preview;
 
 
@@ -352,7 +360,8 @@ if (0)
 		
 		// BREADCRUMB ==
 		// Create breadcrumb for the current page
-		$preview_qry = ($preview ? '?preview=' . $cfg['authcode'] : '');
+		$preview_checkcode = md5('preview' . $cfg['authcode']);
+		$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
 		if($row->urlpage=="home") 
 		{
 			$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' Home">Home</a></span>';
