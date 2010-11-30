@@ -69,7 +69,7 @@ div.mochaToolbarWrapper.bottom { border: 0; border-bottom: 1px solid #d9d9d9; }
 	1. Set the useCanvasControls window option to false.
 	2. If you use a different button size you may need to reposition the controls.
 	   Modify the controlsOffset window option.		
-	2. Replcac the background-color with a background-image for each button.
+	2. Replace the background-color with a background-image for each button.
 
 */
 .mochaMinimizeButton, .mochaMaximizeButton, .mochaCloseButton { float: right; width: 14px; height: 14px; font-size: 1px; cursor: pointer; z-index: 4; color: #666; background-color: #fff; margin-left: 5px; }
