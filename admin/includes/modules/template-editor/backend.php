@@ -112,7 +112,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		{ 
 		?>
 		<div class="span-25 last center-text error">
-			<p><span class="ss_sprite_16 ]">&#160;</span><?php echo $ccms['lang']['template']['nowrite']; ?></p>
+			<p class="ss_has_sprite"><span class="ss_sprite_16 ss_error">&#160;</span><?php echo $ccms['lang']['template']['nowrite']; ?></p>
 		</div>
 		<?php 
 		} 
@@ -189,13 +189,12 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
 		
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
-		<fieldset>
 			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
 			
 			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
@@ -210,17 +209,46 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 				?>
 				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 			</div>
-		</fieldset>
 		</form>
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
 	</div>
 <?php
 
 // TODO: call edit_area_compressor.php only from the combiner: combine.inc.php when constructing the edit_area.js file for the first time.
 
 ?>
-		<script language="Javascript" type="text/javascript" src="../../edit_area/edit_area_full.js" charset="utf-8"></script>
-		<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
 		<script type="text/javascript">
+	
+	
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tmp_ccms');
+	}
+	return false;
+}
+
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../edit_area/edit_area_full.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
 		// initialisation
 		
 // make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!		
@@ -245,17 +273,24 @@ for (syn in editAreaLoader.load_syntax)
 }
 */
 
-	
-	
-function confirmation()
+	//});
+}
+
+
+function jslog(message) 
 {
-	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
-	if(answer)
-	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tmp_ccms');
-	}
-	return false;
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
 }
 </script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

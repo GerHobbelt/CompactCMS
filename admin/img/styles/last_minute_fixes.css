@@ -33,3 +33,11 @@ at the top of the .htaccess:
 
 
 
+/*
+tinyMCE toolbar gets screwed up due to our table @ width:100% so we reset the width for the toolbar table ONLY
+*/
+.mceToolbar table
+{
+	width: 1%;
+}
+

@@ -325,6 +325,7 @@ $ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
 $ccms['lang']['guestbook']['author']	= "Author";
 $ccms['lang']['guestbook']['date']		= "Date";
 $ccms['lang']['guestbook']['host']		= "IP address";
+$ccms['lang']['guestbook']['configuration'] = "Configuration";
 
 
       /* ### OBSOLETED ENTRIES ### */

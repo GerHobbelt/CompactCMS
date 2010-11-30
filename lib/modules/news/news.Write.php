@@ -105,33 +105,49 @@ if($newsID != null)
 		<h2><?php echo $ccms['lang']['news']['writenews']; ?></h2>
 		<div class="span-25 last">
 			<form action="./news.Process.php?action=add-edit-news" id="newsForm" method="post" accept-charset="utf-8">
-				<div class="span-11">
-					<label for="newsTitle"><?php echo $ccms['lang']['news']['title']; ?></label>
-					<input type="text" class="minLength:3 text span-25" name="newsTitle" value="<?php echo (isset($news)?$news->newsTitle:null);?>" id="newsTitle"/>
-				</div>
-				<div class="span-8">
-					<label for="newsAuthor"><?php echo $ccms['lang']['news']['author']; ?></label>
-					<select name="newsAuthor" class="required text span-25" id="newsAuthor">
-						<?php 
-							if (!$db->SelectRows($cfg['db_prefix'].'users')) $db->Kill();
-							while (! $db->EndOfSeek()) 
-							{
-		    						$user = $db->Row(); 
+			<div class="table_inside">
+				<table cellspacing="0" cellpadding="0">
+					<tr>
+						<th class="span-10">
+							<label for="newsTitle"><?php echo $ccms['lang']['news']['title']; ?></label>
+						</th>
+						<th class="span-7">
+							<label for="newsAuthor"><?php echo $ccms['lang']['news']['author']; ?></label>
+						</th>
+						<th class="span-5">
+							<label for="newsModified"><?php echo $ccms['lang']['news']['date']; ?></label>
+						</th>
+						<th class="span-2 last">
+							<label for="newsPublished"><?php echo $ccms['lang']['news']['published']; ?></label>
+						</th>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" class="minLength:3 text span-25" name="newsTitle" value="<?php echo (isset($news)?$news->newsTitle:null);?>" id="newsTitle"/>
+						</td>
+						<td>
+							<select name="newsAuthor" class="required text span-25" id="newsAuthor">
+								<?php 
+								$userlist = $db->SelectObjects($cfg['db_prefix'].'users');
+								if ($userlist === false) $db->Kill();
+								foreach($userlist as $user)
+								{
 								?>
-								<option value="<?php echo rm0lead($user->userID);?>" <?php echo (isset($news)&&$user->userID==$news->userID?'selected="selected"':null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
-							<?php 
-							} 
-							?>
-					</select>
-				</div>
-				<div class="span-4">
-					<label for="newsModified"><?php echo $ccms['lang']['news']['date']; ?></label>
-					<input type="text" class="required text" name="newsModified" value="<?php echo (isset($news)?date('Y-m-d G:i',strtotime($news->newsModified)):date('Y-m-d G:i'));?>" id="newsModified">
-				</div>
-				<div class="span-2 last">
-					<label for="newsPublished"><?php echo $ccms['lang']['news']['published']; ?></label>
-					<input type="checkbox" name="newsPublished" <?php echo (isset($news)&&$news->newsPublished?'checked="checked"':null); ?>  value="1" id="newsPublished" />
-				</div>
+									<option value="<?php echo rm0lead($user->userID); ?>" <?php echo (isset($news) && $user->userID==$news->userID ? 'selected="selected"' : null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
+								<?php 
+								} 
+								?>
+							</select>
+						</td>
+						<td class="nowrap">
+							<input type="text" class="required text" name="newsModified" value="<?php echo (isset($news) ? date('Y-m-d G:i',strtotime($news->newsModified)) : date('Y-m-d G:i')); ?>" id="newsModified">
+						</td>
+						<td>
+							<input type="checkbox" name="newsPublished" <?php echo (isset($news) && $news->newsPublished ? 'checked="checked"' : null); ?>  value="1" id="newsPublished" />
+						</td>
+					</tr>
+				</table>
+			</div>
 				<label class="clear" for="newsTeaser"><?php echo $ccms['lang']['news']['teaser']; ?></label>
 				<textarea name="newsTeaser" id="newsTeaser" style="height:50px;" class="minLength:3 text span-25" rows="4" cols="40"><?php 
 					echo (isset($news) ? $news->newsTeaser : null);

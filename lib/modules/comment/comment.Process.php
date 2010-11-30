@@ -122,20 +122,21 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
 	SetUpLanguageAndLocale($rsLoc);
 
 	// Load recordset
-	if (!$db->SelectRows($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID'), $limit4sql))
+	$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID'), $limit4sql);
+	if ($commentlist === false)
 		$db->Kill();
 	//echo "<pre>" . $db->GetLastSQL() . " -- $limit, $pageID, ".getGETparam4Number('offset')."\n";
 	//var_dump($_GET);
 	//echo "</pre>";
 	
 	// Start switch for comments, select all the right details
-	if($db->HasRecords()) 
+	if(count($commentlist) > 0) 
 	{
 		$index = $limit;
-		while (!$db->EndOfSeek()) 
+		foreach($commentlist as $rsComment)
 		{
 			$index++; // start numbering at 1 (+ N*pages)
-			$rsComment = $db->Row(); 
+			
 			?>
 			<div id="s-display"><a name="<?php echo "cmt" . $index; ?>"></a>
 				<?php 
@@ -214,13 +215,19 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="del-comment" && checkAuth
 				exit();
 			} 
 			else 
+			{
 				die($ccms['lang']['auth']['featnotallowed']);
+			}
 		} 
 		else 
+		{
 			die($ccms['lang']['auth']['featnotallowed']);
+		}
 	} 
-	else 
+	else     
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 }
 
 /**

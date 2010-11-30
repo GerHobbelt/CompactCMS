@@ -117,7 +117,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#150;</span>'.$status_message.'</p>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#150;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -158,9 +158,9 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 				<form action="../../process.inc.php?action=edit-user-password" id="userPassForm" method="post" accept-charset="utf-8">
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?>
 						<br/>
-						<a class="small ss_sprite ss_bullet_key" onclick="randomPassword(8); return false;"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
+						<a class="small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_bullet_key">&#160;</span><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
 					</label>
-					<input type="text" onkeyup="passwordStrength(this.value)" class="required minLength:6 text" name="userPass" value="" id="userPass" />
+					<input type="text" onkeyup="passwordStrength(this.value);" class="required minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">
 						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
 					</div>

@@ -43,7 +43,7 @@ if (!defined('BASE_PATH'))
 
 
 // Check first whether installation directory exists
-if(is_dir('./_install/')&&is_file('./_install/index.php') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) {
+if(is_dir('./_install/')&&is_file('./_install/index.php') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'] && 0) {
 	header('Location: ' . makeAbsoluteURI('./_install/index.php'));
 	exit();
 }

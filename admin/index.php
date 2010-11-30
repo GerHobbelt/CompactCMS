@@ -100,7 +100,7 @@ if ($db->ErrorNumber())
 		<div class="sprite logo">
 			<h1>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></h1>
 		</div>
-		<p><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
+		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
 	</div>
 	<div id="notify" class="span-12">
 	<div class="rounded-border">
@@ -193,7 +193,7 @@ if ($db->ErrorNumber())
 	{ 
 	?>
 	<fieldset>
-		<legend><a class="toggle" rel="form_wrapper" href="#"><span class="ss_sprite_16 ss_add">&#160;</span><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
+		<legend><a class="toggle" rel="form_wrapper"><span class="ss_sprite_16 ss_add">&#160;</span><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
 		<div id="form_wrapper">
 		<form method="post" id="addForm" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 			<p><?php echo $ccms['lang']['backend']['createtip']; ?></p>
@@ -239,7 +239,7 @@ if ($db->ErrorNumber())
 				?>
 				
 				<div id="editor-options">
-					<div class="clearfix span-8 redbox">
+					<div class="clearfix span-8">
 						<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
 						<label for="f_pr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
 							<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
@@ -247,7 +247,7 @@ if ($db->ErrorNumber())
 							<input type="radio" id="f_pr2" name="printable" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
 					</div>
-					<div class="clearfix span-8 redbox">
+					<div class="clearfix span-8">
 						<label><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
 						<label for="f_pu1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
 							<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
@@ -255,7 +255,7 @@ if ($db->ErrorNumber())
 							<input type="radio" id="f_pu2" name="published" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
 					</div>
-					<div class="clearfix span-8 redbox">
+					<div class="clearfix span-8">
 						<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
 						<label for="f_cod" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
 							<input type="radio" id="f_cod" name="iscoding" value="Y" />  
@@ -278,7 +278,7 @@ if ($db->ErrorNumber())
 	else
 	{
 	?>
-		<p class="ss_sprite ss_warning"><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
 	<?php 
 	} 
 	?>
@@ -293,20 +293,10 @@ if ($db->ErrorNumber())
 	{ 
 	?>
 	<fieldset>
-		<legend><a class="toggle" rel="menu_wrapper" href="#"><span class="ss_sprite_16 ss_text_list_bullets">&#160;</span><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
+		<legend><a class="toggle" rel="menu_wrapper"><span class="ss_sprite_16 ss_text_list_bullets">&#160;</span><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
 		<div id="menu_wrapper">
 		<p><?php echo $ccms['lang']['backend']['ordertip']; ?></p>
 		<form method="post" id="menuForm" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-			<table class="span-15 last" id="table_menu">
-			<tr>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['menutitle']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['menuid']; ?>">&#160;</span></th>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['template']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['template']; ?>">&#160;</span></th>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['toplevel']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['toplevel']; ?>">&#160;</span></th>
-				<th class="span-2"><?php echo $ccms['lang']['backend']['sublevel']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['sublevel']; ?>">&#160;</span></th>
-				<th class="span-1-1"><?php echo $ccms['lang']['backend']['linktitle']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['activelink']; ?>">&#160;</span></th>
-				<th class="span-4 last"><?php echo $ccms['lang']['forms']['pagetitle']; ?></th>
-			</tr>
-			</table>
 			<div id="menuFields">
 				<!--spinner-->
 			</div>
@@ -324,7 +314,7 @@ if ($db->ErrorNumber())
 	else
 	{
 	?>
-		<p class="ss_sprite ss_warning"><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
 	<?php 
 	} 
 	?>
@@ -333,72 +323,33 @@ if ($db->ErrorNumber())
 	
 
 		
-	// Manage current files 
-
-	function gen_span4pagelist_filterheader($name, $title)
-	{
-		global $ccms;
-		
-		if (!empty($name) && !empty($_SESSION[$name]))
-		{
-			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
-		}
-		else
-		{
-			echo '<span class="sprite livefilter livefilter_add" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['add']) . ' ' . strtolower($title) . '">&#160;</span>';
-		}
-	}
-
 	?>
 	<div id="manage" class="span-25">
 	<fieldset>
-		<legend><a class="toggle" rel="filelist_wrapper" href="#"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
+		<legend><a class="toggle" rel="filelist_wrapper"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
 		<div id="filelist_wrapper">
 		<p><?php echo $ccms['lang']['backend']['currentfiles']; ?></p>
 		<form action="index.php" id="delete">
-		<table id="table_manage">
-			<tr>
-				<th style="padding-left: 5px;" class="span-1"></th>
-				<th class="span-3"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?> <span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-4"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?> <span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-6"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?> <span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="center span-2-1"><?php echo $ccms['lang']['forms']['printable']; ?> <span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
-				<th class="center span-2">
-					<?php 
-					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
-					{ 
-						echo $ccms['lang']['forms']['published']; 
-						?> 
-						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
-					<?php 
-					} 
-					?>
-				</th>
-				<th class="center span-2">
-					<?php
-					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
-					{ 
-						echo $ccms['lang']['forms']['iscoding']; 
-						?> 
-						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
-					<?php 
-					} 
-					?>
-				</th>
-				<th class="span-5 last" style="text-align: right;">&#160;</th>
-			</tr>
-		</table>
+		<?php
+		/*
+		With lining the header texts with the data and everything, it's simply way too much hassle to keep them in separate tables:
+		you never get the laignment right.
+		
+		So starting with this edition, the header is regenerated with each reload. This has an impact on the filters, but we can fix them
+		easily there by re-registering those nodes in the JS code.
+		*/
+		?>
 		<div id="dyn_list">
 			<?php echo $ccms['lang']['system']['error_misconfig']; ?> <a href="http://community.compactcms.nl/forum/"><strong><?php echo $ccms['lang']['backend']['see_forum']; ?></strong></a>.
 			<!--spinner-->
 		</div>
-		<table width="100%">
+		<table width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<?php 
 				if($_SESSION['ccms_userLevel']>=$perm['managePages']) 
 				{ 
 				?>
-					<th class="span-11" style="text-align: left;">
+					<th class="span-17 text-left">
 						<input type="hidden" name="form" value="delete" />
 						<input type="hidden" id="ad_msg01" value="<?php echo $ccms['lang']['backend']['confirmdelete']; ?>" />
 						<button type="submit" name="btn_del"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
@@ -408,12 +359,12 @@ if ($db->ErrorNumber())
 				else 
 				{
 				?>
-					<th class="span-11">&#160;</th>
+					<th class="span-17">&#160;</th>
 				<?php 
 				}
 				?>
-				<th class="span-2"><div style="background-color: #CDE6B3; text-align: center;"><span class="ss_sprite_16 ss_accept">&#160;</span><?php echo $ccms['lang']['backend']['active']; ?></div></th>
-				<th class="span-2"><div style="background-color: #F2D9DE; text-align: center;"><span class="ss_sprite_16 ss_stop">&#160;</span><?php echo $ccms['lang']['backend']['disabled']; ?></div></th>
+				<th class="span-4"><div style="background-color: #CDE6B3; text-align: center; padding-left: 20px; padding-right: 20px;"><span class="ss_sprite_16 ss_accept">&#160;</span><?php echo $ccms['lang']['backend']['active']; ?></div></th>
+				<th class="span-4 last"><div style="background-color: #F2D9DE; text-align: center; padding-left: 20px; padding-right: 20px;"><span class="ss_sprite_16 ss_stop">&#160;</span><?php echo $ccms['lang']['backend']['disabled']; ?></div></th>
 			</tr>
 		</table>
 		</form>
@@ -454,7 +405,7 @@ if (0)
 	echo "</pre>";
 }
 
-if (1)
+if (0)
 {
 	require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
 
@@ -470,6 +421,11 @@ if (1)
 ?>
 	</div>
 
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
+	
 	<?php // Footer block ?>
 	<div id="footer" class="span-25">
 		<div class="prepend-11 span-11 colborder">
@@ -487,36 +443,18 @@ if (1)
 	</div>
 </div>
 </div>
-	
-	<?php // Dock block ?>
-	<div id="dockWrapper">
-		<div id="dock">
-			<div id="dockPlacement"></div>
-			<div id="dockAutoHide"></div>
-			<div id="dockSort"><div id="dockClear" class="clear"></div></div>
-		</div>
+
+<?php // Dock block ?>
+<div id="dockWrapper">
+	<div id="dock">
+		<div id="dockPlacement"></div>
+		<div id="dockAutoHide"></div>
+		<div id="dockSort"><div id="dockClear" class="clear"></div></div>
 	</div>
-	
-	<!--[if IE]>
-		<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>
-	<![endif]-->
-	<script type="text/javascript" src="../lib/includes/js/mootools-core.js,mootools-more.js,common.js,mocha.js" charset="utf-8"></script>
-	<script type="text/javascript" charset="utf-8">
-window.addEvent('domready',function()
-	{
-		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
-		{
-			new FormValidator($('addForm')); 
-		}
-	});
-	
-function set_filter_msgs(el)
-{
-	/* add language dependent texts to the relevant elements: */
-	el.msg_edit = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['edit_remove']))."'"; ?>;
-	el.msg_showing = <?php echo "'".str_replace("'", "\\'", $ccms['lang']['forms']['filter_showing'])."'"; ?>;
-	el.msg_add = <?php echo "'".str_replace("'", "\\'", ucfirst($ccms['lang']['forms']['add']))."'"; ?>;
-}
+</div>
+
+
+<script type="text/javascript" charset="utf-8">
 
 function get_admin_user_count()
 {
@@ -526,6 +464,52 @@ function get_total_page_count()
 {
 	return <?php printf("%d", $total_page_count); ?>;
 }
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../lib/includes/js/mootools-core.js',
+	'../lib/includes/js/mootools-more.js',
+	'../lib/includes/js/mocha.js',
+	'../lib/includes/js/common.js',
+	'../lib/includes/js/excanvas.js?only-when=%3d%3d+IE'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
+		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
+		{
+			new FormValidator($('addForm')); 
+		}
+	//});
+}
+
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+
+
+if (typeof window.ccms_lazyload_setup_GHO == 'function')
+{
+	//alert('2');
+}
+
 </script>
+<script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

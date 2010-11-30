@@ -145,6 +145,7 @@ default:
 
 
 $extra_JS_callback = getGETparam4IdOrNumber('cb');
+$only_when_expression = trim(getGETparam4MathExpression('only-when', ''));
 
 
 
@@ -161,6 +162,36 @@ if (0)
 	var_dump($client_browser);
 	echo "</pre>";
 }
+
+/*
+we abuse the browscap conditional filter to check whether we should okay or discard this load request.
+
+This is our server-side alternative, suitable for use with lazyloading, to the MSIE conditional
+comment:
+
+<--[equ IEx] .... -->
+
+For this we 'fake; a wee bit of content (a single line) and see whether the filter leaves it be, or not:
+*/
+if (!empty($only_when_expression))
+{
+	$faked_content = '1 /*:: ' . $only_when_expression . ' */';
+	$faked_content = filter4browser($faked_content, $client_browser);
+	$do_not_load = (empty($faked_content) || $faked_content[0] != '1');
+}
+else
+{
+	$do_not_load = false;
+}
+/*
+when $do_not_load==true then we produce a seemingly EMPTY file.
+
+However, we DO adhere to the ?cb=callback JS request, when it's there.
+
+In short: we go through the entire process, we just do NOT load any real content!
+*/
+
+
 
 
 /*
@@ -217,12 +248,35 @@ foreach($elements as $element)
 }
 
 
-// Send Etag hash
-//
-// make sure all settings, which influence what should be fetched from cache, are 
-// include in the MD5 hash!
-// This includes the current minification settings in $optimize[]!
-$hash = $lastmodified . '-' . md5($base . ':' . implode(':', $optimize) . ':' . $_GET['files']);
+/*
+ Send Etag hash
+
+ make sure all settings, which influence what should be fetched from cache, are 
+ include in the MD5 hash!
+ 
+ This includes the current minification settings in $optimize[]!
+ 
+ And since we now have server-side Browser-dependent filtering enabled in here
+ (to filter CSS and JS depending on who's visiting), plus we have lazyload/loadorder-safe
+ JS invocation through the request-definable JS callback, all those should taken into
+ account for the indentifying hash code as well.
+ 
+ This basically means we'll need to include the browscap record and the $_SERVER['QUERY_STRING']
+ both to cover all bases.
+ 
+ However, since our current filter is limited to checking against major brands and versions
+ only, we can significantly cut down on the number of variations which should co-exist 
+ by only including just those particular browscap elements in the hash!
+ 
+ That way we can be sure that each browser brand gets served the appropriate pre-filtered CSS/JS
+ from cache!
+*/
+$hash = $lastmodified . '-' . 
+		md5($base . ':' . implode(':', $optimize) . ':' . 
+			$_SERVER['QUERY_STRING'] /* this includes all 'files'! */ . '::' . 
+			$client_browser->Browser . '::' .
+			$client_browser->Version 
+		);
 header("Etag: \"" . $hash . "\"");
 
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && 
@@ -550,11 +604,11 @@ function css_mk_abs_path($relpath, $basedir)
 
 
 /**
-Filter the CSS based on sniffed browser capacilities: this way we can deliver nicely compliant CSS files to
+Filter the CSS/JS based on sniffed browser capacilities: this way we can deliver nicely compliant CSS/JS files to
 the browsers that can handle them and feed 'browser hacked' content to MSIE et al.
 
 After all, not everything can be easily remedied in a separate MSIE-only 'conditional comment'ed individual
-CSS file...
+CSS/JS file...
 
 The relevant 'markers' are comments which start with '::' without any leading whitespace. The expression 
 which follows it is of the format:
@@ -577,16 +631,16 @@ The 'marker' comment filter is applied per line by default. The only time such m
 DEFINITION is when the marker is FOLLOWED by a '{' open curly brace: this implies that the entire scope block
 will be kept or removed, depending on the outcome of the browser check.
 
-Returns the filtered CSS.
+Returns the filtered CSS/JS.
 
 
 WARNING: 
 
 it is assumed such a marker comment is the last thing on the current line. We do NOT wish to cope with 'minified'
-CSS here, so you'd better make sure the CSS is spread across multiple lines, i.e. CSS code formatting for
+CSS/JS here, so you'd better make sure the CSS/JS is spread across multiple lines, i.e. CSS/JS code formatting for
 /human perusal/ is what we accept/assume as input.
 
-you may feed this function 'minified' CSS, but then it will only play nice IFF you also have ensured there's not
+you may feed this function 'minified' CSS/JS, but then it will only play nice IFF you also have ensured there's not
 even a single occurrence of the 'filter marker' (comment start plus double colon) in there! In that case it's
   output <- input
 and we're done.
@@ -594,20 +648,20 @@ and we're done.
 
 IMPORTANT NOTE:
 
-This filter system is *NOT* meant to remove the 'CSS hacks' from the CSS source files (heck, the fact alone 
-that the installer will be using those CSS files as well, while we (the Combiner) have NOT been turned on yet
+This filter system is *NOT* meant to remove the 'CSS/JS hacks' from the CSS/JS source files (heck, the fact alone 
+that the installer will be using those CSS/JS files as well, while we (the Combiner) have NOT been turned on yet
 through the RewriteRules is reason enough to keep them in there), but the reason for this filter is rather to
-rid CSS output of such CSS hacks for compliant browsers, which would report quite a few of them as the errors
+rid CSS/JS output of such CSS/JS hacks for compliant browsers, which would report quite a few of them as the errors
 that they may be.
-In short, reason #1 for this filter code is to shut up Firefox and Opera about errors in the CSS being fed
+In short, reason #1 for this filter code is to shut up Firefox and Opera about errors in the CSS/JS being fed
 to them.
 
-A nice side effect that is not to be sneezed at is the fact that we can now also 'condition' CSS for those
+A nice side effect that is not to be sneezed at is the fact that we can now also 'condition' CSS/JS for those
 brosers as we now have something similar to a 'server side conditional comment' approach. 
 
 Ooooooh... shiny!
 */
-function filter_css4browser($contents, $http_base, $type, $base, $root, $element, $client_browser)
+function filter4browser($contents, $client_browser)
 {
 	$prev_content = '';
 	for($idx = strpos($contents, "/*::"); $idx !== false; $idx = strpos($contents, "/*::"))
@@ -636,9 +690,9 @@ function filter_css4browser($contents, $http_base, $type, $base, $root, $element
 			die("Illegal filter condition string: " . $this_line);
 		}
 		
-		$pass_css = true;
+		$pass = true;
 		
-		$css = $matches[1];
+		$src = $matches[1];
 		$match_count = count($matches);
 		$comment = trim($matches[$match_count - 1]);
 		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
@@ -658,7 +712,7 @@ function filter_css4browser($contents, $http_base, $type, $base, $root, $element
 				continue;
 			}
 			
-			// perform check, set $pass_css=false when there's a match
+			// perform check, set $pass=false when there's a match
 			//echo "<pre>check: ($op) ($brand) ($b_version) ($this_line) ($comment)\n";
 			//echo "<pre>matches: \n"; var_dump($matches);
 			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
@@ -692,38 +746,38 @@ function filter_css4browser($contents, $http_base, $type, $base, $root, $element
 				die("Illegal filter comparison operator: " . $this_line);
 			
 			case '!=':
-				$pass_css = !($gotcha && (!$b_v_set || $vchk == 0));
+				$pass = !($gotcha && (!$b_v_set || $vchk == 0));
 				break;
 				
 			case '==':
-				$pass_css = ($gotcha && (!$b_v_set || $vchk == 0));
+				$pass = ($gotcha && (!$b_v_set || $vchk == 0));
 				break;
 				
 			case '>=':
-				$pass_css = ($gotcha && (!$b_v_set || $vchk >= 0));
+				$pass = ($gotcha && (!$b_v_set || $vchk >= 0));
 				break;
 				
 			case '>':
-				$pass_css = ($gotcha && (!$b_v_set || $vchk > 0));
+				$pass = ($gotcha && (!$b_v_set || $vchk > 0));
 				break;
 				
 			case '<':
-				$pass_css = ($gotcha && (!$b_v_set || $vchk < 0));
+				$pass = ($gotcha && (!$b_v_set || $vchk < 0));
 				break;
 				
 			case '<=':
-				$pass_css = ($gotcha && (!$b_v_set || $vchk <= 0));
+				$pass = ($gotcha && (!$b_v_set || $vchk <= 0));
 				break;
 			}
-			//echo "\n<pre>#### Verdict: " . ($pass_css ? "FILTER" : "PASS") . "\n";
+			//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
 		}
 		
-		if (!$pass_css)
+		if (!$pass)
 		{
-			// filter line... or CSS block? When the next non-whitespace item is a '{' we'll need to ditch the entire block
+			// filter line... or CSS/JS block? When the next non-whitespace item is a '{' we'll need to ditch the entire block
 			if (preg_match('/^\s*(\{[^}]*\})(.*)$/s', $contents, $matches))
 			{
-				// bingo! CSS block!
+				// bingo! CSS/JS block!
 				$contents = $matches[2];
 				// removed!  <snip> Just like that! :-)
 			}
@@ -756,7 +810,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 {
 	global $cfg, $optimize, $client_browser;
 
-	$contents = filter_css4browser($contents, $http_base, $type, $base, $root, $element, $client_browser);
+	$contents = filter4browser($contents, $client_browser);
 	
 	// make sure the @import statements are on their own lines: easier for us to process them:
 	$prev_content = '';
@@ -897,8 +951,6 @@ patch/correct JS relative paths and other particulars
 */
 function fixup_js($contents, $http_base, $type, $base, $root, $element)
 {
-	global $cfg;
-
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
 		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element);
@@ -912,13 +964,25 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 
 function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 {
+	global $cfg;
+	global $do_not_load;
+
+	if ($do_not_load) return ''; // return zip, nada, nothing 
+	
+	/*
+	Make sure the tinyMCE language is set up correctly! 
+	
+	If we don't this here, then $cfg['tinymce_language'] will not exist and we will croak further down below.
+	*/
+	SetUpLanguageAndLocale($cfg['language'], true);
+	
 	$mce_basepath = merg_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
 	
 	$mce_files = array();
 	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
 	
 	// Add core
-	$mce_files[] = $mce_basepath . "tiny_mce" . $suffix . ".js";
+	$mce_files[] = merg_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
 	// Add core language(s)
 	$languages = array($cfg['tinymce_language']);
 	if ($cfg['tinymce_language'] != 'en')
@@ -927,18 +991,18 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	}
 	foreach ($languages as $lang)
 	{
-		$mce_files[] = $mce_basepath . "langs/" . $lang . ".js";
+		$mce_files[] = merg_path_elems($mce_basepath, "langs/" . $lang . ".js");
 	}
 	// Add themes
 	$themes = array('advanced');
 	foreach ($themes as $theme) 
 	{
-		$mce_files[] = $mce_basepath . "themes/" . $theme . "/editor_template" . $suffix . ".js";
+		$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
 
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = $mce_basepath . "themes/" . $theme . "/langs/" . $lang . ".js";
-			$mce_files[] = $mce_basepath . "themes/" . $theme . "/langs/" . $lang . "_dlg.js";
+			$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
+			$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
 		}
 	}
 	// Add plugins
@@ -1013,14 +1077,18 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	{
 		if (!$in_use) continue;
 		
-		$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/editor_plugin" . $suffix . ".js";
+		$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
 
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/langs/" . $lang . ".js";
-			$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/langs/" . $lang . "_dlg.js";
+			$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
+			$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
 		}
 	}
+
+//echo "<pre>";
+//var_dump($mce_files);	
+//echo "</pre>\n";
 
 	// now load all content:
 	$my_content = '';
@@ -1042,6 +1110,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 		}
 	}
 
+	return $my_content;
 }
 
 
@@ -1054,6 +1123,8 @@ invocation of this function to load each of the dectected sub-items. This way we
 */
 function load_one($type, $http_base, $base, $root, $element)
 {
+	global $do_not_load;
+	
 	$uri = path_remove_dot_segments($base . '/' . $element);
 	$path = str_replace("\\", '/', realpath($uri)); /* Windows can handle '/' so we're OK with the replace here; makes strpos() below work on all platforms */
 	
@@ -1069,7 +1140,11 @@ function load_one($type, $http_base, $base, $root, $element)
 	if (is_file($path) && strpos($path, $root) === 0)
 	{
 		//echo "<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root);
-		$my_content = file_get_contents($path);
+		$my_content = '';
+		if (!$do_not_load)
+		{
+			$my_content = file_get_contents($path);
+		}
 	}
 	else
 	{

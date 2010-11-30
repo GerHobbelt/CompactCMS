@@ -34,6 +34,7 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
+
 /* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
@@ -56,10 +57,11 @@ if (!defined('BASE_PATH'))
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
+
 // Some security functions
 if (!checkAuth())
 {
-	die($ccms['lang']['auth']['featnotallowed']);
+	die_and_goto_url(null, $ccms['lang']['auth']['featnotallowed']);
 }
 
 // set jpeg quality for the thumbnails; turns out they are quite reasonable @ 70% quality (and still way smaller than @ 100%)
@@ -72,6 +74,8 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 // Set default variables
 $album_name	= getPOSTparam4Filename('album');
 $do_action	= getGETparam4IdOrNumber('action');
+
+
 
 /**
  *
@@ -213,7 +217,8 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image")
 			$thumb	= BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$image;
 			if(is_file($file)) 
 			{
-				if(@unlink($file)&&@unlink($thumb)) 
+				// first kill the thumbnail: if anything goes wrong then, we always regenerate later.
+				if(@unlink($thumb) && @unlink($file)) 
 				{
 					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved']).'&album='.$album));
 					exit();
@@ -300,18 +305,22 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 {
 	if (!checkAuth() || empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])
 	{
-		$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+		echo "<p>" . (empty($_GET['SIDCHK']) ? '----' : $_GET['SIDCHK']) . ', ' . $_SESSION['fup1'] . "</p>\n";
+		var_dump($_GET);
+		var_dump($_COOKIES);
 	
+		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+		
 		die($ccms['lang']['auth']['featnotallowed']);
 	}
 	
 	/*
 	WARNING: we must NOT reset/alter the extra check session value in here as 
 	         FancyUpload will invoke this code multiple times from the same 
-		 web form when bulk uploads are performed (more then one(1) image file).
+		     web form when bulk uploads are performed (more then one(1) image file).
 	
 	         So we are a little less safe as the extra session var will only 
-		 be regenerated every time the upload form is rerendered.
+		     be regenerated every time the upload form is rerendered.
 		 
 	         Alas.
 	*/
@@ -330,22 +339,23 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	$error_code = 0;
 	$size       = false; // init to prevent PHP errors about unknown vars further down
 
-	$uploadedfile = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['tmp_name']) ? filterParam4FullFilePath($_FILES['Filedata']['tmp_name']) : null);
+	// get the local (temporary) filename:
+	$uploadedfile = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['tmp_name']) ? $_FILES['Filedata']['tmp_name'] : null); // RAW is okay: it's generated locally (server-side) and contains a temp filename
+	// and what it's supposed to be named (as specced by the uploader):
 	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? filterParam4Filename($_FILES['Filedata']['name']) : null);
 	// Set file and get file extension
 	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
-	$extension = (!empty($extension['extension']) ? strtolower($extension['extension']) : '');
 
 	if (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)) 
 	{
-		$error = 'Invalid Upload';
-		$error_code = $uploadedfile;
+		$error = 'Invalid Upload: ';
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
 	if (empty($error) && !($size = @getimagesize($uploadedfile))) 
 	{
 		$error = 'Please upload only images, no other files are supported.';
-		$error_code = $uploadedfile;
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
 	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
@@ -381,7 +391,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 			
 		default:
 			$error = 'Unsupported file format.';
-			$error_code = $uploadedfile . ' : ' . $extension;
+			$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 			break;
 		}
 	}
@@ -389,7 +399,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	if (empty($error) && $src == false)
 	{
 		$error = 'Internal error.';
-		$error_code = $uploadedfile . ' : ' . $extension;
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
 	if (empty($error))
@@ -398,7 +408,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 		if (!is_array($imginf))
 		{
 			$error = 'Invalid or severely corrupt image file.';
-			$error_code = $uploadedfile;
+			$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 		}
 		else
 		{
@@ -408,15 +418,15 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 			{
 			case 'jpg':
 			case 'jpeg':
-				$ok = ($imginf[3] == IMAGETYPE_JPEG);
+				$ok = ($imginf[2] == IMAGETYPE_JPEG);
 				break;
 				
 			case 'png':
-				$ok = ($imginf[3] == IMAGETYPE_PNG);
+				$ok = ($imginf[2] == IMAGETYPE_PNG);
 				break;
 				
 			case 'gif':
-				$ok = ($imginf[3] == IMAGETYPE_GIF);
+				$ok = ($imginf[2] == IMAGETYPE_GIF);
 				break;
 				
 			default:
@@ -425,7 +435,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 			if (!$ok)
 			{
 				$error = 'File type does not match extension or corrupt file.';
-				$error_code = $uploadedfile;
+				$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename . ' : ' . $imginf[2];
 			}
 		}
 	}
@@ -466,7 +476,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 			$newwidth_t = intval($newheight_t / $aspect_ratio);
 		}
 		$tmp_t = imagecreatetruecolor($newwidth_t,$newheight_t);
-		imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
+		imagecopyresampled($tmp_t,$tmp,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
 		
 		// Save newly generated versions
 		$thumbnail	= $dest.'/_thumbs/'. $target_filename;
@@ -575,7 +585,6 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 				if(is_file($dest.'/'.$f)) 
 				{
 					$extension = pathinfo($f, PATHINFO_EXTENSION);
-					$extension = (!empty($extension['extension']) ? strtolower($extension['extension']) : '');
 
 					$uploadedfile = $dest . '/' . $f;
 					
@@ -598,6 +607,11 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 					default:
 						// skip all other file formats
 						continue;
+					}
+					if (empty($src))
+					{
+						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode('invalid image format for file ' . $uploadedfile . ', type: ' . $extension)));
+						exit();
 					}
 						 
 					list($width,$height)=getimagesize($uploadedfile);

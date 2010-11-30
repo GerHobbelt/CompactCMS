@@ -203,7 +203,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -217,9 +217,9 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 		{ 
 		?>
 			<form action="lightbox.Process.php?action=del-album" method="post" accept-charset="utf-8">
-				<h2><?php echo $ccms['lang']['album']['currentalbums']; ?></h2>
-				<div class="table_inside">
-				<table border="0" cellspacing="2" cellpadding="2">
+			<h2><?php echo $ccms['lang']['album']['currentalbums']; ?></h2>
+			<div class="table_inside">
+				<table cellspacing="0" cellpadding="0">
 					<?php 
 					if(count($albums) > 0) 
 					{ 
@@ -243,7 +243,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 							// Alternate rows
 					    	if($key % 2 != 1) 
 							{
-								echo '<tr style="background-color: #E6F2D9;">';
+								echo '<tr class="altrgb">';
 							} 
 							else 
 							{ 
@@ -253,30 +253,33 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 							if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
 							{ 
 							?>
-								<td><input type="checkbox" name="albumID[<?php echo $key+1;?>]" value="<?php echo $value; ?>" id="newsID"></td>
+								<td><input type="checkbox" name="albumID[<?php echo $key+1; ?>]" value="<?php echo $value; ?>" id="newsID"></td>
 							<?php 
 							} 
 							?>
-							<td><span class="ss_sprite ss_folder_picture"><a href="lightbox.Manage.php?album=<?php echo $value;?>"><?php echo $value;?></a></span></td>
-							<td><span class="ss_sprite ss_pictures"><?php echo $count[$key]; ?></span></td>
-							<td><span class="ss_sprite ss_calendar"><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
+							<td><a href="lightbox.Manage.php?album=<?php echo $value;?>"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $value;?></a></td>
+							<td><span class="ss_sprite_16 ss_pictures">&#160;</span><?php echo $count[$key]; ?></td>
+							<td><span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
 						</tr>
 						<?php
 		  				}
 	  				} 
 					else 
+					{
 						echo $ccms['lang']['system']['noresults']; 
+					}
 					?>
 				</table>
-				<hr />
-				<?php 
-				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']&&count($albums)>0) 
-				{ 
-				?>
-					<button type="submit" onclick="return confirmation_delete();" name="deleteAlbum"><span class="ss_sprite ss_bin_empty"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
-				<?php 
-				} 
-				?>
+			</div>
+			<hr />
+			<?php 
+			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']&&count($albums)>0) 
+			{ 
+			?>
+				<button type="submit" onclick="return confirmation_delete();" name="deleteAlbum"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
+			<?php 
+			} 
+			?>
 			</form>
 		<?php 
 		} 
@@ -298,20 +301,20 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			} 
 			?>
 			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
-			<div class="clearfix right">
-			<?php
-			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
-			{
-			?>
-				<a class="button" onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
-					<span class="ss_sprite_16 ss_arrow_in">&#160;</span><?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
-				</a>
-			<?php
-			}
-			?>
-			<a class="button" href="lightbox.Manage.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?></a>
+			<div class="right">
+				<?php
+				if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+				{
+				?>
+					<a class="button" onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
+						<span class="ss_sprite_16 ss_arrow_in">&#160;</span><?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
+					</a>
+				<?php
+				}
+				?>
+				<a class="button" href="lightbox.Manage.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?></a>
 			</div>
-			<div>
+			<div class="clear">
 			<?php 
 			foreach ($images as $key => $value) 
 			{ 
@@ -346,16 +349,18 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			{
 			?>
 				<form action="lightbox.Process.php?action=create-album" method="post" accept-charset="utf-8">
-					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" style="width:160px;" name="album" value="" id="album" />
-					<button type="submit"><span class="ss_sprite ss_wand"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button>
+					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" name="album" value="" id="album" />
+					<button type="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 				</form>
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
 			?>
 		
-			<hr class="space" />
+			<hr class="clear space" />
 		<?php 
 		} 
 		else 
@@ -377,7 +382,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 						for ($i=0; $i < count($lightboxes); $i++) 
 						{ 
 						?>
-							<option <?php echo (!empty($lines[0])&&trim($lines[0])==$lightboxes[$i]['urlpage']?'selected':null); ?> value="<?php echo $lightboxes[$i]['urlpage'];?>"><?php echo $lightboxes[$i]['urlpage'];?>.html</option>
+							<option <?php echo (!empty($lines[0])&&trim($lines[0])==$lightboxes[$i]['urlpage']?'selected="selected"':null); ?> value="<?php echo $lightboxes[$i]['urlpage'];?>"><?php echo $lightboxes[$i]['urlpage'];?>.html</option>
 						<?php 
 						} 
 						?>
@@ -390,14 +395,22 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 					}
 					?>
 					<label for="description"><?php echo $ccms['lang']['album']['description']; ?></label>
-					<textarea name="description" rows="3" cols="40" style="height:50px;width:290px;" id="description"><?php echo $desc; ?></textarea>
+					<textarea name="description" rows="3" cols="40" id="description"><?php echo $desc; ?></textarea>
 					<input type="hidden" name="album" value="<?php echo $album; ?>" id="album" />
-					<p class="prepend-5"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton']; ?></span></button></p>
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
+					</div>
 				</form>
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
+			?>
+		
+			<hr class="clear space" />
+		<?php
 		} 
 		
 		if(count($albums)>0) 
@@ -420,8 +433,6 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 					http://devzone.zend.com/article/1312
 					http://www.php.net/manual/en/session.idpassing.php
 				*/
-				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-
 				$sesid = null;
 				if (defined('SID'))
 				{
@@ -448,8 +459,8 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 
 				/* whitespace is important here... */ ?>&action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
 		
-				<label for="album" style="margin-right:5px;display:inline;"><?php echo $ccms['lang']['album']['toexisting']; ?></label>
-				<select name="album" id="album" class="text" style="width:130px;" size="1">
+				<label for="album"><?php echo $ccms['lang']['album']['toexisting']; ?></label>
+				<select name="album" id="album" class="text" size="1">
 					<?php 
 					foreach ($albums as $value) 
 					{ 
@@ -464,22 +475,26 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 					<form action="lightbox.Process.php?action=save-files" method="post" accept-charset="utf-8">
 						<?php echo $ccms['lang']['album']['singlefile']; ?>
 						<input id="lightbox-photoupload" type="file" name="Filedata" />
-						<p><button type="submit"><span class="ss_sprite ss_add"><?php echo $ccms['lang']['album']['upload']; ?></span></button></p>
+						<div class="right">
+							<button type="submit"><span class="ss_sprite_16 ss_add"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></button>
+						</div>
 					</form>
 				</div>
 			
-				<div id="lightbox-status" class="hide">
+				<div id="lightbox-status" >
 					<p>
-						<span class="ss_sprite ss_folder_image"><a href="#" id="lightbox-browse"><?php echo $ccms['lang']['album']['browse']; ?></a></span> |
-						<span class="ss_sprite ss_cross"><a href="#" id="lightbox-clear"><?php echo $ccms['lang']['album']['clear']; ?></a></span> |
-						<span class="ss_sprite ss_picture_save"><a href="#" id="lightbox-upload"><?php echo $ccms['lang']['album']['upload']; ?></a></span>
+						<a id="lightbox-browse"><span class="ss_sprite_16 ss_folder_image">&#160;</span><?php echo $ccms['lang']['album']['browse']; ?></a> |
+						<a id="lightbox-clear"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['album']['clear']; ?></a> |
+						<a id="lightbox-upload"><span class="ss_sprite_16 ss_picture_save">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></a>
 					</p>
 					<div>
-						<strong class="overall-title"></strong><br />
+						<strong class="overall-title"></strong>
+						<br />
 						<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress overall-progress" />
 					</div>
 					<div>
-						<strong class="current-title"></strong><br />
+						<strong class="current-title"></strong>
+						<br />
 						<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress current-progress" />
 					</div>
 					<div class="current-text"></div>

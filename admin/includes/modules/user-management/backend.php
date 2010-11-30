@@ -84,7 +84,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -93,7 +93,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
 			<form action="../../process.inc.php?action=delete-user" method="post" accept-charset="utf-8">
 				<div class="table_inside">
-				<table border="0" cellspacing="2" cellpadding="2">
+				<table cellspacing="0" cellpadding="0">
 					<tr>
 						<th>&#160;</th>
 						<th><?php echo $ccms['lang']['users']['user']; ?></th>
@@ -152,7 +152,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							?>
 							</td>
 							<td><?php echo substr($row['userFirst'],0,1); ?>. <?php echo $row['userLast']; ?></td>
-							<td><a href="mailto:<?php echo $row['userEmail']; ?>"><span class="ss_sprite ss_email">&#160;</span><?php echo $row['userEmail']; ?></a></td>
+							<td><a href="mailto:<?php echo $row['userEmail']; ?>"><span class="ss_sprite_16 ss_email">&#160;</span><?php echo $row['userEmail']; ?></a></td>
 							<td><?php echo ($row['userActive']==1 ? $ccms['lang']['backend']['yes'] : $ccms['lang']['backend']['no']); ?></td>
 							<td><?php echo $row['userLevel']; ?></td>
 							<td class="nowrap"><?php echo date('d-m-\'y',strtotime($row['userLastlog'])); ?></td>
@@ -185,7 +185,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label>
 					<input type="text" class="minLength:3 text" name="user" value="" id="userName" />
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/>
-						<a class="small ss_sprite ss_bullet_key" onclick="randomPassword(8); return false;"><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
+						<a class="small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_bullet_key">&#160;</span><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
 					</label>
 					<input type="text" onkeyup="passwordStrength(this.value);" class="minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">
@@ -233,7 +233,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 					</div>
 					<hr class="space"/>
 					<div class="right">
-						<button type="submit"><span class="ss_sprite ss_user_add"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button>
+						<button type="submit"><span class="ss_sprite_16 ss_user_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 					</div>
 				</form>
@@ -245,8 +245,11 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			}
 			?>
 		</div>
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
 	</div>	
-	<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
 function confirmation_delete()
 {
@@ -267,9 +270,24 @@ function confirmation()
 
 
 
+	
+	
+	
 
-window.addEvent('domready',function()
-	{
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
+	'passwordcheck.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
 		new FormValidator($('addUser'),
 		{
 			onFormValidate:function(passed,form,event)
@@ -278,8 +296,24 @@ window.addEvent('domready',function()
 					form.submit();
 			}
 		});
-	});
-	</script>
-	<script type="text/javascript" src="passwordcheck.js" charset="utf-8"></script>
+	//});
+}
+
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

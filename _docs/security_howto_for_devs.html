@@ -28,7 +28,7 @@
 
 <body>
 <div id="the_oddities_log">
-<h1 class="center-text">Security for websites: what <em>not</em> to do</h1>
+<h1 class="center-text">Security for websites: to do and <em>not</em> to do</h1>
 <p>A website, like any other product which may be subjected to scrutiny by 
 undesirables, is a technical challenge in two ways:</p>
 <ol>
@@ -321,6 +321,96 @@ once again, thus producing a quite viable preview code consisting of one MD5
 code and a numeric record ID, both of which are very easy to filter when they 
 arrive as inputs later on while a preview is performed (or an attack is 
 attempted through this mode).</p>
+<h3>Postnatal notes</h3>
+<p>Spreading preview codes for pages marked &#39;published&#39; is ill-advised: whenever 
+a preview authentication code is spread for a page, the lifetime of said 
+authCode equals the the time until that page, or its attributes, are altered. We 
+may assume that an already &#39;published&#39; page is quite stable, hence implicitly 
+produces a longlived authCode. Keep in mind that an authCode is <em>site-wide</em>, 
+so a longlived authCode means <em>any</em> part of the (then hidden/unpublished) 
+site is visible to anyone having obtained such an authCode (through any means) 
+for a very long time!<br />
+We counter this by doing two things: </p>
+<p>We force the preview code to be generated for the <strong>un</strong>published 
+page, i.e. act as if it was marked &#39;unpublished&#39; at the time the page is 
+generated. When you visit the page with such a preview code, it is automatically 
+invalid when the page is published, but that does not matter as the page you 
+currently access is already public, so you do not need the authCode to view it.</p>
+<p>We add a &#39;last-edit&#39; timestamp field to the pages table in the database and 
+require any page update, however tiny, to also update that timestamp. (The added 
+(small) benefit here is that we now have a quickly available &#39;last edited&#39; 
+timestamp to pass on to any web cache for the page: the &#39;last edit&#39; timestamp of 
+the HTML page itself only registers our editing actions with respect to the page 
+content itself, not the page attributes<span class="style1">—all of which have 
+an impact on the generated HTML output for the page, hence should &#39;tickle&#39; any 
+web cache to update to the latest state of affairs</span>!)</p>
+<p>&nbsp;: only when e page which has been marked &#39;published&#39;</p>
+<h1>Risk: session not strictly bound to client</h1>
+<p>The current code (Nov/2010) contains the following to authenticate a running 
+session, i.e. make sure the secured page X on the site is visited by the 
+previously authenticated visitor herself and not some later session-stealing / 
+replay-attacking visitor:</p>
+<blockquote><pre>
+function checkAuth()
+{
+	$canarycage	= md5(<strong>session_id()</strong>);
+	$currenthost = md5(<strong>$_SERVER['HTTP_HOST']</strong>);
+	
+	//if(md5(session_id())==$cage && md5($_SERVER['HTTP_HOST']) == $host) {   // [i_a] bugfix
+	if (!empty($_SESSION['id']) && $canarycage == <strong>$_SESSION['id']</strong> 
+		&& !empty($_SESSION['host']) && $currenthost == <strong>$_SESSION['host']</strong>) 
+	{
+		return true;
+	} 
+	return false;
+}
+
+function SetAuthSafety()
+{
+<strong>	$_SESSION['host'] = md5($_SERVER['HTTP_HOST']);
+	$_SESSION['id']	= md5(session_id());
+</strong>	
+	unset($_SESSION['rc1']);
+	unset($_SESSION['rc2']);
+}
+</pre></blockquote>
+<p>The authenticity of the request is validated through checking two components, 
+which have been stored in the server-side session store at the time of 
+authentication: the active session ID and the <code>
+<a href="http://php.net/manual/en/reserved.variables.server.php">$_SERVER['HTTP_HOST']</a></code> value.</p>
+<p>The latter is of much worth from a session security perspective as this value 
+will be constant for the given web site.</p>
+<p>Of course it is useful to check against so session IDs are at least verified 
+to have originated from our own server, but we can do better than this! A 
+session has a few more attributes which we can use to restrict access to 
+authenticated entities only: when you visit a web site, you do so from a given 
+machine. You are not expected to switch machines (or browsers!) midway during a 
+session; if you travel through a web proxy or more (as set up by your ISP or 
+other intermediary, e.g. the company you work at), then such machines are all 
+configured to present a stable IP address to the outside world<span class="style1">—that 
+means us! Hence whether you have direct access to the web server or have to go 
+through a company proxy annex firewall or other intermediary does not matter 
+with respect to your &#39;point of origin&#39; as far as the web server is concerned.
+</span></p>
+<p><span class="style1">However, when I&#39;d be trying to steal or ride your 
+session, given the code above, I can do so from any remote point of origin once 
+I&#39;ve obtained your session ID. &#39;Regular&#39; CSRF attacks and such go through your 
+own web browser, so what we are about to do is no help there, but we should 
+restrict validity of any authenticated session as much as possible nevertheless 
+as any such restriction limits the means available to an attacker. Hence we will 
+add these components to the session validity check:</span></p>
+<ol>
+	<li><code><a href="http://php.net/manual/en/reserved.variables.server.php">$_SERVER['REMOTE_ADDR']</a></code> 
+	: the point of origin (i.e. the IP address where the visitor is coming from; 
+	having a name instead of an IP (reverse DNS) does not help and only raises 
+	the cost in transfer delays)</li>
+	<li><code><a href="http://php.net/manual/en/reserved.variables.server.php">$_SERVER['HTTP_USER_AGENT']</a></code> 
+	: the software used to visit us (the browser software identifier): a user 
+	does not switch browser applications halfway through a running session. Are 
+	you? </li>
+</ol>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>

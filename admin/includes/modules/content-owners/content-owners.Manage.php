@@ -94,13 +94,13 @@ if (!is_array($users)) $db->Kill();
 		<?php
 		if(!empty($status_message))
 		{
-			echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
 		}
 		?>
 	</div>
 
-	<h2><span class="ss_sprite ss_group_gear"><?php echo $ccms['lang']['owners']['header']; ?></span></h2>
-	<p><?php echo $ccms['lang']['owners']['explain']; ?></p>
+	<h2><span class="ss_sprite_16 ss_group_gear">&#160;</span><?php echo $ccms['lang']['owners']['header']; ?></h2>
+	<p class="left-text"><?php echo $ccms['lang']['owners']['explain']; ?></p>
 	<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
 	<div class="table_inside">
 		<table cellspacing="0" cellpadding="0">
@@ -111,7 +111,7 @@ if (!is_array($users)) $db->Kill();
 			{
 			?>
 				<th class="center-text span-2">
-					<span class="ss_sprite ss_user_<?php echo ($users[$ar1]['userLevel']>=4?'suit':'green'); ?>"><?php echo $users[$ar1]['userFirst'].' '.substr($users[$ar1]['userLast'],0,1); ?>.</span>
+					<span class="ss_sprite_16 ss_user_<?php echo ($users[$ar1]['userLevel']>=4?'suit':'green'); ?>">&#160;</span><?php echo $users[$ar1]['userFirst'].' '.substr($users[$ar1]['userLast'],0,1); ?>.</span>
 				</th>
 			<?php
 			}
@@ -125,7 +125,7 @@ if (!is_array($users)) $db->Kill();
 		?>
 			<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
 			<th class="span-4 pagename">
-				<span class="ss_sprite ss_page_white_world"><?php echo $pages[$i]['urlpage']; ?>.html</span>
+				<span class="ss_sprite_16 ss_page_white_world">&#160;</span><?php echo $pages[$i]['urlpage']; ?>.html
 			</td>
 			<?php
 			for ($ar2=0; $ar2<count($users); $ar2++)
@@ -166,12 +166,26 @@ if (!is_array($users)) $db->Kill();
 		</table>
 	</div>
 	<div class="right">
-		<button type="submit"><span class="ss_sprite ss_disk">Save</span></button>
+		<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 		<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 	</div>
 	</form>
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
+	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
+	<textarea id="elm1" name="elm1" rows="15" cols="80" style="width: 80%">
+		&lt;p&gt;
+			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
+		&lt;/p&gt;
+		&lt;p&gt;
+		Nam nisi elit, cursus in rhoncus sit amet, pulvinar laoreet leo. Nam sed lectus quam, ut sagittis tellus. Quisque dignissim mauris a augue rutrum tempor. Donec vitae purus nec massa vestibulum ornare sit amet id tellus. Nunc quam mauris, fermentum nec lacinia eget, sollicitudin nec ante. Aliquam molestie volutpat dapibus. Nunc interdum viverra sodales. Morbi laoreet pulvinar gravida. Quisque ut turpis sagittis nunc accumsan vehicula. Duis elementum congue ultrices. Cras faucibus feugiat arcu quis lacinia. In hac habitasse platea dictumst. Pellentesque fermentum magna sit amet tellus varius ullamcorper. Vestibulum at urna augue, eget varius neque. Fusce facilisis venenatis dapibus. Integer non sem at arcu euismod tempor nec sed nisl. Morbi ultricies, mauris ut ultricies adipiscing, felis odio condimentum massa, et luctus est nunc nec eros.
+		&lt;/p&gt;
+	</textarea>
+
+
 	</div>
-	<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
 	<script type="text/javascript">
 function confirmation()
 {
@@ -182,6 +196,47 @@ function confirmation()
 	}
 	return false;
 }
-	</script>
+
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../tiny_mce/tiny_mce_full.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
+	tinyMCE.init({
+		mode : "exact",
+		elements : "elm1",
+		theme : "advanced",
+		theme : "simple"
+	});
+	//});
+}
+
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

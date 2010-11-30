@@ -69,7 +69,7 @@ session_start();
 $do	= getGETparam4IdOrNumber('do');
 
 // If no step, set session hash
-if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['host'])) 
+if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
 {
 	// Setting safety variables
 	SetAuthSafety();
@@ -436,8 +436,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					
 					<label for="rootdir"><span class="ss_sprite_16 ss_application_osx_terminal">&#160;</span>Web root directory</label>
 					<input type="text" class="alt title" name="rootdir" autofocus value="<?php echo $rootdir;?>" id="rootdir" />
-					<p class="ss_sprite ss_bullet_star small quiet">When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</p>
-					<p class="ss_sprite ss_bullet_star small quiet">Must include trailing slash!</p>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</p>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Must include trailing slash!</p>
 					
 					<label for="language"><span class="ss_sprite_16 ss_comments">&#160;</span>CCMS backend language</label>
 					<select name="language" class="title" id="language" size="1">
@@ -463,7 +463,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					
 					<label for="ftp_host">FTP host</label>
 					<input type="text" class="alt title" name="ftp_host" value="" id="ftp_host"/>
-					<p class="ss_sprite ss_bullet_star small quiet">Often www.domain.ext or ftp.domain.ext</p>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Often www.domain.ext or ftp.domain.ext</p>
 					<label for="ftp_user">FTP username</label>
 					<input type="text" class="alt title" name="ftp_user" value="" id="ftp_user"/>
 					<br/>
@@ -472,7 +472,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					<br/>
 					<label for="ftp_path">Installation path</label>
 					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
-					<p class="ss_sprite ss_bullet_star small quiet">CCMS will try to auto-find this using the default value above</p>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
 					
 					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 				<?php 
@@ -492,7 +492,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 </div>
 
 <div>
-  <textarea id="jslog" class="log">
+  <textarea id="jslog" class="log" readonly="readonly">
   </textarea>
 </div>
 
@@ -528,7 +528,7 @@ function ccms_lazyload_setup_GHO()
 
 function ccms_combiner_running()
 {
-	alert("the Combiner is already running; you are installing over an existing installation! :-)");
+	jslog("the Combiner is already running; you are installing over an existing installation! :-)");
 }
 
 /* now show the correct DIV, as we do have JavaScript up & running */

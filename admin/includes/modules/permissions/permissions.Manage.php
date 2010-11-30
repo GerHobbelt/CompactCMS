@@ -85,11 +85,11 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 		<?php 
 		if(!empty($status_message)) 
 		{ 
-			echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
 			if ($status != 'error') 
 			{
 			?>
-				<p><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['must_refresh']; ?></p>
+				<p class="ss_has_sprite"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['must_refresh']; ?></p>
 				<form id="refresh_everytin_form" onsubmit="return refresh_adminmain();">
 					<button type="submit"><span class="ss_sprite_16  ss_arrow_refresh">&#160;</span><?php echo $ccms['lang']['backend']['reload_admin_screen']; ?></button>
 				</form>
@@ -106,7 +106,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 	if($_SESSION['ccms_userLevel']>=4) 
 	{
 	?>
-		<p><?php echo $ccms['lang']['permission']['explain']; ?></p>
+		<p class="left-text"><?php echo $ccms['lang']['permission']['explain']; ?></p>
 		<form action="permissions.Process.php" method="post" accept-charset="utf-8">
 			<div class="table_inside">
 			<table cellspacing="0" cellpadding="0">
@@ -163,7 +163,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			</table>
 			</div>
 			<div class="right">
-				<button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> 
+				<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
 				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 			</div>
 		</form>
@@ -174,8 +174,11 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 		die($ccms['lang']['auth']['featnotallowed']);
 	}
 	?>
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
 </div>
-<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
 <script type="text/javascript">
 function refresh_adminmain()
 {
@@ -191,6 +194,38 @@ function confirmation()
 	}
 	return false;
 }
-</script>	
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
+	//});
+}
+
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

@@ -54,12 +54,14 @@ if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && Che
 }
 
 // Check for ./install directory
-if(is_dir('../../_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+if(is_dir('../../_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'] && 0) 
 {
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
 
 $userName = strtolower(getPOSTparam4IdOrNumber('userName'));
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 // Do authentication
 if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST") 
@@ -84,18 +86,19 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	of this session.
 	*/
 	$userPass = md5($_POST['userPass'].$cfg['authcode']);
-
+	$logmsg = null;
+	
 	if(empty($userName) && empty($userPass))
 	{
-		$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nodetails']);
+		$logmsg = rawurlencode($ccms['lang']['login']['nodetails']);
 	} 
 	elseif(empty($userName))
 	{
-		$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nouser']);
+		$logmsg = rawurlencode($ccms['lang']['login']['nouser']);
 	} 
 	elseif(empty($userPass))
 	{
-		$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nopass']);
+		$logmsg = rawurlencode($ccms['lang']['login']['nopass']);
 	} 
 	else
 	{
@@ -106,7 +109,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		$matchNumRows = $db->SelectSingleValue($cfg['db_prefix'].'users', $values, 'COUNT(userID)');
 		if($matchNumRows>0)
 		{
-			$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['notactive']);
+			$logmsg = rawurlencode($ccms['lang']['login']['notactive']);
 		} 
 		else
 		{
@@ -118,7 +121,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 			if ($db->RowCount() > 1)
 			{
 				// probably corrupt db table (corrupt import?) or hack attempt
-				die('<strong>Database corruption or hack attempt. Access denied.</strong>');
+				$logmsg = '<strong>Database corruption or hack attempt. Access denied.</strong>';
 				
 				// TODO: alert website owner about this failure/abuse. email to owner?
 			}
@@ -127,7 +130,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 				// no match found in DB: user/pass combo doesn't exist!
 				//
 				// If no match: count attempt and show error
-				$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nomatch']);
+				$logmsg = rawurlencode($ccms['lang']['login']['nomatch']);
 			}
 			elseif($userName != $row['userName'] || $userPass != $row['userPass'] || $row['userActive'] <= 0)
 			{
@@ -135,7 +138,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 				//
 				// NOTE: code should never enter here!
 				//
-				die('INTERNAL ERROR!');
+				$logmsg = 'INTERNAL ERROR!';
 			} 
 			else
 			{
@@ -155,19 +158,21 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 					// Setting safety variables as well: used for checkAuth() during the session.
 					SetAuthSafety();
 
-					unset($_SESSION['logmsg']);
+					unset($logmsg);
 					// Return functions result
 					header('Location: ' . makeAbsoluteURI('../../admin/index.php'));
 					exit();
 				}
 				else
 				{
-					$db->Kill();
+					$logmsg = $db->MyDyingMessage();
 				}
 			}
 		}
 	}
+	die_and_goto_url(null, $logmsg);
 }
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
@@ -183,32 +188,32 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	</head>
 <body>
 
+<div class="center-text <?php echo $status; ?>">
+	<?php 
+	if(!empty($status_message)) 
+	{ 
+		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+	} 
+	?>
+</div>
+
 <div id="login-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">
 		<div id="logo" class="sprite logo">
 			<h1>CompactCMS administration</h1>
 		</div>
-		<span class="ss_sprite ss_door_open">&#160;</span><h2 style="display:inline;"><?php echo $ccms['lang']['login']['login']; ?></h2>
-		<?php echo $ccms['lang']['login']['welcome'];?>
+		<h2><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></h2>
+		<p><?php echo $ccms['lang']['login']['welcome'];?></p>
 	</div>
 	
 	<div id="login" class="span-9 last">
-		<?php 
-		if(!empty($_SESSION['logmsg'])) 
-		{ 
-		?>
-			<div class="loginMsg"><?php echo rawurldecode($_SESSION['logmsg']);?></div>
-		<?php 
-		} 
-		?>
-		<p>&#160;</p>
 		<form id="loginFrm" name="loginFrm" class="clear" action="./auth.inc.php" method="post">
 			<label for="userName"><?php echo $ccms['lang']['login']['username']; ?></label><input type="text" class="alt title" autofocus placeholder="username" name="userName" style="width:300px;" value="<?php echo $userName;?>" id="userName" />
 			<br class="clear"/>
 			<label for="userPass"><?php echo $ccms['lang']['login']['password']; ?></label><input type="password" class="title" name="userPass" style="width:300px;" value="" id="userPass" />
 			
 			<p class="span-8 right">
-				<button name="submit" type="submit"><span class="ss_sprite ss_lock_go"><?php echo $ccms['lang']['login']['login']; ?></span></button>
+				<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></button>
 			</p>
 		</form>
 	</div>

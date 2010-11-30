@@ -454,28 +454,19 @@ if ($do == 'update')
 	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
 	
 		<div id="google_translate_element"></div>
-		<script>
-function googleTranslateElementInit() 
-{
-	new google.translate.TranslateElement({
-			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
-			layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
-		}, 'google_translate_element');
-}
-		</script>
-		<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 	<?php
 	}
 	?>
-		<div class="center <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
-				if ($status != 'error' && 0)  
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message;
+				if ($status != 'error')  
 				{
-					echo '<br/><span class="ss_sprite ss_exclamation">'.$ccms['lang']['backend']['must_refresh'].'</span>'; 
+					echo '<br/><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$ccms['lang']['backend']['must_refresh']; 
 				}
+				echo '</p>';
 			} 
 			?>
 		</div>
@@ -515,48 +506,84 @@ function googleTranslateElementInit()
 		die($ccms['lang']['auth']['featnotallowed']);
 	}
 	?>
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
 </div>
-<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
-
-<!-- TinyMCE JS -->
-<script type="text/javascript" src="../../tiny_mce/tiny_mce_ccms.js"></script>	
-
-<!-- Mootools library -->
-<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
-
-<!-- File uploader JS -->
-<script type="text/javascript" src="../../fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"></script>
-
 <script type="text/javascript">
-FileManager.TinyMCE=function(options)
+
+function confirmation()
 {
-	return function(field,url,type,win)
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
 	{
-		var manager=new FileManager(
-			$extend(
-				{
-					onComplete:function(path)
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tran_ccms');
+	}
+	return false;
+}
+
+function googleTranslateElementInit() 
+{
+	new google.translate.TranslateElement({
+			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
+			layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
+		}, 'google_translate_element');
+}
+
+
+
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/the_goto_guy.js',
+	/* TinyMCE JS */
+	'../../tiny_mce/tiny_mce_full.js',
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
+	/* File uploader JS */
+	'../../fancyupload/dummy.js,Source/FileManager.js,Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js',
+	'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+	];
+
+	
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
+FileManager.TinyMCE=function(options)
+	{
+		return function(field,url,type,win)
+		{
+			var manager=new FileManager(
+				$extend(
 					{
-						if(!win.document)
-							return;
-						win.document.getElementById(field).value='<?php echo $cfg['rootdir']; ?>'+path;
-						if(win.ImageDialog)
-							win.ImageDialog.showPreviewImage('<?php echo $cfg['rootdir']; ?>'+path,1);
-						this.container.destroy();
-					}
-				},
-				options(type)
-			)
-		);
-		manager.dragZIndex=400002;
-		manager.SwiffZIndex=400003;
-		manager.el.setStyle('zIndex',400001);
-		manager.overlay.el.setStyle('zIndex',400000);
-		document.id(manager.tips).setStyle('zIndex',400010);
-		manager.show();
-		return manager;
+						onComplete:function(path)
+						{
+							if(!win.document)
+								return;
+							win.document.getElementById(field).value='<?php echo $cfg['rootdir']; ?>'+path;
+							if(win.ImageDialog)
+								win.ImageDialog.showPreviewImage('<?php echo $cfg['rootdir']; ?>'+path,1);
+							this.container.destroy();
+						}
+					},
+					options(type)
+				)
+			);
+			manager.dragZIndex=400002;
+			manager.SwiffZIndex=400003;
+			manager.el.setStyle('zIndex',400001);
+			manager.overlay.el.setStyle('zIndex',400000);
+			document.id(manager.tips).setStyle('zIndex',400010);
+			manager.show();
+			return manager;
+		};
 	};
-};
 FileManager.implement('SwiffZIndex',400003);
 var Dialog=new Class(
 	{
@@ -577,7 +604,7 @@ tinyMCE.init(
 	{
 		mode:"textareas",
 		theme:"advanced",
-		<?php echo 'language:"'.$cfg['tinymce_language'].'",'; ?>
+		// <?php echo 'language:"'.$cfg['tinymce_language'].'",'; ?>
 		skin:"o2k7",
 		skin_variant:"silver",
 		<?php echo (!empty($css)?'content_css:"'.$css.'",':null);?>
@@ -619,72 +646,24 @@ tinyMCE.init(
 				};
 			})
 	});
-
-		
-		
-		
-		
-	/* Confirm close */
-window.addEvent('domready', function()
-{
-	function editin_init() 
-	{
-		$$('.liveedit').each(function(el) 
-		{
-			el.addEvent('click',function() 
-			{
-				el.set('class','liveedit2');
-				var before = el.get('html').trim();
-				el.set('html','');
-				
-				var input = new Element('textarea', { 'wrap':'soft', 'class':'textarea', 'text':before });
-				
-				input.addEvent('click', function (e) 
-				{
-					e.stop();
-					return;
-				});
-				
-				input.addEvent('keydown', function(e) { if(e.key == 'enter') { this.fireEvent('blur'); } });
-				input.inject(el).select();
-				
-				//add blur event to input
-				input.addEvent('blur', function() 
-				{
-					//get value, place it in original element
-					val = input.get('value').trim();
-					el.set('text',val);
-					
-					//save respective record
-					var content = el.get('text');
-					var request = new Request.HTML({
-						url:'<?php echo $_SERVER['PHP_SELF'];?>?do=liveedit&part='+el.get('rel'),
-						method:'post',
-						update: el,
-						data: 'do=liveedit&id='+el.get('id')+'&content='+encodeURIComponent(content),
-						onRequest: function() {
-							el.set("html","<img src='./img/saving.gif' alt='Saving' />");
-						},
-						onComplete: function() {
-							el.set("class","sprite-hover liveedit");
-						}
-					}).send();
-				});
-			});
-		});
-	}
-});
-
-	
-function confirmation()
-{
-	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
-	if(answer)
-	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tran_ccms');
-	}
-	return false;
+	//});
 }
-</script>	
+
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

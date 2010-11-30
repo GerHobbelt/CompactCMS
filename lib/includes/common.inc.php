@@ -793,6 +793,48 @@ function filterParam4DateTime($value, $def = null)
 
 
 
+function getGETparam4MathExpression($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4MathExpression(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4MathExpression($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4MathExpression($_POST[$name], $def);
+}
+
+/*
+Accepts any ASCII which might befit a conditional expression. In short: we accept the entire ASCII range from SPACE to 126(dec).
+*/
+function filterParam4MathExpression($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	$value = preg_replace('/\s/s', ' ', $value); // any whitespace becomes SPACE: this way we get rid of CR LF (using the /s regex option!)
+	$value = str2USASCII($value);
+	
+	return $value;
+}
+
+
+
+
+
+
+
+
+
 /*
 	public static function pagetitle($data, $options = array()){
 		static $regex;
@@ -1020,6 +1062,24 @@ function is_http_response_code($response_code)
 	case 503:	// RFC2616 Section 10.5.4: Service Unavailable
 	case 504:	// RFC2616 Section 10.5.5: Gateway Time-out
 	case 505:	// RFC2616 Section 10.5.6: HTTP Version not supported
+/*
+	case 102:
+	case 207:
+	case 418:
+	case 419:
+	case 420:
+	case 421:
+	case 422:
+	case 423:
+	case 424:
+	case 425:
+	case 426:
+	case 506:
+	case 507:
+	case 508:
+	case 509:
+	case 510:
+*/
 		return true;
 		
 	default:
@@ -1076,7 +1136,25 @@ function get_response_code_string($response_code)
 	case 502:	return "RFC2616 Section 10.5.3: Bad Gateway";
 	case 503:	return "RFC2616 Section 10.5.4: Service Unavailable";
 	case 504:	return "RFC2616 Section 10.5.5: Gateway Time-out";
-	case 505:	return "RFC2616 Section 10.5.6: HTTP Version not supported";
+	case 505:	return "RFC2616 Section 10.5.6: HTTP Version not supported";                     
+/*	
+	case 102:	return "Processing";  // http://www.askapache.com/htaccess/apache-status-code-headers-errordocument.html#m0-askapache3
+	case 207:	return "Multi-Status";
+	case 418:	return "I'm a teapot";
+	case 419:	return "unused";
+	case 420:	return "unused";
+	case 421:	return "unused";
+	case 422:	return "Unproccessable entity";
+	case 423:	return "Locked";
+	case 424:	return "Failed Dependency";
+	case 425:	return "Node code";
+	case 426:	return "Upgrade Required";
+	case 506:	return "Variant Also Negotiates";
+	case 507:	return "Insufficient Storage";
+	case 508:	return "unused";
+	case 509:	return "unused";
+	case 510:	return "Not Extended";
+*/
 	default:   return rtrim("Unknown Response Code " . $response_code);
 	}
 }
@@ -1269,6 +1347,8 @@ function makeAbsoluteURI($path)
 
 
 
+
+
 /**
 Convert an absolute HTTP path to a 'real path' on physical disc
 
@@ -1346,6 +1426,89 @@ function merg_path_elems( /* ... */ )
 	// return path_remove_dot_segments($path);
 	return $path;
 }
+
+
+
+
+/**
+pathinfo with UTF-8 support.
+
+See also / derived from: 
+	http://nl.php.net/manual/en/function.pathinfo.php
+*/
+function pathinfo_utf($path)
+{
+	$path = str_replace('\\', '/', $path);
+	if (strpos($path, '/') !== false) 
+		$basename = end(explode('/', $path));
+	else 
+		return false;
+	if (empty($basename)) 
+		return false;
+
+	$dirname = substr($path, 0, strlen($path) - strlen($basename) - 1);
+
+	if (strpos($basename, '.') !== false)
+	{
+		$extension = end(explode('.', $path));
+		$filename = substr($basename, 0, strlen($basename) - strlen($extension) - 1);
+	}
+	else
+	{
+		$extension = '';
+		$filename = $basename;
+	}
+
+	return array
+		(
+			'dirname' => $dirname,
+			'basename' => $basename,
+			'extension' => $extension,
+			'filename' => $filename
+		);
+}
+
+
+
+
+
+/**
+Like die($error) but this one redirect the client to the login page if that's possible.
+
+There the error message will be diplayed at the top of the screen, while you can enter
+your credentials.
+
+The default error message is 'feature not allowed'.
+
+The default 
+
+NOTE:
+This function turned out to be necessary while testing the lightbox upload facility
+with the new, stricter session checking: the simple 'feature not allowed' message
+may be nice and dandy, but it essentially blocked us from easily logging in. Only
+when we entered the login page (lib/includes/auth.inc.php) did we get a chance to
+enter the site again -- because our existing session was destroyed as part of the
+failed SID/SIDCHK test. 
+That doesn't make the test faulty, on the contrary, but we'd rather not get a DoS
+this easily. ;-)
+*/
+function die_and_goto_url($url = null, $msg = null)
+{
+	global $cfg, $ccms;
+	
+	if (empty($msg))
+	{
+		$msg = $ccms['lang']['auth']['featnotallowed'];
+	}
+	if (empty($url))
+	{
+		$url = $cfg['rootdir'] . 'lib/includes/auth.inc.php';
+	}
+	header('Location: ' . makeAbsoluteURI($url . (strpos($url, '?') > 0 ? '&' : '?') .'status=error&msg=' . rawurlencode($msg)));
+	exit();
+}
+
+
 
 
 
@@ -1647,7 +1810,7 @@ and for /country codes/ (which we don't use here!) there's ISO3166:
 
 http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 */
-function SetUpLanguageAndLocale($language)
+function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 {
 	global $cfg;
 	global $ccms; // <-- this one will be augmented by the (probably) loaded language file(s).
@@ -1680,9 +1843,12 @@ function SetUpLanguageAndLocale($language)
 		}
 	}
 
-	// Set local for time, currency, etc
-	setlocale(LC_ALL, $locale);
-
+	if (!$only_set_cfg_array)
+	{
+		// Set local for time, currency, etc
+		setlocale(LC_ALL, $locale);
+	}
+	
 	
 	// core language
 	$mce_langfile = array();
@@ -1745,7 +1911,9 @@ function SetUpLanguageAndLocale($language)
 	
 	$cfg['language'] = $language;
 	$cfg['locale'] = $locale;
-	
+//echo "<pre>";
+//var_dump($cfg);	
+//echo "</pre>\n";
 	return $language;
 }
 
@@ -1923,6 +2091,13 @@ function cvt_ordercode2list($ordercode)
 
 
 
+
+
+
+
+
+
+
 /**
  Check for authentic request ($cage=md5(SESSION_ID),$host=md5(CURRENT_HOST)) v.s. 'id' and 'host' session variable values.
  
@@ -1931,12 +2106,16 @@ function cvt_ordercode2list($ordercode)
 */
 function checkAuth()
 {
-	$canarycage	= md5(session_id());
-	$currenthost = md5($_SERVER['HTTP_HOST']);
+	/* 
+	The remaining MD5 call in here is NOT for security but to keep session storage tiny: the collected data 
+	is packed in a fixed, limited number of characters. Meanwhile, MD5 is still quite good enough to hash this
+	very limited entropy data anyhow. No loss, just a little gain.
+	*/
+	$canarycage	= session_id();
+	$currenthost = md5($_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] /* . '::' . $_SERVER['HTTP_USER_AGENT'] */ );
 	
-	//if(md5(session_id())==$cage && md5($_SERVER['HTTP_HOST']) == $host) {   // [i_a] bugfix
 	if (!empty($_SESSION['id']) && $canarycage == $_SESSION['id'] 
-		&& !empty($_SESSION['host']) && $currenthost == $_SESSION['host']) 
+		&& !empty($_SESSION['authcheck']) && $currenthost == $_SESSION['authcheck']) 
 	{
 		return true;
 	} 
@@ -1945,13 +2124,77 @@ function checkAuth()
 
 function SetAuthSafety()
 {
-	$_SESSION['host'] = md5($_SERVER['HTTP_HOST']);
-	$_SESSION['id']	= md5(session_id());
+	$_SESSION['authcheck'] = md5($_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] /* . '::' . $_SERVER['HTTP_USER_AGENT'] */ );
+	$_SESSION['id']	= session_id();  // superfluous, but we'll keep this in here for now, just to be on the safe side.
 	
 	unset($_SESSION['rc1']);
 	unset($_SESSION['rc2']);
 }
 
 
+function GenerateNewAuthCode()
+{
+	if (function_exists('openssl_random_pseudo_bytes'))
+	{
+		$bytes = openssl_random_pseudo_bytes(16, $cryptstrong);
+		$code = bin2hex($bytes);
+	}
+	else
+	{
+		$code = mt_rand('12345','98765');
+	}
+	return $code;
+}
+
+function GenerateNewPreviewCode($page_id = null, $page_name = null, $this_run_is_checking_instead = false)
+{
+	global $db, $cfg;
+	
+	// grab the page record for the original entry page for this preview
+	$filter = array();
+	if (!empty($page_id))
+	{
+		$filter['page_id'] = MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
+	}
+	if (!empty($page_name))
+	{
+		$filter['urlpage'] = MySQL::SQLValue($page_name, MySQL::SQLVALUE_TEXT);
+	}
+	// we MUST have at least one search filter criterium by now:
+	if (count($filter) < 1)
+		return false;
+		
+	$pagerec = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', $filter);
+	if ($pagerec === false) 
+		return false;
+
+	$data = implode('::', $pagerec);
+	if (!$this_run_is_checking_instead)
+	{
+		// force 'published' to be NO to help limit the lifetime of the previewCode: see also the 'Postnatal notes' section in _docs/security_how_to_for_devs.html.
+		$data['published'] = 'N';
+	}
+	$preview_checkcode = $data['page_id'] . '-' . md5($cfg['authcode'] . '::' . $data);
+	return $preview_checkcode;
+}
+
+function IsValidPreviewCode($previewCode)
+{
+	if (empty($previewCode))
+		return false;
+		
+	$code = explode('-', $previewCode, 2);
+	if (!is_array($code) || count($code) != 2 || !is_numeric($code[0]))
+		return false;
+		
+	$orig_page_id = $code[0];
+	
+	// regenerate the preview code as it should be and compare that one with what we've actually got:
+	$sollwert = GenerateNewPreviewCode($orig_page_id, null, true);
+	if ($sollwert === false)
+		return false;
+	
+	return ($sollwert === $previewCode);
+}
 
 ?>

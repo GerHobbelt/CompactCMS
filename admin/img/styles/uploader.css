@@ -1,6 +1,12 @@
 .swiff-uploader-box a {display: none !important;}
 a:hover, a.hover {color: red;}
-#lightbox-status {padding: 10px 15px;width: 290px;border: 1px solid #eee;}
+#lightbox-status 
+{
+	padding: 10px 15px;
+	width: 99%;
+	/* width: 290px; */
+	border: 1px solid #eee;
+}
 #lightbox-status .progress {
 	background: url(../../includes/fancyupload/Assets/progress.gif) no-repeat;
 	background-position: +50% 0;
@@ -8,8 +14,14 @@ a:hover, a.hover {color: red;}
 	vertical-align: middle;
 }
 #lightbox-status .progress-text {font-size: 0.9em;font-weight: bold;}
-#lightbox-list {list-style: none;width: 320px;margin: 0;}
-#lightbox-list li.validation-error {
+#lightbox-list 
+{
+	list-style: none;
+	width: 99%;
+	margin: 0;
+}
+#lightbox-list li.validation-error 
+{
 	padding-left: 44px;
 	display: block;
 	clear: left;
@@ -52,6 +64,31 @@ a:hover, a.hover {color: red;}
 	line-height: 18px;
 	margin-right: 6px;
 }
+
+
+#lightbox-management #description
+{
+	height:50px;
+	width:100%;
+}
+#lightbox-management input.text
+{
+	width: 98%;
+}
+#lightbox-management select
+{
+	width: 99%;
+}
+/* prevent the 'buttons' from wrapping too early: */
+#lightbox-management button
+{
+	margin-left: 0;
+}
+#lightbox-management .button
+{
+	margin-right: 0;
+}
+
 
 
 .lightbox-spinner-bg

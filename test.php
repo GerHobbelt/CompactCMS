@@ -55,5 +55,6 @@ function show($foo)
 
 <p>link: <a href="/c/_install/"> /c/_install/ </a> -- direct access to the installer (IFF it's there)
 
+<p> link: <a href="/c/admin/includes/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX"> /c/admin/includes/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX </a> -- see if the combiner processes the tinyMCE implicit source merge correctly + test the callback code generator at the end of the JS output
 
-
+<p> link: <a href="/c/admin/includes/tiny_mce/examples/index.html"> /c/admin/includes/tiny_mce/examples/index.html </a> -- the tinyMCE examples directory for testing

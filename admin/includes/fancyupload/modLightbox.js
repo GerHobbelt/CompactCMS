@@ -89,6 +89,7 @@ window.addEvent('domready', function() { // wait for the content
 		 * to send something else than JSON or different items).
 		 */
 		onFileSuccess: function(file, response) {
+			//alert(file + ': ' + response);
 			var json = new Hash(JSON.decode(response, true) || {});
 
 			if (json.get('status') == '1') {

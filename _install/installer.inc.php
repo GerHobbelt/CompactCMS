@@ -81,28 +81,41 @@ if($nextstep == md5('2') && CheckAuth())
 	
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
-		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password<br/>
-			<a href="#" class="small ss_sprite ss_arrow_refresh" onclick="randomPassword(8);">Auto generate a safe password</a></label>
+		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password
+			<br/>
+			<a class="ss_has_sprite small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_arrow_refresh">&#160;</span>Auto generate a safe password</a>
+		</label>
 		<input type="text" class="alt title" name="userPass" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
 		<div id="passwordStrength" class="strength0"></div>
-		<p class="ss_sprite ss_bullet_star small quiet clear">Remember your admin password as it cannot be retrieved</p>
-		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN</label>
+		<p class="ss_has_sprite small quiet clear"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Remember your admin password as it cannot be retrieved</p>
+		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN
+			<br/>
+			<a class="small" onclick="mkNewAuthCode(); return false;"><span class="ss_sprite_16 ss_arrow_refresh">&#160;</span>Generate a safe authCode</a></label>
+		</label>
 		<input type="text" class="alt title" name="authcode" value="<?php
-			echo (empty($_SESSION['variables']['authcode']) ? mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
-		<p class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</p>
-		<p class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</p>
-		
+			echo (empty($_SESSION['variables']['authcode']) ? GenerateNewAuthCode() : $_SESSION['variables']['authcode']); ?>" id="authcode" />
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>This PIN is used as a <a href="http://en.wikipedia.org/wiki/Salt_%28cryptography%29">salt</a> to help secure user credentials (specifically: user passphrases) and previews of inactive pages.</p>
+		<?php 
+		if ($may_upgrade) 
+		{ 
+		?>
+			<p class="ss_has_sprite small alert"><span class="ss_sprite_16 ss_exclamation">&#160;</span>Be reminded that altering the existing authCode during a 
+			restore or upgrade operation will <strong>invalidate</strong> all user passwords and preview codes. You <em>may</em> not want to do this, 
+			unless you want to reset <em>all</em> user passwords during this upgrade/restore operation.</p>
+		<?php
+		}
+		?>
 		<label for="protect"><input type="checkbox" name="protect" value="true" <?php
 			echo (!empty($_SESSION['variables']['protect']) && $_SESSION['variables']['protect'] ? 'checked' : ''); ?> id="protect" /> Password protect the administration</label>
 		<label for="version"><input type="checkbox" name="version" value="true"  <?php
 			echo (!empty($_SESSION['variables']['version']) && $_SESSION['variables']['version'] ? 'checked' : ''); ?>  id="version" /> Show version information</label>
-		<p class="ss_sprite ss_bullet_star small quiet">Want to see the latest CCMS version at the dashboard?</p>
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Want to see the latest CCMS version at the dashboard?</p>
 		<label for="iframe"><input type="checkbox" name="iframe" value="true"  <?php
 			echo (!empty($_SESSION['variables']['iframe']) && $_SESSION['variables']['iframe'] ? 'checked' : ''); ?> id="iframe" /> Support &amp; allow iframes</label>
-		<p class="ss_sprite ss_bullet_star small quiet">Can iframes be managed from within the WYSIWYG editor?</p>
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Can iframes be managed from within the WYSIWYG editor?</p>
 		<label for="wysiwyg"><input type="checkbox" name="wysiwyg" value="true"  <?php
 			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
-		<p class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</p>
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Uncheck if you want to disable the visual editor all together</p>
 		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?> >
 			<input type="checkbox" <?php if ($do_upgrade) { echo 'value="true"'; } ?> name="upgrade" 
 			<?php if ($may_upgrade) { echo 'checked'; } else { echo 'disabled="disabled"'; } ?> id="upgrade" /> Perform an 
@@ -128,17 +141,52 @@ if($nextstep == md5('2') && CheckAuth())
 				&#160;</span>
 			<strong>upgrade</strong>
 		</label>
-		<p class="ss_sprite ss_bullet_star small <?php if (!$may_upgrade) { echo 'quiet'; } ?>">Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></p>
+		<p class="ss_has_sprite small <?php if (!$may_upgrade) { echo 'quiet'; } ?>"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></p>
 
 		<div class="right">
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
 		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
+		<script>
+function mkNewAuthCode()		
+{
+	var node = $('authcode');
+	var val = node.get('value').trim();
+
+	var request = new Request.JSON({
+		url:'installer.inc.php',
+		data: 'do=mkNewAuthCode',
+		method:'post',
+		onComplete: function(properties, text) {
+			//alert(text);
+			//alert(properties);
+			//alert(properties.code);
+			node.set('value', properties.code);
+		}
+	}).send();
+}
+		</script>
 <?php
 
 	exit();
 } // Close step two
+
+// assistant for step 2:
+if ($nextstep == 'mkNewAuthCode')
+{
+	// no need to check the session?
+	$code = GenerateNewAuthCode();
+
+	$return = array(
+		'code' => $code
+	);
+
+	header('Content-type: application/json');
+	echo json_encode($return);
+
+	exit();
+}
 
 // Step three
 if($nextstep == md5('3') && CheckAuth()) 
@@ -241,7 +289,7 @@ if($nextstep == md5('4') && CheckAuth())
 		if(count($chfile) == 0) 
 		{ 
 		?>
-			<p class="center"><span class="ss_sprite_16 ss_tick">&#160;</span><em>All files are already correctly chmod()'ed</em></p>
+			<p class="ss_has_sprite center-text"><span class="ss_sprite_16 ss_tick">&#160;</span><em>All files are already correctly chmod()'ed</em></p>
 		<?php 
 		} 
 		
@@ -351,8 +399,8 @@ if($nextstep == md5('4') && CheckAuth())
 		</table>
 
 		<hr noshade="noshade" />
-		<p class="quiet">
-			<strong><span class="ss_sprite_16 ss_exclamation">&#160;</span>Please note</strong><br/>
+		<p class="ss_has_sprite quiet">
+			<span class="ss_sprite_16 ss_exclamation">&#160;</span><strong>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
 
@@ -906,7 +954,7 @@ if($nextstep == md5('final') && CheckAuth())
 		<?php
 		while (list($key,$value) = each($log)) 
 		{
-			echo '<p><span class="ss_sprite_16 ss_accept">&#160;</span>'.$value.'</p>';
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_accept">&#160;</span>'.$value.'</p>';
 		} 
 	} 
 	if(isset($errors)) 
@@ -916,7 +964,7 @@ if($nextstep == md5('final') && CheckAuth())
 		<?php
 		while (list($key,$value) = each($errors)) 
 		{
-			echo '<p><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$value.'</p>';
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$value.'</p>';
 		} 
 	} 
 	
@@ -937,7 +985,7 @@ if($nextstep == md5('final') && CheckAuth())
 	{
 	?>
 		<div class="right">
-			<a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a>
+			<p class="ss_has_sprite"><a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a></p>
 		</div>
 	<?php
 	}
@@ -945,4 +993,7 @@ if($nextstep == md5('final') && CheckAuth())
 	exit();
 } // Close final processing
 
+
+// when we get here, something went horribly wrong. Have you been messing about?
 ?>
+<p class="error">The flow has been broken. Some unidentified internal error occurred.</p>

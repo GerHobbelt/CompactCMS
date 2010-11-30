@@ -90,7 +90,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<p><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
@@ -100,11 +100,12 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			<?php
 			// Load recordset
 			$i=0;
-			if(!$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)))
+			$newsitems = $db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+			if ($newsitems === false)
 				$db->Kill();
 
 			// Start switch for news, select all the right details
-			if($db->HasRecords()) 
+			if(count($newsitems) > 0) 
 			{ 
 			?>
 				<form action="news.Process.php?action=del-news" method="post" accept-charset="utf-8">
@@ -118,10 +119,8 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							<th class="span-4 last"><?php echo $ccms['lang']['news']['date']; ?></th>
 						</tr>
 						<?php
-						while (!$db->EndOfSeek()) 
+						foreach($newsitems as $rsNews)
 						{
-							$rsNews = $db->Row();
-							
 							// Alternate rows
 							if($i%2 != 1) 
 							{
@@ -135,26 +134,32 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
-									<input type="checkbox" name="newsID[]" value="<?php echo rm0lead($rsNews->newsID); ?>">
+									<label>
+										<input type="checkbox" name="newsID[]" value="<?php echo rm0lead($rsNews->newsID); ?>">
+									</label>
 								<?php 
 								} 
 								?>
 								</td>
-								<td><?php echo "<span class='ss_sprite_16 ".($rsNews->newsPublished != 0 ? "ss_bullet_green'>" : "ss_bullet_red'>") . "&#160;</span>"; ?></td>
+								<td>
+									<?php echo "<span class='ss_sprite_16 ".($rsNews->newsPublished != 0 ? "ss_bullet_green'>" : "ss_bullet_red'>") . "&#160;</span>"; ?>
+								</td>
+								<td>
 								<?php 
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
-									<td><a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><span class="ss_sprite_16 ss_pencil">&#160;</span><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20 ? '...' : null); ?></a></td>
+									<a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><span class="ss_sprite_16 ss_pencil">&#160;</span><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20 ? '...' : null); ?></a>
 								<?php 
 								} 
 								else 
 								{ 
 								?>
-									<td><?php echo $rsNews->newsTitle; ?></td>
+									<?php echo $rsNews->newsTitle; ?>
 								<?php 
 								} 
-								?>
+								?>                                       
+								</td>
 								<td class="nowrap"><a href="mailto:<?php echo $rsNews->userEmail; ?>"><span class="ss_sprite_16 ss_email">&#160;</span><?php echo substr(ucfirst($rsNews->userFirst),0,1).'. '.ucfirst($rsNews->userLast); ?></a></td>
 								<td class="nowrap"><span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date('Y-m-d G:i', strtotime($rsNews->newsModified)); ?></td>
 							</tr>
@@ -163,7 +168,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 						}
 						?>
 					</table>
-					<hr />
+				</div>
 					<?php 
 					if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 					{ 
@@ -175,7 +180,6 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 					<?php 
 					} 
 					?>
-				</div>
 				</form>
 				<?php
 			} 
@@ -191,7 +195,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 			{ 
 			?>
-				<p><span class="ss_sprite ss_newspaper_add"><a href="news.Write.php?pageID=<?php echo $pageID; ?>"><?php echo $ccms['lang']['news']['addnewslink']; ?></a></span></p>
+				<p class="ss_has_sprite"><a href="news.Write.php?pageID=<?php echo $pageID; ?>"><span class="ss_sprite_16 ss_newspaper_add">&#160;</span><?php echo $ccms['lang']['news']['addnewslink']; ?></a></p>
 			
 				<h2><?php echo $ccms['lang']['news']['settings']; ?></h2>
 				<?php 
@@ -220,10 +224,10 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 				?>
 				<form action="news.Process.php?action=cfg-news" method="post" accept-charset="utf-8">
 					<label for="messages"><?php echo $ccms['lang']['news']['numbermess']; ?></label>
-					<input type="text" class="text span-25" name="messages" value="<?php echo $showmsg; ?>" id="messages" />
+					<input type="text" class="text span-25 last" name="messages" value="<?php echo $showmsg; ?>" id="messages" />
 					
 					<label for="locale"><?php echo $ccms['lang']['forms']['setlocale']; ?></label>
-					<select name="locale" class="title span-25" id="locale" size="1">
+					<select name="locale" class="title span-25 last" id="locale" size="1">
 						<?php 
 						// Get current languages
 						$s = (isset($_SESSION['variables']['language']) ? $_SESSION['variables']['language'] : 'en');
@@ -279,8 +283,8 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			?>
 		</div>
 	</div>
-	<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
-	<script type="text/javascript">
+	<script type="text/javascript" src="../../includes/js/the_goto_guy.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
 function confirmation_delete()
 {
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
@@ -293,7 +297,7 @@ function confirmation()
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-pow_ccms');
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pageID; ?>_ccms');
 	}
 	return false;
 }

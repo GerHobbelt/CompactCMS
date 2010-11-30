@@ -52,8 +52,11 @@ h1
 {
 	font-size: 2em;
 }
-
-
+p.small
+{
+	margin-bottom: 1.5em;
+	line-height: 1.5em;
+}
 
 /*
 these reside within a span-9 div:

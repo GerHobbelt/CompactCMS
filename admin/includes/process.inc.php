@@ -161,24 +161,68 @@ if ($do_update_or_livefilter && checkAuth())
 		$page_selectquery_restriction = 'WHERE ' . $page_selectquery_restriction;
 	}
 
+	
+	
+	function gen_span4pagelist_filterheader($name, $title)
+	{
+		global $ccms;
+		
+		if (!empty($name) && !empty($_SESSION[$name]))
+		{
+			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
+		}
+		else
+		{
+			echo '<span class="sprite livefilter livefilter_add" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['add']) . ' ' . strtolower($title) . '">&#160;</span>';
+		}
+	}
+
+	
 	// Open recordset for sites' pages
-	$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
-	if ($db->ErrorNumber()) $db->Kill();
+	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
+	if ($rows === false) $db->Kill();
 
 	// Check whether the recordset is not empty
-	if($db->HasRecords()) 
+	if(count($rows) > 0) 
 	{
-		$i = 0;
+		?>
+		<table id="table_manage" cellspacing="0" cellpadding="0">
+			<tr>
+				<th class="span-1a">&#160;</th>
+				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-2a nowrap center-text"><?php echo $ccms['lang']['forms']['printable']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
+				<th class="span-2a nowrap center-text">
+					<?php 
+					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
+					{ 
+						echo $ccms['lang']['forms']['published']; 
+						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
+					<?php 
+					} 
+					?>
+				</th>
+				<th class="span-2a nowrap center-text">
+					<?php
+					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
+					{ 
+						echo $ccms['lang']['forms']['iscoding']; 
+						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
+					<?php 
+					} 
+					?>
+				</th>
+				<th class="span-5a nowrap last">&#160;</th>
+			</tr>
 		
-		echo '<table cellpadding="0" cellspacing="0">';
+		<?php
+		
+		$i = 0;
 
 		// Get previously opened DB stream
-		$db->MoveFirst();
-		while (!$db->EndOfSeek()) 
+		foreach($rows as $row)
 		{
-			// Fill $row with values
-			$row = $db->Row();
-				
 			// Check whether current user is owner, or no owners at all
 			$owner = @explode('||', $row->user_ids);
 			if(empty($row->user_ids) || $perm['manageOwners']==0 || $_SESSION['ccms_userLevel']>=4 || in_array($_SESSION['ccms_userID'], $owner)) 
@@ -217,12 +261,12 @@ if ($do_update_or_livefilter && checkAuth())
 					}
 				} 
 				?>
-				<td class="span-1 leftpad-2">
+				<td class="leftpad-2">
 				<?php 
 				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
 				{ 
 				?>
-					<span class="ss_sprite ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>"></span>
+					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
 				<?php 
 				} 
 				else 
@@ -233,17 +277,17 @@ if ($do_update_or_livefilter && checkAuth())
 				} 
 				?>
 				</td>
-				<td class="span-3">
+				<td>
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
 				</td>
-				<td class="span-4">
+				<td>
 					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
-				<td class="span-6">
+				<td>
 					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
-				<td class="span-2 center-text">
-					<a href="#" id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+				<td class="center-text">
+					<a id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 						if($row->printable == "Y")
 						{ 
 							echo $ccms['lang']['backend']['yes']; 
@@ -254,12 +298,12 @@ if ($do_update_or_livefilter && checkAuth())
 						}
 						?></a>
 				</td>
-				<td class="span-2 center-text">
+				<td class="center-text">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
 					{ 
 					?>
-						<a href="#" id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+						<a id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 							if($row->published == "Y") 
 							{ 
 								echo $ccms['lang']['backend']['yes']; 
@@ -273,7 +317,7 @@ if ($do_update_or_livefilter && checkAuth())
 					} 
 					?>
 				</td>
-				<td class="span-2 center-text">
+				<td class="center-text">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
 					{ 
@@ -282,7 +326,7 @@ if ($do_update_or_livefilter && checkAuth())
 						if($row->module=="editor") 
 						{ 
 						?>
-							<a href="#" id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+							<a id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 							if($row->iscoding == "Y") 
 							{ 
 								echo '<span class="signal-coding">'.$ccms['lang']['backend']['yes'].'</span>'; 
@@ -295,7 +339,9 @@ if ($do_update_or_livefilter && checkAuth())
 						<?php 
 						} 
 						else 
+						{
 							echo "&ndash;"; 
+						}
 						?>
 					<?php 
 					} 
@@ -305,17 +351,17 @@ if ($do_update_or_livefilter && checkAuth())
 				// Check for restrictions
 				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
 				{ 
-					$preview_checkcode = md5('preview' . $cfg['authcode']);
+					$preview_checkcode = GenerateNewPreviewCode($row->page_id);
 					
 				?>
-					<td class="span-5 last right-text">
+					<td class="last right-text nowrap">
 						<a id="<?php echo $row->urlpage;?>" 
 							href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" 
 							rel="Edit <?php echo $row->urlpage.'.html';?>" 
 							class="tabs sprite edit"
 						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
 						| 
-						<a href="../<?php echo ($row->urlpage!="home") ? $row->urlpage . '.html?preview=' . $preview_checkcode : '?preview=' . $preview_checkcode; ?>" 
+						<a href="../<?php echo ($row->urlpage != "home" ? $row->urlpage . '.html' : '') . '?preview=' . $preview_checkcode; ?>" 
 							class="external"
 						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
 					</td>
@@ -324,8 +370,8 @@ if ($do_update_or_livefilter && checkAuth())
 				else 
 				{ 
 				?>
-					<td class="span-5 last right-text">
-						<div style="margin: 2px;"><span class="ss_sprite ss_exclamation" title="<?php echo $ccms['lang']['backend']['restrictpage']; ?>"></span> <?php echo $ccms['lang']['backend']['restrictpage'];?></div>
+					<td class="last right-text nowrap">
+						<div style="margin: 2px;"><span class="ss_sprite_16 ss_exclamation" title="<?php echo $ccms['lang']['backend']['restrictpage']; ?>">&#160;</span><?php echo $ccms['lang']['backend']['restrictpage'];?></div>
 					</td>
 				<?php 
 				} 
@@ -371,13 +417,15 @@ if ($do_update_or_livefilter && checkAuth())
 					if($row->module=="editor" && !empty($row->toplevel)) 
 					{ 
 					?>
-						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em> <?php echo "<strong>".strtolower($ccms['lang']['menu'][$row->menu_id])."</strong> | <em>".$ccms['lang']['backend']['item']." </em> <strong>".$row->toplevel.":".$row->sublevel."</strong>"; ?></td></tr>
+						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em> 
+							<?php echo '<strong>' . strtolower($ccms['lang']['menu'][$row->menu_id]) . '</strong> | <em>' . $ccms['lang']['backend']['item'] . ' </em> <strong>' . $row->toplevel . ':' . $row->sublevel . '</strong>'; 
+						?>
 					<?php 
 					} 
 					elseif($row->module!="editor") 
 					{ 
 						// TODO: add a module/plugin hook to provide the proper icon/formatting for the module name:
-						$modID = "<span class=\"ss_sprite ss_information\"><strong>".ucfirst($row->module)."</strong></span>";
+						$modID = '<span class="ss_sprite_16 ss_information">&#160;</span><strong>' . ucfirst($row->module) . '</strong></span>';
 						
 						switch ($row->module)
 						{
@@ -385,15 +433,15 @@ if ($do_update_or_livefilter && checkAuth())
 							break;
 						
 						case 'lightbox':
-							$modID = "<span class=\"ss_sprite ss_images\"><strong>".ucfirst($row->module)."</strong></span>";
+							$modID = '<span class="ss_sprite_16 ss_images">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
 							
 						case 'news':
-							$modID = "<span class=\"ss_sprite ss_newspaper\"><strong>".ucfirst($row->module)."</strong></span>";
+							$modID = '<span class="ss_sprite_16 ss_newspaper">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
 							
 						case 'comment':
-							$modID = "<span class=\"ss_sprite ss_comments\"><strong>".ucfirst($row->module)."</strong></span>";
+							$modID = '<span class="ss_sprite_16 ss_comments">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
 						}
 						echo $modID . ' '.strtolower($ccms['lang']['forms']['module']);
@@ -407,13 +455,8 @@ if ($do_update_or_livefilter && checkAuth())
 				</tr>
 			<?php
 			} 
-			// If user is not a page owner 
-			else 
-			{
-				$i++;
-			} 
 			
-			// Regular move on	
+			// move on	
 			$i++;
 		} 
 		?>
@@ -422,7 +465,7 @@ if ($do_update_or_livefilter && checkAuth())
 	}
 	else
 	{
-		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+		echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_bullet_red">&#160;</span>'.$ccms['lang']['system']['noresults'].'</p>'; 
 	}
 }
 	
@@ -440,22 +483,28 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 	if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
 	{
 		// Open recordset for sites' pages
-		$db->SelectRows($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
-		if ($db->ErrorNumber()) $db->Kill();
+		$rows = $db->SelectObjects($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
+		if ($rows === false) $db->Kill();
 
 		// Check whether the recordset is not empty
-		if($db->HasRecords()) 
+		if(count($rows) > 0) 
 		{
-			echo '<table class="span-15 last" cellpadding="0" cellspacing="0">';
+		?>
+			<table id="table_menu" cellspacing="0" cellpadding="0">
+			<tr>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['menutitle']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['menuid']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['template']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['template']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['toplevel']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['toplevel']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['sublevel']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['sublevel']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['linktitle']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['activelink']; ?>">&#160;</span></th>
+				<th class="nowrap last"><?php echo $ccms['lang']['forms']['pagetitle']; ?></th>
+			</tr>
+			<?php
 			
 			$i = 0;
 			// Get previously opened DB stream
-			$db->MoveFirst();
-			while (!$db->EndOfSeek()) 
+			foreach($rows as $row)
 			{
-				// Fill $row with values
-				$row = $db->Row();
-				
 				// Define $isEven for alternate table coloring
 				$isEven = !($i % 2);
 				if($isEven != '1') 
@@ -468,7 +517,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 				} 
 				$pageIdAsStr = rm0lead($row->page_id); // empty cannot be; rm0lead() makes sure zero is actually "0"
 				?>
-					<td class="span-2">
+					<td>
 						<select class="span-2 last" name="menuid[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Menu">
 								<?php 
@@ -484,23 +533,21 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">
-						<select class="span-2 last" name="template[<?php echo $pageIdAsStr; ?>]">
+					<td>
+						<select class="span-3 last" name="template[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
 								<?php 
-								$x = 0; 
-								while($x<count($template)) 
+								for ($x = 0; $x < count($template); $x++) 
 								{ 
 								?>
-									<option <?php echo ($row->variant==$template[$x]) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>"><?php echo ucfirst($template[$x]); ?></option>
-									<?php 
-									$x++; 
+									<option <?php echo ($row->variant==$template[$x]) ? 'selected="selected"' : ''; ?> value="<?php echo $template[$x]; ?>"><?php echo ucfirst($template[$x]); ?></option>
+								<?php 
 								} 
 								?>
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">
+					<td>
 						<select class="span-2 last" name="toplevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Toplevel">
 								<?php 
@@ -516,7 +563,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">
+					<td>
 						<select class="span-2 last" name="sublevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Sublevel">
 								<?php 
@@ -532,7 +579,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-1-1" id="td-islink-<?php echo $pageIdAsStr; ?>">
+					<td class="center-text" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php 
 						if($row->urlpage == "home") 
 						{ 
@@ -548,7 +595,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 						} 
 						?>
 					</td>
-					<td class="span-4 last">
+					<td class="last">
 						<?php echo $row->urlpage; ?><em>(.html)</em>
 						<input type="hidden" name="pageid[]" value="<?php echo $pageIdAsStr; ?>" id="pageid"/>
 					</td>
@@ -562,12 +609,12 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 		} 
 		else
 		{
-			echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+			echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_bullet_red">&#160;</span>'.$ccms['lang']['system']['noresults'].'</p>'; 
 		}
 	}
 	else 
 	{
-		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_delete">'.$ccms['lang']['auth']['featnotallowed'].'</span></p>';
+		echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_delete">&#160;</span>'.$ccms['lang']['auth']['featnotallowed'].'</p>';
 	} 
 }
 
@@ -713,7 +760,7 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 
 	if(count($errors) != 0)
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p>';
 		while (list($key,$value) = each($errors))
 		{
 			echo '<p class="fault">'.$value.'</p>';
@@ -722,7 +769,7 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	}
 
 	// success!
-	echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['newfilecreated'].'</p><p>'.$ccms['lang']['backend']['starteditbody'].'</p>';
+	echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['newfilecreated'].'</p><p>'.$ccms['lang']['backend']['starteditbody'].'</p>';
 	exit();
 }
 
@@ -735,7 +782,7 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 {
 	if(!empty($_POST['page_id'])) 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['statusdelete'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['statusdelete'].'</p>';
 	
 		// Loop through all submitted page ids
 		foreach ($_POST['page_id'] as $index) 
@@ -789,7 +836,7 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	} 
 	else 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$ccms['lang']['system']['error_selection'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$ccms['lang']['system']['error_selection'].'</p>';
 	}
 }
 
@@ -830,11 +877,11 @@ if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 	
 	if(empty($error)) 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['success'].'</p><p>'.$ccms['lang']['backend']['orderprefsaved'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['success'].'</p><p>'.$ccms['lang']['backend']['orderprefsaved'].'</p>';
 	} 
 	else 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$error.'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$error.'</p>';
 	}
 	exit();
 }
@@ -1328,7 +1375,7 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
 			<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
 			<div class="right">
-				<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
+				<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 			</div>
 		</form>
@@ -1532,7 +1579,7 @@ if($do_action == "save-changes" && checkAuth())
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values["keywords"] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 	
-	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array("urlpage" => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)))) 
 	{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1569,17 +1616,30 @@ if($do_action == "save-changes" && checkAuth())
 			<?php 
 			} 
 			
-			$preview_checkcode = md5('preview' . $cfg['authcode']);
+			$preview_checkcode = GenerateNewPreviewCode(null, $name);
 			?>
 			<hr/>
 			<p>
 				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $preview_checkcode;?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>
 			</p>
-			<div>
-				<a href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
-				<a href="#" onClick="parent.MochaUI.closeWindow(parent.$('<?php echo $name; ?>_ccms'));" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['closewindow']; ?></a>
+			<div class="right">
+				<a class="button" href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
+				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['closewindow']; ?></a>
 			</div>
 		</div>
+	<script type="text/javascript" src="../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+function confirmation()
+{
+	//var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	var answer = true;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $name; ?>_ccms');
+	}
+	return false;
+}
+	</script>
 	</body>
 	</html>
 	<?php 	

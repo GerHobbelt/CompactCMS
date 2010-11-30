@@ -40,6 +40,7 @@ table th, table td
 	line-height: 18px;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	/* border: 1px solid red; */
 }
 
 
@@ -174,7 +175,7 @@ a#clockLink
 	border: 3px solid #90D244;
 	border-radius: 10px;
 }
-legend, .loginMsg, .installMsg 
+legend, .installMsg 
 {
 	background-color: #F4F6F7; /* <-- effective color with opacity applied to white BG for color #C9D3D9; */
 	font-size:1.1em;
@@ -184,7 +185,7 @@ legend, .loginMsg, .installMsg
 	border: 2px solid #9DAFBB;
 	border-radius: 5px;
 }
-legend, .loginMsg, .installMsg 
+legend, .installMsg 
 {
 	/*
 	See also:
@@ -201,12 +202,18 @@ legend, .loginMsg, .installMsg
 
 /* === 1. CORE === */
 /* === INSIDE SUB-DIVS === */
-#dyn_list td, th {
+#dyn_list td, th 
+{
 	vertical-align: top;
 	height: 22px;
 	padding: 5px 0;
 }
-#dyn_list {
+#dyn_list th 
+{
+	border-bottom: #9ACC66 2px solid;
+}
+#dyn_list 
+{
 	display: block;
 	min-width: 800px;
 	background: #CDE6B3;
@@ -214,14 +221,17 @@ legend, .loginMsg, .installMsg
 	min-height: 30px;
 	height: auto;
 }
-#table_menu
-{
-	margin-left: 4px; /* compensate for the 4px border of the table below us to make things align properly */
-}
+
 #menuFields 
 { 
 	border: #9ACC66 4px solid; 
 }
+#table_menu th 
+{
+	background: #CDE6B3;
+	border-bottom: #9ACC66 2px solid;
+}
+
 /*
 make sure all padding of the TH/TD for the menu table is GONE, as the TDs carry same-width SELECT elements:
 */
@@ -230,6 +240,7 @@ make sure all padding of the TH/TD for the menu table is GONE, as the TDs carry 
 	/*
 	also reduce the interline padding: top/bottom=0
 	*/
+	margin: 0;
 	padding: 0;
 }
 /*
@@ -812,6 +823,10 @@ div.warning
 {
 	text-align: right;
 }
+.left-text
+{
+	text-align: left;
+}
 .signal-coding
 {
 	color: #8F0000;
@@ -1144,10 +1159,12 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 
 
 
+/*
 #comment-manager table tr.head0 th
 {
 	border-top: solid #AD8CCF 1px;
 }
+*/
 #comment-manager table tr.head0 th.rowspan2
 {
 	border-bottom: solid #AD8CCF 2px;
@@ -1185,6 +1202,12 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 }
 
 
+
+
+
+
+
+
 /*
 Because tables can only shrink so much and laptop/PC displays aren't always HDready ;-)
 you may find a few liquid layout situations where the table 'overflows' into the next column
@@ -1196,6 +1219,17 @@ when in dire need, to add a horizontal scrollbar.
 .module form div.table_inside
 {
 	overflow-x: auto;
+	overflow-y: hidden;	/* needed for IE6 */
+	border: 1px solid #AD8CCF;
+	width: 99.7%;			/* must be less than 100% for IE6/7/8 to ensure the border is shown on all sides! */
+	margin-left: 0;
+	margin-right: 0;
+}
+.module form div.table_inside table
+{
+	margin-left: 0;
+	margin-right: 0;
+	width: 100%;
 }
 
 
@@ -1206,6 +1240,14 @@ when in dire need, to add a horizontal scrollbar.
 	white-space: nowrap; 
 }
 
+
+
+
+.log 
+{
+	font: 10pt Consolas, Monaco, fixed;
+	width: 100%;
+}
 
 
 

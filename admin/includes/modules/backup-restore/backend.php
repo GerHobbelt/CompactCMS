@@ -344,7 +344,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
 			<p><?php echo $ccms['lang']['backup']['explain'];?></p>
 			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8" class="clearfix" >
-				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite ss_package_add"><?php echo $ccms['lang']['forms']['createbutton'];?></span></button>
+				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton'];?></button>
 			</form>
 			<?php
 			if ($show_warn_about_partial_backup)
@@ -368,7 +368,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 		<h2><?php echo $ccms['lang']['backup']['currenthd'];?></h2>
 			<form id="delete-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
 				<div class="table_inside">
-				<table border="0" cellspacing="2" cellpadding="2">
+				<table cellspacing="0" cellpadding="0">
 					<tr>
 						<?php 
 						if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
@@ -451,7 +451,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 	</div>
 <?php
 
-if (1)
+if (0)
 {
 	global $ccms;
 	global $cfg;
@@ -486,8 +486,13 @@ if (1)
 }
 
 ?>
-	<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js,the_goto_guy.js" charset="utf-8"></script>
-	<script type="text/javascript" charset="utf-8">
+
+	<textarea id="jslog" class="log" readonly="readonly">
+	</textarea>
+
+	
+<script type="text/javascript" charset="utf-8">
+
 function confirmation_delete()
 {
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
@@ -504,8 +509,22 @@ function confirmation()
 	return false;
 }
 
-window.addEvent('domready', function()
-	{
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/mootools-core.js',
+	'../../../../lib/includes/js/mootools-more.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete() 
+{
+	jslog('All JS has been loaded!');
+	
+	// window.addEvent('domready',function()
+	//{
 		$('create-arch').addEvent('click', function()
 			{
 				var el = $('backup-module');
@@ -517,11 +536,27 @@ window.addEvent('domready', function()
 					});
 				el.spin(); //obscure the element with the spinner
 
-				alert('go! ' + el);
+				//alert('go! ' + el);
 				return true;
 			});
-	});
-	
-		</script>
+	//});
+}
+
+
+function jslog(message) 
+{
+	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>
