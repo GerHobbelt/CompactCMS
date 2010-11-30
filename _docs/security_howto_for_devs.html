@@ -344,7 +344,6 @@ the HTML page itself only registers our editing actions with respect to the page
 content itself, not the page attributes<span class="style1">—all of which have 
 an impact on the generated HTML output for the page, hence should &#39;tickle&#39; any 
 web cache to update to the latest state of affairs</span>!)</p>
-<p>&nbsp;: only when e page which has been marked &#39;published&#39;</p>
 <h1>Risk: session not strictly bound to client</h1>
 <p>The current code (Nov/2010) contains the following to authenticate a running 
 session, i.e. make sure the secured page X on the site is visited by the 
@@ -409,7 +408,13 @@ add these components to the session validity check:</span></p>
 	does not switch browser applications halfway through a running session. Are 
 	you? </li>
 </ol>
-<p>&nbsp;</p>
+<h3>Postnatal notes</h3>
+<p>Turns out the CCMS lightbox module uses a Flash component to upload images 
+(we knew that already) and, of course, that bloody bugger presents itself ever 
+so slightly different than the browser it was invoked from! So the 
+HTTP_USER_AGENT check had to go, or the lightbox would fail to operate. Bummer. 
+Alas, all is not lost, we still get to check against the visitor IP address, 
+which is a stable component, at least for the duration of the session.</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
