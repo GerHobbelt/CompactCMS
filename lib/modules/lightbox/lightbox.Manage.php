@@ -301,38 +301,41 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			} 
 			?>
 			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
+			<form action="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=del-images" accept-charset="utf-8" method="post" id="album-pics">
 			<div class="right">
 				<?php
 				if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
 				{
 				?>
+					<a class="button" onclick="delete_these_files(); return false;">
+						<span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?>
+					</a>
 					<a class="button" onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
 						<span class="ss_sprite_16 ss_arrow_in">&#160;</span><?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
 					</a>
 				<?php
 				}
 				?>
-				<a class="button" href="lightbox.Manage.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?></a>
+				<a class="button" href="lightbox.Manage.php">
+					<span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?>
+				</a>
 			</div>
 			<div class="clear">
 			<?php 
 			foreach ($images as $key => $value) 
 			{ 
-				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox'])
-				{
-					echo '<a onclick="return confirmation_delete();" href="lightbox.Process.php?album=' . $album . '&amp;image=' . $value . '&amp;action=del-image" title="' . $ccms['lang']['backend']['delete'] . ': ' . $value . '">';
-				} 
-
-				echo '<img src="' . $imagethumbs[$key] . '" class="thumbview" alt="Thumbnail of ' . $value . '" ' . $imginfo[$key]['style'] . ' />';
+				echo '<label class="thumbimgwdel"><div style="background-image: url(' . path2urlencode($imagethumbs[$key]) . ');" class="thumbview" title="Thumbnail of ' . $value . '" ' . /* $imginfo[$key]['style'] . */ ' >&#160;</div>';
 
 				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 				{
-					echo '</a>';
+					echo '<input type="checkbox" name="imageName['. ($key+1) .']" value="' . $value . '">';
 				} 
-				echo "\n";
+				echo "</label>\n";
 			} 
 			?>
 			</div>
+			</form>
+			<hr class="clear space" />
 			<?php
 		} 
 		?>
@@ -515,15 +518,23 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 		<div id="lightbox-pending" class="lightbox-spinner-bg">
 			<p class="loading-img" ><?php echo $ccms['lang']['album']['please_wait']; ?></p>
 		</div>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
 	</div>
-	<script type="text/javascript" src="../../includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
 	<?php 
 	// prevent JS errors when permissions don't allow uploading (and all the rest)
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 	{
 	?>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js"></script>
-		<script type="text/javascript" charset="utf-8">
+var js = [
+	'../../includes/js/mootools-core.js,mootools-more.js',
+	'../../../admin/includes/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js',
+	'../../../lib/includes/js/the_goto_guy.js'
+	];
+	
 function confirmation_delete()
 {
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
@@ -552,9 +563,64 @@ function confirm_regen()
 		return false;
 	}
 }
-		</script>
+
+function delete_these_files()
+{
+	var go = confirmation_delete();
+	
+	if (go)
+	{
+		var form = $('album-pics');
+		form.submit();
+	}
+}
+
+
 	<?php
 	}
 	?>
+
+
+
+var jsLogEl = document.getElementById('jslog');
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+	lazyload_done_now_init('<?php echo $cfg['rootdir']; ?>');   // defined in modLightbox.js
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

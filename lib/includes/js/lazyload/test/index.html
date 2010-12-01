@@ -133,8 +133,17 @@
         clearInterval(cssInterval);
       }
 
-      function jsComplete() {
-        jslog('callback');
+	  function jsComplete(user_obj, lazy_obj)
+	  {
+		if (lazy_obj.todo_count)
+		{
+			/* nested invocation of LazyLoad added one or more sets to the load queue */
+			jslog('callback: Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		}
+		else
+		{
+			jslog('callback: All JS has been loaded!');
+		}
       }
       
       function jslog(message) {

@@ -50,8 +50,8 @@ class FileManager {
 		$path = FileManagerUtility::getPath();
 		
 		$this->options = array_merge(array(
-			'directory' => '',
-			'baseURL' => '../../',
+			'directory' => BASE_PATH . '/media/',
+			'baseURL' => $cfg['rootdir'] . 'xyz-yabayaba/',
 			'assetBasePath' => '../Assets',
 			'id3Path' => $path . '/Assets/getid3/getid3.php',
 			'mimeTypesPath' => $path . '/MimeTypes.ini',

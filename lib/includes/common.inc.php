@@ -211,6 +211,20 @@ function filterParam4IdOrNumber($value, $def = null)
 	return $value;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getGETparam4Filename($name, $def = null) 
 {
 	if (!isset($_GET[$name]))
@@ -1382,6 +1396,36 @@ function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
 
 
 
+/**
+convert a UNIX path to an URL encoded string, i.e. perform rawurlencode on each of the path elements,
+so that spaces and other noncompliant characters can be placed in the path.
+
+Recognizes these spacial characters: {':', '/'}
+*/
+function path2urlencode($path, $specialcharset = ':/')
+{
+	if (empty($path)) return '';
+	
+	$dst = '';
+	$len = strlen($path);
+	for ($i = 0; $i < $len; $i++)
+	{
+		$c = $path[$i];
+		if (strpos($specialcharset, $c) !== false)
+		{
+			$dst .= $c;
+		}
+		else
+		{
+			$dst .= rawurlencode($c);
+		}
+	}
+	return $dst;
+}
+
+
+
+
 
 /**
 Append pieces of a path together. Each part (argument) is treated as a directory or filename/filepath, so an extra '/' is
@@ -2168,13 +2212,13 @@ function GenerateNewPreviewCode($page_id = null, $page_name = null, $this_run_is
 	if ($pagerec === false) 
 		return false;
 
-	$data = implode('::', $pagerec);
 	if (!$this_run_is_checking_instead)
 	{
 		// force 'published' to be NO to help limit the lifetime of the previewCode: see also the 'Postnatal notes' section in _docs/security_how_to_for_devs.html.
-		$data['published'] = 'N';
+		$pagerec['published'] = 'N';
 	}
-	$preview_checkcode = $data['page_id'] . '-' . md5($cfg['authcode'] . '::' . $data);
+	$data = implode('::', $pagerec);
+	$preview_checkcode = $pagerec['page_id'] . '-' . md5($cfg['authcode'] . '::' . $data);
 	return $preview_checkcode;
 }
 

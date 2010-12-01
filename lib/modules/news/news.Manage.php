@@ -100,7 +100,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			<?php
 			// Load recordset
 			$i=0;
-			$newsitems = $db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+			$newsitems = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
 			if ($newsitems === false)
 				$db->Kill();
 
@@ -119,6 +119,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							<th class="span-4 last"><?php echo $ccms['lang']['news']['date']; ?></th>
 						</tr>
 						<?php
+						
 						foreach($newsitems as $rsNews)
 						{
 							// Alternate rows

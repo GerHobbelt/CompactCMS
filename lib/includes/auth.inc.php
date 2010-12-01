@@ -46,15 +46,23 @@ if (!defined('BASE_PATH'))
 }
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
+/*
+NOTICE:
+
+as this file can be loaded as part of /anything/, you CANNOT SPECIFY RELATIVE PATHS FOR URLs IN HERE AND EXPECT TO LIVE!
+
+URLs and local paths in here MUST be absolute: use $cfg['rootdir'] and BASE_PATH respectively to make it so.
+*/
+
 // If session already exists
 if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
-	header('Location: ' . makeAbsoluteURI('../../admin/index.php'));
+	header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
 	exit();
 }
 
 // Check for ./install directory
-if(is_dir('../../_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'] && 0) 
+if(is_dir(BASE_PATH . '_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 {
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
@@ -160,7 +168,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 
 					unset($logmsg);
 					// Return functions result
-					header('Location: ' . makeAbsoluteURI('../../admin/index.php'));
+					header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
 					exit();
 				}
 				else
@@ -181,9 +189,9 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>CompactCMS Administration</title>
 		<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
-		<link rel="stylesheet" type="text/css" href="../../admin/img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<link rel="stylesheet" type="text/css" href="<?php echo $cfg['rootdir']; ?>admin/img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
 		<!--[if IE]>
-			<link rel="stylesheet" type="text/css" href="../../admin/img/styles/ie.css" />
+			<link rel="stylesheet" type="text/css" href="<?php echo $cfg['rootdir']; ?>admin/img/styles/ie.css" />
 		<![endif]-->
 	</head>
 <body>
@@ -207,10 +215,10 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	</div>
 	
 	<div id="login" class="span-9 last">
-		<form id="loginFrm" name="loginFrm" class="clear" action="./auth.inc.php" method="post">
-			<label for="userName"><?php echo $ccms['lang']['login']['username']; ?></label><input type="text" class="alt title" autofocus placeholder="username" name="userName" style="width:300px;" value="<?php echo $userName;?>" id="userName" />
+		<form id="loginFrm" name="loginFrm" class="clear" action="<?php echo $cfg['rootdir']; ?>lib/includes/auth.inc.php" method="post">
+			<label for="userName"><?php echo $ccms['lang']['login']['username']; ?></label><input type="text" class="alt title span-8" autofocus placeholder="username" name="userName" value="<?php echo $userName;?>" id="userName" />
 			<br class="clear"/>
-			<label for="userPass"><?php echo $ccms['lang']['login']['password']; ?></label><input type="password" class="title" name="userPass" style="width:300px;" value="" id="userPass" />
+			<label for="userPass"><?php echo $ccms['lang']['login']['password']; ?></label><input type="password" class="title span-8" name="userPass" value="" id="userPass" />
 			
 			<p class="span-8 right">
 				<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></button>
@@ -221,6 +229,12 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 <p class="quiet small" style="text-align:center;">&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
 
 <script type="text/javascript" charset="utf-8">
+
+/*
+we're parsed before the external file will be; make it call back to us to execute the check and optional redirect:
+*/
+function jump_if_not_top()
+{
 	/* 
 	make sure we are NOT loaded in a [i]frame (~ MochaUI window) 
 	
@@ -254,15 +268,11 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 
 	if (isFramed) 
 	{
-		if (typeof top.location.replace == "function")
-		{
-			top.location.replace("<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>");
-		}
-		else
-		{
-			top.location.href = "<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>";
-		}
+		close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>", null);
 	}
+}
+
 </script>
+<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top" charset="utf-8"></script>
 </body>
 </html>

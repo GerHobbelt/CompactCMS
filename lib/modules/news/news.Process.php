@@ -166,8 +166,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth()
 				$idnum = filterParam4Number($idnum);
 				
 				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['newsID'] = MySQL::SQLValue($idnum,MySQL::SQLVALUE_NUMBER);
+				$values['newsID'] = MySQL::SQLValue($idnum, MySQL::SQLVALUE_NUMBER);
 				$result = $db->DeleteRows($cfg['db_prefix'].'modnews', $values);
+				if (!$result) break;
 				$i++;
 			}
 		

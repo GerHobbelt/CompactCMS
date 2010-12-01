@@ -422,7 +422,7 @@ if (0)
 	</div>
 
 
-	<textarea id="jslog" class="log" readonly="readonly">
+	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 
 	
@@ -469,17 +469,24 @@ function get_total_page_count()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../lib/includes/js/mootools-core.js',
-	'../lib/includes/js/mootools-more.js',
-	'../lib/includes/js/mocha.js',
-	'../lib/includes/js/common.js',
-	'../lib/includes/js/excanvas.js?only-when=%3d%3d+IE'
+	'../lib/includes/js/mootools-core.js,mootools-more.js,mocha.js',
+	'../lib/includes/js/excanvas.js?only-when=%3d%3d+IE',
+	'../lib/includes/js/common.js'
 	];
 
-function jsComplete() 
+function jsComplete(user_obj, lazy_obj)
 {
-	jslog('All JS has been loaded!');
-	
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
 	// window.addEvent('domready',function()
 	//{
 		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
@@ -492,7 +499,10 @@ function jsComplete()
 
 function jslog(message) 
 {
-	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
 }
 
 /* the magic function which will start it all, thanks to the augmented lazyload.js: */
@@ -503,11 +513,6 @@ function ccms_lazyload_setup_GHO()
 	LazyLoad.js(js, jsComplete);
 }
 
-
-if (typeof window.ccms_lazyload_setup_GHO == 'function')
-{
-	//alert('2');
-}
 
 </script>
 <script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

@@ -56,6 +56,10 @@ if (!defined('BASE_PATH'))
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
+
+class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
+
+
 // Security functions
 
 
@@ -65,7 +69,6 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 // Set default variables
-$commentID 	= getGETparam4Number('commentID');
 $pageID		= getPOSTparam4Filename('pageID');
 $cfgID		= getPOSTparam4Number('cfgID');
 $do_action 	= getGETparam4IdOrNumber('action');
@@ -189,45 +192,79 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
 	{	
 		echo $ccms['lang']['guestbook']['noposts'];
 	}
+	
+	exit();
 }
 
 /**
  *
- * Delete comment
+ * Delete comments (one or more)
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="del-comment" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-comments" && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/comment/comment.Manage.php');
+	
+	try
 	{
-		$pageID	= getGETparam4Filename('pageID');
-		if (!empty($pageID))
+		// Only if current user has the rights
+		if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['commentID'] = MySQL::SQLValue($commentID,MySQL::SQLVALUE_NUMBER);
-			/* only do this when a good pageID value was specified! */
-			$values["pageID"] = MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT);
-			
-			if($db->DeleteRows($cfg['db_prefix'].'modcomment', $values)) 
+			$pageID	= getPOSTparam4Filename('pageID');
+			if (!empty($pageID))
 			{
-				header('Location: ' . makeAbsoluteURI('comment.Manage.php?status=notice&file='.$pageID.'&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
-				exit();
+				// Number of selected items
+				$total = (!empty($_POST['commentID']) && is_array($_POST['commentID']) ? count($_POST['commentID']) : 0);
+				
+				// If nothing selected, throw error
+				if($total==0) 
+				{
+					throw new FbX($ccms['lang']['system']['error_selection'], 'file=' . $pageID);
+				}
+				
+				// Delete details from the database
+				$i=0;
+				foreach ($_POST['commentID'] as $idnum) 
+				{
+					$idnum = filterParam4Number($idnum);
+					
+					$values = array(); // [i_a] make sure $values is an empty array to start with here
+					$values['commentID'] = MySQL::SQLValue($idnum, MySQL::SQLVALUE_NUMBER);
+					/* only do this when a good pageID value was specified! */
+					$values["pageID"] = MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+					
+					$result = $db->DeleteRows($cfg['db_prefix'].'modcomment', $values);
+					if (!$result) break;
+					$i++;
+				}
+			
+				// Check for errors
+				if($result && $i==$total) 
+				{
+					header('Location: ' . makeAbsoluteURI('comment.Manage.php?status=notice&file='.$pageID.'&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+					exit();
+				} 
+				else 
+				{
+					throw new FbX($db->MyDyingMessage(), 'file=' . $pageID);
+				}
 			} 
 			else 
 			{
-				die($ccms['lang']['auth']['featnotallowed']);
+				throw new FbX($ccms['lang']['auth']['featnotallowed'], 'file=' . $pageID);
 			}
 		} 
 		else 
 		{
-			die($ccms['lang']['auth']['featnotallowed']);
+			throw new FbX($ccms['lang']['auth']['featnotallowed'], 'file=' . $pageID);
 		}
-	} 
-	else     
-	{
-		die($ccms['lang']['auth']['featnotallowed']);
 	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 /**

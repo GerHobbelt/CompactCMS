@@ -171,7 +171,7 @@ if (!is_array($users)) $db->Kill();
 	</div>
 	</form>
 
-	<textarea id="jslog" class="log" readonly="readonly">
+	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 
 	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
@@ -203,13 +203,23 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../tiny_mce/tiny_mce_full.js',
+	'../../tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
 	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 
-function jsComplete() 
+
+function jsComplete(user_obj, lazy_obj) 
 {
-	jslog('All JS has been loaded!');
+    if (lazy_obj.todo_count) 
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
 	
 	// window.addEvent('domready',function()
 	//{
@@ -225,7 +235,10 @@ function jsComplete()
 
 function jslog(message) 
 {
-	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
 }
 
 
@@ -234,6 +247,18 @@ function ccms_lazyload_setup_GHO()
 {
 	jslog('loading JS (sequential calls)');
 
+
+	/*
+	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
+	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
+	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
+	*/
+	tinyMCEPreInit = {
+		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
+		, base: <?php echo '"' . $cfg['rootdir'] . 'admin/includes/tiny_mce"'; ?>
+		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+	};
+	
 	LazyLoad.js(js, jsComplete);
 }
 </script>

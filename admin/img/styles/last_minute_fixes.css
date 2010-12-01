@@ -40,4 +40,13 @@ tinyMCE toolbar gets screwed up due to our table @ width:100% so we reset the wi
 {
 	width: 1%;
 }
+/*
+and make those toolbars float so they reposition themselves when the space is wide enough!
+*/
+.mceToolbar table
+{
+	float: left;
+}
+
+
 

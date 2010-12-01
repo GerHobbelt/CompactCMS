@@ -57,12 +57,14 @@ if (!defined('BASE_PATH'))
 
 
 // Load file manager class
-/*MARKER*/include('./Backend/FileManager.php');
+/*MARKER*/require_once('./Backend/FileManager.php');
 
 $browser = new FileManager(array(
-	'directory' => '../../../media/',
-	'assetBasePath' => './fancyupload/Assets',
+	'directory' => BASE_PATH . '/media/',
+	'assetBasePath' => BASE_PATH . '/admin/includes/fancyupload/Assets',
 	'maxUploadSize' => 1024 * 1024 * 5,
+	//'upload' => false,
+	//'destroy' => false,
 	'filter' => 'image/',
 ));
 

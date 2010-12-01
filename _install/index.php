@@ -492,7 +492,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 </div>
 
 <div>
-  <textarea id="jslog" class="log" readonly="readonly">
+  <textarea id="jslog" class="log span-25" readonly="readonly">
   </textarea>
 </div>
 
@@ -508,14 +508,26 @@ var js = [
 	'install.js'
 	];
 
-function jsComplete() 
+function jsComplete(user_obj, lazy_obj)
 {
-	jslog('All JS has been loaded!');
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
 }
 
 function jslog(message) 
 {
-	jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
 }
 
 /* the magic function which will start it all, thanks to the augmented lazyload.js: */

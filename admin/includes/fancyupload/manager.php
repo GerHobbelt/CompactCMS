@@ -55,18 +55,21 @@ if (!defined('BASE_PATH'))
 
 
 
-/*MARKER*/include('./Backend/FileManager.php');
+/*MARKER*/require_once('./Backend/FileManager.php');
 
 // Please add your own authentication here
 function UploadIsAuthenticated($get){
 	if(!empty($get['session'])) return true;
+	
 	return false;
 }
 
 $browser = new FileManager(array(
-	'directory' => '../../../media/',
-	'assetBasePath' => './fancyupload/Assets',
+	'directory' => BASE_PATH . '/media/',
+	'assetBasePath' => BASE_PATH . '/admin/includes/fancyupload/Assets',
 	'maxUploadSize' => 1024 * 1024 * 5,
+	//'upload' => false,
+	//'destroy' => false,
 ));
 
 $browser->fireEvent(getGETparam4IdOrNumber('event'));

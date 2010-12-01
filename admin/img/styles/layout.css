@@ -714,19 +714,42 @@ div.module
 	width:80px;
 	height:80px;
 	border:solid #E3E3E3 3px;
-	margin: 5px 1px;
+	margin: 5px 1px 1px 1px;
 	padding: 1px;
 	text-align:center;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
 }
 .thumbview:hover
 {
-	background-color: #E6F2D9;
+	/* background-color: #E6F2D9; */
 	border:solid #A5D611 3px;
 }
-.albumbox img
+.thumbimgwdel
 {
-	border:1px solid #000;
+	float: left;
+	border: 1px solid red;
+	text-align:center;
 }
+.thumbimgwdel:hover
+{
+	background-color: #E6F2D9;
+}
+.thumbimgwdel br
+{
+	margin: 0;
+	padding: 0;
+	line-height: 1px;
+	height: 1px;
+}
+.thumbimgwdel input
+{
+	margin: 0;
+	padding: 0 25px 0 25px;
+	line-height: 1em;
+	height: 1em;
+}
+
 
 /* === BACKUPS === */
 #no-delete-action 

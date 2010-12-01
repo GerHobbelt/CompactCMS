@@ -86,19 +86,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
 	<![endif]-->
-	<script type="text/javascript" src="../../../../lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
-	<!-- Check form and post -->
-	<script type="text/javascript" charset="utf-8">
-	window.addEvent('domready', function()
-	{
-		new FormValidator($('userDetailForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
-		new FormValidator($('userPassForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
-		new FormValidator($('userLevelForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
-	});
-	</script>
-	<script type="text/javascript" src="passwordcheck.js" charset="utf-8"></script>
 </head>
-
 <body>
 	<div class="module" id="edit-user-details">
 
@@ -237,7 +225,63 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		<div class="clear right">
 			<a href="backend.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
 		</div>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
 	</div>
+<script type="text/javascript">
+
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
+	'passwordcheck.js'
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+		new FormValidator($('userDetailForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
+		new FormValidator($('userPassForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
+		new FormValidator($('userLevelForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>
 <?php 

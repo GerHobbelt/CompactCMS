@@ -58,6 +58,10 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
 
+class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
+
+
+
 // Some security functions
 if (!checkAuth())
 {
@@ -70,6 +74,7 @@ define('THUMBNAIL_JPEG_QUALITY', 70);
 // Get permissions
 $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+
 
 // Set default variables
 $album_name	= getPOSTparam4Filename('album');
@@ -200,52 +205,84 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 
 /**
  *
- * Delete a single image
+ * Delete a one or more images
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image") 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-images") 
 {
-	// Only if current user has the rights
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/lightbox/lightbox.Manage.php');
+	
+	try
 	{
-		$album = getGETparam4Filename('album');
-		$image = getGETparam4Filename('image');
-		
-		if(!empty($album)&&!empty($image)) 
+		// Only if current user has the rights
+		if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 		{
-			$file	= BASE_PATH.'/media/albums/'.$album.'/'.$image;
-			$thumb	= BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$image;
-			if(is_file($file)) 
+			$album = getGETparam4Filename('album');
+			
+			if(!empty($album)) 
 			{
-				// first kill the thumbnail: if anything goes wrong then, we always regenerate later.
-				if(@unlink($thumb) && @unlink($file)) 
+				// Number of selected items
+				$total = (!empty($_POST['imageName']) && is_array($_POST['imageName']) ? count($_POST['imageName']) : 0);
+				
+				// If nothing selected, throw error
+				if($total==0) 
 				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved']).'&album='.$album));
-					exit();
-				} 
-				else 
-				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_delete']).'&album='.$album));
-					exit();
+					throw new FbX($ccms['lang']['system']['error_selection'], 'album=' . $album);
 				}
-			}
+				
+				$i=0;
+				foreach ($_POST['imageName'] as $key => $picname) 
+				{
+					$picname = filterParam4FileName($picname);
+					
+					if(!empty($picname)) 
+					{
+						$file	= BASE_PATH.'/media/albums/'.$album.'/'.$picname;
+						$thumb	= BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$picname;
+						if(is_file($file)) 
+						{
+							// first kill the thumbnail: if anything goes wrong then, we always regenerate later.
+							if(@unlink($thumb) && @unlink($file)) 
+							{
+								// good!
+							} 
+							else 
+							{
+								throw new FbX($ccms['lang']['system']['error_delete'] . ': ' . htmlentities($picname), 'album='.$album);
+							}
+						}
+						else 
+						{
+							throw new FbX($ccms['lang']['system']['error_delete'] . '= ' . htmlentities($picname), 'album='.$album);
+						}
+					}
+					else 
+					{
+						throw new FbX($ccms['lang']['system']['error_tooshort'], 'album='.$album);
+					}
+					
+					$i++;
+				}
+				
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'].' ('.$i.' '.$ccms['lang']['album']['files'].')').'&album='.$album));
+				exit();
+			} 
 			else 
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_delete']).'&album='.$album));
-				exit();
+				throw new FbX($ccms['lang']['auth']['featnotallowed'], 'album='.$album);
 			}
-		}
+		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort']).'&album='.$album));
-			exit();
+			throw new FbX($ccms['lang']['auth']['featnotallowed'], 'album='.$album);
 		}
-	} 
-	else 
-	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed']).'&album='.$album));
-		exit();
 	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 /**

@@ -1,5 +1,7 @@
-window.addEvent('domready', function() { // wait for the content
 
+// wait for the content
+function lazyload_done_now_init(basedir)
+{
 	// our uploader instance
 	var up = new FancyUpload2($('lightbox-status'), $('lightbox-list'), { // options object
 		// we console.log infos, remove that in production!!
@@ -9,7 +11,7 @@ window.addEvent('domready', function() { // wait for the content
 		url: $('lightboxForm').action,
 
 		// path to the SWF file
-		path: '../../../admin/includes/fancyupload/Assets/Swiff.Uploader.swf',
+		path: basedir + 'admin/includes/fancyupload/Assets/Swiff.Uploader.swf',
 
 		// remove that line to select all files, or edit it, add more items
 		typeFilter: {
@@ -122,8 +124,9 @@ window.addEvent('domready', function() { // wait for the content
 					alert('Uploader did not finish loading, try reloading if necessary.');
 					break;
 				case 'flash': // no flash 9+ :(
-					alert('To enable the embedded uploader, install the latest Adobe Flash plugin.')
+					alert('To enable the embedded uploader, install the latest Adobe Flash plugin.');
+					break;
 			}
 		}
 	});
-});
+}

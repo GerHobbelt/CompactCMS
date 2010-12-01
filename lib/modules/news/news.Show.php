@@ -59,17 +59,18 @@ SetUpLanguageAndLocale($locale);
 $special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
 
 // Do actions for overview
+$newsrows = false;
 if(empty($id)) 
 {
 	if(!empty($news_in_page)) 
 	{
 		// Load recordset for all news on specific news page
-		$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT) . " ORDER BY newsModified DESC");
+		$newsrows = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT) . " ORDER BY newsModified DESC");
 	} 
 	else 
 	{
 		// Load recordset for all news on any page
-		$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' ORDER BY newsModified DESC");
+		$newsrows = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' ORDER BY newsModified DESC");
 	}
 } 
 else 
@@ -80,7 +81,11 @@ else
 	$newsID = explode("-", $id, 2);
 	
 	// Load recordset for newsID
-	$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsID=".MySQL::SQLValue($newsID[0], MySQL::SQLVALUE_NUMBER)." AND newsPublished<>'0' AND pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+	$newsrows = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsID=".MySQL::SQLValue($newsID[0], MySQL::SQLVALUE_NUMBER)." AND newsPublished<>'0' AND pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+}
+if ($newsrows === false)
+{
+	$db->Kill();
 }
 
 ?>
@@ -91,7 +96,7 @@ else
 
 <?php 
 // Start switch for news, select all the right details
-if($db->HasRecords()) 
+if(count($newsrows) > 0) 
 {
 	if(empty($do)) 
 	{
@@ -110,9 +115,10 @@ if($db->HasRecords())
 			$showAuthor	= 1;
 			$showDate	= 1;
 		}
-		for ($i=0; $i<$listMax; $i++) 
+		for ($i=0; $i < $listMax; $i++) 
 		{ 
-			$rsNews = $db->Row();
+			$rsNews = $newsrows[$i];
+			
 			?>
 			<div>
 				<?php 
@@ -230,10 +236,9 @@ if($db->HasRecords())
 		//$ccms['keywords']   = $row->keywords;
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 		
-		for ($i=0; $i<$db->RowCount(); $i++) 
-		{ 
-			$rsNews = $db->Row();
-	    	
+		$i = 0;
+		foreach($newsrows as $rsNews)
+		{
 			// Filter spaces, non-file characters and account for UTF-8
 			$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
   			$newsTitle = str_replace($special_chars, "", $newsTitle); 
@@ -244,10 +249,13 @@ if($db->HasRecords())
 			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
 			<span style="font-size:0.8em;font-style:italic;"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></span>
 	    	<p><?php echo $rsNews->newsTeaser; ?></p>
-		<?php
+			<?php
+			$i++;
 		}
 	}
 } 
 else 
+{
 	echo $ccms['lang']['system']['noresults'];
+}
 ?>
