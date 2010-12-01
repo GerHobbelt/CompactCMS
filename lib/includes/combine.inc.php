@@ -280,7 +280,8 @@ $hash = $lastmodified . '-' .
 header("Etag: \"" . $hash . "\"");
 
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && 
-	stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == '"' . $hash . '"') 
+	stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == '"' . $hash . '"' &&
+	!$cfg['IN_DEVELOPMENT_ENVIRONMENT']) // disable this 'shortcut' when in development environment
 {
 	// Return visit and no modifications, so do not send anything
 	send_response_status_header(304); // Not Modified
