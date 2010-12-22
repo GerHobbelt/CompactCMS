@@ -494,6 +494,8 @@ function jsComplete(user_obj, lazy_obj)
 			new FormValidator($('addForm')); 
 		}
 	//});
+
+	lazyloading_commonJS_done();
 }
 
 
