@@ -324,7 +324,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			<?php 
 			foreach ($images as $key => $value) 
 			{ 
-				echo '<label class="thumbimgwdel"><div style="background-image: url(' . path2urlencode($imagethumbs[$key]) . ');" class="thumbview" title="Thumbnail of ' . $value . '" ' . /* $imginfo[$key]['style'] . */ ' >&#160;</div>';
+				echo '<label class="thumbimgwdel"><span style="background-image: url(' . path2urlencode($imagethumbs[$key]) . ');" class="thumbview" title="Thumbnail of ' . $value . '" ' . /* $imginfo[$key]['style'] . */ ' >&#160;</span>';
 
 				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 				{
