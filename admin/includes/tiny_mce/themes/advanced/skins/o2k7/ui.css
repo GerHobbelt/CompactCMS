@@ -24,6 +24,10 @@
 .o2k7Skin .mceStatusbar a.mceResize {display:block; float:right; background:url(../../img/icons.gif) -800px 0; width:20px; height:20px; cursor:se-resize; outline:0}
 .o2k7Skin .mceStatusbar a:hover {text-decoration:underline}
 .o2k7Skin table.mceToolbar {margin-left:3px}
+.o2k7Skin table.mceLayout td.mceToolbar 
+{
+	white-space: normal; /* [i_a] make sure Chrome doesn't put all toolbars on a single line when the width really is not sufficient for that */
+}
 .o2k7Skin .mceToolbar .mceToolbarStart span {display:block; background:url(img/button_bg.png) -22px 0; width:1px; height:22px; margin-left:3px;}
 .o2k7Skin .mceToolbar td.mceFirst span {margin:0}
 .o2k7Skin .mceToolbar .mceToolbarEnd span {display:block; background:url(img/button_bg.png) -22px 0; width:1px; height:22px}
