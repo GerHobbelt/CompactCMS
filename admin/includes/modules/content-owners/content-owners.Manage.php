@@ -67,12 +67,13 @@ $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Get all pages
-$pages = $db->QueryArray("SELECT page_id,urlpage,user_ids FROM ".$cfg['db_prefix'].'pages');
+$pages = $db->SelectArray($cfg['db_prefix'].'pages', null, array('page_id', 'urlpage', 'user_ids'));
 if (!is_array($pages)) $db->Kill();
 
 // Get all users
-$users = $db->QueryArray("SELECT userID,userName,userFirst,userLast,userEmail,userLevel FROM ".$cfg['db_prefix'].'users');
+$users = $db->SelectArray($cfg['db_prefix'].'users', null, array('userID', 'userName', 'userFirst', 'userLast', 'userEmail', 'userLevel'));
 if (!is_array($users)) $db->Kill();
+
 
 
 ?>
@@ -100,6 +101,10 @@ if (!is_array($users)) $db->Kill();
 	</div>
 
 	<h2><span class="ss_sprite_16 ss_group_gear">&#160;</span><?php echo $ccms['lang']['owners']['header']; ?></h2>
+	<?php
+	if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
+	{ 
+	?>
 	<p class="left-text"><?php echo $ccms['lang']['owners']['explain']; ?></p>
 	<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
 	<div class="table_inside">
@@ -126,7 +131,7 @@ if (!is_array($users)) $db->Kill();
 			<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
 			<th class="span-4 pagename">
 				<span class="ss_sprite_16 ss_page_white_world">&#160;</span><?php echo $pages[$i]['urlpage']; ?>.html
-			</td>
+			</th>
 			<?php
 			for ($ar2=0; $ar2<count($users); $ar2++)
 			{
@@ -162,7 +167,6 @@ if (!is_array($users)) $db->Kill();
 		<?php
 		}
 		?>
-		</tr>
 		</table>
 	</div>
 	<div class="right">
@@ -170,12 +174,23 @@ if (!is_array($users)) $db->Kill();
 		<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 	</div>
 	</form>
+	<?php
+	} 
+	else 
+	{
+		die($ccms['lang']['auth']['featnotallowed']);
+	}
+	?>
 
+	<hr class="clear" />
+	
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 
+	<hr class="clear" />
+	
 	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
-	<textarea id="elm1" name="elm1" rows="15" cols="80" style="width: 80%">
+	<textarea id="elm1" name="elm1" rows="15" cols="80" class="span-25">
 		&lt;p&gt;
 			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
 		&lt;/p&gt;
@@ -184,6 +199,8 @@ if (!is_array($users)) $db->Kill();
 		&lt;/p&gt;
 	</textarea>
 
+	<hr class="clear" />
+	
 
 	</div>
 	<script type="text/javascript">
