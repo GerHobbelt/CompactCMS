@@ -661,7 +661,7 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	// Set chmod on config.inc.php, .htaccess, content, cache and albums
 	//
-	if($err==0 && !isset($_POST['ftp_host']) && empty($_POST['ftp_host']) && !strpos($_SERVER['SERVER_SOFTWARE'], "Win"))
+	if($err==0 && empty($_POST['ftp_host']) /* && !strpos($_SERVER['SERVER_SOFTWARE'], "Win") */ )
 	{
 		// Set warning when safe mode is enabled
 		if(ini_get('safe_mode')) 
@@ -671,13 +671,13 @@ if($nextstep == md5('final') && CheckAuth())
 
 		// Set default values
 		$chmod = 0;
-		$errfile=0;
+		$errfile = array();
 
 		// Chmod check and set function
 		function setChmod($path, $value) 
 		{
 			// Check current chmod() status
-			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4)!=$value) 
+			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4) != $value) 
 			{
 				// If not set, set
 				if(@chmod(BASE_PATH.$path, $value)) 
@@ -692,24 +692,26 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 
 		// Do chmod() per necessary folder and set status
-		if(setChmod('/.htaccess','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
-		if(setChmod('/lib/config.inc.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
-		if(setChmod('/content/home.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
-		if(setChmod('/content/contact.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
-		if(setChmod('/lib/templates/ccms.tpl.html','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
+		//
+		// The permissions MUST be octal numbers (or at least integers); see also http://nl.php.net/manual/en/function.chmod.php and the comment by Geoff W. @ 2010/feb/08 !
+		if(setChmod('/.htaccess', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
+		if(setChmod('/lib/config.inc.php', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
+		if(setChmod('/content/home.php', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
+		if(setChmod('/content/contact.php', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
+		if(setChmod('/lib/templates/ccms.tpl.html', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
 
 		// Directories under risk due to chmod(0777)
-		if(setChmod('/content/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/';
-		if(setChmod('/media/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/';
-		if(setChmod('/media/albums/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
-		if(setChmod('/media/files/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
-		if(setChmod('/lib/includes/cache/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+		if(setChmod('/content/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /content/';
+		if(setChmod('/media/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /media/';
+		if(setChmod('/media/albums/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
+		if(setChmod('/media/files/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+		if(setChmod('/lib/includes/cache/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
 
 		if($chmod>0) 
 		{
-			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files</abbr>';
+			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files/directories.</abbr>';
 		}
-		if(!isset($chmod)||$chmod==0||$errfile>0) 
+		if($chmod==0 || count($errfile) > 0) 
 		{
 			$errors[] = 'Warning: could not chmod() all files.';
 			foreach ($errfile as $key => $value) 
@@ -723,73 +725,81 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	// Perform optional FTP chmod command
 	//
-	if(isset($_POST['ftp_host']) && !empty($_POST['ftp_host']) && isset($_POST['ftp_user']) && !empty($_POST['ftp_user'])) 
+	if($err==0 && !empty($_POST['ftp_host']) && !empty($_POST['ftp_user'])) 
 	{
 		// Set up a connection or die
 		$conn_id = ftp_connect($_POST['ftp_host']) or die("Couldn't connect to ".$_POST['ftp_host']);
-
-		// Try to login using provided details
-		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+		if ($conn_id !== false)
 		{
-			// trimPath function
-			function trimPath($path,$depth) 
+			// Try to login using provided details
+			if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
 			{
-				$path = explode('/',$path);
-				$np = '/';
-				for ($i=$depth; $i<count($path); $i++) 
+				// trimPath function
+				function trimPath($path,$depth) 
 				{
-					$np .= $path[$i].'/';
+					$path = explode('/',$path);
+					$np = '/';
+					for ($i=$depth; $i<count($path); $i++) 
+					{
+						$np .= $path[$i].'/';
+					}
+					return $np;
 				}
-				return $np;
+
+				// Find FTP path
+				$i      = 1;
+				$path   = $_POST['ftp_path'];
+
+				// Set max tries to 15
+				for ($i=1; $i<15; $i++) 
+				{ 
+					if(@ftp_chdir($conn_id, trimPath($path,$i))) 
+					{
+						$log[] = "Successfully connected to FTP server";
+						$i = 15;
+					}
+				}
+			} 
+			else 
+			{
+				$errors[] = "Fatal: couldn't connect to the FTP server. Perform chmod() manually.";
+				$err++;
+			}
+			// Count the ftp_chmod() successes
+			$ftp_chmod = 0;
+			$errfile = array();
+
+			// Perform the ftp_chmod command
+			if(@ftp_chmod($conn_id, 0666, "./.htaccess")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
+			if(@ftp_chmod($conn_id, 0666, "./lib/config.inc.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
+			if(@ftp_chmod($conn_id, 0666, "./content/home.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
+			if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
+			if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
+			// Directories under risk due to chmod(0777)
+			if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
+			if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
+			if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
+			if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+
+			if($ftp_chmod>0) 
+			{
+				$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files/directories using FTP.</abbr>';
+			} 
+			if($ftp_chmod==0 || count($errfile) > 0) 
+			{
+				$errors[] = 'Fatal: could not FTP chmod() various files.';
+				foreach ($errfile as $key => $value) 
+				{
+					$errors[] = $value;
+				}
+				$errors[] = 'Perform chmod() manually.';
+				$err++;
 			}
 
-			// Find FTP path
-			$i      = 1;
-			$path   = $_POST['ftp_path'];
-
-			// Set max tries to 15
-			for ($i=1; $i<15; $i++) 
-			{ 
-				if(@ftp_chdir($conn_id, trimPath($path,$i))) 
-				{
-					$log[] = "Successfully connected to FTP server";
-					$i = 15;
-				}
-			}
-		} 
-		else 
-		{
-			$errors[] = "Fatal: couldn't connect to the FTP server. Perform chmod() manually.";
-			$err++;
+			// Close the connection
+			ftp_close($conn_id);
 		}
-		// Count the ftp_chmod() successes
-		$ftp_chmod = 0;
-
-		// Perform the ftp_chmod command
-		if(@ftp_chmod($conn_id, 0666, "./.htaccess")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./lib/config.inc.php")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./content/home.php")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; }
-		// Directories under risk due to chmod(0777)
-		if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; }
-
-		if($ftp_chmod>0) 
-		{
-			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files using FTP.</abbr>';
-		} 
-		elseif($ftp_chmod==0) 
-		{
-			$errors[] = 'Fatal: could not FTP chmod() various files.';
-			$err++;
-		}
-
-		// Close the connection
-		ftp_close($conn_id);
 	}
 
 	//
