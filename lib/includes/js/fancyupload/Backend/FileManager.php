@@ -47,6 +47,8 @@ class FileManager {
 	protected $get;
 	
 	public function __construct($options){
+		global $cfg; // CCMS global
+		
 		$path = FileManagerUtility::getPath();
 		
 		$this->options = array_merge(array(
