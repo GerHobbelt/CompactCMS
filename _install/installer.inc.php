@@ -853,7 +853,8 @@ if($nextstep == md5('final') && CheckAuth())
 		// Write the new setup to the config file
 		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		{
-			if ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w'))
+			// make sure the fopen(..., 'w') is only called when the destination is writable; otherwise an empty file may be produced.
+			if (is_writable_ex(BASE_PATH . '/lib/config.inc.php') && ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w')))
 			{
 				if(fwrite($fp, $configinc, strlen($configinc)))
 				{
@@ -912,7 +913,7 @@ if($nextstep == md5('final') && CheckAuth())
 			{
 				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				{
-					if ($fp = fopen(BASE_PATH.'/.htaccess', 'w'))
+					if (is_writable_ex(BASE_PATH . '/.htaccess') && ($fp = fopen(BASE_PATH . '/.htaccess', 'w')))
 					{
 						if(fwrite($fp, $htaccess, strlen($htaccess)))
 						{
@@ -926,11 +927,7 @@ if($nextstep == md5('final') && CheckAuth())
 						}
 						fclose($fp);
 					}
-					elseif($_SESSION['variables']['rootdir']=="/")
-					{
-						$errors[] = 'Warning: the .htaccess file is not writable.';
-					}
-					elseif($_SESSION['variables']['rootdir']!="/")
+					else
 					{
 						$errors[] = 'Fatal: the .htaccess file is not writable.';
 						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
