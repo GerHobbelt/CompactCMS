@@ -77,7 +77,7 @@ if (0)
 
 $browser = new FileManager(array(
 	'directory' => BASE_PATH . '/media/',
-	'assetBasePath' => BASE_PATH . '/lib/includes/js/fancyupload/Assets',
+	'assetBasePath' => $cfg['rootdir'] . '/lib/includes/js/fancyupload/Assets',
 	'maxUploadSize' => 1024 * 1024 * 5,
 	//'upload' => false,
 	//'destroy' => false,
