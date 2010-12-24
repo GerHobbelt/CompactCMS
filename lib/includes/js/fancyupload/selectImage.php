@@ -61,10 +61,10 @@ if (!defined('BASE_PATH'))
 
 $browser = new FileManager(array(
 	'directory' => BASE_PATH . '/media/',
-	'assetBasePath' => BASE_PATH . '/admin/includes/fancyupload/Assets',
+	'assetBasePath' => $cfg['rootdir'] . '/admin/includes/fancyupload/Assets',
 	'maxUploadSize' => 1024 * 1024 * 5,
-	//'upload' => false,
-	//'destroy' => false,
+	'upload' => false,
+	'destroy' => false,
 	'filter' => 'image/',
 ));
 

@@ -1469,12 +1469,14 @@ tinyMCE.init(
 			{
 				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
 					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+					baseURL: '<?php echo $cfg['rootdir']; ?>',
 					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
 					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
 					selectable: true,
 					uploadAuthData:
 					{
-						session:'ccms_userLevel'
+						session:'ccms_userLevel',
+						sid:'<?php echo session_id(); ?>'
 					}
 				};
 			})

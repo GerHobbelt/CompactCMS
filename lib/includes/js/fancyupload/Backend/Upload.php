@@ -80,7 +80,7 @@ class Upload {
 	 * @param string $file
 	 * @return bool
 	 */
-	public function exists($file){
+	public static function exists($file){
 		return !(empty($_FILES[$file]['name']) || empty($_FILES[$file]['size']));
 	}
 	
@@ -90,7 +90,7 @@ class Upload {
 	 * @param string $file
 	 * @param array $options
 	 */
-	public function mime($file, $options = array()){
+	public static function mime($file, $options = array()){
 		$file = realpath($file);
 		$options = array_merge(array(
 			'default' => null,

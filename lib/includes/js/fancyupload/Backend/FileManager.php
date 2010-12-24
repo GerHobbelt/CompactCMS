@@ -51,7 +51,7 @@ class FileManager {
 		
 		$this->options = array_merge(array(
 			'directory' => BASE_PATH . '/media/',
-			'baseURL' => $cfg['rootdir'] . 'xyz-yabayaba/',
+			'baseURL' => $cfg['rootdir'],
 			'assetBasePath' => '../Assets',
 			'id3Path' => $path . '/Assets/getid3/getid3.php',
 			'mimeTypesPath' => $path . '/MimeTypes.ini',
@@ -59,13 +59,13 @@ class FileManager {
 			'maxUploadSize' => 1024 * 1024 * 3,
 			'upload' => true,  // false
 			'destroy' => true, // false
-			'safe' => false,   // true
+			'safe' => true,   // true
 			'filter' => null
 		), $options);
 		
-		$this->basedir = realpath($this->options['directory']);
+		$this->basedir = str_replace('\\','/',realpath($this->options['directory']));
 		$this->basename = pathinfo($this->basedir, PATHINFO_BASENAME) . '/';
-		$this->path = realpath($this->options['directory'] . '/../');
+		$this->path = str_replace('\\','/',realpath($this->options['directory'] . '/../'));
 		$this->length = strlen($this->path);
 		
 		header('Expires: Fri, 01 Jan 1990 00:00:00 GMT');
@@ -81,7 +81,8 @@ class FileManager {
 	
 	protected function onView(){
 		$dir = $this->getDir(!empty($_POST['directory']) ? $_POST['directory'] : null);
-		$files = ($files = glob($dir . '/*')) ? $files : array();
+		$files = safe_glob($dir . '/*', GLOB_NODOTS | GLOB_PATH);
+		if (!is_array($files)) $files = array();
 		
 		if ($dir != $this->basedir) array_unshift($files, $dir . '/..');
 		natcasesort($files);
@@ -114,7 +115,7 @@ class FileManager {
 	protected function onDetail(){
 		if (empty($_POST['directory']) || empty($_POST['file'])) return;
 		
-		$file = realpath($this->path . '/' . $_POST['directory'] . '/' . $_POST['file']);
+		$file = str_replace('\\','/',realpath($this->path . '/' . $_POST['directory'] . '/' . $_POST['file']));
 		if (!$this->checkFile($file)) return;
 		
 		require_once($this->options['id3Path']);
@@ -173,7 +174,7 @@ class FileManager {
 	protected function onDestroy(){
 		if (!$this->options['destroy'] || empty($_POST['directory']) || empty($_POST['file'])) return;
 		
-		$file = realpath($this->path . '/' . $_POST['directory'] . '/' . $_POST['file']);
+		$file = str_replace('\\','/',realpath($this->path . '/' . $_POST['directory'] . '/' . $_POST['file']));
 		if (!$this->checkFile($file)) return;
 		
 		$this->unlink($file);
@@ -183,26 +184,40 @@ class FileManager {
 		));
 	}
 	
-	protected function onCreate(){
+	protected function doCreate(){
 		if (empty($_POST['directory']) || empty($_POST['file'])) return false;
 		
 		$file = $this->getName($_POST['file'], $this->getDir($_POST['directory']));
-		if (!$file) return;
+		if (!$file) return false;
 		
-		mkdir($file);
-		
-		$this->onView();
+		return mkdir($file);
+	}
+	
+	protected function onCreate(){
+		if (!$this->doCreate())
+		{
+			echo json_encode(array(
+				'status' => 0,
+				'error' => 'failed to create directory'
+			));
+		}
+		else
+		{
+			$this->onView();
+		}
 	}
 	
 	protected function onUpload(){
 		try{
 			if (!$this->options['upload'])
 				throw new FileManagerException('disabled');
+			if (!Upload::exists('Filedata'))
+				throw new FileManagerException('nofile');
 			if (empty($_GET['directory']) || (function_exists('UploadIsAuthenticated') && !UploadIsAuthenticated($this)))
 				throw new FileManagerException('authenticated');
 			
 			$dir = $this->getDir($_GET['directory']);
-			$name = pathinfo((Upload::exists('Filedata')) ? $this->getName($_FILES['Filedata']['name'], $dir) : null, PATHINFO_FILENAME);
+			$name = pathinfo($this->getName($_FILES['Filedata']['name'], $dir), PATHINFO_FILENAME);
 			$file = Upload::move('Filedata', $dir . '/', array(
 				'name' => $name,
 				'extension' => $this->options['safe'] && $name && in_array(strtolower(pathinfo($_FILES['Filedata']['name'], PATHINFO_EXTENSION)), array('exe', 'dll', 'php', 'php3', 'php4', 'php5', 'phps')) ? 'txt' : null,
@@ -240,7 +255,7 @@ class FileManager {
 		
 		$rename = empty($_POST['newDirectory']) && !empty($_POST['name']);
 		$dir = $this->getDir($_POST['directory']);
-		$file = realpath($dir . '/' . $_POST['file']);
+		$file = str_replace('\\','/',realpath($dir . '/' . $_POST['file']));
 		
 		$is_dir = is_dir($file);
 		if (!$this->checkFile($file) || (!$rename && $is_dir))
@@ -267,12 +282,12 @@ class FileManager {
 	}
 	
 	protected function unlink($file){
-		$file = realpath($file);
+		$file = str_replace('\\','/',realpath($file));
 		if ($this->basedir==$file || strlen($this->basedir)>=strlen($file))
 			return;
 		
 		if (is_dir($file)){
-			$files = glob($file . '/*');
+			$files = safe_glob($file . '/*', GLOB_NODOTS | GLOB_PATH);
 			if (is_array($files))
 				foreach ($files as $f)
 					$this->unlink($f);
@@ -285,8 +300,12 @@ class FileManager {
 	
 	protected function getName($file, $dir){
 		$files = array();
-		foreach ((array)glob($dir . '/*') as $f)
-			$files[] = pathinfo($f, PATHINFO_FILENAME);
+		$dirlist = safe_glob($dir . '/*', GLOB_PATH);
+		if (is_array($dirlist))
+		{
+			foreach ($dirlist as $f)
+				$files[] = pathinfo($f, PATHINFO_FILENAME);
+		}
 		
 		$pathinfo = pathinfo($file);
 		$file = $dir . '/' . FileManagerUtility::pagetitle($pathinfo['filename'], $files).(!empty($pathinfo['extension']) ? '.' . $pathinfo['extension'] : null);
@@ -307,7 +326,7 @@ class FileManager {
 	}
 	
 	protected function getDir($dir){
-		$dir = realpath($this->path . '/' . (FileManagerUtility::startsWith($dir, $this->basename) ? $dir : $this->basename));
+		$dir = str_replace('\\','/',realpath($this->path . '/' . (FileManagerUtility::startsWith($dir, $this->basename) ? $dir : $this->basename)));
 		return $this->checkFile($dir) ? $dir : $this->basedir;
 	}
 	

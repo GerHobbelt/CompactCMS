@@ -63,6 +63,11 @@ function show($foo)
 
 <p> link <a href="/c/lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js"> fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js </a> -- which is /meant/ to be exactly the same as the one above, but this one does NOT get damaged by '..'-path optimizing browsers such as FF3.6!
 
+<p> link <a href="/c/lib/includes/js/fancyupload/selectImage.php"> fancyupload's FileManager </a>
+
+<p> link <a href="/c/admin/includes/fancyupload/Demos/mootools-core.js"> /c/admin/includes/fancyupload/Demos/mootools-core.js should give a 404 instead of 403! </a>
+
+<p> link <a href="/c/lib/includes/js/fancyupload/manager.php?session=MySessionId&event=upload&directory=media%2Falbums%2F0rn3&resize=1" > /c/lib/includes/js/fancyupload/manager.php?session=MySessionId&event=upload&directory=media%2Falbums%2F0rn3&resize=1 </a> should work out ok in POST as that's what the fancyupload FLASH component calls.
 
 
 
