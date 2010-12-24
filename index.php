@@ -41,14 +41,6 @@ if (!defined('BASE_PATH'))
 // This file loads the appropriate configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
-
-// Check first whether installation directory exists
-if(is_dir('./_install/')&&is_file('./_install/index.php') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'] && 0) {
-	header('Location: ' . makeAbsoluteURI('./_install/index.php'));
-	exit();
-}
-
-
 // This file parses the template and coding
 /*MARKER*/require_once(BASE_PATH . '/lib/class/engine.class.php');
 

@@ -87,12 +87,25 @@ function check_session_sidpatch_and_start()
 check_session_sidpatch_and_start();
 
 
+
+
 // Load MySQL Class and initiate connection
 /*MARKER*/require_once(BASE_PATH . '/lib/class/mysql.class.php');
-$db = new MySQL();
 
 // Load generic functions
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
+
+
+
+// Check first whether installation directory exists
+if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+{
+	header('Location: ' . makeAbsoluteURI('./_install/index.php'));
+	exit();
+}
+
+// initiate database connection; do this AFTER checking for the _install directory, because otherwise error reports from this init will have precendence over the _install-dir-exists error report!
+$db = new MySQL();
 
 
 // LANGUAGE ==
