@@ -1647,10 +1647,10 @@ function safe_glob($pattern, $flags = 0)
         $glob=array();
         while(($file=readdir($dir))!==false) 
 		{
-            // Recurse subdirectories (GLOB_RECURSE)
+            // Recurse subdirectories (GLOB_RECURSE); speedup: no need to sort the intermediate results
             if (($flags&GLOB_RECURSE) && is_dir($file) && (!in_array($file,array('.','..'))))
 			{
-                $glob = array_merge($glob, array_prepend(safe_glob($path.'/'.$file.'/'.$mask, $flags), ($flags&GLOB_PATH?'':$file.'/')));
+                $glob = array_merge($glob, array_prepend(safe_glob($path.'/'.$file.'/'.$mask, $flags | GLOB_NOSORT), ($flags&GLOB_PATH?'':$file.'/')));
 			}
             // Match file mask
             if (fnmatch($mask,$file)) 
@@ -1659,7 +1659,7 @@ function safe_glob($pattern, $flags = 0)
                   && ( (!($flags&GLOB_NODIR)) || (!is_dir($path.'/'.$file)) )
                   && ( (!($flags&GLOB_NODOTS)) || (!in_array($file,array('.','..'))) ) )
 				{
-                    $glob[] = ($flags&GLOB_PATH?$path.'/':'') . $file . ($flags&GLOB_MARK?'/':'');
+                    $glob[] = ($flags&GLOB_PATH?$path.'/':'') . $file . (($flags&GLOB_MARK) && is_dir($path.'/'.$file) ? '/' : '');
 				}
             }
         }
