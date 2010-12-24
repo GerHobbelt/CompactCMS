@@ -55,14 +55,25 @@ if (!defined('BASE_PATH'))
 
 
 
-/*MARKER*/require_once('./Backend/FileManager.php');
-
 // Please add your own authentication here
-function UploadIsAuthenticated($get){
-	if(!empty($get['session'])) return true;
-	
-	return false;
+function UploadIsAuthenticated($fu_obj)
+{
+if (0)
+{
+	if(empty($_GET['session'])) 
+		return false;
 }
+		
+	ob_start();
+	var_dump($_GET);
+	var_dump($_POST);
+	$dump = ob_get_clean();
+	file_put_contents(BASE_PATH . '/media/fancyupload_uploadmgr.log', $dump);
+	
+	return true;
+}
+
+/*MARKER*/require_once('./Backend/FileManager.php');
 
 $browser = new FileManager(array(
 	'directory' => BASE_PATH . '/media/',

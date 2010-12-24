@@ -43,8 +43,6 @@ class FileManager {
 	protected $basedir = null;
 	protected $basename = null;
 	protected $options;
-	protected $post;
-	protected $get;
 	
 	public function __construct($options){
 		global $cfg; // CCMS global
@@ -72,9 +70,6 @@ class FileManager {
 		
 		header('Expires: Fri, 01 Jan 1990 00:00:00 GMT');
 		header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-		
-		$this->get = $_GET;
-		$this->post = $_POST;
 	}
 	
 	public function fireEvent($event){
@@ -85,7 +80,7 @@ class FileManager {
 	}
 	
 	protected function onView(){
-		$dir = $this->getDir(!empty($this->post['directory']) ? $this->post['directory'] : null);
+		$dir = $this->getDir(!empty($_POST['directory']) ? $_POST['directory'] : null);
 		$files = ($files = glob($dir . '/*')) ? $files : array();
 		
 		if ($dir != $this->basedir) array_unshift($files, $dir . '/..');
@@ -117,9 +112,9 @@ class FileManager {
 	}
 	
 	protected function onDetail(){
-		if (empty($this->post['directory']) || empty($this->post['file'])) return;
+		if (empty($_POST['directory']) || empty($_POST['file'])) return;
 		
-		$file = realpath($this->path . '/' . $this->post['directory'] . '/' . $this->post['file']);
+		$file = realpath($this->path . '/' . $_POST['directory'] . '/' . $_POST['file']);
 		if (!$this->checkFile($file)) return;
 		
 		require_once($this->options['id3Path']);
@@ -176,9 +171,9 @@ class FileManager {
 	}
 	
 	protected function onDestroy(){
-		if (!$this->options['destroy'] || empty($this->post['directory']) || empty($this->post['file'])) return;
+		if (!$this->options['destroy'] || empty($_POST['directory']) || empty($_POST['file'])) return;
 		
-		$file = realpath($this->path . '/' . $this->post['directory'] . '/' . $this->post['file']);
+		$file = realpath($this->path . '/' . $_POST['directory'] . '/' . $_POST['file']);
 		if (!$this->checkFile($file)) return;
 		
 		$this->unlink($file);
@@ -189,9 +184,9 @@ class FileManager {
 	}
 	
 	protected function onCreate(){
-		if (empty($this->post['directory']) || empty($this->post['file'])) return;
+		if (empty($_POST['directory']) || empty($_POST['file'])) return false;
 		
-		$file = $this->getName($this->post['file'], $this->getDir($this->post['directory']));
+		$file = $this->getName($_POST['file'], $this->getDir($_POST['directory']));
 		if (!$file) return;
 		
 		mkdir($file);
@@ -203,10 +198,10 @@ class FileManager {
 		try{
 			if (!$this->options['upload'])
 				throw new FileManagerException('disabled');
-			if (empty($this->get['directory']) || (function_exists('UploadIsAuthenticated') && !UploadIsAuthenticated($this->get)))
+			if (empty($_GET['directory']) || (function_exists('UploadIsAuthenticated') && !UploadIsAuthenticated($this)))
 				throw new FileManagerException('authenticated');
 			
-			$dir = $this->getDir($this->get['directory']);
+			$dir = $this->getDir($_GET['directory']);
 			$name = pathinfo((Upload::exists('Filedata')) ? $this->getName($_FILES['Filedata']['name'], $dir) : null, PATHINFO_FILENAME);
 			$file = Upload::move('Filedata', $dir . '/', array(
 				'name' => $name,
@@ -215,7 +210,7 @@ class FileManager {
 				'mimes' => $this->getAllowedMimeTypes()
 			));
 			
-			if (FileManagerUtility::startsWith(Upload::mime($file), 'image/') && !empty($this->get['resize'])){
+			if (FileManagerUtility::startsWith(Upload::mime($file), 'image/') && !empty($_GET['resize'])){
 				$img = new Image($file);
 				$size = $img->getSize();
 				if ($size['width'] > 800) $img->resize(800)->save();
@@ -241,23 +236,23 @@ class FileManager {
 	
 	/* This method is used by both move and rename */
 	protected function onMove(){
-		if (empty($this->post['directory']) || empty($this->post['file'])) return;
+		if (empty($_POST['directory']) || empty($_POST['file'])) return;
 		
-		$rename = empty($this->post['newDirectory']) && !empty($this->post['name']);
-		$dir = $this->getDir($this->post['directory']);
-		$file = realpath($dir . '/' . $this->post['file']);
+		$rename = empty($_POST['newDirectory']) && !empty($_POST['name']);
+		$dir = $this->getDir($_POST['directory']);
+		$file = realpath($dir . '/' . $_POST['file']);
 		
 		$is_dir = is_dir($file);
 		if (!$this->checkFile($file) || (!$rename && $is_dir))
 			return;
 		
 		if ($rename || $is_dir){
-			if (empty($this->post['name'])) return;
-			$newname = $this->getName($this->post['name'], $dir);
+			if (empty($_POST['name'])) return;
+			$newname = $this->getName($_POST['name'], $dir);
 			$fn = 'rename';
 		}else{
-			$newname = $this->getName(pathinfo($file, PATHINFO_FILENAME), $this->getDir($this->post['newDirectory']));
-			$fn = !empty($this->post['copy']) ? 'copy' : 'rename';
+			$newname = $this->getName(pathinfo($file, PATHINFO_FILENAME), $this->getDir($_POST['newDirectory']));
+			$fn = !empty($_POST['copy']) ? 'copy' : 'rename';
 		}
 		
 		if (!$newname) return;
