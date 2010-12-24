@@ -1565,9 +1565,9 @@ function ccms_lazyload_setup_GHO()
 
 	LazyLoad.js(js, jsComplete);
 }
-</script>
-<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
-<	</body>
+	</script>
+	<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
+	</body>
 	</html>
 <?php 
 
