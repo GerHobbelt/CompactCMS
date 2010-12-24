@@ -62,6 +62,17 @@ session_start();
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 
+if (!isset($cfg))
+{
+	?>
+	<h1>Fatal Error</h1>
+	<p>The installer has apparently rewritten the config.inc.php file but failed to rewrite its content. 
+	This is a severe failure and you must restore a backup or re-install the CompactCMS source code, in
+	particular the <file>lib/config.inc.php</file> and <file>.htaccess</file> files!</p>
+	<?php
+	die();
+}
+
 // Load generic functions
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
