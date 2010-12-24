@@ -1896,18 +1896,18 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 	
 	// core language
 	$mce_langfile = array();
-	$mce_langfile[] = BASE_PATH . '/admin/includes/tiny_mce/langs/'.$language.'.js';
+	$mce_langfile[] = BASE_PATH . '/lib/includes/js/tiny_mce/langs/'.$language.'.js';
 	if (0)
 	{
 		// themes language
-		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
 			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
 		}
 		// plugins language
-		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
@@ -1933,7 +1933,7 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		$cfg['tinymce_language'] = 'en';
 	}
 
-	$editarea_langfile = BASE_PATH . '/admin/includes/edit_area/langs/'.$language.'.js';
+	$editarea_langfile = BASE_PATH . '/lib/includes/js/edit_area/langs/'.$language.'.js';
 	if (is_file($editarea_langfile))
 	{
 		$cfg['editarea_language'] = $language;
@@ -1943,7 +1943,7 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		$cfg['editarea_language'] = 'en';
 	}
 	
-	$fancyupload_langfile = BASE_PATH . '/admin/includes/fancyupload/Language/Language.'.$language.'.js';
+	$fancyupload_langfile = BASE_PATH . '/lib/includes/js/fancyupload/Language/Language.'.$language.'.js';
 	if (is_file($fancyupload_langfile))
 	{
 		$cfg['fancyupload_language'] = $language;

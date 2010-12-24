@@ -493,12 +493,12 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 					<div>
 						<strong class="overall-title"></strong>
 						<br />
-						<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress overall-progress" />
+						<img src="../../../lib/includes/js/fancyupload/Assets/bar.gif" class="progress overall-progress" />
 					</div>
 					<div>
 						<strong class="current-title"></strong>
 						<br />
-						<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress current-progress" />
+						<img src="../../../lib/includes/js/fancyupload/Assets/bar.gif" class="progress current-progress" />
 					</div>
 					<div class="current-text"></div>
 				</div>
@@ -531,7 +531,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 	?>
 var js = [
 	'../../includes/js/mootools-core.js,mootools-more.js',
-	'../../../admin/includes/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js',
+	'../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js',
 	'../../../lib/includes/js/the_goto_guy.js'
 	];
 	

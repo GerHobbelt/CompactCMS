@@ -239,7 +239,7 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../edit_area/edit_area_full.js',
+	'../../../../lib/includes/js/edit_area/edit_area_full.js',
 	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 

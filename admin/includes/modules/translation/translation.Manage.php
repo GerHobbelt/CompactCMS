@@ -439,7 +439,7 @@ if ($do == 'update')
 	<title>Translation module</title>
 	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Css/FileManager.css,Additions.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
 	<![endif]-->
@@ -541,10 +541,10 @@ var jsLogEl = document.getElementById('jslog');
 var js = [
 	'../../../../lib/includes/js/the_goto_guy.js',
 	'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
-	'../../tiny_mce/tiny_mce_dev.js',
+	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
 	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
 	/* File uploader JS */
-	'../../fancyupload/dummy.js,Source/FileManager.js,<?php
+	'../../../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
 	if ($cfg['fancyupload_language'] != 'en')
 	{
 		echo 'Language/Language.en.js,';
@@ -606,8 +606,8 @@ tinyMCE.init(
 			function(type)
 			{
 				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url: '<?php echo $cfg['rootdir']; ?>admin/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-					assetBasePath: '<?php echo $cfg['rootdir']; ?>admin/fancyupload/Assets',
+					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
 					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
 					selectable: true,
 					uploadAuthData:
@@ -645,7 +645,7 @@ function ccms_lazyload_setup_GHO()
 	*/
 	tinyMCEPreInit = {
 		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'admin/includes/tiny_mce"'; ?>
+		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
 		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
 

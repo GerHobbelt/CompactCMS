@@ -95,7 +95,7 @@ if($newsID != null)
 	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 
 	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../admin/includes/fancyupload/Css/FileManager.css,Additions.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
 
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
@@ -208,9 +208,9 @@ function confirmation()
 var jsLogEl = document.getElementById('jslog');
 var js = [
 	'../../includes/js/the_goto_guy.js',
-	'../../../admin/includes/tiny_mce/tiny_mce_dev.js',
+	'../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
 	'../../includes/js/mootools-core.js,mootools-more.js',
-	'../../../admin/includes/fancyupload/dummy.js,Source/FileManager.js,<?php
+	'../../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
 	if ($cfg['fancyupload_language'] != 'en')
 	{
 		echo 'Language/Language.en.js,';
@@ -268,8 +268,8 @@ function jsComplete(user_obj, lazy_obj)
 					function(type)
 					{
 						return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-							url: '<?php echo $cfg['rootdir']; ?>admin/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-							assetBasePath: '<?php echo $cfg['rootdir']; ?>admin/fancyupload/Assets',
+							url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+							assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
 							<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
 							selectable: true,
 							uploadAuthData:
@@ -319,7 +319,7 @@ function ccms_lazyload_setup_GHO()
 	*/
 	tinyMCEPreInit = {
 		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'admin/includes/tiny_mce"'; ?>
+		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
 		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
 

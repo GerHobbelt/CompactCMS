@@ -46,7 +46,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT',
 // Define default location
 if (!defined('BASE_PATH'))
 {
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
 	define('BASE_PATH', $base);
 }
 

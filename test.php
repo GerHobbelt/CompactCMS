@@ -33,9 +33,9 @@ function show($foo)
 }
 ?>
 
-<p>link: <a href="/c/admin/includes/fancyupload/Source/FileManager.js,../../../../../../../Language/Language.en.js,Additions.js,Uploader/Fx.ProgressBar.js,Uploader/Swiff.Uploader.js,Uploader.js"> multiple js with ../ bits inside the URL</a>
+<p>link: <a href="/c/lib/includes/js/fancyupload/Source/FileManager.js,../../../../../../../Language/Language.en.js,Additions.js,Uploader/Fx.ProgressBar.js,Uploader/Swiff.Uploader.js,Uploader.js"> multiple js with ../ bits inside the URL</a>
 
-<p>link: <a href="/c/admin/includes/fancyupload/dummy.js,Source/FileManager.js,Language/Language.en.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"> same: multiple js, now without the ../ bits inside the URL</a>
+<p>link: <a href="/c/lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,Language/Language.en.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js"> same: multiple js, now without the ../ bits inside the URL</a>
 
 <p>link: <a href="/c/admin/img/styles/base.css,layout.css,editor.css,sprite.css,last_minute_fixes.css"> /c/admin/img/styles/base.css,layout.css,editor.css,sprite.css,last_minute_fixes.css</a> -- when combiner is configured to NOT run CSS minification, 
          the comments should exhibit that the encoding is indeed UTF-8: no screwed-up names in there, 
@@ -55,10 +55,14 @@ function show($foo)
 
 <p>link: <a href="/c/_install/"> /c/_install/ </a> -- direct access to the installer (IFF it's there)
 
-<p> link: <a href="/c/admin/includes/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX"> /c/admin/includes/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX </a> -- see if the combiner processes the tinyMCE implicit source merge correctly + test the callback code generator at the end of the JS output
+<p> link: <a href="/c/lib/includes/js/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX"> tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX </a> -- see if the combiner processes the tinyMCE implicit source merge correctly + test the callback code generator at the end of the JS output
 
-<p> link: <a href="/c/admin/includes/tiny_mce/examples/index.html"> /c/admin/includes/tiny_mce/examples/index.html </a> -- the tinyMCE examples directory for testing
+<p> link: <a href="/c/lib/includes/js/tiny_mce/examples/index.html"> tiny_mce/examples/index.html </a> -- the tinyMCE examples directory for testing
 
-<p> link: <a href="/c/admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js,../../modLightbox.js"> /c/admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js,../../modLightbox.js </a> -- it's about the ',../' bits in there: FF3.6 reduces those CLIENT-side, so this type of mixed URL will NEVER work on such a browser. Hence the need for the dummy.js:
+<p> link: <a href="/c/lib/includes/js/fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js,../../modLightbox.js"> fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js,../../modLightbox.js </a> -- it's about the ',../' bits in there: FF3.6 reduces those CLIENT-side, so this type of mixed URL will NEVER work on such a browser. Hence the need for the dummy.js:
 
-<p> link <a href="/c/admin/includes/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js"> /c/admin/includes/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js </a> -- which is /meant/ to be exactly the same as the one above, but this one does NOT get damaged by '..'-path optimizing browsers such as FF3.6!
+<p> link <a href="/c/lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js"> fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js </a> -- which is /meant/ to be exactly the same as the one above, but this one does NOT get damaged by '..'-path optimizing browsers such as FF3.6!
+
+
+
+

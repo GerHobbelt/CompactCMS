@@ -46,7 +46,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT',
 // Define default location
 if (!defined('BASE_PATH'))
 {
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
 	define('BASE_PATH', $base);
 }
 
@@ -66,7 +66,7 @@ function UploadIsAuthenticated($get){
 
 $browser = new FileManager(array(
 	'directory' => BASE_PATH . '/media/',
-	'assetBasePath' => BASE_PATH . '/admin/includes/fancyupload/Assets',
+	'assetBasePath' => BASE_PATH . '/lib/includes/js/fancyupload/Assets',
 	'maxUploadSize' => 1024 * 1024 * 5,
 	//'upload' => false,
 	//'destroy' => false,

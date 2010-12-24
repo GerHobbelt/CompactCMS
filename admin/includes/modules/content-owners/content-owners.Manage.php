@@ -220,7 +220,7 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
+	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
 	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 
@@ -272,7 +272,7 @@ function ccms_lazyload_setup_GHO()
 	*/
 	tinyMCEPreInit = {
 		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'admin/includes/tiny_mce"'; ?>
+		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
 		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
 	

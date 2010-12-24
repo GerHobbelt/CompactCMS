@@ -8,7 +8,7 @@ a:hover, a.hover {color: red;}
 	border: 1px solid #eee;
 }
 #lightbox-status .progress {
-	background: url(../../includes/fancyupload/Assets/progress.gif) no-repeat;
+	background: url(../../../lib/includes/js/fancyupload/Assets/progress.gif) no-repeat;
 	background-position: +50% 0;
 	margin-right: 0.5em;
 	vertical-align: middle;
