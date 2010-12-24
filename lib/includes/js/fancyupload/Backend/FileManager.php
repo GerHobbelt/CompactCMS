@@ -228,7 +228,7 @@ class FileManager {
 			if (FileManagerUtility::startsWith(Upload::mime($file), 'image/') && !empty($_GET['resize'])){
 				$img = new Image($file);
 				$size = $img->getSize();
-				if ($size['width'] > 800) $img->resize(800)->save();
+				if ($size['width'] > 800 && $size['height'] <= 600) $img->resize(800)->save();   // [i_a] another case where portrait-sized images didn't get treated properly.
 				elseif ($size['height'] > 600) $img->resize(null, 600)->save();
 			}
 			
