@@ -99,7 +99,7 @@
 				</li>
 				<li><a class="returnFalse" href="">Tools</a>
 					<ul>
-						<li><a id="builderLinkCheck" href="plugins/windowform/">Window Builder</a></li>
+						<li><a id="builderLinkCheck" href="../Source/Plugins/windowform/">Window Builder</a></li>
 						<li class="divider"><a class="returnFalse arrow-right" href="">Options</a>
 							<ul>
 								<li><a id="toggleStandardEffectsLinkCheck" href="#">Standard Effects</a></li>
@@ -124,15 +124,15 @@
 				</li>
 			</ul>
 
-			<div class="toolbox divider">
-				<div id="spinnerWrapper">
-					<div id="spinner"></div>
+			<div class="toolbar divider">
+				<div class="spinnerWrapper">
+					<div class="spinner"></div>
 				</div>
 			</div>
 
-			<div class="toolbox divider">
+			<div class="toolbar divider">
 				<select id="themeControl" name="themeControl" size="1"
-						onchange="MochaUI.Themes.init(this.options[this.selectedIndex].value)">
+						onchange="MUI.Themes.init(this.options[this.selectedIndex].value)">
 					<option id="chooseTheme" value="" selected="selected">Choose Theme:</option>
 					<option value="default">Default</option>
 					<option value="Charcoal">Charcoal</option>
