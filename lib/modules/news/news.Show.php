@@ -40,13 +40,12 @@ $do	= getGETparam4IdOrNumber('do');
 $id = getGETparam4IdOrNumber('id');
 $is_printing = ($ccms['printing'] == 'Y');
 
-$numCfg = 0;
 if(!empty($pageID)) 
 {
 	$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
-	$numCfg	= $db->RowCount();
+	if ($db->ErrorNumber() != 0) $db->Kill();
 }
-$locale 	= ($numCfg>0?$rsCfg->showLocale:$cfg['locale']);
+$locale 	= ($rsCfg ? $rsCfg->showLocale : $cfg['locale']);
 
 // we only need to check if the given page is a valid news page...
 $news_in_page = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('module' => "'news'", 'urlpage' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('urlpage'));
@@ -100,8 +99,8 @@ if(count($newsrows) > 0)
 {
 	if(empty($do)) 
 	{
-		$newsCount = $db->RowCount();
-		if($numCfg>0) 
+		$newsCount = count($newsrows);
+		if($rsCfg) 
 		{
 			$listMax 	= ($rsCfg->showMessage > $newsCount ? $newsCount : $rsCfg->showMessage);
 			$showTeaser	= intval($rsCfg->showTeaser);

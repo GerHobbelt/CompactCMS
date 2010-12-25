@@ -245,7 +245,8 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
 			{ 
 				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
-				if ($db->HasRecords())
+				if ($db->ErrorNumber() != 0) $db->Kill();
+				if ($rsCfg !== false)
 				{
 					$showmsg = max(1,intval($rsCfg->showMessage)); // always show at least 1 news item on a comment page!
 					$locale = $rsCfg->showLocale;
@@ -278,7 +279,12 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 						?>   	
 					</select>
 					
-					<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.rm0lead($rsCfg->cfgID).'" id="cfgID" />':null); ?>
+					<?php 
+					if ($rsCfg !== false) 
+					{
+						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />'; 
+					}
+					?>
 					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>

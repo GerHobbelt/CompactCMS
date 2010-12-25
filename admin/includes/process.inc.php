@@ -552,7 +552,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							<optgroup label="Toplevel">
 								<?php 
 								$z = 1; 
-								while($z <= $db->RowCount()) 
+								while($z <= count($rows)) 
 								{ 
 								?>
 									<option <?php echo ($row->toplevel==$z) ? "selected=\"selected\"" : ""; ?> value="<?php echo $z; ?>"><?php echo $z; ?></option>
@@ -568,7 +568,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							<optgroup label="Sublevel">
 								<?php 
 								$y = 0; 
-								while($y+1 < $db->RowCount()) 
+								while($y+1 < count($rows)) 
 								{ 
 								?>
 									<option <?php echo ($row->sublevel==$y) ? "selected=\"selected\"" : ""; ?> value="<?php echo $y; ?>"><?php echo $y; ?></option>

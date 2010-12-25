@@ -200,10 +200,10 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			
 				<h2><?php echo $ccms['lang']['news']['settings']; ?></h2>
 				<?php 
-				if (!$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT))))
-					$db->Kill();
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT)));
+				if ($db->ErrorNumber() != 0) $db->Kill();
 					
-				if ($db->HasRecords())
+				if ($rsCfg !== false)
 				{
 					$showmsg = max(1,intval($rsCfg->showMessage)); // always show at least 1 news item on a news page!
 					$locale = $rsCfg->showLocale;
@@ -268,7 +268,12 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							<input type="radio" name="show_teaser" <?php echo ($showteaser==0?'checked="checked"':null); ?> value="0" id="show_teaser0" />
 						</label>
 					</div>
-					<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.rm0lead($rsCfg->cfgID).'" id="cfgID" />':null); ?>
+					<?php 
+					if ($rsCfg !== false)
+					{
+						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />';
+					}
+					?>
 					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
