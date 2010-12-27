@@ -104,7 +104,11 @@ if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOP
 	exit();
 }
 
-// initiate database connection; do this AFTER checking for the _install directory, because otherwise error reports from this init will have precendence over the _install-dir-exists error report!
+/*
+ initiate database connection; do this AFTER checking for the _install directory, because 
+ otherwise error reports from this init will have precedence over the _install-dir-exists 
+ error report!
+*/
 $db = new MySQL();
 
 
