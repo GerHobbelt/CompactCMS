@@ -554,7 +554,7 @@ if($nextstep == md5('final') && CheckAuth())
 		if ($err == 0 && $_SESSION['variables']['do_upgrade'])
 		{
 			$sql = file_get_contents(BASE_PATH.'/media/files/ccms-restore/compactcms-sqldump.sql');
-			// $sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql); -- all tables herin will already have the correct prefix: we're doing a restore anyway, so we have this info from the config.inc.php file
+			$sql = preg_replace('/\\bccms_\\B/', $_SESSION['variables']['db_prefix'], $sql); // all tables here-in will get the correct prefix: we're doing a restore, so we have this info from the config.inc.php file, but we may have changed our setup in the install run just before!
 			$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
 			// note that the passwords for the other users in the backup may be invalid IFF you changed the authcode!
 			$sql = str_replace("\r\n", "\n", $sql);
@@ -592,14 +592,14 @@ if($nextstep == md5('final') && CheckAuth())
 				  want the 'fresh install' records to linger in there when performing 
 				  an upgrade/restore.
 				*/
-				if (preg_match('/DROP\sTABLE/i', $tok))
+				if (preg_match('/DROP\s+TABLE/i', $tok))
 					continue;
 					
-				if (preg_match('/CREATE\sTABLE\s`?([a-zA-Z0-9_\-]+)`?\s\(/is', $tok, $matches))
+				if (preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([a-zA-Z0-9_\-]+)`?\s+\(/is', $tok, $matches))
 				{
 					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 					{
-						$results = $db->TruncateTable($matches[1]);
+						$results = $db->TruncateTable($matches[2]);
 						if ($results == false)
 						{
 							$errors[] = 'Error: executing query: ' . $db->GetLastSQL();
@@ -609,7 +609,7 @@ if($nextstep == md5('final') && CheckAuth())
 					}
 					else
 					{
-						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[1] . "`\n---------------------------------------\n";
+						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[2] . "`\n---------------------------------------\n";
 					}
 				}
 				else
