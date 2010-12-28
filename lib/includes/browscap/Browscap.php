@@ -455,7 +455,7 @@ class Browscap {
       $content .= preg_replace($pattern, '$1="$2"', $subject) . "\n";
     }
 
-    if (!file_put_contents($path, $content)) {
+    if (!@file_put_contents($path, $content)) {
       throw new Browscap_Exception("Could not write .ini content to " . $path);
     }
 
