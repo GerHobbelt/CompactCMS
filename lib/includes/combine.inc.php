@@ -1020,7 +1020,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 		media,
 		nonbreaking,noneditable,
 		pagebreak,paste,preview,print,
-		safari,save,searchreplace,spellchecker,style,
+		save,searchreplace,spellchecker,style,
 		tabfocus,table,template,tinyautosave,
 		visualchars,
 		wordcount,
@@ -1032,7 +1032,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 		inlinepopups,
 		media,
 		paste,print,
-		safari,searchreplace,spellchecker,
+		searchreplace,spellchecker,
 		table,tinyautosave,
 		visualchars,
 	*/

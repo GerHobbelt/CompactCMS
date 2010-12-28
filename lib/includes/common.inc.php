@@ -1425,6 +1425,32 @@ function path2urlencode($path, $specialcharset = ':/')
 
 
 
+/*
+Convert any text (including any HTML) to a legible bit of text to act as part of a URL
+*/
+function cvt_text2legibleURL($text)
+{
+	// Limited characters
+	static $special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
+
+	$text = trim(strip_tags($text));
+	$a1 = strtolower(str2USASCII($text));
+	// Filter spaces, non-file characters and account for UTF-8
+	$a1 = str_replace($special_chars, "", $a1); 
+	$a1 = trim(str_replace(array(' ', '~'),'-',$a1), '-');
+	
+	if (empty($a1))
+	{
+		// the alternative is URLencoding the whole shebang!
+		$a1 = strtolower($text);
+		// Filter spaces, non-file characters and account for UTF-8
+		$a1 = str_replace($special_chars, "", $a1); 
+		$a1 = trim(str_replace(array(' ', '~'),'-',$a1), '-');
+	}
+	
+	return rawurlencode($a1);
+}
+
 
 
 /**

@@ -73,6 +73,8 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
+
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -107,6 +109,8 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			// Start switch for news, select all the right details
 			if(count($newsitems) > 0) 
 			{ 
+				$preview_checkcode = GenerateNewPreviewCode(null, $pageID);
+				
 			?>
 				<form action="news.Process.php?action=del-news" method="post" accept-charset="utf-8">
 				<div class="table_inside">
@@ -131,7 +135,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							{ 
 								echo '<tr><td>';
 							} 
-						
+					
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
@@ -143,7 +147,16 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 								?>
 								</td>
 								<td>
-									<?php echo "<span class='ss_sprite_16 ".($rsNews->newsPublished != 0 ? "ss_bullet_green'>" : "ss_bullet_red'>") . "&#160;</span>"; ?>
+								<?php
+								
+								echo "<span class='ss_sprite_16 ".($rsNews->newsPublished != 0 ? "ss_bullet_green'>" : "ss_bullet_red'>") . "&#160;</span>"; 
+								
+								// Filter spaces, non-file characters and account for UTF-8
+								$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
+								
+								echo '<a href="' . $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle . '.html?preview=' . $preview_checkcode . '" ' .
+											'title="' . $ccms['lang']['backend']['previewpage'] . '"><span class="ss_sprite_16 ss_eye">&#160;</span></a>'; 
+								?>
 								</td>
 								<td>
 								<?php 

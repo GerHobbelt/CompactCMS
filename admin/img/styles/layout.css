@@ -708,6 +708,8 @@ div.module
 .strength4{background:#4dcd00;width:166px;}
 .strength5{background:#399800;width:212px;}
 
+
+
 /* === 2. MODULE === */
 /* === LIGHTBOX === */
 .thumbview {
@@ -1153,6 +1155,8 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 
 
 
+/* === 2. MODULE === */
+/* === PAGE EDITOR (DEFAULT MODULE) === */
 #edit-page textarea#content
 {
 	height:345px;
@@ -1164,6 +1168,8 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 
 
 
+/* === 2. MODULE === */
+/* === NEWS === */
 #news-manager div#show-author label, #news-manager div#show-date label, #news-manager div#show-teaser label
 {
 	display: inline;
@@ -1171,10 +1177,22 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 	padding-right: 1%;
 }
 
+#news-writer #newsTeaser
+{
+	height: 100px;
+}
+
+#news-writer #newsContent
+{
+	height: 350px;
+}
 
 
 
 
+
+/* === 2. MODULE === */
+/* === GUESTBOOK / COMMENTS === */
 /*
 #comment-manager table tr.head0 th
 {

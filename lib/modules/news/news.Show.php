@@ -54,8 +54,6 @@ if ($db->ErrorNumber()) $db->Kill();
 // Set front-end language
 SetUpLanguageAndLocale($locale);
 
-// Limited characters
-$special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
 
 // Do actions for overview
 $newsrows = false;
@@ -86,6 +84,11 @@ if ($newsrows === false)
 {
 	$db->Kill();
 }
+
+
+// generate the preview code when applicable:
+$preview_checkcode = ($ccms['preview'] ? GenerateNewPreviewCode(null, $pageID) : false);
+
 
 ?>
 <!-- additional style and code -->
@@ -129,9 +132,7 @@ if(count($newsrows) > 0)
 				} 
 
 				// Filter spaces, non-file characters and account for UTF-8
-				$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
-				$newsTitle = str_replace($special_chars, "", $newsTitle); 
-				$newsTitle = str_replace(' ','-',$newsTitle);
+				$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
 				
 				if(empty($id)) 
 				{ 
@@ -149,7 +150,7 @@ if(count($newsrows) > 0)
 					if($showAuthor==1||$showDate==1) 
 					{ 
 					?>
-						<p style="text-align:right;">
+						<p class="right-text">
 							<?php 
 							if($showAuthor==1) 
 							{ 
@@ -167,8 +168,6 @@ if(count($newsrows) > 0)
 					if ($i == 0)
 					{
 						// and augment the breadcrumb trail and other template variables:
-						$preview_checkcode = GenerateNewPreviewCode(null, $pageID);
-						
 						$preview_qry = ($ccms['preview'] ? '?preview=' . $preview_checkcode : '');
 						$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a></span>';
 						$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
@@ -189,7 +188,7 @@ if(count($newsrows) > 0)
 					if($showAuthor==1||$showDate==1) 
 					{ 
 					?>
-						<p style="text-align:right;">
+						<p class="right-text">
 							<?php 
 							if($showAuthor==1) 
 							{ 
@@ -208,13 +207,13 @@ if(count($newsrows) > 0)
 				} 
 				?>
 			</div>
-			<hr style="clear:both;"/>
+			<hr class="clear" />
 		<?php
 		}
 		if(empty($id) && $newsCount > $rsCfg->showMessage) 
 		{ 
 		?>
-			<hr/><p style="text-align:center;"><a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a></p>
+			<hr/><p class="center-text"><a href="<?php echo $cfg['rootdir'].$rsNews->pageID; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a></p>
 		<?php 
 		}
 	}
@@ -222,8 +221,6 @@ if(count($newsrows) > 0)
 	if($do == "all") 
 	{
 		// and augment the breadcrumb trail and other template variables:
-		$preview_checkcode = ($ccms['preview'] ? GenerateNewPreviewCode(null, $pageID) : false);
-		
 		$preview_qry = ($preview_checkcode ? '&preview=' . $preview_checkcode : '');
 		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a></span>';
 		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
@@ -235,18 +232,18 @@ if(count($newsrows) > 0)
 		//$ccms['keywords']   = $row->keywords;
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 		
+		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
+
 		$i = 0;
 		foreach($newsrows as $rsNews)
 		{
 			// Filter spaces, non-file characters and account for UTF-8
-			$newsTitle = htmlentities(strtolower($rsNews->newsTitle),ENT_COMPAT,'UTF-8');
-  			$newsTitle = str_replace($special_chars, "", $newsTitle); 
-			$newsTitle = str_replace(' ','-',$newsTitle); 
+			$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
 			
 			?>
 	    	
-			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h3>
-			<span style="font-size:0.8em;font-style:italic;"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></span>
+			<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry; ?>"><?php echo $rsNews->newsTitle; ?></a></h3>
+			<span class="news-timestamp"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></span>
 	    	<p><?php echo $rsNews->newsTeaser; ?></p>
 			<?php
 			$i++;
