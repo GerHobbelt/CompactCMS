@@ -190,6 +190,21 @@ if($newsID != null)
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 
+	<hr class="clear" />
+	
+	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
+	<textarea id="elm1" name="elm1" rows="15" cols="80" class="span-25">
+		&lt;p&gt;
+			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
+		&lt;/p&gt;
+		&lt;p&gt;
+		Nam nisi elit, cursus in rhoncus sit amet, pulvinar laoreet leo. Nam sed lectus quam, ut sagittis tellus. Quisque dignissim mauris a augue rutrum tempor. Donec vitae purus nec massa vestibulum ornare sit amet id tellus. Nunc quam mauris, fermentum nec lacinia eget, sollicitudin nec ante. Aliquam molestie volutpat dapibus. Nunc interdum viverra sodales. Morbi laoreet pulvinar gravida. Quisque ut turpis sagittis nunc accumsan vehicula. Duis elementum congue ultrices. Cras faucibus feugiat arcu quis lacinia. In hac habitasse platea dictumst. Pellentesque fermentum magna sit amet tellus varius ullamcorper. Vestibulum at urna augue, eget varius neque. Fusce facilisis venenatis dapibus. Integer non sem at arcu euismod tempor nec sed nisl. Morbi ultricies, mauris ut ultricies adipiscing, felis odio condimentum massa, et luctus est nunc nec eros.
+		&lt;/p&gt;
+	</textarea>
+
+	<hr class="clear" />
+	
+
 	</div>
 	<script type="text/javascript">
 
@@ -233,6 +248,8 @@ function jsComplete(user_obj, lazy_obj)
 
 	// window.addEvent('domready',function()
 	//{
+if (1)
+{	
 		tinyMCE.init(
 			{
 				mode: 'exact',
@@ -241,7 +258,7 @@ function jsComplete(user_obj, lazy_obj)
 				<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
 				skin: 'o2k7',
 				skin_variant: 'silver',
-				plugins: 'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
+				//plugins: 'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
 				theme_advanced_toolbar_location: 'top',
 				theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
 				theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
@@ -281,7 +298,24 @@ function jsComplete(user_obj, lazy_obj)
 						};
 					})
 			});
-
+}
+			
+		tinyMCE.init({
+			mode : "exact",
+			elements : "elm1",
+			theme : "advanced",
+				skin: 'o2k7',
+				skin_variant: 'silver',
+				//plugins: 'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
+				plugins: '',
+				theme_advanced_toolbar_location: 'top',
+				theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
+				theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
+				theme_advanced_buttons3: '',
+				theme_advanced_toolbar_align: 'left',
+				theme_advanced_statusbar_location: 'bottom',
+			gerxyz: 1
+		});
 
 
 
