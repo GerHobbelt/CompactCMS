@@ -160,7 +160,7 @@ if($newsID != null)
 				?></textarea>
 
 				<label for="newsContent"><?php echo $ccms['lang']['news']['contents']; ?></label>
-				<textarea name="newsContent" id="newsContent" style="height:290px;color:#000;" class="text span-25" rows="8" cols="40"><?php
+				<textarea name="newsContent" id="newsContent" style="height:290px;" class="text span-25" rows="8" cols="40"><?php
 					echo (isset($news) ? $news->newsContent : null);
 				?></textarea>
 				<hr class="space"/>
@@ -290,6 +290,7 @@ function jsComplete(user_obj, lazy_obj)
 			{
 				onFormValidate:function(passed,form,event)
 				{
+					event.stop();
 					if(passed)
 						form.submit();
 				}
@@ -313,7 +314,6 @@ function ccms_lazyload_setup_GHO()
 	jslog('loading JS (sequential calls)');
 
 
-
 	/*
 	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
 	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
@@ -324,7 +324,7 @@ function ccms_lazyload_setup_GHO()
 		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
 		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
-
+	
 	LazyLoad.js(js, jsComplete);
 }
 </script>

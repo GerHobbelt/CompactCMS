@@ -493,7 +493,15 @@ function jsComplete(user_obj, lazy_obj)
 	//{
 		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
 		{
-			new FormValidator($('addForm')); 
+			new FormValidator($('addForm') /* , 
+			{
+				onFormValidate: function(passed, form, event)
+				{
+					event.stop();
+					if (passed) 
+						form.submit();
+				}
+			} */ ); 
 		}
 	//});
 

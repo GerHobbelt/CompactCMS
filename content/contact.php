@@ -170,10 +170,13 @@ window.addEvent('domready', function(){
 	}
 	
 	// Do: send contact form
-	new FormValidator.Inline($('contactForm'), {
-		onFormValidate: function(passed, form, event){
+	new FormValidator.Inline($('contactForm'), 
+	{
+		onFormValidate: function(passed, form, event)
+		{
 			event.stop();
-			if (passed) sendForm();
+			if (passed) 
+				sendForm();
 		}
 	});
 });

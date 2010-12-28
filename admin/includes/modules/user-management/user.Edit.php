@@ -257,9 +257,33 @@ function jsComplete(user_obj, lazy_obj)
 
 	// window.addEvent('domready',function()
 	//{
-		new FormValidator($('userDetailForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
-		new FormValidator($('userPassForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
-		new FormValidator($('userLevelForm'), {onFormValidate: function(passed, form, event){if (passed) form.submit();}});
+		new FormValidator($('userDetailForm'), 
+			{
+				onFormValidate: function(passed, form, event)
+				{
+					event.stop();
+					if (passed) 
+						form.submit();
+				}
+			});
+		new FormValidator($('userPassForm'), 
+			{
+				onFormValidate: function(passed, form, event)
+				{
+					event.stop();
+					if (passed) 
+						form.submit();
+				}
+			});
+		new FormValidator($('userLevelForm'), 
+			{
+				onFormValidate: function(passed, form, event)
+				{
+					event.stop();
+					if (passed) 
+						form.submit();
+				}
+			});
 	//});
 }
 

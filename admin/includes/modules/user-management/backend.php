@@ -299,9 +299,10 @@ function jsComplete(user_obj, lazy_obj)
 	//{
 		new FormValidator($('addUser'),
 		{
-			onFormValidate:function(passed,form,event)
+			onFormValidate: function(passed, form, event)
 			{
-				if(passed)
+				event.stop();
+				if (passed)
 					form.submit();
 			}
 		});
