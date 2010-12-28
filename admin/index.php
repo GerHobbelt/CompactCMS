@@ -469,8 +469,10 @@ function get_total_page_count()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../lib/includes/js/mootools-core.js,mootools-more.js,mocha.js',
 	'../lib/includes/js/excanvas.js?only-when=%3d%3d+IE',
+	'../lib/includes/js/mootools-core.js,mootools-more.js', /* + mocha.js */
+	/*--MOCHAUI--*/
+	'../lib/includes/js/mochaui/Source/Core/Core.js,Canvas.js,Content.js,Desktop.js,Column.js,Panel.js,Dock.js,Window.js,Modal.js,Themes.js',
 	'../lib/includes/js/common.js'
 	];
 
