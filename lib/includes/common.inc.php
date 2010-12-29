@@ -2026,6 +2026,25 @@ Return the list of fields as indicated by the 'ordercode' parameter
 as an array.
 
 Can, for example, be used to pass this set in the 'ordering' argument for any SQL query.
+
+@param $ordercode   A character series determining the generated field order:
+
+                    Code      	Field Name
+					
+					F			urlpage
+					T			pagetitle
+					S			subheader
+					D			description
+					P			printable
+					A			published
+					C			iscoding
+					H			islink
+					I			menu_id
+					1			toplevel
+					2			sublevel
+					M			module
+					L			variant
+					0			page_id
 */
 function cvt_ordercode2list($ordercode)
 {
@@ -2248,6 +2267,15 @@ function GenerateNewPreviewCode($page_id = null, $page_name = null, $this_run_is
 	return $preview_checkcode;
 }
 
+
+/**
+Return FALSE when the specified preview code is invalid; otherwise return the page number encoded with the preview code.
+
+Note: as the page number will NEVER be zero, you can simply check for a valid preview code (if that's all you need) by
+      comparing the function return value like this:
+	  
+	    if (IsValidPreviewCode($code)) { ... }
+*/
 function IsValidPreviewCode($previewCode)
 {
 	if (empty($previewCode))
@@ -2264,7 +2292,7 @@ function IsValidPreviewCode($previewCode)
 	if ($sollwert === false)
 		return false;
 	
-	return ($sollwert === $previewCode);
+	return ($sollwert === $previewCode ? $orig_page_id : false);
 }
 
 ?>

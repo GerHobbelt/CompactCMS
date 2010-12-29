@@ -331,7 +331,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	{
 		$menu_in_set .= ',' . $i;
 	}
-	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
+	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE (`published`='Y'" . ($preview ? " OR `page_id`=" . MySQL::SQLValue($preview, MySQL::SQLVALUE_NUMBER) : '') . ") AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
 	if ($db->ErrorNumber()) $db->Kill();
 
 	// Select the appropriate statement (home page versus specified page)
@@ -581,6 +581,7 @@ if (0)
 			{
 				$current_class = 'to_external_url';
 				$menu_item_class = 'menu_item_extref';
+				$current_link = $msg[0];
 			}
 			else if ($row['urlpage'] == "home")
 			{
@@ -615,15 +616,15 @@ if (0)
 			if ($dummy_top_written)
 			{
 				$menu_item_text = '<span ' . $current_link_classes . '>-</span>';
-				$ccms[$current_structure] .= '<li class="' . /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim( /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 			else if ($row['sublevel'] != 0)
 			{
-				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 			else
 			{
-				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 		}
 		
