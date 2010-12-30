@@ -479,6 +479,7 @@ var js = [
 
 function jsComplete(user_obj, lazy_obj)
 {
+	//alert('done count: ' + lazy_obj.todo_count);
     if (lazy_obj.todo_count)
 	{
 		/* nested invocation of LazyLoad added one or more sets to the load queue */
