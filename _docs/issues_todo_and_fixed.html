@@ -291,28 +291,38 @@ around everywhere I go); moved the paper notes here for easier transportation.)<
 		</td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/30</p></td>
+		<td class="ms-grid5-1001-even"><p>admin page crashes and renders 
+		incorrectly (dyn_list and such is not loaded!) on IE6. (v6.0.900.5512)</p>
+		<p>Fixed. Turns out IE6 doesn&#39;t like trailing commas in object 
+		definitions at all: those superfluous ones have been removed. Another 
+		crash occurred in mochaUI while testing, due to an undefined object. 
+		Fixed as well. (see Window.js in the mochaUI sources)</p></td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p>news items: calendar icon is shown 
+		with a non-transparent background in IE6 -- probably due to IE6 not 
+		supporting PNG transparency.</p></td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p>compactCMS default template (&#39;ccms&#39;) 
+		is not okay; bottom menu and breadcrumb lines mix with the content; 
+		others issues as well.</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/30</p></td>
+		<td class="ms-grid5-1001-even"><p>request the default page start: /c/index.html 
+		and you get a 404 instead of the home page. In effect, &#39;/index.html&#39; 
+		produces a 404, where &#39;/&#39; does not. Rewrite rules forward to index.html, 
+		but apparently the backend doesn&#39;t cope correctly with a page called 
+		&#39;index&#39;.</p>
+		<p>Fixed: now home.html, index.html are both recognized as &#39;home page 
+		requests&#39;. The VHOST rewrite rules have been adjusted as well to make 
+		sure the home page always is the &#39;/&#39; URL (though, of course, /home.html 
+		and /index.html are both accepted as well -- it&#39;s better to have unique 
+		front for SEO reasons)</p></td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
