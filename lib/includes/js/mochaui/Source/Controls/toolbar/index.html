@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="../../Core/Desktop.js"></script>
 	<script type="text/javascript" src="../../Core/Column.js"></script>
 	<script type="text/javascript" src="../../Core/Panel.js"></script>
-	<script type="text/javascript" src="../../Core/Dock.js"></script>
+	<script type="text/javascript" src="../../Core/Taskbar.js"></script>
 	<script type="text/javascript" src="../../Core/Window.js"></script>
 	<script type="text/javascript" src="../../Core/Modal.js"></script>
 	<!--MOCHAUI-->
@@ -23,8 +23,8 @@
 				footer: true,
 				content: [
 					{url: '{demo}pages/blank.html'},
-					{section: 'search', position: 'header', control: 'famfamfam'},
-					{section: 'buttons', position: 'footer', control: 'MUI.Toolbar', buttons: [
+					{name: 'search', position: 'header', control: 'famfamfam'},
+					{name: 'buttons', position: 'footer', control: 'MUI.Toolbar', buttons: [
 						{id: 'page0', image:'{demo}images/icons/16x16/page_green.gif'},
 						{id: 'page1', image:'{demo}images/icons/16x16/page_red.gif'},
 						{id: 'page2', image:'{demo}images/icons/16x16/page.gif'}
@@ -34,7 +34,7 @@
 							return true;
 						}
 					},
-					{section: 'menu', position: 'header', control: 'MUI.ToolbarMenu',items:[
+					{name: 'menu', position: 'header', control: 'MUI.ToolbarMenu',items:[
 						{text:'File',items:[
 							{text:'Open',items:[]},
 							{text:'Tests',items:[
@@ -52,7 +52,7 @@
 							{text:'Starters',items:[
 								{text:'Virtual Desktop',url:'{demo}demo-virtual-desktop.html'},
 								{text:'Fixed Width',url:'{demo}demo-fixed-width.html'},
-								{text:'Fixed Width 2',url:'{demo}demo-dock-only.html'},
+								{text:'Fixed Width 2',url:'{demo}demo-taskbar-only.html'},
 								{text:'No Toolbars',url:'{demo}demo-no-toolbars.html'},
 								{text:'No Desktop',url:'{demo}demo-no-desktop.html'},
 								{text:'Modal Only',url:'{demo}demo-modal-only.html'}
@@ -69,7 +69,7 @@
 							{text:'Window Builder',id:'builderLinkCheck',url:'{plugins}/windowform/'},
 							{type:'divider'},
 							{text:'Options',items:[
-								{text:'Standard Effects',id:'minimizeLink',type:'radio',group:'effects'},
+								{text:'Standard Effects',id:'minimizeLink',type:'radio',group:'effects',selected:true},
 								{text:'Advanced Effects',id:'closeLink',type:'radio',group:'effects'}
 							]}
 						]},
@@ -86,9 +86,9 @@
 						]}
 					]
 					},
-					{section: 'theme', position: 'header', control: 'MUI.ToolbarThemeChange'},
-					{section: 'spinner', position: 'header', control: 'MUI.ToolbarSpinner'},
-					{section: 'buttons1', position: 'header', control: 'MUI.Toolbar', buttons: [
+					{name: 'theme', position: 'header', control: 'MUI.ToolbarThemeChange'},
+					{name: 'spinner', position: 'header', control: 'MUI.ToolbarSpinner'},
+					{name: 'buttons1', position: 'header', control: 'MUI.Toolbar', buttons: [
 						{id: 'button', type: 'image', text: 'Button 1', title: 'Click to do something 1', image: '{fff}accept.png'},
 						{id: 'button', type: 'image', text: 'Button 2', title: 'Click to do something 2'}
 					],
@@ -97,7 +97,7 @@
 							return true;
 						}
 					},
-					{section: 'buttons2', position: 'header', control: 'MUI.Toolbar', buttons: [
+					{name: 'buttons2', position: 'header', control: 'MUI.Toolbar', buttons: [
 						{id: 'button', type: 'html', text: 'Button 3', title: 'Click to do something 3'},
 						{id: 'go', cssClass: 'icon_application_go', title: 'Go'},
 						{id: 'get', cssClass: 'icon_application_get'},

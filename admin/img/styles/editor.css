@@ -59,7 +59,7 @@
 /*
  ---
 
- file: Dock.css
+ file: Taskbar.css
 
  description: MUI - Create a window from a form.
 
@@ -74,12 +74,12 @@
 
  ...
  */
-@import url("../../../lib/includes/js/mochaui/Source/Themes/default/css/Dock.css");
+@import url("../../../lib/includes/js/mochaui/Source/Themes/default/css/Taskbar.css");
 
-#dock {
+#taskbar {
 	background: #E3E3E3;
 }
-.dockTab 
+.taskbarTab 
 {
 	font: 0.825em "Verdana", arial, sans-serif;
 	/*
@@ -91,7 +91,7 @@
 	background-repeat: no-repeat;
 	width: 190px; 
 }
-.dockText 
+.taskbarText 
 { 
 	font-weight: bold;
 	padding-left: 22px; /* make sure the text does not obliterate the 'icon' embedded in our dock-tabs.png/dock-tabs.gif */
@@ -110,7 +110,7 @@
 
 
 /* Toolbar Tabs */
-.toolbarTabs {	
+.taskbarTabs {	
 	padding: 0 5px 2px 2px;
 	background: url(../mochaui/tabs.png) repeat-x;
 	background-position: left -70px;
