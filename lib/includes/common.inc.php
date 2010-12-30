@@ -31,6 +31,8 @@ if (!defined('BASE_PATH'))
 
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/email-validator/EmailAddressValidator.php');
 
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/htmLawed/htmLawed.php');
+
 
 
 
@@ -531,7 +533,12 @@ function filterParam4DisplayHTML($value, $def = null)
 	// TODO: use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
 	
 	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
-	$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+	//$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+    $config = array(
+				  'safe' => 1
+				// , 'elements' => 'a, em, strong'
+				);
+    $value = htmLawed($value, $config);
 	
 	return $value;
 }
