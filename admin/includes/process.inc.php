@@ -263,7 +263,7 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				<td class="leftpad-2">
 				<?php 
-				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
+				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == 'home' || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
 				{ 
 				?>
 					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
@@ -361,7 +361,7 @@ if ($do_update_or_livefilter && checkAuth())
 							class="tabs sprite edit"
 						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
 						| 
-						<a href="../<?php echo ($row->urlpage != "home" ? $row->urlpage . '.html' : '') . '?preview=' . $preview_checkcode; ?>" 
+						<a href="../<?php echo ($row->urlpage != 'home' ? $row->urlpage . '.html' : '') . '?preview=' . $preview_checkcode; ?>" 
 							class="external"
 						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
 					</td>
@@ -581,7 +581,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 					</td>
 					<td class="center-text" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php 
-						if($row->urlpage == "home") 
+						if($row->urlpage == 'home') 
 						{ 
 						?>
 							<input type="checkbox" checked="checked" disabled="disabled" />
@@ -666,7 +666,7 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		{ $errors[] = "- ".$ccms['lang']['system']['error_subtitle_2']; }
 	if (strlen($description) > 250)
 		{ $errors[] = "- ".$ccms['lang']['system']['error_description_2']; }
-	if ($post_urlpage=='403' || $post_urlpage=='404' || $post_urlpage=='sitemap' || $post_urlpage=='home')
+	if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
 		{ $errors[] = "- ".$ccms['lang']['system']['error_reserved']; }
 	
 	if(count($errors) == 0)
