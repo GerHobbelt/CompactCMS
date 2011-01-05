@@ -1,0 +1,111 @@
+# the list of packages to install for the VPS machine base:
+
+apt-utils
+bash
+bzip2
+console-setup
+console-terminus
+consolekit
+coreutils
+cpio
+cpp
+cron
+diffutils
+file
+findutils
+gnupg
+gpgv
+grep
+groff-base
+gzip
+kbd
+less
+locales
+logrotate
+make
+makedev
+man-db
+mawk
+mime-support
+mktemp
+module-init-tools
+mount
+mountall
+nano
+net-tools
+ntpdate
+openssh-client
+openssh-server
+perl
+perl-base
+perl-modules
+procps
+psmisc
+python
+python-central
+python-minimal
+python2.6
+python2.6-minimal
+readline-common
+rsyslog
+sed
+sensible-utils
+sgml-base
+shared-mime-info
+ssh
+sudo
+tar
+tzdata
+vim-common
+vim-tiny
+wget
+xml-core
+xz-utils
+
+# #  unattended-upgrades                  0.55ubuntu4                                     automatic installation of security upgrades
+# unattended-upgrades
+
+
+# so we can fetch compactCMS from github:
+git
+
+
+# lacking at directVPS:
+
+#  at                              3.1.12-1ubuntu2                   Delayed job execution and batch processing
+at
+#  ca-certificates                 20090814                          Common CA certificates
+ca-certificates
+#  lshw                            02.14-1build1                     information about hardware configuration
+lshw
+#  lsof                            4.81.dfsg.1-1build1               List open files
+lsof
+#  manpages                        3.24-1ubuntu1                     Manual pages about using a GNU/Linux system
+manpages
+#  openssl                         0.9.8o-1ubuntu4.3                 Secure Socket Layer (SSL) binary and related cryptographic tools
+openssl
+#  openssl-doc                     0.9.8k-7ubuntu8.5                 Secure Socket Layer (SSL) documentation
+openssl-doc
+#  rsync                           3.0.7-2ubuntu1                    fast remote file copy program (like rcp)
+rsync
+
+
+
+
+# missing on local VM:
+
+#  shared-mime-info                0.71-3                   FreeDesktop.org shared MIME database and spec
+shared-mime-info
+#  ssh                             1:5.5p1-4ubuntu4         secure shell client and server (metapackage)
+ssh
+
+
+
+
+
+
+
+# for SQL-ledger
+
+#  luatex                               0.50.0-1                                        next generation TeX engine
+texlive-luatex
