@@ -31,6 +31,8 @@ if (!defined('BASE_PATH'))
 
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/email-validator/EmailAddressValidator.php');
 
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/htmLawed/htmLawed.php');
+
 
 
 
@@ -211,6 +213,20 @@ function filterParam4IdOrNumber($value, $def = null)
 	return $value;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getGETparam4Filename($name, $def = null) 
 {
 	if (!isset($_GET[$name]))
@@ -245,26 +261,26 @@ function filterParam4Filename($value, $def = null)
 
 
 
-function getGETparam4CommaSeppedFilenames($name, $def = null) 
+function getGETparam4CommaSeppedFullFilePaths($name, $def = null) 
 {
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4CommaSeppedFilenames(rawurldecode($_GET[$name]), $def);
+	return filterParam4CommaSeppedFullFilePaths(rawurldecode($_GET[$name]), $def);
 }
 
-function getPOSTparam4CommaSeppedFilenames($name, $def = null) 
+function getPOSTparam4CommaSeppedFullFilePaths($name, $def = null) 
 {
 	if (!isset($_POST[$name]))
 		return $def;
 
-	return filterParam4CommaSeppedFilenames($_POST[$name], $def);
+	return filterParam4CommaSeppedFullFilePaths($_POST[$name], $def);
 }
 
 /**
-As filterParam4Filename(), but also accepts a 'comma' separator
+As filterParam4FullFilePath(), but also accepts a 'comma' separator
 */
-function filterParam4CommaSeppedFilenames($value, $def = null)
+function filterParam4CommaSeppedFullFilePaths($value, $def = null)
 {
 	if (!isset($value))
 		return $def;
@@ -276,7 +292,7 @@ function filterParam4CommaSeppedFilenames($value, $def = null)
 	}
 	for ($i = count($fns); $i-- > 0; )
 	{
-		$fns[$i] = filterParam4Filename($fns[$i], '');
+		$fns[$i] = filterParam4FullFilePath($fns[$i], '');
 	}
 	
 	return implode(',', $fns);
@@ -517,7 +533,12 @@ function filterParam4DisplayHTML($value, $def = null)
 	// TODO: use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
 	
 	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
-	$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+	//$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+    $config = array(
+				  'safe' => 1
+				// , 'elements' => 'a, em, strong'
+				);
+    $value = htmLawed($value, $config);
 	
 	return $value;
 }
@@ -793,6 +814,48 @@ function filterParam4DateTime($value, $def = null)
 
 
 
+function getGETparam4MathExpression($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4MathExpression(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4MathExpression($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4MathExpression($_POST[$name], $def);
+}
+
+/*
+Accepts any ASCII which might befit a conditional expression. In short: we accept the entire ASCII range from SPACE to 126(dec).
+*/
+function filterParam4MathExpression($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	$value = preg_replace('/\s/s', ' ', $value); // any whitespace becomes SPACE: this way we get rid of CR LF (using the /s regex option!)
+	$value = str2USASCII($value);
+	
+	return $value;
+}
+
+
+
+
+
+
+
+
+
 /*
 	public static function pagetitle($data, $options = array()){
 		static $regex;
@@ -1020,6 +1083,24 @@ function is_http_response_code($response_code)
 	case 503:	// RFC2616 Section 10.5.4: Service Unavailable
 	case 504:	// RFC2616 Section 10.5.5: Gateway Time-out
 	case 505:	// RFC2616 Section 10.5.6: HTTP Version not supported
+/*
+	case 102:
+	case 207:
+	case 418:
+	case 419:
+	case 420:
+	case 421:
+	case 422:
+	case 423:
+	case 424:
+	case 425:
+	case 426:
+	case 506:
+	case 507:
+	case 508:
+	case 509:
+	case 510:
+*/
 		return true;
 		
 	default:
@@ -1076,7 +1157,25 @@ function get_response_code_string($response_code)
 	case 502:	return "RFC2616 Section 10.5.3: Bad Gateway";
 	case 503:	return "RFC2616 Section 10.5.4: Service Unavailable";
 	case 504:	return "RFC2616 Section 10.5.5: Gateway Time-out";
-	case 505:	return "RFC2616 Section 10.5.6: HTTP Version not supported";
+	case 505:	return "RFC2616 Section 10.5.6: HTTP Version not supported";                     
+/*	
+	case 102:	return "Processing";  // http://www.askapache.com/htaccess/apache-status-code-headers-errordocument.html#m0-askapache3
+	case 207:	return "Multi-Status";
+	case 418:	return "I'm a teapot";
+	case 419:	return "unused";
+	case 420:	return "unused";
+	case 421:	return "unused";
+	case 422:	return "Unproccessable entity";
+	case 423:	return "Locked";
+	case 424:	return "Failed Dependency";
+	case 425:	return "Node code";
+	case 426:	return "Upgrade Required";
+	case 506:	return "Variant Also Negotiates";
+	case 507:	return "Insufficient Storage";
+	case 508:	return "unused";
+	case 509:	return "unused";
+	case 510:	return "Not Extended";
+*/
 	default:   return rtrim("Unknown Response Code " . $response_code);
 	}
 }
@@ -1088,6 +1187,17 @@ http://nadeausoftware.com/node/79
 */
 function path_remove_dot_segments($path)
 {
+	// make sure the split is still safe when the 'path' is either a Windows path or a URL:
+	$root = '';
+	$q = '';
+	$count = preg_match('/^([^:]+)(:\/+)([^?]*)(\?.*)$/s', $path, $matches);
+	if ($count)
+	{
+		$root = $matches[1] . $matches[2];
+		$path = $matches[3];
+		$q = $matches[4];
+	}
+	
     // multi-byte character explode
     $inSegs  = preg_split('!/!u', $path);
     $outSegs = array();
@@ -1106,7 +1216,7 @@ function path_remove_dot_segments($path)
     // // compare last multi-byte character against '/'
     // if ($outPath != '/' && (mb_strlen($path)-1) == mb_strrpos($path, '/', 'UTF-8'))
     //     $outPath .= '/';
-    return $outPath;
+    return $root . $outPath . $q;
 }
 
 
@@ -1258,6 +1368,8 @@ function makeAbsoluteURI($path)
 
 
 
+
+
 /**
 Convert an absolute HTTP path to a 'real path' on physical disc
 
@@ -1288,6 +1400,190 @@ function cvt_abs_http_path2realpath($http_base, $site_rootdir, $real_basedir)
 	}
 }
 
+
+
+
+/**
+convert a UNIX path to an URL encoded string, i.e. perform rawurlencode on each of the path elements,
+so that spaces and other noncompliant characters can be placed in the path.
+
+Recognizes these spacial characters: {':', '/'}
+*/
+function path2urlencode($path, $specialcharset = ':/')
+{
+	if (empty($path)) return '';
+	
+	$dst = '';
+	$len = strlen($path);
+	for ($i = 0; $i < $len; $i++)
+	{
+		$c = $path[$i];
+		if (strpos($specialcharset, $c) !== false)
+		{
+			$dst .= $c;
+		}
+		else
+		{
+			$dst .= rawurlencode($c);
+		}
+	}
+	return $dst;
+}
+
+
+
+/*
+Convert any text (including any HTML) to a legible bit of text to act as part of a URL
+*/
+function cvt_text2legibleURL($text)
+{
+	// Limited characters
+	static $special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
+
+	$text = trim(strip_tags($text));
+	$a1 = strtolower(str2USASCII($text));
+	// Filter spaces, non-file characters and account for UTF-8
+	$a1 = str_replace($special_chars, "", $a1); 
+	$a1 = trim(str_replace(array(' ', '~'),'-',$a1), '-');
+	
+	if (empty($a1))
+	{
+		// the alternative is URLencoding the whole shebang!
+		$a1 = strtolower($text);
+		// Filter spaces, non-file characters and account for UTF-8
+		$a1 = str_replace($special_chars, "", $a1); 
+		$a1 = trim(str_replace(array(' ', '~'),'-',$a1), '-');
+	}
+	
+	return rawurlencode($a1);
+}
+
+
+
+/**
+Append pieces of a path together. Each part (argument) is treated as a directory or filename/filepath, so an extra '/' is
+included between elements, where necessary (i.e. if the previous element didn't end on a '/').
+
+NOTES:
+
+Path elements get their Windows '\\' converted to '/' for free.
+
+Return FALSE when the argument list is empty
+
+
+SECURITY NOTICE / WARNING:
+
+1) if you suspect read attacks like fetching '/etc/passwd' might arrive at the doorstep
+   of this one, then MAKE SURE to check the acceptability of the generated path!
+
+2) does *NOT* clean up the generated path!
+
+*/
+function merg_path_elems( /* ... */ )
+{
+	if(func_num_args() == 0) 
+	{
+		return false;
+	}
+	
+	$path = str_replace("\\", '/', func_get_arg(0));
+	
+	for($i = 1; $i < func_num_args(); $i++) 
+	{
+		$part = str_replace("\\", '/', func_get_arg($i));
+		if (empty($part)) continue;
+		
+		if (substr($path, -1, 1) != '/') $path .= '/';
+		// strip off leading '/' of any subpart!
+		if ($part[1] == '/') $part = substr($part, 1);
+		
+		$path .= $part;
+	}
+	
+	// return path_remove_dot_segments($path);
+	return $path;
+}
+
+
+
+
+/**
+pathinfo with UTF-8 support.
+
+See also / derived from: 
+	http://nl.php.net/manual/en/function.pathinfo.php
+*/
+function pathinfo_utf($path)
+{
+	$path = str_replace('\\', '/', $path);
+	if (strpos($path, '/') !== false) 
+		$basename = end(explode('/', $path));
+	else 
+		return false;
+	if (empty($basename)) 
+		return false;
+
+	$dirname = substr($path, 0, strlen($path) - strlen($basename) - 1);
+
+	if (strpos($basename, '.') !== false)
+	{
+		$extension = end(explode('.', $path));
+		$filename = substr($basename, 0, strlen($basename) - strlen($extension) - 1);
+	}
+	else
+	{
+		$extension = '';
+		$filename = $basename;
+	}
+
+	return array
+		(
+			'dirname' => $dirname,
+			'basename' => $basename,
+			'extension' => $extension,
+			'filename' => $filename
+		);
+}
+
+
+
+
+
+/**
+Like die($error) but this one redirect the client to the login page if that's possible.
+
+There the error message will be diplayed at the top of the screen, while you can enter
+your credentials.
+
+The default error message is 'feature not allowed'.
+
+The default 
+
+NOTE:
+This function turned out to be necessary while testing the lightbox upload facility
+with the new, stricter session checking: the simple 'feature not allowed' message
+may be nice and dandy, but it essentially blocked us from easily logging in. Only
+when we entered the login page (lib/includes/auth.inc.php) did we get a chance to
+enter the site again -- because our existing session was destroyed as part of the
+failed SID/SIDCHK test. 
+That doesn't make the test faulty, on the contrary, but we'd rather not get a DoS
+this easily. ;-)
+*/
+function die_and_goto_url($url = null, $msg = null)
+{
+	global $cfg, $ccms;
+	
+	if (empty($msg))
+	{
+		$msg = $ccms['lang']['auth']['featnotallowed'];
+	}
+	if (empty($url))
+	{
+		$url = $cfg['rootdir'] . 'lib/includes/auth.inc.php';
+	}
+	header('Location: ' . makeAbsoluteURI($url . (strpos($url, '?') > 0 ? '&' : '?') .'status=error&msg=' . rawurlencode($msg)));
+	exit();
+}
 
 
 
@@ -1384,10 +1680,10 @@ function safe_glob($pattern, $flags = 0)
         $glob=array();
         while(($file=readdir($dir))!==false) 
 		{
-            // Recurse subdirectories (GLOB_RECURSE)
+            // Recurse subdirectories (GLOB_RECURSE); speedup: no need to sort the intermediate results
             if (($flags&GLOB_RECURSE) && is_dir($file) && (!in_array($file,array('.','..'))))
 			{
-                $glob = array_merge($glob, array_prepend(safe_glob($path.'/'.$file.'/'.$mask, $flags), ($flags&GLOB_PATH?'':$file.'/')));
+                $glob = array_merge($glob, array_prepend(safe_glob($path.'/'.$file.'/'.$mask, $flags | GLOB_NOSORT), ($flags&GLOB_PATH?'':$file.'/')));
 			}
             // Match file mask
             if (fnmatch($mask,$file)) 
@@ -1396,7 +1692,7 @@ function safe_glob($pattern, $flags = 0)
                   && ( (!($flags&GLOB_NODIR)) || (!is_dir($path.'/'.$file)) )
                   && ( (!($flags&GLOB_NODOTS)) || (!in_array($file,array('.','..'))) ) )
 				{
-                    $glob[] = ($flags&GLOB_PATH?$path.'/':'') . $file . ($flags&GLOB_MARK?'/':'');
+                    $glob[] = ($flags&GLOB_PATH?$path.'/':'') . $file . (($flags&GLOB_MARK) && is_dir($path.'/'.$file) ? '/' : '');
 				}
             }
         }
@@ -1472,64 +1768,102 @@ function is_writable_ex($path)
 
 
 
-// Set friendly local names languages
-function setLanguage($lang) 
-{
-	switch ($lang) 
-	{
-		case 'en':
-			return "English";
-			break;
-		case 'nl':
-			return "Nederlands";
-			break;
-		case 'de':
-			return "Deutsch";
-			break;
-		case 'it':
-			return "italiano";
-			break;
-		case 'ru':
-			return "русский";
-			break;
-		case 'sv':
-			return "svenska";
-			break;
-		case 'fr':
-			return "français";
-			break;
-		case 'es':
-			return "español (castellano)";
-			break;
-		case 'pr':
-			return "Português";
-			break;
-		case 'tr':
-			return "Türk";
-			break;
-		case 'zh': /* Chinese ('simplified' is assumed as we only support 2-char codes here... */
-			return "中文";
-			break;
-		case 'ar':
-			return "العربية";
-			break;
-		case 'ja':
-			return "日本";
-			break;
-		case 'ko':
-			return "한국어";
-			break;
-		case 'hi': /* Hindi: India */
-			return "हिन्दी";
-			break;
-		case 'pl':
-			return "Polska";
-			break;
+/**
+Return an array:
 
-		default:
-			return $lang;
-			break;
+["name"] - friendly local name for the language
+["lang"] - language code - 2 characters
+["locale"] - locale code - 3 characters
+*/
+function setLanguage($language) 
+{
+	switch ($language) 
+	{
+	default:	/* fallback: English */
+	case 'en':
+	case 'eng':
+		$language = 'en'; $locale = 'eng';
+		$name = "English";
+		break;
+	case 'de':
+	case 'deu':
+		$language = 'de'; $locale = 'deu';
+		$name = "Deutsch";
+		break;
+	case 'it':
+	case 'ita':
+		$language = 'it'; $locale = 'ita';
+		$name = "italiano";
+		break;
+	case 'nl':
+	case 'nld':
+		$language = 'nl'; $locale = 'nld';
+		$name = "Nederlands";
+		break;
+	case 'ru':
+	case 'rus':
+		$language = 'ru'; $locale = 'rus';
+		$name = "русский";
+		break;
+	case 'sv':
+	case 'sve':
+		$language = 'sv'; $locale = 'sve';
+		$name = "svenska";
+		break;
+	case 'fr':
+	case 'fra':
+		$language = 'fr'; $locale = 'fra';
+		$name = "français";
+		break;
+	case 'es':
+	case 'esp':
+		$language = 'es'; $locale = 'esp';
+		$name = "español (castellano)";
+		break;
+	case 'pt':
+	case 'por':
+		$language = 'pt'; $locale = 'por';
+		$name = "Português";
+		break;
+	case 'tr':
+	case 'tur':
+		$language = 'tr'; $locale = 'tur';
+		$name = "Türk";
+		break;
+	case 'zh': /* Chinese ('simplified' is assumed as we only support 2-char codes here... */
+	case 'zho':
+	case 'chi':
+		$language = 'zh'; $locale = 'zho';
+		$name = "中文";
+		break;
+	case 'ar':
+	case 'ara':
+		$language = 'ar'; $locale = 'ara';
+		$name = "العربية";
+		break;
+	case 'ja':
+	case 'jpn':
+		$language = 'ja'; $locale = 'jpn';
+		$name = "日本";
+		break;
+	case 'ko':
+	case 'kor':
+		$language = 'ko'; $locale = 'kor';
+		$name = "한국어";
+		break;
+	case 'hi': /* Hindi: India */
+	case 'hin':
+		$language = 'hi'; $locale = 'hin';
+		$name = "हिन्दी";
+		break;
+	case 'pl':
+	case 'pol':
+		$language = 'pl'; $locale = 'pol';
+		$name = "Polska";
+		break;
 	}
+
+	return array('name' => $name, 'lang' => $language, 'locale' => $locale);
 }
 
 
@@ -1553,7 +1887,7 @@ and for /country codes/ (which we don't use here!) there's ISO3166:
 
 http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 */
-function SetUpLanguageAndLocale($language)
+function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 {
 	global $cfg;
 	global $ccms; // <-- this one will be augmented by the (probably) loaded language file(s).
@@ -1561,59 +1895,9 @@ function SetUpLanguageAndLocale($language)
 	// Translate 2 character code to setlocale compliant code
 	//
 	// ALSO fix the 2-char language code if it is unknown (security + consistancy measure)!
-	switch ($language) 
-	{
-	default:
-	case 'en':
-	case 'eng':
-		$language = 'en'; $locale = 'eng';break;
-	case 'de':
-	case 'deu':
-		$language = 'de'; $locale = 'deu';break;
-	case 'it':
-	case 'ita':
-		$language = 'it'; $locale = 'ita';break;
-	case 'nl':
-	case 'nld':
-		$language = 'nl'; $locale = 'nld';break;
-	case 'ru':
-	case 'rus':
-		$language = 'ru'; $locale = 'rus';break;
-	case 'sv':
-	case 'sve':
-		$language = 'sv'; $locale = 'sve';break;
-	case 'fr':
-	case 'fra':
-		$language = 'fr'; $locale = 'fra';break;
-	case 'es':
-	case 'esp':
-		$language = 'es'; $locale = 'esp';break;
-	case 'pr':
-	case 'por':
-		$language = 'pr'; $locale = 'por';break;
-	case 'tr':
-	case 'tur':
-		$language = 'tr'; $locale = 'tur';break;
-	case 'zh':
-	case 'zho':
-	case 'chi':
-		$language = 'zh'; $locale = 'zho';break;
-	case 'ar':
-	case 'ara':
-		$language = 'ar'; $locale = 'ara';break;
-	case 'ja':
-	case 'jpn':
-		$language = 'ja'; $locale = 'jpn';break;
-	case 'ko':
-	case 'kor':
-		$language = 'ko'; $locale = 'kor';break;
-	case 'hi':
-	case 'hin':
-		$language = 'hi'; $locale = 'hin';break;
-	case 'pl':
-	case 'pol':
-		$language = 'pl'; $locale = 'pol';break;
-	}
+	$a = setLanguage($language);
+	$language = $a['lang'];
+	$locale = $a['locale'];
 
 	// Either select the specified language file or fall back to English
 	$langfile = BASE_PATH . '/lib/languages/'.$language.'.inc.php';
@@ -1636,24 +1920,27 @@ function SetUpLanguageAndLocale($language)
 		}
 	}
 
-	// Set local for time, currency, etc
-	setlocale(LC_ALL, $locale);
-
+	if (!$only_set_cfg_array)
+	{
+		// Set local for time, currency, etc
+		setlocale(LC_ALL, $locale);
+	}
+	
 	
 	// core language
 	$mce_langfile = array();
-	$mce_langfile[] = BASE_PATH . '/admin/includes/tiny_mce/langs/'.$language.'.js';
+	$mce_langfile[] = BASE_PATH . '/lib/includes/js/tiny_mce/langs/'.$language.'.js';
 	if (0)
 	{
 		// themes language
-		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
 			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
 		}
 		// plugins language
-		$dirlist = safe_glob(BASE_PATH . '/admin/includes/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
@@ -1679,7 +1966,7 @@ function SetUpLanguageAndLocale($language)
 		$cfg['tinymce_language'] = 'en';
 	}
 
-	$editarea_langfile = BASE_PATH . '/admin/includes/edit_area/langs/'.$language.'.js';
+	$editarea_langfile = BASE_PATH . '/lib/includes/js/edit_area/langs/'.$language.'.js';
 	if (is_file($editarea_langfile))
 	{
 		$cfg['editarea_language'] = $language;
@@ -1689,9 +1976,21 @@ function SetUpLanguageAndLocale($language)
 		$cfg['editarea_language'] = 'en';
 	}
 	
+	$fancyupload_langfile = BASE_PATH . '/lib/includes/js/fancyupload/Language/Language.'.$language.'.js';
+	if (is_file($fancyupload_langfile))
+	{
+		$cfg['fancyupload_language'] = $language;
+	}
+	else
+	{
+		$cfg['fancyupload_language'] = 'en';
+	}
+	
 	$cfg['language'] = $language;
 	$cfg['locale'] = $locale;
-	
+//echo "<pre>";
+//var_dump($cfg);	
+//echo "</pre>\n";
 	return $language;
 }
 
@@ -1702,7 +2001,7 @@ Collect the available languages (translations) and return those in an array.
 function GetAvailableLanguages()
 {
 	$sl = array();
-	if ($handle = opendir('../lib/languages')) 
+	if ($handle = opendir(BASE_PATH . '/lib/languages')) 
 	{
 		while (false !== ($file = readdir($handle))) 
 		{
@@ -1711,6 +2010,11 @@ function GetAvailableLanguages()
 			{
 				$f = substr($file,0,strpos($file, '.'));
 				$sl[$f] = setLanguage($f);
+				// making sure language support is indeed in sync in code and definition files:
+				if ($sl[$f]['lang'] != $f)
+				{
+					die("CCMS code has not been updated to support language: language code=" . $f);
+				}
 			}
 		}
 	}
@@ -1729,6 +2033,25 @@ Return the list of fields as indicated by the 'ordercode' parameter
 as an array.
 
 Can, for example, be used to pass this set in the 'ordering' argument for any SQL query.
+
+@param $ordercode   A character series determining the generated field order:
+
+                    Code      	Field Name
+					
+					F			urlpage
+					T			pagetitle
+					S			subheader
+					D			description
+					P			printable
+					A			published
+					C			iscoding
+					H			islink
+					I			menu_id
+					1			toplevel
+					2			sublevel
+					M			module
+					L			variant
+					0			page_id
 */
 function cvt_ordercode2list($ordercode)
 {
@@ -1864,6 +2187,13 @@ function cvt_ordercode2list($ordercode)
 
 
 
+
+
+
+
+
+
+
 /**
  Check for authentic request ($cage=md5(SESSION_ID),$host=md5(CURRENT_HOST)) v.s. 'id' and 'host' session variable values.
  
@@ -1872,12 +2202,16 @@ function cvt_ordercode2list($ordercode)
 */
 function checkAuth()
 {
-	$canarycage	= md5(session_id());
-	$currenthost = md5($_SERVER['HTTP_HOST']);
+	/* 
+	The remaining MD5 call in here is NOT for security but to keep session storage tiny: the collected data 
+	is packed in a fixed, limited number of characters. Meanwhile, MD5 is still quite good enough to hash this
+	very limited entropy data anyhow. No loss, just a little gain.
+	*/
+	$canarycage	= session_id();
+	$currenthost = md5($_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] /* . '::' . $_SERVER['HTTP_USER_AGENT'] */ );
 	
-	//if(md5(session_id())==$cage && md5($_SERVER['HTTP_HOST']) == $host) {   // [i_a] bugfix
 	if (!empty($_SESSION['id']) && $canarycage == $_SESSION['id'] 
-		&& !empty($_SESSION['host']) && $currenthost == $_SESSION['host']) 
+		&& !empty($_SESSION['authcheck']) && $currenthost == $_SESSION['authcheck']) 
 	{
 		return true;
 	} 
@@ -1886,13 +2220,86 @@ function checkAuth()
 
 function SetAuthSafety()
 {
-	$_SESSION['host'] = md5($_SERVER['HTTP_HOST']);
-	$_SESSION['id']	= md5(session_id());
+	$_SESSION['authcheck'] = md5($_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] /* . '::' . $_SERVER['HTTP_USER_AGENT'] */ );
+	$_SESSION['id']	= session_id();  // superfluous, but we'll keep this in here for now, just to be on the safe side.
 	
 	unset($_SESSION['rc1']);
 	unset($_SESSION['rc2']);
 }
 
 
+function GenerateNewAuthCode()
+{
+	if (function_exists('openssl_random_pseudo_bytes'))
+	{
+		$bytes = openssl_random_pseudo_bytes(16, $cryptstrong);
+		$code = bin2hex($bytes);
+	}
+	else
+	{
+		$code = mt_rand('12345','98765');
+	}
+	return $code;
+}
+
+function GenerateNewPreviewCode($page_id = null, $page_name = null, $this_run_is_checking_instead = false)
+{
+	global $db, $cfg;
+	
+	// grab the page record for the original entry page for this preview
+	$filter = array();
+	if (!empty($page_id))
+	{
+		$filter['page_id'] = MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
+	}
+	if (!empty($page_name))
+	{
+		$filter['urlpage'] = MySQL::SQLValue($page_name, MySQL::SQLVALUE_TEXT);
+	}
+	// we MUST have at least one search filter criterium by now:
+	if (count($filter) < 1)
+		return false;
+		
+	$pagerec = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', $filter);
+	if ($pagerec === false) 
+		return false;
+
+	if (!$this_run_is_checking_instead)
+	{
+		// force 'published' to be NO to help limit the lifetime of the previewCode: see also the 'Postnatal notes' section in _docs/security_how_to_for_devs.html.
+		$pagerec['published'] = 'N';
+	}
+	$data = implode('::', $pagerec);
+	$preview_checkcode = $pagerec['page_id'] . '-' . md5($cfg['authcode'] . '::' . $data);
+	return $preview_checkcode;
+}
+
+
+/**
+Return FALSE when the specified preview code is invalid; otherwise return the page number encoded with the preview code.
+
+Note: as the page number will NEVER be zero, you can simply check for a valid preview code (if that's all you need) by
+      comparing the function return value like this:
+	  
+	    if (IsValidPreviewCode($code)) { ... }
+*/
+function IsValidPreviewCode($previewCode)
+{
+	if (empty($previewCode))
+		return false;
+		
+	$code = explode('-', $previewCode, 2);
+	if (!is_array($code) || count($code) != 2 || !is_numeric($code[0]))
+		return false;
+		
+	$orig_page_id = $code[0];
+	
+	// regenerate the preview code as it should be and compare that one with what we've actually got:
+	$sollwert = GenerateNewPreviewCode($orig_page_id, null, true);
+	if ($sollwert === false)
+		return false;
+	
+	return ($sollwert === $previewCode ? $orig_page_id : false);
+}
 
 ?>

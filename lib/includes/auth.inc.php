@@ -46,20 +46,30 @@ if (!defined('BASE_PATH'))
 }
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
+/*
+NOTICE:
+
+as this file can be loaded as part of /anything/, you CANNOT SPECIFY RELATIVE PATHS FOR URLs IN HERE AND EXPECT TO LIVE!
+
+URLs and local paths in here MUST be absolute: use $cfg['rootdir'] and BASE_PATH respectively to make it so.
+*/
+
 // If session already exists
 if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
-	header('Location: ' . makeAbsoluteURI('../../admin/index.php'));
+	header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
 	exit();
 }
 
 // Check for ./install directory
-if(is_dir('../../_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+if(is_dir(BASE_PATH . '_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 {
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
 
 $userName = strtolower(getPOSTparam4IdOrNumber('userName'));
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 // Do authentication
 if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST") 
@@ -84,18 +94,19 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 	of this session.
 	*/
 	$userPass = md5($_POST['userPass'].$cfg['authcode']);
-
+	$logmsg = null;
+	
 	if(empty($userName) && empty($userPass))
 	{
-		$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nodetails']);
+		$logmsg = rawurlencode($ccms['lang']['login']['nodetails']);
 	} 
 	elseif(empty($userName))
 	{
-		$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nouser']);
+		$logmsg = rawurlencode($ccms['lang']['login']['nouser']);
 	} 
 	elseif(empty($userPass))
 	{
-		$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nopass']);
+		$logmsg = rawurlencode($ccms['lang']['login']['nopass']);
 	} 
 	else
 	{
@@ -106,7 +117,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		$matchNumRows = $db->SelectSingleValue($cfg['db_prefix'].'users', $values, 'COUNT(userID)');
 		if($matchNumRows>0)
 		{
-			$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['notactive']);
+			$logmsg = rawurlencode($ccms['lang']['login']['notactive']);
 		} 
 		else
 		{
@@ -118,7 +129,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 			if ($db->RowCount() > 1)
 			{
 				// probably corrupt db table (corrupt import?) or hack attempt
-				die('<strong>Database corruption or hack attempt. Access denied.</strong>');
+				$logmsg = '<strong>Database corruption or hack attempt. Access denied.</strong>';
 				
 				// TODO: alert website owner about this failure/abuse. email to owner?
 			}
@@ -127,7 +138,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 				// no match found in DB: user/pass combo doesn't exist!
 				//
 				// If no match: count attempt and show error
-				$_SESSION['logmsg'] = rawurlencode($ccms['lang']['login']['nomatch']);
+				$logmsg = rawurlencode($ccms['lang']['login']['nomatch']);
 			}
 			elseif($userName != $row['userName'] || $userPass != $row['userPass'] || $row['userActive'] <= 0)
 			{
@@ -135,7 +146,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 				//
 				// NOTE: code should never enter here!
 				//
-				die('INTERNAL ERROR!');
+				$logmsg = 'INTERNAL ERROR!';
 			} 
 			else
 			{
@@ -155,19 +166,21 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 					// Setting safety variables as well: used for checkAuth() during the session.
 					SetAuthSafety();
 
-					unset($_SESSION['logmsg']);
+					unset($logmsg);
 					// Return functions result
-					header('Location: ' . makeAbsoluteURI('../../admin/index.php'));
+					header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
 					exit();
 				}
 				else
 				{
-					$db->Kill();
+					$logmsg = $db->MyDyingMessage();
 				}
 			}
 		}
 	}
+	die_and_goto_url(null, $logmsg);
 }
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
@@ -176,39 +189,90 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST")
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>CompactCMS Administration</title>
 		<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
-		<link rel="stylesheet" type="text/css" href="../../admin/img/styles/base.css,layout.css,sprite.css" />
+		<link rel="stylesheet" type="text/css" href="<?php echo $cfg['rootdir']; ?>admin/img/styles/base.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="<?php echo $cfg['rootdir']; ?>admin/img/styles/ie.css" />
+		<![endif]-->
 	</head>
 <body>
 
-<div id="login-wrapper" class="container">
+<div class="center-text <?php echo $status; ?>">
+	<?php 
+	if(!empty($status_message)) 
+	{ 
+		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+	} 
+	?>
+</div>
+
+<div id="login-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">
-		<div id="logo" class="sprite logo"><h1>CompactCMS administration</h1></div>
-		<span class="ss_sprite ss_door_open">&#160;</span><h2 style="display:inline;"><?php echo $ccms['lang']['login']['login']; ?></h2>
-		<?php echo $ccms['lang']['login']['welcome'];?>
+		<div id="logo" class="sprite logo">
+			<h1>CompactCMS administration</h1>
+		</div>
+		<h2><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></h2>
+		<p><?php echo $ccms['lang']['login']['welcome'];?></p>
 	</div>
 	
-	<div id="login" class="span-9">
-		<?php 
-		if(!empty($_SESSION['logmsg'])) 
-		{ 
-		?>
-			<div class="loginMsg"><?php echo rawurldecode($_SESSION['logmsg']);?></div>
-		<?php 
-		} 
-		?>
-		<p>&#160;</p>
-		<form id="loginFrm" name="loginFrm" class="clear" action="./auth.inc.php" method="post">
-			<label for="userName"><?php echo $ccms['lang']['login']['username']; ?></label><input type="text" class="alt title" autofocus placeholder="username" name="userName" style="width:300px;" value="<?php echo $userName;?>" id="userName" />
+	<div id="login" class="span-9 last">
+		<form id="loginFrm" name="loginFrm" class="clear" action="<?php echo $cfg['rootdir']; ?>lib/includes/auth.inc.php" method="post">
+			<label for="userName"><?php echo $ccms['lang']['login']['username']; ?></label><input type="text" class="alt title span-8" autofocus placeholder="username" name="userName" value="<?php echo $userName;?>" id="userName" />
 			<br class="clear"/>
-			<label for="userPass"><?php echo $ccms['lang']['login']['password']; ?></label><input type="password" class="title" name="userPass" style="width:300px;" value="" id="userPass" />
+			<label for="userPass"><?php echo $ccms['lang']['login']['password']; ?></label><input type="password" class="title span-8" name="userPass" value="" id="userPass" />
 			
 			<p class="span-8 right">
-				<button name="submit" type="submit"><span class="ss_sprite ss_lock_go"><?php echo $ccms['lang']['login']['login']; ?></span></button>
+				<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></button>
 			</p>
 		</form>
 	</div>
 </div>
 <p class="quiet small" style="text-align:center;">&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
 
+<script type="text/javascript" charset="utf-8">
+
+/*
+we're parsed before the external file will be; make it call back to us to execute the check and optional redirect:
+*/
+function jump_if_not_top()
+{
+	/* 
+	make sure we are NOT loaded in a [i]frame (~ MochaUI window) 
+	
+	code bit taken from mootools 'domready' internals; rest derived from
+	  http://tjkdesign.com/articles/frames/4.asp#breaking
+	*/
+	var isFramed = false;
+	// Thanks to Rich Dougherty <http://www.richdougherty.com/>
+	try 
+	{
+		isFramed = (window.frameElement != null);
+	} 
+	catch(e){}
+	/* another way to detect placement in a frame/iframe */
+	try 
+	{
+		var f = (top != this);
+		if (f) isFramed = true;
+	} 
+	catch(e){}
+	/* and for those rare occasions where the login screen is (inadvertedly) loaded through an AJAX load into a <div> or other in the current document: */
+	try 
+	{
+		if (this.location && this.location.href)
+		{
+			var f = (this.location.href.indexOf("<?php echo $_SERVER['PHP_SELF']; ?>") < 0);
+			if (f) isFramed = true;
+		}
+	} 
+	catch(e){}
+
+	if (isFramed) 
+	{
+		close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>", null);
+	}
+}
+
+</script>
+<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top" charset="utf-8"></script>
 </body>
 </html>

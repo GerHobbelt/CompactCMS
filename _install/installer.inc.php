@@ -52,9 +52,10 @@ session_start();
 // Set current && additional step
 $nextstep = getPOSTparam4IdOrNumber('do');
 
-$may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] == 'true'); 
-$do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] == 'true'); 
+$may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] != false); 
+$do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] != false); 
 
+$dump_queries_n_stuff_in_devmode = false;
 
 
 /**
@@ -80,38 +81,49 @@ if($nextstep == md5('2') && CheckAuth())
 	
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
-
-		<label for="userPass"><span class="ss_sprite ss_lock">Administrator password</span><br/><a href="#" class="small ss_sprite ss_arrow_refresh" onclick="randomPassword(8);">Auto generate a safe password</a></label>
-		<input type="text" class="alt title" name="userPass" maxlenght="5" onkeyup="passwordStrength(this.value)" style="width:300px;" value="" id="userPass" />
-		<div class="clear center">
-			<div id="passwordStrength" class="strength0"></div>
-		</div>
-		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Remember your admin password as it cannot be retrieved</span>
-		<label for="authcode"><span class="ss_sprite ss_textfield_key">Authentication PIN</span></label>
-		<input type="text" class="alt title" name="authcode" maxlenght="5" style="width:300px;" value="<?php
-			echo (empty($_SESSION['variables']['authcode']) ? $_SESSION['variables']['authcode'] . '::' . mt_rand('12345','98765') : $_SESSION['variables']['authcode']); ?>" id="authcode" />
-		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Adding this PIN to the URL shows previews of inactive pages</span>
-		<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">This code is used to encrypt passwords (salt)</span>
-		<br class="clear"/>
+		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password
+			<br/>
+			<a class="ss_has_sprite small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_arrow_refresh">&#160;</span>Auto generate a safe password</a>
+		</label>
+		<input type="text" class="alt title" name="userPass" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
+		<div id="passwordStrength" class="strength0"></div>
+		<p class="ss_has_sprite small quiet clear"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Remember your admin password as it cannot be retrieved</p>
+		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN
+			<br/>
+			<a class="small" onclick="mkNewAuthCode(); return false;"><span class="ss_sprite_16 ss_arrow_refresh">&#160;</span>Generate a safe authCode</a></label>
+		</label>
+		<input type="text" class="alt title" name="authcode" value="<?php
+			echo (empty($_SESSION['variables']['authcode']) ? GenerateNewAuthCode() : $_SESSION['variables']['authcode']); ?>" id="authcode" />
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>This PIN is used as a <a href="http://en.wikipedia.org/wiki/Salt_%28cryptography%29">salt</a> to help secure user credentials (specifically: user passphrases) and previews of inactive pages.</p>
+		<?php 
+		if ($may_upgrade) 
+		{ 
+		?>
+			<p class="ss_has_sprite small alert"><span class="ss_sprite_16 ss_exclamation">&#160;</span>Be reminded that altering the existing authCode during a 
+			restore or upgrade operation will <strong>invalidate</strong> all user passwords and preview codes. You <em>may</em> not want to do this, 
+			unless you want to reset <em>all</em> user passwords during this upgrade/restore operation.</p>
+		<?php
+		}
+		?>
 		<label for="protect"><input type="checkbox" name="protect" value="true" <?php
-			echo (!empty($_SESSION['variables']['protect']) && $_SESSION['variables']['protect'] == 'true' ? 'checked' : ''); ?> id="protect" /> Password protect the administration</label>
+			echo (!empty($_SESSION['variables']['protect']) && $_SESSION['variables']['protect'] ? 'checked' : ''); ?> id="protect" /> Password protect the administration</label>
 		<label for="version"><input type="checkbox" name="version" value="true"  <?php
-			echo (!empty($_SESSION['variables']['version']) && $_SESSION['variables']['version'] == 'true' ? 'checked' : ''); ?>  id="version" /> Show version information</label>
-		&#160;<span class="ss_sprite ss_bullet_star small quiet">Want to see the latest CCMS version at the dashboard?</span>
+			echo (!empty($_SESSION['variables']['version']) && $_SESSION['variables']['version'] ? 'checked' : ''); ?>  id="version" /> Show version information</label>
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Want to see the latest CCMS version at the dashboard?</p>
 		<label for="iframe"><input type="checkbox" name="iframe" value="true"  <?php
-			echo (!empty($_SESSION['variables']['iframe']) && $_SESSION['variables']['iframe'] == 'true' ? 'checked' : ''); ?> id="iframe" /> Support &amp; allow iframes</label>
-		&#160;<span class="ss_sprite ss_bullet_star small quiet">Can iframes be managed from within the WYSIWYG editor?</span>
+			echo (!empty($_SESSION['variables']['iframe']) && $_SESSION['variables']['iframe'] ? 'checked' : ''); ?> id="iframe" /> Support &amp; allow iframes</label>
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Can iframes be managed from within the WYSIWYG editor?</p>
 		<label for="wysiwyg"><input type="checkbox" name="wysiwyg" value="true"  <?php
-			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] == 'true' ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
-		&#160;<span class="ss_sprite ss_bullet_star small quiet">Uncheck if you want to disable the visual editor all together</span>
-		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?>	>
+			echo (!empty($_SESSION['variables']['wysiwyg']) && $_SESSION['variables']['wysiwyg'] ? 'checked' : ''); ?>  id="wysiwyg" /> Enable the visual content editor</label>
+		<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Uncheck if you want to disable the visual editor all together</p>
+		<label for="upgrade" <?php if (!$may_upgrade) { echo 'class="quiet"'; } ?> >
 			<input type="checkbox" <?php if ($do_upgrade) { echo 'value="true"'; } ?> name="upgrade" 
 			<?php if ($may_upgrade) { echo 'checked'; } else { echo 'disabled="disabled"'; } ?> id="upgrade" /> Perform an 
-			<span class="ss_sprite ss_help" title="When and how can we upgrade? :: 
+				<span class="ss_sprite_16 ss_help" title="When and how can we upgrade? :: 
 						<ul>
 						<li>
 							<p>You can perform an upgrade when you have <strong>made a backup of your site</strong>: this installer will automatically detect this and consequently enable the 'upgrade' tickbox.</p>
-							<p><span class='small'>(assuming you have created the backup with a running version of CompactCMS 1.4.2 or later)</span></p>
+							<p class='small'>(assuming you have created the backup with a running version of CompactCMS 1.4.2 or later)</p>
 						</li>
 						<li>
 							<p>Note that you can also <strong>restore an existing site</strong> by taking its backup and extracting the contents of the backup (zip archive) 
@@ -119,25 +131,62 @@ if($nextstep == md5('2') && CheckAuth())
 							<p>This will result in the backed-up content to be placed in the <file><?php echo $dir; ?>content/</file> directory 
 							and the <file>config.inc.php</file> and <file>compactcms-sqldump.sql</file> files are available in the web site's restore directory
 							<file><?php echo $dir; ?>media/files/ccms-restore/</file> .</p>
-							<p><span class='small'>(This is assuming you have created the backup with a running version of CompactCMS 1.4.2 or later; if your backup
+							<p class='small'>(This is assuming you have created the backup with a running version of CompactCMS 1.4.2 or later; if your backup
 							originates from an earlier version of CompactCMS, you will have to move the extracted content to the appropriate spots and possibly
 							recover your original config.inc.php some other way as those versions did not include that file in the backups. Consult the 
-							CompactCMS forum for assistance.)</span></p>
+							CompactCMS forum for assistance.)</p>
 							<p>Subsequently running this install wizard will result in auto-detection of such a restore operation and enable the 'upgrade' tickbox for you.</p>
-							">
-				&#160;<strong>upgrade</strong>
-			</span>
-			</label>
-		&#160;<span class="ss_sprite ss_bullet_star small <?php if (!$may_upgrade) { echo 'quiet'; } ?>">Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></span>
+						</li>
+						</ul> ">
+				&#160;</span>
+			<strong>upgrade</strong>
+		</label>
+		<p class="ss_has_sprite small <?php if (!$may_upgrade) { echo 'quiet'; } ?>"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Uncheck if you want to execute a fresh install <strong>(your site data will be lost!)</strong></p>
 
-		<p class="span-8 right">
-			<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
-			<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
-		</p>
+		<div class="right">
+			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
+			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
+		</div>
+		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
+		<script>
+function mkNewAuthCode()		
+{
+	var node = $('authcode');
+	var val = node.get('value').trim();
 
+	var request = new Request.JSON({
+		url:'installer.inc.php',
+		data: 'do=mkNewAuthCode',
+		method:'post',
+		onComplete: function(properties, text) {
+			//alert(text);
+			//alert(properties);
+			//alert(properties.code);
+			node.set('value', properties.code);
+		}
+	}).send();
+}
+		</script>
 <?php
+
+	exit();
 } // Close step two
+
+// assistant for step 2:
+if ($nextstep == 'mkNewAuthCode')
+{
+	// no need to check the session?
+	$code = GenerateNewAuthCode();
+
+	$return = array(
+		'code' => $code
+	);
+
+	header('Content-type: application/json');
+	echo json_encode($return);
+
+	exit();
+}
 
 // Step three
 if($nextstep == md5('3') && CheckAuth()) 
@@ -159,28 +208,34 @@ if($nextstep == md5('3') && CheckAuth())
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$version,$iframe,$wysiwyg,$protect,$userPass,$authcode,$do_upgrade);
 ?>
 	<legend class="installMsg">Step 3 - Collecting your database details</legend>
-		<label for="db_host"><span class="ss_sprite ss_server_database">Database host</span></label><input type="text" class="alt title" name="db_host" style="width:300px;" value="<?php
+		<label for="db_host"><span class="ss_sprite_16 ss_server_database">&#160;</span>Database host</label>
+		<input type="text" class="alt title" name="db_host" value="<?php
 			echo (empty($_SESSION['variables']['db_host']) ? 'localhost' : $_SESSION['variables']['db_host']); ?>" id="db_host" />
-		<br class="clear"/>
-		<label for="db_user"><span class="ss_sprite ss_drive_user">Database username</span></label><input type="text" class="alt title" name="db_user" style="width:300px;" value="<?php
+		<br/>
+		<label for="db_user"><span class="ss_sprite_16 ss_drive_user">&#160;</span>Database username</label>
+		<input type="text" class="alt title" name="db_user" value="<?php
 			echo (empty($_SESSION['variables']['db_user']) ? '' : $_SESSION['variables']['db_user']); ?>" id="db_user" />
-		<br class="clear"/>
-		<label for="db_pass"><span class="ss_sprite ss_drive_key">Database password</span></label><input type="password" class="title" name="db_pass" style="width:300px;" value="<?php
+		<br/>
+		<label for="db_pass"><span class="ss_sprite_16 ss_drive_key">&#160;</span>Database password</label>
+		<input type="password" class="title" name="db_pass" value="<?php
 			echo (empty($_SESSION['variables']['db_pass']) ? '' : $_SESSION['variables']['db_pass']); ?>" id="db_pass" />
-		<br class="clear"/>
-		<label for="db_name"><span class="ss_sprite ss_database">Database name</span></label><input type="text" class="alt title" name="db_name" style="width:300px;" value="<?php
+		<br>
+		<label for="db_name"><span class="ss_sprite_16 ss_database">&#160;</span>Database name</label>
+		<input type="text" class="alt title" name="db_name" value="<?php
 			echo (empty($_SESSION['variables']['db_name']) ? 'compactcms' : $_SESSION['variables']['db_name']); ?>" id="db_name" />
-		<br class="clear"/>
-		<label for="db_prefix"><span class="ss_sprite ss_database_table">Database table prefix</span></label><input type="text" class="alt title" name="db_prefix" style="width:300px;" value="<?php
+		<br/>
+		<label for="db_prefix"><span class="ss_sprite_16 ss_database_table">&#160;</span>Database table prefix</label>
+		<input type="text" class="alt title" name="db_prefix" value="<?php
 			echo (empty($_SESSION['variables']['db_prefix']) ? 'ccms_' : $_SESSION['variables']['db_prefix']); ?>" id="db_prefix" />
 
-		<p class="span-8 right">
-			<button name="submit" type="submit"><span class="ss_sprite ss_information">To confirmation</span></button>
-			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
-			<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
-		</p>
-
+		<div class="right">
+			<button name="submit" type="submit"><span class="ss_sprite_16 ss_information">&#160;</span>To confirmation</button>
+			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
+		</div>
+		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
 <?php
+
+	exit();
 } // Close step three
 
 // Step four
@@ -198,9 +253,6 @@ if($nextstep == md5('4') && CheckAuth())
 
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$db_host,$db_user,$db_pass,$db_name,$db_prefix);
-
-	// Define alternative table row color
-	$alt_row = "#CDE6B3";
 
 	//
 	// Check for current chmod(); we only are interesting in whether these files and directories are readable and writeable:
@@ -237,15 +289,17 @@ if($nextstep == md5('4') && CheckAuth())
 		if(count($chfile) == 0) 
 		{ 
 		?>
-			<p class="center"><span class="ss_sprite ss_tick"><em>All files are already correctly chmod()'ed</em></span></p>
+			<p class="ss_has_sprite center-text"><span class="ss_sprite_16 ss_tick">&#160;</span><em>All files are already correctly chmod()'ed</em></p>
 		<?php 
 		} 
 		
 		if(ini_get('safe_mode') || count($chfile) > 0)
 		{ 
 		?>
-			<span class="ss_sprite ss_exclamation">&#160;</span><h2 style="display:inline;">Warning</h2>
-			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the <a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
+			<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span>Warning</h2>
+			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> 
+			for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the 
+			<a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
 			<span>&rarr; <em>Files that still require chmod():</em></span>
 			<ul>
 				<?php 
@@ -258,9 +312,9 @@ if($nextstep == md5('4') && CheckAuth())
 		<?php 
 		} 
 		?>
-		<span class="ss_sprite ss_computer">&#160;</span><h2 style="display:inline;">Environment</h2>
+		<h2><span class="ss_sprite_16 ss_computer">&#160;</span>Environment</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Sitename</th>
 				<td><?php echo $_SESSION['variables']['sitename'];?></td>
 			</tr>
@@ -268,15 +322,15 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Root directory</th>
 				<td><?php echo $_SESSION['variables']['rootdir'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Language</th>
 				<td><?php echo $_SESSION['variables']['language'];?></td>
 			</tr>
 		</table>
-		<br class="clear"/>
-		<span class="ss_sprite ss_cog">&#160;</span><h2 style="display:inline;">Preferences</h2>
+
+		<h2><span class="ss_sprite_16 ss_cog">&#160;</span>Preferences</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Version Check</th>
 				<td><?php echo ($_SESSION['variables']['version'] ? 'yes' : '---');?></td>
 			</tr>
@@ -284,7 +338,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Iframes Allowed</th>
 				<td><?php echo ($_SESSION['variables']['iframe'] ? 'yes' : '---');?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Visual editor</th>
 				<td><?php echo ($_SESSION['variables']['wysiwyg'] ? 'yes' : '---');?></td>
 			</tr>
@@ -292,7 +346,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">User authentication</th>
 				<td><?php echo ($_SESSION['variables']['protect'] ? 'yes' : '---');?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Administrator password</th>
 				<td> *** </td>
 			</tr>
@@ -300,7 +354,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Authentication PIN</th>
 				<td><?php echo $_SESSION['variables']['authcode'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Install Type</th>
 				<td><?php 
 				if ($_SESSION['variables']['do_upgrade'])
@@ -319,10 +373,10 @@ if($nextstep == md5('4') && CheckAuth())
 				?></td>
 			</tr>
 		</table>
-		<br class="clear"/>
-		<span class="ss_sprite ss_database">&#160;</span><h2 style="display:inline;">Database details</h2>
+		
+		<h2><span class="ss_sprite_16 ss_database">&#160;</span>Database details</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th width="55%" scope="row">Database host</th>
 				<td><?php echo $_SESSION['variables']['db_host'];?></td>
 			</tr>
@@ -330,7 +384,7 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Database username</th>
 				<td><?php echo $_SESSION['variables']['db_user'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Database password</th>
 				<td> *** </td>
 			</tr>
@@ -338,25 +392,26 @@ if($nextstep == md5('4') && CheckAuth())
 				<th scope="row">Database name</th>
 				<td><?php echo $_SESSION['variables']['db_name'];?></td>
 			</tr>
-			<tr style="background-color: <?php echo $alt_row; ?>;">
+			<tr class="altcolor">
 				<th scope="row">Database table prefix</th>
 				<td><?php echo $_SESSION['variables']['db_prefix'];?></td>
 			</tr>
 		</table>
 
 		<hr noshade="noshade" />
-		<p class="quiet">
-			<strong><span class="ss_sprite ss_exclamation">Please note</span></strong><br/>
+		<p class="ss_has_sprite quiet">
+			<span class="ss_sprite_16 ss_exclamation">&#160;</span><strong>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
 
-		<p class="span-8 right">
-			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite ss_accept">Install <strong>CompactCMS</strong></span></button>
-			<span class="ss_sprite ss_cancel"><a href="index.php" title="Back to step first step">Cancel</a></span>
-			<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
-		</p>
-
+		<div class="right">
+			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite_16 ss_accept">&#160;</span>Install <strong>CompactCMS</strong></button>
+			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
+		</div>
+		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 <?php
+
+	exit();
 } // Close step four
 
 /**
@@ -499,7 +554,7 @@ if($nextstep == md5('final') && CheckAuth())
 		if ($err == 0 && $_SESSION['variables']['do_upgrade'])
 		{
 			$sql = file_get_contents(BASE_PATH.'/media/files/ccms-restore/compactcms-sqldump.sql');
-			// $sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql); -- all tables herin will already have the correct prefix: we're doing a restore anyway, so we have this info from the config.inc.php file
+			$sql = preg_replace('/\\bccms_\\B/', $_SESSION['variables']['db_prefix'], $sql); // all tables here-in will get the correct prefix: we're doing a restore, so we have this info from the config.inc.php file, but we may have changed our setup in the install run just before!
 			$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
 			// note that the passwords for the other users in the backup may be invalid IFF you changed the authcode!
 			$sql = str_replace("\r\n", "\n", $sql);
@@ -537,14 +592,14 @@ if($nextstep == md5('final') && CheckAuth())
 				  want the 'fresh install' records to linger in there when performing 
 				  an upgrade/restore.
 				*/
-				if (preg_match('/DROP\sTABLE/i', $tok))
+				if (preg_match('/DROP\s+TABLE/i', $tok))
 					continue;
 					
-				if (preg_match('/CREATE\sTABLE\s`?([a-zA-Z0-9_\-]+)`?\s\(/is', $tok, $matches))
+				if (preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([a-zA-Z0-9_\-]+)`?\s+\(/is', $tok, $matches))
 				{
 					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 					{
-						$results = $db->TruncateTable($matches[1]);
+						$results = $db->TruncateTable($matches[2]);
 						if ($results == false)
 						{
 							$errors[] = 'Error: executing query: ' . $db->GetLastSQL();
@@ -554,7 +609,7 @@ if($nextstep == md5('final') && CheckAuth())
 					}
 					else
 					{
-						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[1] . "`\n---------------------------------------\n";
+						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[2] . "`\n---------------------------------------\n";
 					}
 				}
 				else
@@ -587,18 +642,16 @@ if($nextstep == md5('final') && CheckAuth())
 		{
 			$log[] = "Database structure and data successfully imported";
 		}
-		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && $dump_queries_n_stuff_in_devmode)
 		{
 ?>
-			<div id="configinc_display" >
-				<h2>Database Initialization</h2>
-				<pre class="small"><?php
-					foreach($sqldump as $line)
-					{
-						echo htmlspecialchars($line);
-					}
-				?></pre>
-			</div>
+			<h2>Database Initialization</h2>
+			<pre class="small"><?php
+				foreach($sqldump as $line)
+				{
+					echo htmlspecialchars($line);
+				}
+			?></pre>
 <?php
 		}
 
@@ -608,7 +661,7 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	// Set chmod on config.inc.php, .htaccess, content, cache and albums
 	//
-	if($err==0 && !isset($_POST['ftp_host']) && empty($_POST['ftp_host']) && !strpos($_SERVER['SERVER_SOFTWARE'], "Win"))
+	if($err==0 && empty($_POST['ftp_host']) /* && !strpos($_SERVER['SERVER_SOFTWARE'], "Win") */ )
 	{
 		// Set warning when safe mode is enabled
 		if(ini_get('safe_mode')) 
@@ -618,13 +671,13 @@ if($nextstep == md5('final') && CheckAuth())
 
 		// Set default values
 		$chmod = 0;
-		$errfile=0;
+		$errfile = array();
 
 		// Chmod check and set function
 		function setChmod($path, $value) 
 		{
 			// Check current chmod() status
-			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4)!=$value) 
+			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4) != $value) 
 			{
 				// If not set, set
 				if(@chmod(BASE_PATH.$path, $value)) 
@@ -639,24 +692,26 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 
 		// Do chmod() per necessary folder and set status
-		if(setChmod('/.htaccess','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
-		if(setChmod('/lib/config.inc.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
-		if(setChmod('/content/home.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
-		if(setChmod('/content/contact.php','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
-		if(setChmod('/lib/templates/ccms.tpl.html','0666')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
+		//
+		// The permissions MUST be octal numbers (or at least integers); see also http://nl.php.net/manual/en/function.chmod.php and the comment by Geoff W. @ 2010/feb/08 !
+		if(setChmod('/.htaccess', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
+		if(setChmod('/lib/config.inc.php', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
+		if(setChmod('/content/home.php', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
+		if(setChmod('/content/contact.php', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
+		if(setChmod('/lib/templates/ccms.tpl.html', 0666)) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
 
 		// Directories under risk due to chmod(0777)
-		if(setChmod('/content/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /content/';
-		if(setChmod('/media/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/';
-		if(setChmod('/media/albums/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
-		if(setChmod('/media/files/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
-		if(setChmod('/lib/includes/cache/','0777')) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+		if(setChmod('/content/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /content/';
+		if(setChmod('/media/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /media/';
+		if(setChmod('/media/albums/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
+		if(setChmod('/media/files/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+		if(setChmod('/lib/includes/cache/', 0777)) { $chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
 
 		if($chmod>0) 
 		{
-			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files</abbr>';
+			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files/directories.</abbr>';
 		}
-		if(!isset($chmod)||$chmod==0||$errfile>0) 
+		if($chmod==0 || count($errfile) > 0) 
 		{
 			$errors[] = 'Warning: could not chmod() all files.';
 			foreach ($errfile as $key => $value) 
@@ -670,73 +725,81 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	// Perform optional FTP chmod command
 	//
-	if(isset($_POST['ftp_host']) && !empty($_POST['ftp_host']) && isset($_POST['ftp_user']) && !empty($_POST['ftp_user'])) 
+	if($err==0 && !empty($_POST['ftp_host']) && !empty($_POST['ftp_user'])) 
 	{
 		// Set up a connection or die
 		$conn_id = ftp_connect($_POST['ftp_host']) or die("Couldn't connect to ".$_POST['ftp_host']);
-
-		// Try to login using provided details
-		if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+		if ($conn_id !== false)
 		{
-			// trimPath function
-			function trimPath($path,$depth) 
+			// Try to login using provided details
+			if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
 			{
-				$path = explode('/',$path);
-				$np = '/';
-				for ($i=$depth; $i<count($path); $i++) 
+				// trimPath function
+				function trimPath($path,$depth) 
 				{
-					$np .= $path[$i].'/';
+					$path = explode('/',$path);
+					$np = '/';
+					for ($i=$depth; $i<count($path); $i++) 
+					{
+						$np .= $path[$i].'/';
+					}
+					return $np;
 				}
-				return $np;
+
+				// Find FTP path
+				$i      = 1;
+				$path   = $_POST['ftp_path'];
+
+				// Set max tries to 15
+				for ($i=1; $i<15; $i++) 
+				{ 
+					if(@ftp_chdir($conn_id, trimPath($path,$i))) 
+					{
+						$log[] = "Successfully connected to FTP server";
+						$i = 15;
+					}
+				}
+			} 
+			else 
+			{
+				$errors[] = "Fatal: couldn't connect to the FTP server. Perform chmod() manually.";
+				$err++;
+			}
+			// Count the ftp_chmod() successes
+			$ftp_chmod = 0;
+			$errfile = array();
+
+			// Perform the ftp_chmod command
+			if(@ftp_chmod($conn_id, 0666, "./.htaccess")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /.htaccess/';
+			if(@ftp_chmod($conn_id, 0666, "./lib/config.inc.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/config.inc.php';
+			if(@ftp_chmod($conn_id, 0666, "./content/home.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/home.php';
+			if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
+			if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
+			// Directories under risk due to chmod(0777)
+			if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
+			if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
+			if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
+			if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+
+			if($ftp_chmod>0) 
+			{
+				$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files/directories using FTP.</abbr>';
+			} 
+			if($ftp_chmod==0 || count($errfile) > 0) 
+			{
+				$errors[] = 'Fatal: could not FTP chmod() various files.';
+				foreach ($errfile as $key => $value) 
+				{
+					$errors[] = $value;
+				}
+				$errors[] = 'Perform chmod() manually.';
+				$err++;
 			}
 
-			// Find FTP path
-			$i      = 1;
-			$path   = $_POST['ftp_path'];
-
-			// Set max tries to 15
-			for ($i=1; $i<15; $i++) 
-			{ 
-				if(@ftp_chdir($conn_id, trimPath($path,$i))) 
-				{
-					$log[] = "Successfully connected to FTP server";
-					$i = 15;
-				}
-			}
-		} 
-		else 
-		{
-			$errors[] = "Fatal: couldn't connect to the FTP server. Perform chmod() manually.";
-			$err++;
+			// Close the connection
+			ftp_close($conn_id);
 		}
-		// Count the ftp_chmod() successes
-		$ftp_chmod = 0;
-
-		// Perform the ftp_chmod command
-		if(@ftp_chmod($conn_id, 0666, "./.htaccess")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./lib/config.inc.php")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./content/home.php")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; }
-		// Directories under risk due to chmod(0777)
-		if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; }
-		if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; }
-
-		if($ftp_chmod>0) 
-		{
-			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files using FTP.</abbr>';
-		} 
-		elseif($ftp_chmod==0) 
-		{
-			$errors[] = 'Fatal: could not FTP chmod() various files.';
-			$err++;
-		}
-
-		// Close the connection
-		ftp_close($conn_id);
 	}
 
 	//
@@ -768,7 +831,13 @@ if($nextstep == md5('final') && CheckAuth())
 				$new_val = $cfg[$key];
 			}
 			// Rewrite the previous loaded string
-			if($new_val=="true"||$new_val=="false")
+			if($new_val===true||$new_val===false)
+			{
+				$new_val = ($new_val ? 'true' : 'false');
+				$config_str = "\$cfg['{$key}'] = {$new_val};";
+				$re_str = '/\$cfg\[\''.$key.'\'\]\s+=\s+[^;]+;/';
+			}
+			else if(is_integer($new_val))
 			{
 				$config_str = "\$cfg['{$key}'] = {$new_val};";
 				$re_str = '/\$cfg\[\''.$key.'\'\]\s+=\s+[^;]+;/';
@@ -784,7 +853,8 @@ if($nextstep == md5('final') && CheckAuth())
 		// Write the new setup to the config file
 		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		{
-			if ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w'))
+			// make sure the fopen(..., 'w') is only called when the destination is writable; otherwise an empty file may be produced.
+			if (is_writable_ex(BASE_PATH . '/lib/config.inc.php') && ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w')))
 			{
 				if(fwrite($fp, $configinc, strlen($configinc)))
 				{
@@ -806,12 +876,14 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 		else
 		{
+			if ($dump_queries_n_stuff_in_devmode)
+			{
 ?>
-			<div id="configinc_display" >
 				<h2>config.inc.php Configuration Values - after modification</h2>
 				<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
-			</div>
 <?php
+			}
+			
 			$log[] = "Successfully wrote the new configuration values in the config.inc.php file";
 		}
 	}
@@ -821,11 +893,17 @@ if($nextstep == md5('final') && CheckAuth())
 	if($err==0)
 	{
 		$htaccess   = @file_get_contents(BASE_PATH.'/.htaccess');
-		$newline    = "RewriteBase ".$_SESSION['variables']['rootdir']." "; // 'superfluous' space at the end there to simplify the match, even when moving the setup from /dir/ to /
+		$newpath    = $_SESSION['variables']['rootdir'];
 
 		if(strpos($htaccess, $newline)===false)
 		{
-			$htaccess = preg_replace('/RewriteBase\s+\/.*/', $newline, $htaccess);
+			// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
+			$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
+			$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
+
+			// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
+			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
+			$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
 			if (!$htaccess)
 			{
 				$errors[] = 'Fatal: could not set the RewriteBase in the .htaccess file.';
@@ -835,7 +913,7 @@ if($nextstep == md5('final') && CheckAuth())
 			{
 				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				{
-					if ($fp = fopen(BASE_PATH.'/.htaccess', 'w'))
+					if (is_writable_ex(BASE_PATH . '/.htaccess') && ($fp = fopen(BASE_PATH . '/.htaccess', 'w')))
 					{
 						if(fwrite($fp, $htaccess, strlen($htaccess)))
 						{
@@ -849,11 +927,7 @@ if($nextstep == md5('final') && CheckAuth())
 						}
 						fclose($fp);
 					}
-					elseif($_SESSION['variables']['rootdir']=="/")
-					{
-						$errors[] = 'Warning: the .htaccess file is not writable.';
-					}
-					elseif($_SESSION['variables']['rootdir']!="/")
+					else
 					{
 						$errors[] = 'Fatal: the .htaccess file is not writable.';
 						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
@@ -862,12 +936,14 @@ if($nextstep == md5('final') && CheckAuth())
 				}
 				else
 				{
+					if ($dump_queries_n_stuff_in_devmode)
+					{
 ?>
-					<div id="htaccess_display" >
 						<h2>.htaccess Rewrite Rules - after modification</h2>
 						<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
-					</div>
 <?php
+					}
+					
 					$log[] = "Successfully rewrote the .htaccess file";
 				}
 			}
@@ -882,29 +958,21 @@ if($nextstep == md5('final') && CheckAuth())
 		unset($_SESSION['variables']); 
 		?>
 		<h2>Process results</h2>
-		<p>
-			<?php
-			while (list($key,$value) = each($log)) 
-			{
-				echo '<span class="ss_sprite ss_accept">'.$value.'</span><br />';
-			} 
-			?>
-		</p>
-	<?php 
+		<?php
+		while (list($key,$value) = each($log)) 
+		{
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_accept">&#160;</span>'.$value.'</p>';
+		} 
 	} 
 	if(isset($errors)) 
 	{ 
 	?>
 		<h2>Errors &amp; warnings</h2>
-		<p>
-			<?php
-			while (list($key,$value) = each($errors)) 
-			{
-				echo '<span class="ss_sprite ss_exclamation">'.$value.'</span><br />';
-			} 
-			?>
-		</p>
-	<?php 
+		<?php
+		while (list($key,$value) = each($errors)) 
+		{
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$value.'</p>';
+		} 
 	} 
 	
 	if($err==0) 
@@ -914,7 +982,7 @@ if($nextstep == md5('final') && CheckAuth())
 		<p>The installation has been successful! You should now follow the steps below, to get you started.</p>
 		<ol>
 			<li>Delete the <em>./_install</em> directory</li>
-			<li><a href="../admin/">Login</a> using username <span class="ss_sprite ss_user_red"><strong>admin</strong></span></li>
+			<li><a href="../admin/">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
 			<li>Change your password through the back-end</li>
 			<li><a href="http://www.compactcms.nl/contact.html" target="_blank">Let me know</a> how you like CompactCMS!</li>
 		</ol>
@@ -922,8 +990,17 @@ if($nextstep == md5('final') && CheckAuth())
 	} 
 	else 
 	{
-		echo '<a href="index.php">Retry setting the variables</a>'; 
+	?>
+		<div class="right">
+			<p class="ss_has_sprite"><a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a></p>
+		</div>
+	<?php
 	}
+
+	exit();
 } // Close final processing
 
+
+// when we get here, something went horribly wrong. Have you been messing about?
 ?>
+<p class="error">The flow has been broken. Some unidentified internal error occurred.</p>

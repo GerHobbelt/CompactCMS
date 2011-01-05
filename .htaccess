@@ -2,7 +2,7 @@
 #
 # Copyright 2008 - 2010 by CompactCMS.nl. All rights reserved.
 # This file is part of CompactCMS (refer to license.txt)
-# Revision: CompactCMS - 1.4.1
+# Revision: CompactCMS - 1.4.2
 #
 ##
 
@@ -18,15 +18,21 @@
 
 AddDefaultCharset utf-8
 Options +FollowSymLinks
-RewriteEngine On 
+# AcceptPathInfo     On
+
+<IfDefine CCMS_installed>
+
+RewriteEngine On
+# RewriteLog         /var/log/apache2/example.com.mod_rewrite.log
+# RewriteLogLevel    7
 
 ## 
 # Start modification
 # Make sure the RewriteBase variable reflects your file structure
 ##
 
-		   
-# WARNING / TODO: these must be patched when CCMS sits in a subdir within the site!
+
+# WARNING: these must be patched when CCMS sits in a subdir within the site!
 ErrorDocument 403 /index.php?page=403
 ErrorDocument 404 /index.php?page=404
 
@@ -44,25 +50,34 @@ RewriteBase /
 # Adjust the two lines below and UNCOMMENT both lines (remove #'s)
 ##
 
-# RewriteCond %{HTTP_HOST} ^www.mysite.com [NC] 
-# RewriteRule ^(.*)$ http://mysite.com/$1 [L,R=301]
+# RewriteCond %{HTTP_HOST} ^www.example.com [NC] 
+# RewriteRule ^(.*)$ http://example.com/$1 [L,R=301]
 
 ##
 # Various rewrite rules
 ##
 
+
+RewriteCond    %{REQUEST_FILENAME}  -f
+RewriteRule    ^(.*\.html)$          $1  [L]
+RewriteCond    %{REQUEST_FILENAME}  -f
+RewriteRule    ^(.*\.csx)$           $1  [L]
+
+
 RewriteRule ^([^/]*)/([^/]*)\.html$             index.php?page=$1&id=$2 [QSA,L]
 RewriteRule ^([^/]*)/([^/]*)\.print$            index.php?page=$1&id=$2&printing=Y [QSA,L]
 RewriteRule ^([^/]+)\.html$                     index.php?page=$1 [QSA,L]
 RewriteRule ^([^/]+)\.print$                    index.php?page=$1&printing=Y [QSA,L]
-RewriteRule ^lib/includes/js/([^/]+\.js)$       lib/includes/combine.inc.php?type=javascript&files=$1 [L]
-RewriteRule ^admin/img/styles/([^/]+\.css)$     lib/includes/combine.inc.php?type=css&files=$1 [L]    
+RewriteRule ^lib/includes/js/([^/]+\.js)$       lib/includes/combine.inc.php?type=javascript&files=$1 [QSA,L]
+RewriteRule ^admin/img/styles/([^/]+\.css)$     lib/includes/combine.inc.php?type=css&files=$1 [QSA,L]    
 # pull EVERY OTHER JS/CSS file through combine as well: that's our generic cacher/compressor/optimizer
-RewriteRule ^(lib/.+)/([^/]+\.js)$              lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
-RewriteRule ^(lib/.+)/([^/]+\.css)$             lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
-RewriteRule ^(admin/.+)/([^/]+\.js)$            lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [L]
-RewriteRule ^(admin/.+)/([^/]+\.css)$           lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [L]
-RewriteRule ^sitemap\.xml$                      index.php?page=sitemap [L]
+RewriteRule ^(lib/[^,]+)/([^/,]+\.js(,.+)?)$    lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [QSA,L]
+RewriteRule ^(lib/[^,]+)/([^/,]+\.css(,.+)?)$   lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [QSA,L]
+RewriteRule ^(admin/[^,]+)/([^/,]+\.js(,.+)?)$  lib/includes/combine.inc.php?type=javascript&files=$2&jsdir=$1 [QSA,L]
+RewriteRule ^(admin/[^,]+)/([^/,]+\.css(,.+)?)$ lib/includes/combine.inc.php?type=css&files=$2&cssdir=$1 [QSA,L]
+RewriteRule ^sitemap\.xml$                      index.php?page=sitemap [QSA,L]
+
+</IfDefine> # CCMS_installed
 
 ##
 # Security measures
@@ -87,7 +102,19 @@ RewriteRule ^(.+)$ - [F]
 
 <IfModule mod_deflate.c>
     SetOutputFilter DEFLATE
+
+	#
+	# BUT only do this for 'compressible content' where we cannot 'confuse' the browser.
+    #
+    # solution below is better? (at least not 'deprecated' like any use of AddOutputFilterByType...
+    #
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|tiff?)$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.(?:exe|t?gz|zip|bz2|sit|rar|7z|lha|lzh|arj|Z)$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.pdf$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.(?:avi|mov|mkv|mpe?g|vob|rm|ogm|mp3|mp4|ogg|flac|ape|flv|wmv|wma|asf|swf)$ no-gzip dont-vary
+	
 </IfModule>
+
 
 ##
 # Set expiry for caches using the apache Expire mod; misc. headers are set through the Headers module.
@@ -127,9 +154,11 @@ RewriteRule ^(.+)$ - [F]
 </IfModule>
 
 <IfModule mod_headers.c>
-    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|swf|mp3|mp4)$">
+	
+	# TODO: check this header manipulation stuff. The hardcoded dates make me go hmmmmm already...
+    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|swf|mp3|mp4|avi|mov|mkv|mpe?g|vob|rm|ogm|ogg|flac|ape|flv|wmv|wma|asf)$">
     Header set Cache-Control "public"
-    # Header set Expires "access plus 1 year"
+		# Header set Expires "Fri, 1 Jun 2012 20:00:00 GMT"
     Header unset Last-Modified
     </FilesMatch>
     <FilesMatch "\.(html|htm|xml|txt|xsl)$">
@@ -139,7 +168,7 @@ RewriteRule ^(.+)$ - [F]
     Header set Cache-Control "public"
 	# these are all set up in combine.inc.php in a better way...
 	#
-    # Header set Expires "access plus 4 year"
+		# Header set Expires "Sun, 1 Jun 2014 20:00:00 GMT"
     # Header unset Last-Modified
     </FilesMatch>
     

@@ -28,9 +28,9 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************** */
 
 @import url('../admin/img/styles/base.css');
-/* @import url('../admin/img/styles/liquid.css'); */
 @import url('../admin/img/styles/layout.css');
 @import url('../admin/img/styles/sprite.css');
+/* @import url('../admin/img/styles/last_minute_fixes.css'); */
 
 body 
 {
@@ -42,21 +42,108 @@ table
 	line-height:0.95;
 } 
 
-.small
-{
-	font-size:0.8em;
-}
 .signal_upgrade_mode
 {
 	font-weight: bold;
 	color: #f00;
 }
 
-/* LOGIN && INSTALL === */
+h1
+{
+	font-size: 2em;
+}
+p.small
+{
+	margin-bottom: 1.5em;
+	line-height: 1.5em;
+}
 
 /*
-#logo{display:block;height:77px}
-#logo h1{display:none;}
+these reside within a span-9 div:
+*/
+#installFrm input.title, #installFrm input.text
+{
+	width: 310px;
+}
+#installFrm select
+{
+	width: 320px;
+}
+#installFrm legend
+{
+	/*
+	Hack to make Chrome respect at least /some/ margin:
+	
+	See also:
+	
+	http://stackoverflow.com/questions/2568591
+	https://bugs.webkit.org/show_bug.cgi?id=35981
+	
+	-webkit-margin-bottom-collapse: separate;     <-- doesn't work at all Chrome / Opera 
+	
+	Since we're in the installer, we can't use the Combiner+Browscap to produce
+	browser-customized CSS yet... so we don't do nothing about it for now. 
+	Too much hassle.
+	
+	#installFrm fieldset > p:first-of-type
+	{
+		padding-top: 10px;
+		border: 1px red solid;
+	}
+
+	This works for Opera and Chrome, but then FF3/IE8 are burdened,
+	so forget it. Screw Chrome. Screw Opera. They'ld have to wait until 
+	we can run Combiner+Browscap backend CSS customization.
+	*/
+}
+
+
+
+noscript, .noscript
+{
+	border: 10px solid red;
+	background-color: #fee;
+	padding: 20px;
+	width: 70%;
+	/* max-width: 1000px; */
+	margin: 10px auto;
+}
+
+noscript p, .noscript p
+{
+	font-size: 1.2em;
+	text-indent: 0;
+	margin-top: 20px;
+	text-align: left;
+}
+noscript h1, .noscript h1, noscript h2, .noscript h2
+{
+	font-size: 2.5em;
+	text-align: center;
+	color: #300;
+}
+noscript h2, .noscript h2
+{
+	font-size: 1.8em;
+}
+
+
+
+
+
+
+.log 
+{
+	font: 10pt Consolas, Monaco, fixed;
+	width: 100%;
+}
+
+
+
+/* === INSTALL === */
+
+
+/*
 #install-wrapper{
 	width:750px;
 	background-color:#E6F5D6;

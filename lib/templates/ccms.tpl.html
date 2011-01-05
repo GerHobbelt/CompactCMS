@@ -36,15 +36,15 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <meta name="description" content="{%sitename%} | {%desc%}" />
 <meta name="keywords" content="{%keywords%}" />
 <link href="{%rootdir%}lib/templates/ccms/base.css,layout.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="{%rootdir%}lib/includes/js/mootools.js" charset="utf-8"></script>
+<script type="text/javascript" src="{%rootdir%}lib/includes/js/mootools-core.js,mootools-more.js" charset="utf-8"></script>
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
 <body>
-<div class="container">
-	<div id="header" class="span-24">
-		<div class="span-4"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
-		<div class="span-18 last" id="navigation">
+<div class="container-25">
+	<div id="header" class="span-25">
+		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
+		<div class="span-20 last" id="navigation">
 			<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
 		</div>
 	</div>
@@ -58,8 +58,8 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 		
 	</div>
 
-	<div id="content" class="span-18 last">
-		<div id="printable" class="span-18 last" style="text-align: right;">
+	<div id="content" class="span-21 last">
+		<div id="printable" class="span-21 last" style="text-align: right;">
 			{%breadcrumb%}
 			{%IF printable (eq Y)%}
 				<br/><a href="{%rootdir%}{%urlpage%}.print">{%lang:template:print%}</a>

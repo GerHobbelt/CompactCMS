@@ -437,208 +437,15 @@ if ($do == 'update')
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Translation module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
-	<style type="text/css">
-td.nowrap, th.nowrap
-{
-	 white-space: nowrap;
-}
-	</style>
-		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="../../fancyupload/Assets/manager.css" />
-	
-		<!-- TinyMCE JS -->
-		<script type="text/javascript" src="../../tiny_mce/tiny_mce_gzip.js"></script>	
-		
-		<!-- Mootools library -->
-		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
-		
-		<!-- File uploader JS -->
-		<script type="text/javascript" src="../../fancyupload/Source/FileManager.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Language/Language.en.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Additions.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-		<script type="text/javascript" src="../../fancyupload/Source/Uploader.js"></script>
-		<script type="text/javascript">
-FileManager.TinyMCE=function(options)
-{
-	return function(field,url,type,win)
-	{
-		var manager=new FileManager(
-			$extend(
-				{
-					onComplete:function(path)
-					{
-						if(!win.document)
-							return;
-						win.document.getElementById(field).value='<?php echo $cfg['rootdir']; ?>'+path;
-						if(win.ImageDialog)
-							win.ImageDialog.showPreviewImage('<?php echo $cfg['rootdir']; ?>'+path,1);
-						this.container.destroy();
-					}
-				},
-				options(type)
-			)
-		);
-		manager.dragZIndex=400002;
-		manager.SwiffZIndex=400003;
-		manager.el.setStyle('zIndex',400001);
-		manager.overlay.el.setStyle('zIndex',400000);
-		document.id(manager.tips).setStyle('zIndex',400010);
-		manager.show();
-		return manager;
-	};
-};
-FileManager.implement('SwiffZIndex',400003);
-var Dialog=new Class(
-	{
-		Extends:Dialog,
-		initialize:function(text,options)
-		{
-			this.parent(text,options);
-			this.el.setStyle('zIndex',400010);
-			this.overlay.el.setStyle('zIndex',400009);
-		}
-	});
-</script>
-		
-		<!-- GZ version of TinyMCE -->
-		<script type="text/javascript">	
-tinyMCE_GZ.init(
-	{
-		plugins:'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		themes:'advanced',
-		<?php echo "languages: '".$cfg['tinymce_language']."',"; ?>
-		disk_cache:true,
-		debug:false
-	});
-		</script>
-		
-		<script type="text/javascript">
-tinyMCE.init(
-	{
-		mode:"textareas",
-		theme:"advanced",
-		<?php echo 'language:"'.$cfg['tinymce_language'].'",'; ?>
-		skin:"o2k7",
-		skin_variant:"silver",
-		<?php echo (!empty($css)?'content_css:"'.$css.'",':null);?>
-		plugins:"safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave",
-		theme_advanced_buttons1:"fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code",
-		theme_advanced_buttons2:"undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols",
-		theme_advanced_buttons3:"",
-		theme_advanced_toolbar_location:"top",
-		theme_advanced_toolbar_align:"left",
-		theme_advanced_statusbar_location:"bottom",
-		dialog_type:"modal",
-		paste_auto_cleanup_on_paste:true,
-		theme_advanced_resizing:true,
-		relative_urls:true,
-		convert_urls:false,
-		remove_script_host:true,
-		document_base_url:"<?php echo $cfg['rootdir']; ?>",
-		<?php 
-		if($cfg['iframe'] === true) 
-		{ 
-		?> 
-			extended_valid_elements:"iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]",
-		<?php 
-		} 
-		?>
-		spellchecker_languages:"+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru",
-		file_browser_callback:FileManager.TinyMCE(
-			function(type)
-			{
-				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url:'<?php echo $cfg['rootdir']; ?>admin/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-					assetBasePath:'<?php echo $cfg['rootdir']; ?>admin/fancyupload/Assets',
-					language:'en',
-					selectable:true,
-					uploadAuthData:
-					{
-						session:'ccms_userLevel'
-					}
-				};
-			})
-	});
-		</script>
-
-		
-		
-		
-		
-	<!-- Confirm close -->
-	<script type="text/javascript">
-window.addEvent('domready', function(){
-	
-	function editin_init() {
-		$$('.liveedit').each(function(el) {
-			
-			el.addEvent('click',function() {
-				el.set('class','liveedit2');
-				var before = el.get('html').trim();
-				el.set('html','');
-				
-				var input = new Element('textarea', { 'wrap':'soft', 'class':'textarea', 'text':before });
-				
-				input.addEvent('click', function (e) {
-					e.stop();
-					return;
-				});
-				
-				input.addEvent('keydown', function(e) { if(e.key == 'enter') { this.fireEvent('blur'); } });
-				input.inject(el).select();
-				
-				//add blur event to input
-				input.addEvent('blur', function() {
-					//get value, place it in original element
-					val = input.get('value').trim();
-					el.set('text',val);
-					
-					//save respective record
-					var content = el.get('text');
-					var request = new Request.HTML({
-						url:'<?php echo $_SERVER['PHP_SELF'];?>?do=liveedit&part='+el.get('rel'),
-						method:'post',
-						update: el,
-						data: 'do=liveedit&id='+el.get('id')+'&content='+encodeURIComponent(content),
-						onRequest: function() {
-							el.set("html","<img src='./img/saving.gif' alt='Saving' />");
-						},
-						onComplete: function() {
-							el.set("class","sprite-hover liveedit");
-						}
-					}).send();
-				});
-			});
-		});
-	}
-});
-
-	
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
-	if(answer)
-	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-perm_ccms'));
-		}
-		catch(e)
-		{
-		}
-	}
-	else
-	{
-		return false;
-	}
-}
-	</script>	
+	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!-- File uploader styles -->
+	<link rel="stylesheet" media="all" type="text/css" href="../../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+	<![endif]-->
 </head>
 <body>
-<div class="module">
+<div class="module" id="translation-assist">
 	<?php 
 	// (!) Only administrators can change these values
 	if($_SESSION['ccms_userLevel']>=4) 
@@ -647,29 +454,19 @@ function confirmation()
 	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
 	
 		<div id="google_translate_element"></div>
-		<script>
-function googleTranslateElementInit() 
-{
-	new google.translate.TranslateElement({
-			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
-			layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
-		}, 'google_translate_element');
-}
-		</script>
-		<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 	<?php
 	}
 	?>
-
-		<div class="center <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
-				if ($status != 'error' && 0)  
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message;
+				if ($status != 'error')  
 				{
-					echo '<br/><span class="ss_sprite ss_exclamation">'.$ccms['lang']['backend']['must_refresh'].'</span>'; 
+					echo '<br/><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$ccms['lang']['backend']['must_refresh']; 
 				}
+				echo '</p>';
 			} 
 			?>
 		</div>
@@ -682,7 +479,7 @@ function googleTranslateElementInit()
 	{
 	?>
 		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
-		<table border="0" cellspacing="5" cellpadding="5" name="i18n-list" id="i18n-list">
+		<table border="0" cellspacing="0" cellpadding="0" name="i18n-list" id="i18n-list">
 			<tr>
 				<th class="span-4 nowrap"><em>Item</em></th>
 				<th class="span-21">Text</th>
@@ -697,7 +494,10 @@ function googleTranslateElementInit()
 		
 		<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
 		
-		<p class="right"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> <span class="ss_sprite ss_cross"><a href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span></p>
+		<div class="right">
+			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
+			<a class="button" href=="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+		</div>
 	</form>
 	<?php
 	}
@@ -706,6 +506,154 @@ function googleTranslateElementInit()
 		die($ccms['lang']['auth']['featnotallowed']);
 	}
 	?>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
 </div>
+<script type="text/javascript">
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tran_ccms');
+	}
+	return false;
+}
+
+function googleTranslateElementInit() 
+{
+	new google.translate.TranslateElement({
+			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
+			layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
+		}, 'google_translate_element');
+}
+
+
+
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/the_goto_guy.js',
+	'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
+	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
+	/* File uploader JS */
+	'../../../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
+	if ($cfg['fancyupload_language'] != 'en')
+	{
+		echo 'Language/Language.en.js,';
+	}
+	?>Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'
+	];
+
+	
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+
+
+	
+tinyMCE.init(
+	{
+		mode: 'exact',
+		elements: 'content',
+		theme: 'advanced',
+		<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
+		skin: 'o2k7',
+		skin_variant: 'silver',
+		plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
+		theme_advanced_toolbar_location: 'top',
+		theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
+		theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
+		theme_advanced_buttons3: '',
+		theme_advanced_toolbar_align: 'left',
+		theme_advanced_statusbar_location: 'bottom',
+		dialog_type: 'modal',
+		paste_auto_cleanup_on_paste:true,
+		theme_advanced_resizing:true,
+		relative_urls:true,
+		convert_urls:false,
+		remove_script_host:true,
+		document_base_url: '<?php echo $cfg['rootdir']; ?>',
+		<?php
+		if($cfg['iframe'])
+		{
+		?>
+		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',
+		<?php
+		}
+		?>
+		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
+		file_browser_callback:FileManager.TinyMCE(
+			function(type)
+			{
+				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+					baseURL: '<?php echo $cfg['rootdir']; ?>',
+					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
+					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
+					selectable: true,
+					uploadAuthData:
+					{
+						session:'ccms_userLevel',
+						sid:'<?php echo session_id(); ?>'
+					}
+				};
+			})
+	});
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+
+
+
+	/*
+	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
+	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
+	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
+	*/
+	tinyMCEPreInit = {
+		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
+		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
+		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+	};
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

@@ -182,6 +182,7 @@ CREATE TABLE IF NOT EXISTS `ccms_pages` (
   `islink` enum('Y','N') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y' COMMENT 'Y when the item should show up in the menu',
   `iscoding` enum('Y','N') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N' COMMENT 'Y when the WYSIWYG HTML editor should not be used, e.g. when page contains PHP code',
   `published` enum('Y','N') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y' COMMENT 'N will not show the page to visitors and give them a 403 page instead',
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Keeps track of the changes to the page content (through ''touching'' the record) and page attributes - used for web cache hinting and previewCode validation.',
   PRIMARY KEY (`page_id`),
   UNIQUE KEY `urlpage` (`urlpage`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='Table with details for included pages' AUTO_INCREMENT=3 ;

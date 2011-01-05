@@ -66,6 +66,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 $dir_temp = BASE_PATH . "/lib/templates/";
 $get_temp = getGETparam4FullFilePath('template', $template[0].'.tpl.html');
 $chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
+$temp_extension = strtolower(substr($get_temp, strrpos($get_temp, '.') + 1));
 	
 // Check for filename	
 if(!empty($get_temp)) 
@@ -99,64 +100,30 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Template Editing module</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
-<?php
-
-// TODO: call edit_area_compressor.php only from the combiner: combine.inc.php when constructing the edit_area.js file for the first time.
-
-?>
-		<script type="text/javascript" src="../../edit_area/edit_area_compressor.php"></script>
-		<script type="text/javascript">
-editAreaLoader.init(
-	{
-		id:"content",
-		allow_resize:'both',
-		allow_toggle:false,
-		word_wrap:true,
-		start_highlight:true,
-		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
-		syntax:"html"
-	});
-</script>
-		<script type="text/javascript">
-function confirmation()
-{
-	var answer=confirm(<?php echo"'".$ccms['lang']['editor']['confirmclose']."'";?>);
-	if(answer)
-	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-tmp_ccms'));
-		}
-		catch(e)
-		{
-		}
-	}
-	else
-	{
-		return false;
-	}
-}
-</script>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<![endif]-->
 	</head>
 <body>
-	<div class="module">
-
+	<div class="module" id="template-editor">
 		<?php 
-		if($chstatus==0) 
+		if($chstatus==false) 
 		{ 
 		?>
-			<p class="error center"><?php echo $ccms['lang']['template']['nowrite']; ?></p>
+		<div class="span-25 last center-text error">
+			<p class="ss_has_sprite"><span class="ss_sprite_16 ss_error">&#160;</span><?php echo $ccms['lang']['template']['nowrite']; ?></p>
+		</div>
 		<?php 
 		} 
 		?>	
-		<div class="span-13">
+		<div class="span-15">
 			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
 		</div>
 		
-		<div class="span-8 right">
+		<div class="span-10 right last">
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" id="changeTmp" method="get" class="right" accept-charset="utf-8">
-				<label for="template" style="display:inline;"><?php echo $ccms['lang']['backend']['template'];?></label>
+				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
 				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
 					<?php
 					$x = 0; 
@@ -218,34 +185,124 @@ function confirmation()
 		Changed to mimic the layout in the other files...
 		*/                 
 		?>                              
-		<div class="center <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
 		
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
-		
-			<textarea id="content" name="content" style="height:400px;width:100%;color:#000;"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
 			
-			<p>
-				<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
+			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
+			<div class="right">
 				<?php 
 				if($chstatus > 0) 
 				{ 
 				?>
-					<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
+					<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 				<?php 
 				}  
 				?>
-				<span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span>
-			</p>
-			
+				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
 		</form>
-	
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
 	</div>
+<?php
+
+// TODO: call edit_area_compressor.php only from the combiner: combine.inc.php when constructing the edit_area.js file for the first time.
+
+?>
+		<script type="text/javascript">
+	
+	
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tmp_ccms');
+	}
+	return false;
+}
+
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/edit_area/edit_area_full.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+		// initialisation
+		
+// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!		
+var supported_syntaxes = ','+editAreaLoader.default_settings.syntax_selection_allow+',';
+var desired_syntax = '<?php echo $temp_extension; ?>';
+desired_syntax = (supported_syntaxes.indexOf(','+desired_syntax+',') >= 0 ? desired_syntax : "");
+
+editAreaLoader.init(
+	{
+		id:"content",
+		start_highlight:true,
+		allow_resize:'both',
+		allow_toggle:true,
+		word_wrap:true,
+		<?php echo 'language: "'.$cfg['editarea_language'].'",'; ?>
+		syntax: desired_syntax
+	});
+/*
+for (syn in editAreaLoader.load_syntax)
+{
+	alert("syntax: " + syn);
+}
+*/
+
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

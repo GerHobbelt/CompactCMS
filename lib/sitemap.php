@@ -43,31 +43,73 @@ if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 
-function check_session_sidpatch()
+function check_session_sidpatch_and_start()
 {
-	global $cfg;
+	global $cfg, $ccms;
 	
 	$getid = 'SID'.md5($cfg['authcode'].'x');
 	$sesid = session_id();
 	// bloody hack for FancyUpload FLASH component which doesn't pass along cookies:
-	if (!empty($_GET[$getid]) && empty($sesid))
+	if (!empty($_GET[$getid]))
 	{
 		$sesid = preg_replace('/[^A-Za-z0-9]/', 'X', $_GET[$getid]);
+
+		/*
+		Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
+		
+		however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
+		*/
 		session_id($sesid);
+		session_start();
+		//session_write_close();
+		if (!empty($_GET['SIDCHK']) && !empty($_SESSION['fup1']) && $_SESSION['fup1'] == $_GET['SIDCHK'])
+		{
+			//echo " :: legal session ID forced! \n";
+			//session_id($sesid);
+		}
+		else
+		{
+			//echo " :: illegal session override! IGNORED! \n";
+
+			// do NOT nuke the session; this might have been a interloper trying a DoS attack... let it all run its natural course.
+			$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+			
+			die_and_goto_url(null, $ccms['lang']['auth']['featnotallowed']); // default URL: login!
+		}
 	}
-	return true;
+	else
+	{
+		session_start();
+	}
 }
 
 // Start session
-check_session_sidpatch();
-session_start();
+check_session_sidpatch_and_start();
+
+
+
 
 // Load MySQL Class and initiate connection
 /*MARKER*/require_once(BASE_PATH . '/lib/class/mysql.class.php');
-$db = new MySQL();
 
 // Load generic functions
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
+
+
+
+// Check first whether installation directory exists
+if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+{
+	header('Location: ' . makeAbsoluteURI('./_install/index.php'));
+	exit();
+}
+
+/*
+ initiate database connection; do this AFTER checking for the _install directory, because 
+ otherwise error reports from this init will have precedence over the _install-dir-exists 
+ error report!
+*/
+$db = new MySQL();
 
 
 // LANGUAGE ==
@@ -107,12 +149,16 @@ $current = basename(filterParam4FullFilePath($_SERVER['REQUEST_URI']));
 
 // [i_a] $curr_page was identical (enough) to $pagereq before
 $pagereq = getGETparam4Filename('page');
+if (empty($pagereq) || in_array($pagereq, array('home', 'index')))
+{
+	$pagereq = 'home';
+}
 $ccms['pagereq'] = $pagereq;
 
 $ccms['printing'] = getGETparam4boolYN('printing', 'N');
 
-$preview = getGETparam4IdOrNumber('preview');
-$preview = ($preview == $cfg['authcode']);
+$preview = getGETparam4IdOrNumber('preview'); // in fact, it's a hash plus ID!
+$preview = IsValidPreviewCode($preview);
 $ccms['preview'] = $preview;
 
 
@@ -206,7 +252,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT'))
 // OPERATION MODE ==
 // 1) Start normal operation mode (if sitemap.php is not requested directly).
 // This will fill all variables based on the requested page, or throw a 403/404 error when applicable.
-if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitemap") 
+if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitemap') 
 {
 	function setup_ccms_for_40x_error($code, $pagereq)
 	{
@@ -323,7 +369,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	{
 		$menu_in_set .= ',' . $i;
 	}
-	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
+	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE (`published`='Y'" . ($preview ? " OR `page_id`=" . MySQL::SQLValue($preview, MySQL::SQLVALUE_NUMBER) : '') . ") AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
 	if ($db->ErrorNumber()) $db->Kill();
 
 	// Select the appropriate statement (home page versus specified page)
@@ -331,7 +377,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	// This is a separate query for two reasons:
 	// (1) the above might be cached as a whole one day, and 
 	// (2) the requested page doesn't necessarily need to appear in any menu!
-	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue((!empty($pagereq) ? $pagereq : 'home'), MySQL::SQLVALUE_TEXT))); 
+	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($pagereq, MySQL::SQLVALUE_TEXT))); 
 	if ($db->ErrorNumber()) $db->Kill();
 
 	// Start switch for pages, select all the right details
@@ -351,7 +397,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ccms['pagetitle']  = $row->pagetitle;
 		$ccms['subheader']  = $row->subheader;
 		
-		// mirror the menu bielder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
+		// mirror the menu builder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
 		$msg = explode(' ::', $row->description, 2);
 		$ccms['desc']       = $msg[0];
 		$ccms['desc_extra'] = (!empty($msg[1]) ? trim($msg[1]) : '');
@@ -386,8 +432,11 @@ if (0)
 		
 		// BREADCRUMB ==
 		// Create breadcrumb for the current page
-		$preview_qry = ($preview ? '?preview=' . $cfg['authcode'] : '');
-		if($row->urlpage=="home") 
+		$preview_checkcode = GenerateNewPreviewCode($row->page_id, null);
+		
+		$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
+
+		if($row->urlpage == 'home') 
 		{
 			$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' Home">Home</a></span>';
 		}
@@ -545,7 +594,7 @@ if (0)
 			$current_class = '';
 			$current_extra = '';
 			$current_link = '';
-			if ($row['urlpage'] == $pagereq || (empty($pagereq) && $row['urlpage'] == "home"))
+			if ($row['urlpage'] == $pagereq)
 			{
 				// 'home' has a pagereq=='', but we still want to see the 'current' class for that one.
 				// (The original code didn't do this, BTW!)
@@ -571,8 +620,9 @@ if (0)
 			{
 				$current_class = 'to_external_url';
 				$menu_item_class = 'menu_item_extref';
+				$current_link = $msg[0];
 			}
-			else if ($row['urlpage'] == "home")
+			else if ($row['urlpage'] == 'home')
 			{
 				$current_link = $cfg['rootdir'];
 				$menu_item_class = 'menu_item_home';
@@ -605,15 +655,15 @@ if (0)
 			if ($dummy_top_written)
 			{
 				$menu_item_text = '<span ' . $current_link_classes . '>-</span>';
-				$ccms[$current_structure] .= '<li class="' . /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim( /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 			else if ($row['sublevel'] != 0)
 			{
-				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 			else
 			{
-				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 		}
 		
@@ -677,18 +727,16 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 		xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 	<?php
 	// Select all published pages
-	if (!$db->SelectRows($cfg['db_prefix'].'pages', array('published' => "'Y'"), array('urlpage', 'description', 'islink'))) $db->Kill();
+	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', array('published' => "'Y'"), array('urlpage', 'description', 'islink'));
+	if ($rows === false) $db->Kill();
 
-	$db->MoveFirst();
-	while (!$db->EndOfSeek()) 
+	foreach($rows as $row)
 	{
-		$row = $db->Row();
-
 		// Do not include external links in sitemap
 		if(!regexUrl($row->description)) 
 		{
 			echo "<url>\n";
-				if($row->urlpage == "home") 
+				if($row->urlpage == 'home') 
 				{
 					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."</loc>\n";
 					echo "<priority>0.80</priority>\n";
@@ -709,6 +757,7 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 		}
 	}
 	echo "</urlset>";
+	
 	exit(); // [i_a] exit now; no need nor want to run the XML through the template engine
 }
 

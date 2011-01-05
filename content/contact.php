@@ -97,7 +97,7 @@ if($action_type=='send'
 		$headers = 'From: "' . $sender . '" <' . $emailaddress . ">\r\n";
 		// To send HTML mail, the Content-type header must be set
 		$headers .= 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
 
 		$message = "<html>\n<head>\n<title>Email</title>\n</head>\n<body>\n" . $message . "\n</body>\n</html>\n";
 
@@ -170,10 +170,13 @@ window.addEvent('domready', function(){
 	}
 	
 	// Do: send contact form
-	new FormValidator.Inline($('contactForm'), {
-		onFormValidate: function(passed, form, event){
+	new FormValidator.Inline($('contactForm'), 
+	{
+		onFormValidate: function(passed, form, event)
+		{
 			event.stop();
-			if (passed) sendForm();
+			if (passed) 
+				sendForm();
 		}
 	});
 });

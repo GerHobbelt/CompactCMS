@@ -74,40 +74,26 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Permissions module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
-
-	<!-- Confirm close -->
-	<script type="text/javascript">
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
-	if(answer)
-	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('sys-perm_ccms'));
-		}
-		catch(e)
-		{
-		}
-	}
-	else
-	{
-		return false;
-	}
-}
-	</script>	
+	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+	<![endif]-->
 </head>
 <body>
-<div class="module">
-	<div class="center <?php echo $status; ?>">
+<div class="module" id="permission-manager">
+	<div class="center-text <?php echo $status; ?>">
 		<?php 
 		if(!empty($status_message)) 
 		{ 
-			echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>';
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
 			if ($status != 'error') 
 			{
-				echo '<br/><span class="ss_sprite ss_exclamation">'.$ccms['lang']['backend']['must_refresh'].'</span>'; 
+			?>
+				<p class="ss_has_sprite"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['must_refresh']; ?></p>
+				<form id="refresh_everytin_form" onsubmit="return refresh_adminmain();">
+					<button type="submit"><span class="ss_sprite_16  ss_arrow_refresh">&#160;</span><?php echo $ccms['lang']['backend']['reload_admin_screen']; ?></button>
+				</form>
+			<?php
 			}
 		} 
 		?>
@@ -120,16 +106,17 @@ function confirmation()
 	if($_SESSION['ccms_userLevel']>=4) 
 	{
 	?>
-		<p><?php echo $ccms['lang']['permission']['explain']; ?></p>
+		<p class="left-text"><?php echo $ccms['lang']['permission']['explain']; ?></p>
 		<form action="permissions.Process.php" method="post" accept-charset="utf-8">
-			<table border="0" cellspacing="5" cellpadding="5">
+			<div class="table_inside">
+			<table cellspacing="0" cellpadding="0">
 				<tr>
-					<th class="span-4"><em><?php echo $ccms['lang']['permission']['target']; ?></em></th>
-					<th class="span-4 center"><?php echo $ccms['lang']['backend']['disabled']; ?></th>
-					<th class="span-4 center"><?php echo $ccms['lang']['permission']['level1']; ?></th>
-					<th class="span-4 center"><?php echo $ccms['lang']['permission']['level2']; ?></th>
-					<th class="span-4 center"><?php echo $ccms['lang']['permission']['level3']; ?></th>
-					<th class="span-4 center"><?php echo $ccms['lang']['permission']['level4']; ?></th>
+					<th class="span-5"><em><?php echo $ccms['lang']['permission']['target']; ?></em></th>
+					<th class="span-4 center-text"><?php echo $ccms['lang']['backend']['disabled']; ?></th>
+					<th class="span-4 center-text"><?php echo $ccms['lang']['permission']['level1']; ?></th>
+					<th class="span-4 center-text"><?php echo $ccms['lang']['permission']['level2']; ?></th>
+					<th class="span-4 center-text"><?php echo $ccms['lang']['permission']['level3']; ?></th>
+					<th class="span-4 center-text"><?php echo $ccms['lang']['permission']['level4']; ?></th>
 				</tr>
 				<?php
 				$i = 0;
@@ -140,30 +127,33 @@ function confirmation()
 				$columns = $db->GetColumnComments($cfg['db_prefix'].'cfgpermissions');
 				foreach ($columns as $columnName => $comments) 
 				{
-					if($i%2 != 1) 
-					{
-						echo '<tr style="background-color: #E6F2D9;">';
-					} 
-					else 
-					{ 
-						echo '<tr>';
-					}  
 					?>
-						<th><?php echo (!empty($comments) ? "<abbr title=\"$comments\">$columnName</abbr>" : $columnName); ?></th>
-						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?"checked":null); ?> value="0" id="<?php echo $columnName; ?>">
+					<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
+						<th class="permission-name"><?php echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); ?></th>
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?'checked="checked"':null); ?> value="0">
+							</label>
 						</td>
-						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?"checked":null); ?> value="1" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?'checked="checked"':null); ?> value="1">
+							</label>
 						</td>
-						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?"checked":null); ?> value="2" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?'checked="checked"':null); ?> value="2">
+							</label>
 						</td>
-						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?"checked":null); ?> value="3" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?'checked="checked"':null); ?> value="3">
+							</label>
 						</td>
-						<td class="center">
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?"checked":null); ?> value="4" id="<?php echo $columnName; ?>">
+						<td class="hover center-text">
+							<label>
+							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?'checked="checked"':null); ?> value="4">
+							</label>
 						</td>
 					</tr>
 					<?php 
@@ -171,14 +161,83 @@ function confirmation()
 				} 
 				?>
 			</table>
-			<hr />
-			<p class="right"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton'];?></span></button> <span class="ss_sprite ss_cross"><a href="#" onClick="confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span></p>
+			</div>
+			<div class="right">
+				<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
+				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
 		</form>
 	<?php
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 	?>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
 </div>
+<script type="text/javascript">
+function refresh_adminmain()
+{
+	return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", null);
+}
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-perm_ccms');
+	}
+	return false;
+}
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

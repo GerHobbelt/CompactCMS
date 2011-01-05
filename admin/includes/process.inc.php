@@ -161,24 +161,68 @@ if ($do_update_or_livefilter && checkAuth())
 		$page_selectquery_restriction = 'WHERE ' . $page_selectquery_restriction;
 	}
 
+	
+	
+	function gen_span4pagelist_filterheader($name, $title)
+	{
+		global $ccms;
+		
+		if (!empty($name) && !empty($_SESSION[$name]))
+		{
+			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
+		}
+		else
+		{
+			echo '<span class="sprite livefilter livefilter_add" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['add']) . ' ' . strtolower($title) . '">&#160;</span>';
+		}
+	}
+
+	
 	// Open recordset for sites' pages
-	$db->SelectRows($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
-	if ($db->ErrorNumber()) $db->Kill();
+	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
+	if ($rows === false) $db->Kill();
 
 	// Check whether the recordset is not empty
-	if($db->HasRecords()) 
+	if(count($rows) > 0) 
 	{
-		$i = 0;
+		?>
+		<table id="table_manage" cellspacing="0" cellpadding="0">
+			<tr>
+				<th class="span-1a">&#160;</th>
+				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-2a nowrap center-text"><?php echo $ccms['lang']['forms']['printable']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
+				<th class="span-2a nowrap center-text">
+					<?php 
+					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
+					{ 
+						echo $ccms['lang']['forms']['published']; 
+						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
+					<?php 
+					} 
+					?>
+				</th>
+				<th class="span-2a nowrap center-text">
+					<?php
+					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
+					{ 
+						echo $ccms['lang']['forms']['iscoding']; 
+						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
+					<?php 
+					} 
+					?>
+				</th>
+				<th class="span-5a nowrap last">&#160;</th>
+			</tr>
 		
-		echo '<table cellpadding="0" cellspacing="0">';
+		<?php
+		
+		$i = 0;
 
 		// Get previously opened DB stream
-		$db->MoveFirst();
-		while (!$db->EndOfSeek()) 
+		foreach($rows as $row)
 		{
-			// Fill $row with values
-			$row = $db->Row();
-				
 			// Check whether current user is owner, or no owners at all
 			$owner = @explode('||', $row->user_ids);
 			if(empty($row->user_ids) || $perm['manageOwners']==0 || $_SESSION['ccms_userLevel']>=4 || in_array($_SESSION['ccms_userID'], $owner)) 
@@ -198,18 +242,18 @@ if ($do_update_or_livefilter && checkAuth())
 				{
 					if($row->published === "N") 
 					{
-						echo '<tr style="background-color: #F2D9DE;">';
+						echo '<tr class="unpub_altrgb">';
 					} 
 					else 
 					{
-						echo '<tr style="background-color: #E6F2D9;">';
+						echo '<tr class="altrgb">';
 					}
 				} 
 				else 
 				{ 
 					if($row->published === "N") 
 					{
-						echo '<tr style="background-color: #EBC6CD;">';
+						echo '<tr class="unpub">';
 					} 
 					else 
 					{
@@ -217,12 +261,12 @@ if ($do_update_or_livefilter && checkAuth())
 					}
 				} 
 				?>
-				<td style="padding-left:2px;" class="span-1">
+				<td class="leftpad-2">
 				<?php 
-				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == "home" || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
+				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == 'home' || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
 				{ 
 				?>
-					<span class="ss_sprite ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>"></span>
+					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
 				<?php 
 				} 
 				else 
@@ -233,17 +277,17 @@ if ($do_update_or_livefilter && checkAuth())
 				} 
 				?>
 				</td>
-				<td class="span-3">
+				<td>
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
 				</td>
-				<td class="span-4">
+				<td>
 					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
-				<td class="span-6">
+				<td>
 					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
-				<td class="span-2" style="text-align: center;">
-					<a href="#" id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+				<td class="center-text">
+					<a id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 						if($row->printable == "Y")
 						{ 
 							echo $ccms['lang']['backend']['yes']; 
@@ -254,12 +298,12 @@ if ($do_update_or_livefilter && checkAuth())
 						}
 						?></a>
 				</td>
-				<td class="span-2" style="text-align: center;">
+				<td class="center-text">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
 					{ 
 					?>
-						<a href="#" id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+						<a id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
 							if($row->published == "Y") 
 							{ 
 								echo $ccms['lang']['backend']['yes']; 
@@ -273,7 +317,7 @@ if ($do_update_or_livefilter && checkAuth())
 					} 
 					?>
 				</td>
-				<td class="span-2" style="text-align: center;">
+				<td class="center-text">
 					<?php 
 					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
 					{ 
@@ -282,11 +326,22 @@ if ($do_update_or_livefilter && checkAuth())
 						if($row->module=="editor") 
 						{ 
 						?>
-							<a href="#" id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php if($row->iscoding == "Y") { echo "<span style=\"color:#8F0000;font-weight:bold;\">".$ccms['lang']['backend']['yes']."</span>"; } else echo $ccms['lang']['backend']['no']; ?></a>
+							<a id="iscoding-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->iscoding; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+							if($row->iscoding == "Y") 
+							{ 
+								echo '<span class="signal-coding">'.$ccms['lang']['backend']['yes'].'</span>'; 
+							} 
+							else 
+							{
+								echo $ccms['lang']['backend']['no']; 
+							}
+							?></a>
 						<?php 
 						} 
 						else 
+						{
 							echo "&ndash;"; 
+						}
 						?>
 					<?php 
 					} 
@@ -296,17 +351,27 @@ if ($do_update_or_livefilter && checkAuth())
 				// Check for restrictions
 				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
 				{ 
+					$preview_checkcode = GenerateNewPreviewCode($row->page_id);
+					
 				?>
-					<td class="span-5" style="text-align: right;">
-						<a id="<?php echo $row->urlpage;?>" href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" rel="Edit <?php echo $row->urlpage.'.html';?>" class="tabs sprite edit"><?php echo $ccms['lang']['backend']['editpage']; ?></a> | <a href="../<?php echo ($row->urlpage!="home")?$row->urlpage.'.html?preview='.$cfg['authcode']:'?preview='.$cfg['authcode']; ?>" class="external"><?php echo $ccms['lang']['backend']['previewpage']; ?></a>&#160;
+					<td class="last right-text nowrap">
+						<a id="<?php echo $row->urlpage;?>" 
+							href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" 
+							rel="Edit <?php echo $row->urlpage.'.html';?>" 
+							class="tabs sprite edit"
+						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
+						| 
+						<a href="../<?php echo ($row->urlpage != 'home' ? $row->urlpage . '.html' : '') . '?preview=' . $preview_checkcode; ?>" 
+							class="external"
+						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
 					</td>
 				<?php 
 				} 
 				else 
 				{ 
 				?>
-					<td class=\"span-3\" style=\"text-align: right;\">
-						<div style="margin: 2px;"><span class="ss_sprite ss_exclamation" title="<?php echo $ccms['lang']['backend']['restrictpage']; ?>"></span> <?php echo $ccms['lang']['backend']['restrictpage'];?></div>
+					<td class="last right-text nowrap">
+						<div style="margin: 2px;"><span class="ss_sprite_16 ss_exclamation" title="<?php echo $ccms['lang']['backend']['restrictpage']; ?>">&#160;</span><?php echo $ccms['lang']['backend']['restrictpage'];?></div>
 					</td>
 				<?php 
 				} 
@@ -318,22 +383,22 @@ if ($do_update_or_livefilter && checkAuth())
 				{
 					if($row->published === "N") 
 					{
-						echo "<tr style=\"background-color: #F2D9DE;\">";
+						echo '<tr class="unpub_altrgb">';
 					} 
 					else     
 					{
-						echo "<tr style=\"background-color: #E6F2D9;\">";
+						echo '<tr class="altrgb">';
 					}
 				} 
 				else 
 				{ 
 					if($row->published === "N") 
 					{
-						echo "<tr style=\"background-color: #EBC6CD;\">";
+						echo '<tr class="unpub">';
 					} 
 					else 
 					{
-						echo "<tr>"; 
+						echo '<tr>'; 
 					}
 				} 
 				?>
@@ -347,18 +412,20 @@ if ($do_update_or_livefilter && checkAuth())
 				}
 				?>
 				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
-				<td colspan="2" style="text-align: right; padding-right:5px;">
+				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php 
 					if($row->module=="editor" && !empty($row->toplevel)) 
 					{ 
 					?>
-						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em> <?php echo "<strong>".strtolower($ccms['lang']['menu'][$row->menu_id])."</strong> | <em>".$ccms['lang']['backend']['item']." </em> <strong>".$row->toplevel.":".$row->sublevel."</strong>"; ?></td></tr>
+						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em> 
+							<?php echo '<strong>' . strtolower($ccms['lang']['menu'][$row->menu_id]) . '</strong> | <em>' . $ccms['lang']['backend']['item'] . ' </em> <strong>' . $row->toplevel . ':' . $row->sublevel . '</strong>'; 
+						?>
 					<?php 
 					} 
 					elseif($row->module!="editor") 
 					{ 
 						// TODO: add a module/plugin hook to provide the proper icon/formatting for the module name:
-						$modID = "<span class=\"ss_sprite ss_information\"><strong>".ucfirst($row->module)."</strong></span>";
+						$modID = '<span class="ss_sprite_16 ss_information">&#160;</span><strong>' . ucfirst($row->module) . '</strong></span>';
 						
 						switch ($row->module)
 						{
@@ -366,15 +433,15 @@ if ($do_update_or_livefilter && checkAuth())
 							break;
 						
 						case 'lightbox':
-							$modID = "<span class=\"ss_sprite ss_images\"><strong>".ucfirst($row->module)."</strong></span>";
+							$modID = '<span class="ss_sprite_16 ss_images">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
 							
 						case 'news':
-							$modID = "<span class=\"ss_sprite ss_newspaper\"><strong>".ucfirst($row->module)."</strong></span>";
+							$modID = '<span class="ss_sprite_16 ss_newspaper">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
 							
 						case 'comment':
-							$modID = "<span class=\"ss_sprite ss_comments\"><strong>".ucfirst($row->module)."</strong></span>";
+							$modID = '<span class="ss_sprite_16 ss_comments">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
 						}
 						echo $modID . ' '.strtolower($ccms['lang']['forms']['module']);
@@ -388,13 +455,8 @@ if ($do_update_or_livefilter && checkAuth())
 				</tr>
 			<?php
 			} 
-			// If user is not a page owner 
-			else 
-			{
-				$i++;
-			} 
 			
-			// Regular move on	
+			// move on	
 			$i++;
 		} 
 		?>
@@ -403,7 +465,7 @@ if ($do_update_or_livefilter && checkAuth())
 	}
 	else
 	{
-		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+		echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_bullet_red">&#160;</span>'.$ccms['lang']['system']['noresults'].'</p>'; 
 	}
 }
 	
@@ -421,36 +483,42 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 	if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
 	{
 		// Open recordset for sites' pages
-		$db->SelectRows($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
-		if ($db->ErrorNumber()) $db->Kill();
+		$rows = $db->SelectObjects($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
+		if ($rows === false) $db->Kill();
 
 		// Check whether the recordset is not empty
-		if($db->HasRecords()) 
+		if(count($rows) > 0) 
 		{
-			echo '<table class="span-15" cellpadding="0" cellspacing="0">';
+		?>
+			<table id="table_menu" cellspacing="0" cellpadding="0">
+			<tr>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['menutitle']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['menuid']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['template']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['template']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['toplevel']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['toplevel']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['sublevel']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['sublevel']; ?>">&#160;</span></th>
+				<th class="nowrap"><?php echo $ccms['lang']['backend']['linktitle']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['activelink']; ?>">&#160;</span></th>
+				<th class="nowrap last"><?php echo $ccms['lang']['forms']['pagetitle']; ?></th>
+			</tr>
+			<?php
 			
 			$i = 0;
 			// Get previously opened DB stream
-			$db->MoveFirst();
-			while (!$db->EndOfSeek()) 
+			foreach($rows as $row)
 			{
-				// Fill $row with values
-				$row = $db->Row();
-				
 				// Define $isEven for alternate table coloring
 				$isEven = !($i % 2);
 				if($isEven != '1') 
 				{
-					echo "<tr style=\"background-color: #CDE6B3;\">";
+					echo '<tr class="altcolor">';
 				} 
 				else 
 				{ 
-					echo "<tr>"; 
+					echo '<tr>'; 
 				} 
 				$pageIdAsStr = rm0lead($row->page_id); // empty cannot be; rm0lead() makes sure zero is actually "0"
 				?>
-					<td class="span-2">
-						<select class="span-2" name="menuid[<?php echo $pageIdAsStr; ?>]">
+					<td>
+						<select class="span-2 last" name="menuid[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Menu">
 								<?php 
 								$y = 1; 
@@ -465,28 +533,26 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">
-						<select class="span-2" name="template[<?php echo $pageIdAsStr; ?>]">
+					<td>
+						<select class="span-3 last" name="template[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
 								<?php 
-								$x = 0; 
-								while($x<count($template)) 
+								for ($x = 0; $x < count($template); $x++) 
 								{ 
 								?>
-									<option <?php echo ($row->variant==$template[$x]) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>"><?php echo ucfirst($template[$x]); ?></option>
-									<?php 
-									$x++; 
+									<option <?php echo ($row->variant==$template[$x]) ? 'selected="selected"' : ''; ?> value="<?php echo $template[$x]; ?>"><?php echo ucfirst($template[$x]); ?></option>
+								<?php 
 								} 
 								?>
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">&#160;
-						<select class="span-2" name="toplevel[<?php echo $pageIdAsStr; ?>]">
+					<td>
+						<select class="span-2 last" name="toplevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Toplevel">
 								<?php 
 								$z = 1; 
-								while($z <= $db->RowCount()) 
+								while($z <= count($rows)) 
 								{ 
 								?>
 									<option <?php echo ($row->toplevel==$z) ? "selected=\"selected\"" : ""; ?> value="<?php echo $z; ?>"><?php echo $z; ?></option>
@@ -497,12 +563,12 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-2">
-						<select class="span-2" name="sublevel[<?php echo $pageIdAsStr; ?>]">
+					<td>
+						<select class="span-2 last" name="sublevel[<?php echo $pageIdAsStr; ?>]">
 							<optgroup label="Sublevel">
 								<?php 
 								$y = 0; 
-								while($y /* +1  [i_a] one sublevel too few when you hang all under Home, for example */ < $db->RowCount()) 
+								while($y /* +1  [i_a] one sublevel too few when you hang all under Home, for example */ < count($rows)) 
 								{ 
 								?>
 									<option <?php echo ($row->sublevel==$y) ? "selected=\"selected\"" : ""; ?> value="<?php echo $y; ?>"><?php echo $y; ?></option>
@@ -513,9 +579,9 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 							</optgroup>
 						</select>
 					</td>
-					<td class="span-1-1" id="td-islink-<?php echo $pageIdAsStr; ?>">
+					<td class="center-text" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php 
-						if($row->urlpage == "home") 
+						if($row->urlpage == 'home') 
 						{ 
 						?>
 							<input type="checkbox" checked="checked" disabled="disabled" />
@@ -529,7 +595,7 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 						} 
 						?>
 					</td>
-					<td class="span-4">
+					<td class="last">
 						<?php echo $row->urlpage; ?><em>(.html)</em>
 						<input type="hidden" name="pageid[]" value="<?php echo $pageIdAsStr; ?>" id="pageid"/>
 					</td>
@@ -543,12 +609,12 @@ if($do_action == "renderlist" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAu
 		} 
 		else
 		{
-			echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_bullet_red">'.$ccms['lang']['system']['noresults'].'</span></p>'; 
+			echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_bullet_red">&#160;</span>'.$ccms['lang']['system']['noresults'].'</p>'; 
 		}
 	}
 	else 
 	{
-		echo '<p class="center" style="padding-top:5px;"><span class="ss_sprite ss_delete">'.$ccms['lang']['auth']['featnotallowed'].'</span></p>';
+		echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_delete">&#160;</span>'.$ccms['lang']['auth']['featnotallowed'].'</p>';
 	} 
 }
 
@@ -600,7 +666,7 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		{ $errors[] = "- ".$ccms['lang']['system']['error_subtitle_2']; }
 	if (strlen($description) > 250)
 		{ $errors[] = "- ".$ccms['lang']['system']['error_description_2']; }
-	if ($post_urlpage=='403' || $post_urlpage=='404' || $post_urlpage=='sitemap' || $post_urlpage=='home')
+	if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
 		{ $errors[] = "- ".$ccms['lang']['system']['error_reserved']; }
 	
 	if(count($errors) == 0)
@@ -620,6 +686,8 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 		$values['printable']	= MySQL::SQLValue($printable_pref,MySQL::SQLVALUE_Y_N);
 		$values['published']	= MySQL::SQLValue($published_pref,MySQL::SQLVALUE_Y_N);
 		$values['iscoding']		= MySQL::SQLValue($iscoding_pref,MySQL::SQLVALUE_Y_N);
+		// the default 'owner' is the one who creates the page:
+		$values['user_ids']		= MySQL::SQLValue(intval($_SESSION['ccms_userID']),MySQL::SQLVALUE_TEXT);
 		
 		// Execute the insert
 		$result = $db->TransactionBegin();
@@ -692,16 +760,16 @@ if($target_form == "create" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 
 	if(count($errors) != 0)
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p>';
 		while (list($key,$value) = each($errors))
 		{
-			echo '<span class="fault">'.$value.'</span><br />';
+			echo '<p class="fault">'.$value.'</p>';
 		}
 		exit(); // Prevent AJAX from continuing
 	}
 
 	// success!
-	echo "<p class=\"h1\"><span class=\"ss_sprite ss_accept\" title=\"".$ccms['lang']['backend']['success']."\"></span> ".$ccms['lang']['backend']['newfilecreated']."</p>".$ccms['lang']['backend']['starteditbody'];
+	echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['newfilecreated'].'</p><p>'.$ccms['lang']['backend']['starteditbody'].'</p>';
 	exit();
 }
 
@@ -714,7 +782,7 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 {
 	if(!empty($_POST['page_id'])) 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['statusdelete'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['statusdelete'].'</p>';
 	
 		// Loop through all submitted page ids
 		foreach ($_POST['page_id'] as $index) 
@@ -748,7 +816,7 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 					// Delete the actual file
 					if(@unlink("../../content/".$correct_filename.".php")) 
 					{
-						echo '- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'<br/>';
+						echo '<p>- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'</p>';
 					} 
 					else 
 					{
@@ -768,7 +836,7 @@ if($target_form == "delete" && $_SERVER['REQUEST_METHOD'] == "POST" && checkAuth
 	} 
 	else 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p><span class="fault">- '.$ccms['lang']['system']['error_selection'].'</span>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$ccms['lang']['system']['error_selection'].'</p>';
 	}
 }
 
@@ -809,11 +877,11 @@ if($target_form == "menuorder" && $_SERVER['REQUEST_METHOD'] == "POST" && checkA
 	
 	if(empty($error)) 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_accept" title="'.$ccms['lang']['backend']['success'].'"></span> '.$ccms['lang']['backend']['success'].'</p>'.$ccms['lang']['backend']['orderprefsaved'];
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['success'].'</p><p>'.$ccms['lang']['backend']['orderprefsaved'].'</p>';
 	} 
 	else 
 	{
-		echo '<p class="h1"><span class="ss_sprite ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'"></span> '.$ccms['lang']['system']['error_correct'].'</p><span class="fault">- '.$error.'</span>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$error.'</p>';
 	}
 	exit();
 }
@@ -1278,160 +1346,171 @@ if($do_action == "edit" && $_SERVER['REQUEST_METHOD'] != "POST" && checkAuth())
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 	<head>
 		<title>CompactCMS - <?php echo $ccms['lang']['editor']['editorfor']." ".$name; ?></title>
-		<script type="text/javascript">
+		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<?php 
+	// Load TinyMCE (compressed for faster loading) 
+	if($cfg['wysiwyg'] && $iscoding != 'Y')
+	{
+	?>
+		<!-- File uploader styles -->
+		<link rel="stylesheet" media="all" type="text/css" href="../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+	<?php 
+	} 
+	// else : load Editarea for code editing
+	?>
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../img/styles/ie.css" />
+	<![endif]-->
+	</head>
+	
+	<body>
+	<div class="module" id="edit-page">
+		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
+		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
+		
+		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<!--<br/>-->
+			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
+			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
+			<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
+			<div class="right">
+				<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
+				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
+		</form>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
+	</div>
+	<script type="text/javascript">
 function confirmation()
 {
-	var answer=confirm('<?php echo $ccms['lang']['editor']['confirmclose']; ?>');
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		try
-		{
-			parent.MochaUI.closeWindow(parent.$('<?php echo $name; ?>_ccms'));
-		}
-		catch(e)
-		{
-		}
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $name; ?>_ccms');
+	}
+	return false;
+}
+
+
+
+	
+var jsLogEl = document.getElementById('jslog');
+
+
+	<?php 
+	// Load TinyMCE (compressed for faster loading) 
+	if($cfg['wysiwyg'] && $iscoding != 'Y')
+	{
+	?>
+var js = [
+	'../../lib/includes/js/the_goto_guy.js',
+	'../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
+	'../../lib/includes/js/mootools-core.js,mootools-more.js',
+	'../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
+	if ($cfg['fancyupload_language'] != 'en')
+	{
+		echo 'Language/Language.en.js,';
+	}
+	?>Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'
+	];
+		
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
 	}
 	else
 	{
-		return false;
+		jslog('All JS has been loaded!');
 	}
-}
-</script>
-		
-	<?php 
-	// Load TinyMCE (compressed for faster loading) 
-	if($cfg['wysiwyg'] === true && $iscoding != 'Y')
-	{
-	?>
-		
-		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="./fancyupload/Assets/manager.css" />
-	
-		<!-- TinyMCE JS -->
-		<script type="text/javascript" src="./tiny_mce/tiny_mce_gzip.js"></script>	
-		
-		<!-- Mootools library -->
-		<script type="text/javascript" src="../../lib/includes/js/mootools.js" charset="utf-8"></script>
-		
-		<!-- File uploader JS -->
-		<script type="text/javascript" src="./fancyupload/Source/FileManager.js"></script>
-		<script type="text/javascript" src="./fancyupload/Language/Language.en.js"></script>
-		<script type="text/javascript" src="./fancyupload/Source/Additions.js"></script>
-		<script type="text/javascript" src="./fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-		<script type="text/javascript" src="./fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-		<script type="text/javascript" src="./fancyupload/Source/Uploader.js"></script>
-		<script type="text/javascript">
-FileManager.TinyMCE=function(options)
-{
-	return function(field,url,type,win)
-	{
-		var manager=new FileManager(
-			$extend(
-				{
-					onComplete:function(path)
-					{
-						if(!win.document)
-							return;
-						win.document.getElementById(field).value='<?php echo $cfg['rootdir']; ?>'+path;
-						if(win.ImageDialog)
-							win.ImageDialog.showPreviewImage('<?php echo $cfg['rootdir']; ?>'+path,1);
-						this.container.destroy();
-					}
-				},
-				options(type)
-			)
-		);
-		manager.dragZIndex=400002;
-		manager.SwiffZIndex=400003;
-		manager.el.setStyle('zIndex',400001);
-		manager.overlay.el.setStyle('zIndex',400000);
-		document.id(manager.tips).setStyle('zIndex',400010);
-		manager.show();
-		return manager;
-	};
-};
-FileManager.implement('SwiffZIndex',400003);
-var Dialog=new Class(
-	{
-		Extends:Dialog,
-		initialize:function(text,options)
-		{
-			this.parent(text,options);
-			this.el.setStyle('zIndex',400010);
-			this.overlay.el.setStyle('zIndex',400009);
-		}
-	});
-</script>
-		
-		<!-- GZ version of TinyMCE -->
-		<script type="text/javascript">	
-tinyMCE_GZ.init(
-	{
-		plugins:'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		themes:'advanced',
-		<?php echo "languages: '".$cfg['tinymce_language']."',"; ?>
-		disk_cache:true,
-		debug:false
-	});
-		</script>
-		
-		<script type="text/javascript">
+
+	// window.addEvent('domready',function()
+	//{
 tinyMCE.init(
 	{
-		mode:"textareas",
-		theme:"advanced",
-		<?php echo 'language:"'.$cfg['tinymce_language'].'",'; ?>
-		skin:"o2k7",
-		skin_variant:"silver",
-		<?php echo (!empty($css)?'content_css:"'.$css.'",':null);?>
-		plugins:"safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave",
-		theme_advanced_buttons1:"fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code",
-		theme_advanced_buttons2:"undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols",
-		theme_advanced_buttons3:"",
-		theme_advanced_toolbar_location:"top",
-		theme_advanced_toolbar_align:"left",
-		theme_advanced_statusbar_location:"bottom",
-		dialog_type:"modal",
+		mode: 'exact',
+		elements: 'content',
+		theme: 'advanced',
+		<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
+		skin: 'o2k7',
+		skin_variant: 'silver',
+		plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
+		theme_advanced_toolbar_location: 'top',
+		theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
+		theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
+		theme_advanced_buttons3: '',
+		theme_advanced_toolbar_align: 'left',
+		theme_advanced_statusbar_location: 'bottom',
+		dialog_type: 'modal',
 		paste_auto_cleanup_on_paste:true,
 		theme_advanced_resizing:true,
 		relative_urls:true,
 		convert_urls:false,
 		remove_script_host:true,
-		document_base_url:"<?php echo $cfg['rootdir']; ?>",
-		<?php 
-		if($cfg['iframe'] === true) 
-		{ 
-		?> 
-			extended_valid_elements:"iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]",
-		<?php 
-		} 
+		document_base_url: '<?php echo $cfg['rootdir']; ?>',
+		<?php
+		if($cfg['iframe'])
+		{
 		?>
-		spellchecker_languages:"+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru",
+		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',
+		<?php
+		}
+		?>
+		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
 		file_browser_callback:FileManager.TinyMCE(
 			function(type)
 			{
 				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url:'<?php echo $cfg['rootdir']; ?>admin/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-					assetBasePath:'<?php echo $cfg['rootdir']; ?>admin/fancyupload/Assets',
-					language:'en',
-					selectable:true,
+					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+					baseURL: '<?php echo $cfg['rootdir']; ?>',
+					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
+					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
+					selectable: true,
 					uploadAuthData:
 					{
-						session:'ccms_userLevel'
+						session:'ccms_userLevel',
+						sid:'<?php echo session_id(); ?>'
 					}
 				};
 			})
 	});
-		</script>
 
+	//});
+}
 	<?php 
-	} // End TinyMCE. Start load Editarea for code editing
+	} 
 	else 
 	{ 
-	?>
-		<script type="text/javascript" src="./edit_area/edit_area_compressor.php"></script>
-		<script type="text/javascript">
+		// Alternative to tinyMCE: load Editarea for code editing
+		?>
+	
+var js = [
+	'../../lib/includes/js/the_goto_guy.js',
+	'../../lib/includes/js/edit_area/edit_area_full.js'
+	];
+		
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
 editAreaLoader.init(
 	{
 		id:"content",
@@ -1439,38 +1518,60 @@ editAreaLoader.init(
 		allow_toggle:false,
 		word_wrap:true,
 		start_highlight:true,
-		<?php echo 'language:"'.$cfg['tinymce_language'].'",'; ?>
+		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
 		syntax:"html"
 	});
-		</script>
+
+	//});
+}
 	<?php 
 	} 
 	?>
-	<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css" />
-	</head>
 	
-	<body>
-	<div class="module">
-		
-		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
-		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
-		
-		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
-			<textarea id="content" name="content" style="height:345px;width:100%;color:#000;"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
-			<br/>
-				<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
-				<input type="input" class="text" style="height:30px; width:98%;" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
-			<p>
-				<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
-				<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
-				<span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span>
-			</p>
-		</form>
-		
-	</div>
+	
+	
+	
+	
+	
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+
+
+
+	/*
+	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
+	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
+	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
+	*/
+	tinyMCEPreInit = {
+		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
+		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
+		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+	};
+
+	LazyLoad.js(js, jsComplete);
+}
+	</script>
+	<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 	</body>
 	</html>
 <?php 
+
+	exit();
 }
 
  /**
@@ -1525,14 +1626,14 @@ if($do_action == "save-changes" && checkAuth())
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values["keywords"] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 	
-	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array("urlpage" => MySQL::SQLValue($name,MySQL::SQLVALUE_TEXT)))) 
+	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array("urlpage" => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)))) 
 	{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 	<head>
 		<title>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></title>
-		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,layout.css,sprite.css" />
+		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	</head>
 
 	<body>
@@ -1561,17 +1662,31 @@ if($do_action == "save-changes" && checkAuth())
 				<p><?php echo file_get_contents($filename); ?></p>
 			<?php 
 			} 
+			
+			$preview_checkcode = GenerateNewPreviewCode(null, $name);
 			?>
 			<hr/>
 			<p>
-				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $cfg['authcode'];?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>		
+				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $preview_checkcode;?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>
 			</p>
-			<p>
-				<span class="ss_sprite ss_arrow_undo"><a href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><?php echo $ccms['lang']['editor']['backeditor']; ?></a></span>&nbsp;&nbsp;&nbsp;
-				<span class="ss_sprite ss_cross"><a href="#" onClick="parent.MochaUI.closeWindow(parent.$('<?php echo $name; ?>_ccms'));" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><?php echo $ccms['lang']['editor']['closewindow']; ?></a></span>
-			</p>
-			
+			<div class="right">
+				<a class="button" href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
+				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['closewindow']; ?></a>
+			</div>
 		</div>
+	<script type="text/javascript" src="../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+function confirmation()
+{
+	//var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	var answer = true;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $name; ?>_ccms');
+	}
+	return false;
+}
+	</script>
 	</body>
 	</html>
 	<?php 	

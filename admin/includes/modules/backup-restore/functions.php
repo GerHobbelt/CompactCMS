@@ -346,7 +346,7 @@ class MySQL_Backup
       return false;
     }
     $row = mysql_fetch_assoc($result);
-    $value .= str_replace("\n", MSB_NL, $row['Create Table']) . ';';
+    $value .= str_replace("\n", MSB_NL, str_replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS", $row['Create Table'])) . ';';
     $value .= MSB_NL . MSB_NL;
     if (!$this->struct_only)
     {
@@ -395,20 +395,20 @@ class MySQL_Backup
     }
     if ($this->comments)
     {
-      $value .= '#' . MSB_NL;
-      $value .= '# MySQL database dump' . MSB_NL;
-      $value .= '# Created for CompactCMS (www.compactcms.nl)';
-      $value .= '#' . MSB_NL;
-      $value .= '# Host: ' . $this->server . MSB_NL;
-      $value .= '# Generated: ' . date('M j, Y') . ' at ' . date('H:i') . MSB_NL;
-      $value .= '# MySQL version: ' . mysql_get_server_info() . MSB_NL;
-      $value .= '# PHP version: ' . phpversion() . MSB_NL;
+      $value .= '--' . MSB_NL;
+      $value .= '-- MySQL database dump' . MSB_NL;
+      $value .= '-- Created for CompactCMS (www.compactcms.nl)';
+      $value .= '--' . MSB_NL;
+      $value .= '-- Host: ' . $this->server . MSB_NL;
+      $value .= '-- Generated: ' . date('M j, Y') . ' at ' . date('H:i') . MSB_NL;
+      $value .= '-- MySQL version: ' . mysql_get_server_info() . MSB_NL;
+      $value .= '-- PHP version: ' . phpversion() . MSB_NL;
       if (!empty($this->database))
       {
-        $value .= '#' . MSB_NL;
-        $value .= '# Database: `' . $this->database . '`' . MSB_NL;
+        $value .= '--' . MSB_NL;
+        $value .= '-- Database: `' . $this->database . '`' . MSB_NL;
       }
-      $value .= '#' . MSB_NL . MSB_NL . MSB_NL;
+      $value .= '--' . MSB_NL . MSB_NL . MSB_NL;
     }
     if (!($tables = $this->_GetTables()))
     {

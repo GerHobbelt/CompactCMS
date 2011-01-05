@@ -1,0 +1,52 @@
+
+/*
+Last-minute CSS fixes: load after everything else CSS
+*/
+
+/*
+cleaning up the input CSS (Combiner css mode 'remove') would destroy 
+the look of MochaUI windows as their (non-CSS-standard) opacity was 
+removed and hence the red/green background showed through annoyingly.
+
+This was diagnosed finally through using the combiner dev dump 
+(COMBINER_DEV_DUMP_OUTPUT = true) and comparing the looks of
+
+	lib/includes/js/mochaui/Demo/index.html
+
+under various Combiner settings, while having these RewriteRules active
+at the top of the .htaccess:
+
+	RewriteCond    %{REQUEST_FILENAME}  -f
+	RewriteRule    ^(.*\.html)$          $1  [L]
+	RewriteCond    %{REQUEST_FILENAME}  -f
+	RewriteRule    ^(.*\.css)$           $1  [L]
+*/
+.mocha .handle 
+{ 
+	background: transparent;
+}
+.mocha .corner 
+{ 
+	background: transparent;
+}
+
+
+
+
+/*
+tinyMCE toolbar gets screwed up due to our table @ width:100% so we reset the width for the toolbar table ONLY
+*/
+.mceToolbar table
+{
+	width: 1%;
+}
+/*
+and make those toolbars float so they reposition themselves when the space is wide enough!
+*/
+.mceToolbar table
+{
+	float: left;
+}
+
+
+
