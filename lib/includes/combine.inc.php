@@ -87,7 +87,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT',
 // Define default location
 if (!defined('BASE_PATH'))
 {
-	$base = str_replace('\\','/',dirname(dirname(dirname(__FILE__))));
+	$base = str_replace('\\', '/', dirname(dirname(dirname(__FILE__))));
 	define('BASE_PATH', $base);
 }
 
@@ -98,11 +98,13 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
+define('COMBINER_DEV_DUMP_OUTPUT', true); // dump generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
+
 
 $optimize = array();
-$optimize['css'] = 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
-$optimize['javascript'] = 'JSmin';       // possible values: false, 'JSmin'
-$optimize['css3'] = 'remove';            // possible values: false, 'remove', 'IE-fix'
+$optimize['css'] = false; // 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
+$optimize['javascript'] = false; // 'JSmin';       // possible values: false, 'JSmin'
+$optimize['css3'] = 'remove';            // possible values: false, 'remove', 'browser-fix'
 
 
 $cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
@@ -120,6 +122,9 @@ if (empty($cssdir))
 else if ($cssdir[0] != '/') 
 	$cssdir = $cfg['rootdir'] . $cssdir;
 
+$http_root = $cfg['rootdir'];
+$root = str_replace('\\', '/', cvt_abs_http_path2realpath($http_root, $cfg['rootdir'], BASE_PATH));
+	
 
 // Determine the directory and type we should use
 $type = getGETparam4IdOrNumber('type');
@@ -127,16 +132,67 @@ switch ($type)
 {
 case 'css':
 	$http_base = path_remove_dot_segments($cssdir);
-	$base = str_replace('\\','/',cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
+	$base = str_replace('\\', '/', cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
 	break;
 case 'javascript':
 	$http_base = path_remove_dot_segments($jsdir);
-	$base = str_replace('\\','/',cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
+	$base = str_replace('\\', '/', cvt_abs_http_path2realpath($http_base, $cfg['rootdir'], BASE_PATH));
 	break;
 default:
 	send_response_status_header(503); // Not Implemented
 	exit;
 };
+
+
+$extra_JS_callback = getGETparam4IdOrNumber('cb');
+$only_when_expression = trim(getGETparam4MathExpression('only-when', ''));
+
+
+
+require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+
+$client_browser = new Browscap(BASE_PATH . '/lib/includes/cache');
+$client_browser->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+$client_browser = $client_browser->getBrowser();
+
+if (0)
+{
+	echo '<h1>$client_browser</h1>';
+	echo "<pre>";
+	var_dump($client_browser);
+	echo "</pre>";
+}
+
+/*
+we abuse the browscap conditional filter to check whether we should okay or discard this load request.
+
+This is our server-side alternative, suitable for use with lazyloading, to the MSIE conditional
+comment:
+
+<--[equ IEx] .... -->
+
+For this we 'fake; a wee bit of content (a single line) and see whether the filter leaves it be, or not:
+*/
+if (!empty($only_when_expression))
+{
+	$faked_content = '1 /*:: ' . $only_when_expression . ' */';
+	$faked_content = filter4browser($faked_content, $client_browser);
+	$do_not_load = (empty($faked_content) || $faked_content[0] != '1');
+}
+else
+{
+	$do_not_load = false;
+}
+/*
+when $do_not_load==true then we produce a seemingly EMPTY file.
+
+However, we DO adhere to the ?cb=callback JS request, when it's there.
+
+In short: we go through the entire process, we just do NOT load any real content!
+*/
+
+
+
 
 /*
 This bit allows paths such as '../../../../../../../etc/passwd' to enter the system.
@@ -145,6 +201,7 @@ We protect against such attacks by making sure the effective path ends up within
 BASE_PATH subtree (or better).
 */
 $elements = explode(',', getGETparam4CommaSeppedFullFilePaths('files'));
+
 
 if (substr($base, 0, strlen(BASE_PATH)) != BASE_PATH) 
 {
@@ -162,7 +219,7 @@ header($expire);
 $lastmodified = 0;
 foreach($elements as $element)
 {
-	$path = str_replace('\\','/',realpath($base . '/' . $element));
+	$path = str_replace('\\', '/', realpath($base . '/' . $element));
 
 	if (($type == 'javascript' && substr($path, -3) != '.js') || 
 		($type == 'css' && substr($path, -4) != '.css')) 
@@ -176,7 +233,7 @@ foreach($elements as $element)
 	generated file paths are checked against the 'base' directory and 
 	will only be allowed when they are part of that subtree.
 	*/
-	if (substr($path, 0, strlen($base)) != $base) 
+	if (substr($path, 0, strlen($root)) != $root) 
 	{
 		send_response_status_header(403); // Illegal Access
 		die();
@@ -191,16 +248,40 @@ foreach($elements as $element)
 }
 
 
-// Send Etag hash
-//
-// make sure all settings, which influence what should be fetched from cache, are 
-// include in the MD5 hash!
-// This includes the current minification settings in $optimize[]!
-$hash = $lastmodified . '-' . md5($base . ':' . implode(':', $optimize) . ':' . $_GET['files']);
+/*
+ Send Etag hash
+
+ make sure all settings, which influence what should be fetched from cache, are 
+ include in the MD5 hash!
+ 
+ This includes the current minification settings in $optimize[]!
+ 
+ And since we now have server-side Browser-dependent filtering enabled in here
+ (to filter CSS and JS depending on who's visiting), plus we have lazyload/loadorder-safe
+ JS invocation through the request-definable JS callback, all those should taken into
+ account for the indentifying hash code as well.
+ 
+ This basically means we'll need to include the browscap record and the $_SERVER['QUERY_STRING']
+ both to cover all bases.
+ 
+ However, since our current filter is limited to checking against major brands and versions
+ only, we can significantly cut down on the number of variations which should co-exist 
+ by only including just those particular browscap elements in the hash!
+ 
+ That way we can be sure that each browser brand gets served the appropriate pre-filtered CSS/JS
+ from cache!
+*/
+$hash = $lastmodified . '-' . 
+		md5($base . ':' . implode(':', $optimize) . ':' . 
+			$_SERVER['QUERY_STRING'] /* this includes all 'files'! */ . '::' . 
+			$client_browser->Browser . '::' .
+			$client_browser->Version 
+		);
 header("Etag: \"" . $hash . "\"");
 
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && 
-	stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == '"' . $hash . '"') 
+	stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == '"' . $hash . '"' &&
+	!$cfg['IN_DEVELOPMENT_ENVIRONMENT']) // disable this 'shortcut' when in development environment
 {
 	// Return visit and no modifications, so do not send anything
 	send_response_status_header(304); // Not Modified
@@ -282,7 +363,7 @@ else
 	$contents = '';
 	foreach($elements as $element)
 	{
-		$my_content = load_one($type, $http_base, $base, $element);
+		$my_content = load_one($type, $http_base, $base, $root, $element);
 		$contents .= "\n" . $my_content;
 	}
 
@@ -402,6 +483,12 @@ else
 		
 	case 'js':
 	case 'javascript':
+		// make sure to paste the callback invocation at the end:
+		if (!empty($extra_JS_callback))
+		{
+			$contents .= "\n\nif (typeof window.$extra_JS_callback == 'function')\n{\n //alert('invoking $extra_JS_callback');\n window.$extra_JS_callback();\n}\n";
+		}
+		
 		switch ($optimize['javascript'])
 		{
 		case 'JSmin':
@@ -433,6 +520,22 @@ else
 		{
 			send_response_status_header(500);
 			die("Failed to write data to cache file: " . $cachedir . '/' . $cachefile);
+		}
+	}
+
+	if (COMBINER_DEV_DUMP_OUTPUT && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+	{
+		$dump_filename = str2VarOrFileName($_GET['files']);
+		
+		if ($fp = @fopen($cachedir . '/' . $dump_filename, 'wb')) 
+		{
+			fwrite($fp, $contents);
+			fclose($fp);
+		}
+		else
+		{
+			send_response_status_header(500);
+			die("Failed to write data to development diagnostics dump file: " . $cachedir . '/' . $dump_filename);
 		}
 	}
 	
@@ -486,13 +589,14 @@ function css_mk_abs_path($relpath, $basedir)
 		  
 		Anyway, prepend the path with the absolute path to the given file and then discard the ./ and ../ entries in the path.
 		*/
-		$abspath = $basedir . (substr($basedir, -1, 1) != '/' ? '/' : '') . $relpath;
+		$abspath = merg_path_elems($basedir, $relpath);
 		$abspath = path_remove_dot_segments($abspath);
 	}
 	else
 	{
-		// don't modify
+		// don't modify, but bash out any lingering '../' parts in there to prevent illegal access outside DocumentRoot
 		$abspath = $relpath;
+		$abspath = path_remove_dot_segments($abspath);
 	}
 		
 	return $abspath;
@@ -501,13 +605,214 @@ function css_mk_abs_path($relpath, $basedir)
 
 
 /**
+Filter the CSS/JS based on sniffed browser capacilities: this way we can deliver nicely compliant CSS/JS files to
+the browsers that can handle them and feed 'browser hacked' content to MSIE et al.
+
+After all, not everything can be easily remedied in a separate MSIE-only 'conditional comment'ed individual
+CSS/JS file...
+
+The relevant 'markers' are comments which start with '::' without any leading whitespace. The expression 
+which follows it is of the format:
+
+	operator brand [version] ['|' operator brand [version] ]+ ['::' further comment]
+	
+where 'operand' can be any of the comparison operators '==', '<', '>', '>=', '<=', '!=', the 'brand' is
+name of the browser as per browscap and the (optional!) version is compared as a floating point number
+of the format: major.minor
+
+The whitespace between 'brand' and 'version' is optional: 'brand' is assumed to stop at the first occurrence
+of a decimal digit.
+
+When you wish to add a comment here for human perusal, you may do so after the double colon '::'.
+
+You may combine multiple conditions by separating them with '|' pipe symbols; these conditions are, of course,
+treated as a boolean-OR combined set.
+
+The 'marker' comment filter is applied per line by default. The only time such markers apply to the ENTIRE CLASS
+DEFINITION is when the marker is FOLLOWED by a '{' open curly brace: this implies that the entire scope block
+will be kept or removed, depending on the outcome of the browser check.
+
+Returns the filtered CSS/JS.
+
+
+WARNING: 
+
+it is assumed such a marker comment is the last thing on the current line. We do NOT wish to cope with 'minified'
+CSS/JS here, so you'd better make sure the CSS/JS is spread across multiple lines, i.e. CSS/JS code formatting for
+/human perusal/ is what we accept/assume as input.
+
+you may feed this function 'minified' CSS/JS, but then it will only play nice IFF you also have ensured there's not
+even a single occurrence of the 'filter marker' (comment start plus double colon) in there! In that case it's
+  output <- input
+and we're done.
+
+
+IMPORTANT NOTE:
+
+This filter system is *NOT* meant to remove the 'CSS/JS hacks' from the CSS/JS source files (heck, the fact alone 
+that the installer will be using those CSS/JS files as well, while we (the Combiner) have NOT been turned on yet
+through the RewriteRules is reason enough to keep them in there), but the reason for this filter is rather to
+rid CSS/JS output of such CSS/JS hacks for compliant browsers, which would report quite a few of them as the errors
+that they may be.
+In short, reason #1 for this filter code is to shut up Firefox and Opera about errors in the CSS/JS being fed
+to them.
+
+A nice side effect that is not to be sneezed at is the fact that we can now also 'condition' CSS/JS for those
+brosers as we now have something similar to a 'server side conditional comment' approach. 
+
+Ooooooh... shiny!
+*/
+function filter4browser($contents, $client_browser)
+{
+	$prev_content = '';
+	for($idx = strpos($contents, "/*::"); $idx !== false; $idx = strpos($contents, "/*::"))
+	{
+		// shift non-conditional lead off to other buffer, so we're never bothered with it again in this loop: speed!
+		$chunk = substr($contents, 0, $idx);
+		$nlidx = strrpos($chunk, "\n");
+		if ($nlidx === false)
+		{
+			// start of contents: assume we're on the first line!
+			$nlidx = -1;
+		}
+		// clip just AFTER the previous NL: anything before that does not concern us any more...
+		$nlidx = $idx - strlen($chunk) + $nlidx + 1;
+		$prev_content .= substr($contents, 0, $nlidx);
+		
+		$contents = substr($contents, $nlidx);
+		$eol = strcspn($contents, "\n");
+		$this_line = substr($contents, 0, $eol);
+		
+		$contents = substr($contents, $eol);
+		if (!preg_match('/^(.*)\/\*\:\:\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*(|\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*)*(::.*)?\*\/\s*$/', $this_line, $matches))
+		{
+			// illegal format: report this and fail dramatically
+			send_response_status_header(500); 
+			die("Illegal filter condition string: " . $this_line);
+		}
+		
+		$pass = true;
+		
+		$src = $matches[1];
+		$match_count = count($matches);
+		$comment = trim($matches[$match_count - 1]);
+		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
+		$extra_first_step = 1;
+		for ($i = 2; $i < $match_count - 1 /* discount the last one: the trailing comment */; $i++)
+		{
+			$op = $matches[$i++];
+			$brand = trim($matches[$i++]);
+			$b_v_set = !empty($matches[$i]);
+			$b_version = floatval($matches[$i++]);
+			$i++; // skip the minor version match
+			$i += $extra_first_step; // move to the next of a combined set (if there are any more conditions in there)
+			$extra_first_step = 0;
+			if ($i > 6 && empty($op) && empty($brand) && !$b_v_set)
+			{
+				// an empty match of the '| op brand version' set: happens when there's a comment at the end -- skip this entry
+				continue;
+			}
+			
+			// perform check, set $pass=false when there's a match
+			//echo "<pre>check: ($op) ($brand) ($b_version) ($this_line) ($comment)\n";
+			//echo "<pre>matches: \n"; var_dump($matches);
+			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
+			/*
+			we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
+			but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
+			
+			On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
+			stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an 
+			entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
+			past the second '.' dot in there.
+			*/
+			if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
+			{
+				// illegal format: report this and fail dramatically
+				send_response_status_header(500); 
+				die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
+			}
+			$sniffed_version = floatval($vmp[1]);
+			$vchk = $sniffed_version - $b_version;
+			//echo "\n<pre>browser says: " . $client_browser->Browser . " " . $client_browser->Version;
+			//echo "\n<pre>we want: " . $op . " " . $brand . " " . $b_version;
+			//echo "\n<pre>we got: gotcha = $gotcha, sniffed = $sniffed_version, vchk = $vchk, b_v_set = $b_v_set";
+			
+			switch ($op)
+			{
+			default:
+				// illegal format: report this and fail dramatically
+				send_response_status_header(500); 
+				echo "\n<pre>contents = $contents";
+				die("Illegal filter comparison operator: " . $this_line);
+			
+			case '!=':
+				$pass = !($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+				
+			case '==':
+				$pass = ($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+				
+			case '>=':
+				$pass = ($gotcha && (!$b_v_set || $vchk >= 0));
+				break;
+				
+			case '>':
+				$pass = ($gotcha && (!$b_v_set || $vchk > 0));
+				break;
+				
+			case '<':
+				$pass = ($gotcha && (!$b_v_set || $vchk < 0));
+				break;
+				
+			case '<=':
+				$pass = ($gotcha && (!$b_v_set || $vchk <= 0));
+				break;
+			}
+			//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
+		}
+		
+		if (!$pass)
+		{
+			// filter line... or CSS/JS block? When the next non-whitespace item is a '{' we'll need to ditch the entire block
+			if (preg_match('/^\s*(\{[^}]*\})(.*)$/s', $contents, $matches))
+			{
+				// bingo! CSS/JS block!
+				$contents = $matches[2];
+				// removed!  <snip> Just like that! :-)
+			}
+			/*
+			else: single line: just go on with the rest and see what needs to be done there in the next round.
+			      The current line has already been stripped off the contents, so we're good to go.
+			*/
+		}
+		else
+		{
+			// we must keep the current line/block:
+			$prev_content .= $this_line;
+		}
+	}
+	
+	// re-merge contents from both buffers:
+	$contents = $prev_content . $contents;
+	
+	return $contents;
+}
+
+
+
+
+/**
 patch/correct CCS3 and other particulars, such as 
 '@import flattening', which reduces the number of CSS files to load.
 */
-function fixup_css($contents, $http_base, $type, $base, $element)
+function fixup_css($contents, $http_base, $type, $base, $root, $element)
 {
-	global $cfg, $optimize;
+	global $cfg, $optimize, $client_browser;
 
+	$contents = filter4browser($contents, $client_browser);
+	
 	// make sure the @import statements are on their own lines: easier for us to process them:
 	$prev_content = '';
 	for($idx = strpos($contents, "@import"); $idx !== false; $idx = strpos($contents, "@import"))
@@ -546,10 +851,17 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 			  
 			Anyway, prepend the current path to the given file and then discard the ./ and ../ entries in the path.
 			*/
-			$url = $element . '/../' . $url;
-			$url = path_remove_dot_segments($url);
-
-			$imported_content = load_one($type, $http_base, $base, $url);
+			//echo "<pre>@import\n";
+			if (0)
+			{
+			echo "<pre>@import: $type, $http_base, \n$base, \n$root, $url, $element";
+			$rfn = merg_path_elems($base, $element, '../', $url);
+			echo "<pre>makes: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
+			$rfn = path_remove_dot_segments($rfn);
+			echo "<pre>makes 2: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
+			}
+			
+			$imported_content = load_one($type, $http_base, $base, $root, $url);
 			
 			/* 
 			inject imported content into the current buffer to have it (re)processed in the loop:
@@ -571,7 +883,7 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 	
 	switch ($optimize['css3'])
 	{
-	case 'IE-fix':
+	case 'browser-fix':
 		// fix CSS3 border-radius for IE:
 		$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
 
@@ -580,14 +892,35 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 		/* fix opacity for IE: */
 		// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
 		// filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
+		// filter:alpha(opacity=80); 
+		// -ms-filter:'alpha(opacity=80)';
+		/* 
+		see also why we removed the MSIE filter lines in the CSS file 'originals':
+		
+		http://developer.yahoo.com/performance/rules.html
+		  (section: Avoid Filters)
+		
+		we can add the opacity filters back in through fixup_css() in 
+		the Combiner, as all CSS travels through there anyway.
+		*/
+		
+		// FireFox/Chrome fixes
+		//-webkit-border-radius: 5px [5px 5px 5px];
+		//-moz-border-radius: 5px [5px 5px 5px];
+		//border-radius: 5px [5px 5px 5px];
 		break;
 		
 	case 'remove':
 		// remove any border-radius alike entry, including the mozilla+webkit specific ones:
-		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s+\w+;?/', '', $contents);
+		$contents = preg_replace('/\s(-[a-z-]+)?border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
 		
-		// remove -moz-opacity lines and MSIE filter lines:
-		$contents = preg_replace('/\s-moz-opacity:\s+[0-9.];?/', '', $contents);
+		// remove -moz/khtml-opacity lines and MSIE filter lines:
+		//
+		// note that these damage the looks of mochaUI: AJAX windows turn up with a green border and red corners.
+		// It's because a few mochaUI styles specify a 'opacity: 0;' to make them invisible.
+		$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*[Aa]lpha\([^)]+\)[\'"]?\s*;?/', ' ', $contents);
+		$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+		$contents = preg_replace('/\sopacity:\s*[0-9.]+;?/', ' ', $contents);
 		break;
 		
 	default:
@@ -595,7 +928,6 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 		break;
 	}
 
-	
 	/*
 	 make all url() paths in there ABSOLUTE.
 	
@@ -605,7 +937,7 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 	   <path+filename of CSS>/../ 
 	 and let the '..' directory remover do its regular job.
 	*/ 
-	$abspath = $http_base . (substr($http_base, -1, 1) != '/' ? '/' : '') . $element . '/../';
+	$abspath = merg_path_elems($http_base, $element, '../');
 	$abspath = path_remove_dot_segments($abspath);
 	
 	$contents = preg_replace('/\surl\(([^)]+)\)/e', "' url(\"'.css_mk_abs_path('\\1', '".$abspath."').'\")'", $contents);
@@ -618,13 +950,11 @@ function fixup_css($contents, $http_base, $type, $base, $element)
 /**
 patch/correct JS relative paths and other particulars
 */
-function fixup_js($contents, $http_base, $type, $base, $element)
+function fixup_js($contents, $http_base, $type, $base, $root, $element)
 {
-	global $cfg;
-
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
-		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $element);
+		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element);
 		$contents .= "\n" . $flattened_content;
 	}
 		
@@ -633,15 +963,27 @@ function fixup_js($contents, $http_base, $type, $base, $element)
 
 
 
-function load_tinyMCE_js($type, $http_base, $base, $element)
+function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 {
-	$mce_basepath = $base . '/' . substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js"));
+	global $cfg;
+	global $do_not_load;
+
+	if ($do_not_load) return ''; // return zip, nada, nothing 
+	
+	/*
+	Make sure the tinyMCE language is set up correctly! 
+	
+	If we don't this here, then $cfg['tinymce_language'] will not exist and we will croak further down below.
+	*/
+	SetUpLanguageAndLocale($cfg['language'], true);
+	
+	$mce_basepath = merg_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
 	
 	$mce_files = array();
 	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
 	
 	// Add core
-	$mce_files[] = $mce_basepath . "tiny_mce" . $suffix . ".js";
+	$mce_files[] = merg_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
 	// Add core language(s)
 	$languages = array($cfg['tinymce_language']);
 	if ($cfg['tinymce_language'] != 'en')
@@ -650,18 +992,18 @@ function load_tinyMCE_js($type, $http_base, $base, $element)
 	}
 	foreach ($languages as $lang)
 	{
-		$mce_files[] = $mce_basepath . "langs/" . $lang . ".js";
+		$mce_files[] = merg_path_elems($mce_basepath, "langs/" . $lang . ".js");
 	}
 	// Add themes
 	$themes = array('advanced');
 	foreach ($themes as $theme) 
 	{
-		$mce_files[] = $mce_basepath . "themes/" . $theme . "/editor_template" . $suffix . ".js";
+		$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
 
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = $mce_basepath . "themes/" . $theme . "/langs/" . $lang . ".js";
-			$mce_files[] = $mce_basepath . "themes/" . $theme . "/langs/" . $lang . "_dlg.js";
+			$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
+			$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
 		}
 	}
 	// Add plugins
@@ -678,7 +1020,7 @@ function load_tinyMCE_js($type, $http_base, $base, $element)
 		media,
 		nonbreaking,noneditable,
 		pagebreak,paste,preview,print,
-		safari,save,searchreplace,spellchecker,style,
+		save,searchreplace,spellchecker,style,
 		tabfocus,table,template,tinyautosave,
 		visualchars,
 		wordcount,
@@ -690,7 +1032,7 @@ function load_tinyMCE_js($type, $http_base, $base, $element)
 		inlinepopups,
 		media,
 		paste,print,
-		safari,searchreplace,spellchecker,
+		searchreplace,spellchecker,
 		table,tinyautosave,
 		visualchars,
 	*/
@@ -736,14 +1078,18 @@ function load_tinyMCE_js($type, $http_base, $base, $element)
 	{
 		if (!$in_use) continue;
 		
-		$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/editor_plugin" . $suffix . ".js";
+		$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
 
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/langs/" . $lang . ".js";
-			$mce_files[] = $mce_basepath . "plugins/" . $plugin . "/langs/" . $lang . "_dlg.js";
+			$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
+			$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
 		}
 	}
+
+//echo "<pre>";
+//var_dump($mce_files);	
+//echo "</pre>\n";
 
 	// now load all content:
 	$my_content = '';
@@ -765,21 +1111,46 @@ function load_tinyMCE_js($type, $http_base, $base, $element)
 		}
 	}
 
+	return $my_content;
 }
 
 
 /**
-Load the content of the given item.
+Load the content of the given item. ($element MUST be an absolute path!)
 
 Note that this function does 'fixup' the loaded content, which MAY result in recursive
 invocation of this function to load each of the dectected sub-items. This way we can easily handle
 'flattening' CSS which uses the @import statement, etc.
 */
-function load_one($type, $http_base, $base, $element)
+function load_one($type, $http_base, $base, $root, $element)
 {
-	$path = realpath($base . '/' . $element);
+	global $do_not_load;
 	
-	$my_content = file_get_contents($path);
+	$uri = path_remove_dot_segments($base . '/' . $element);
+	$path = str_replace("\\", '/', realpath($uri)); /* Windows can handle '/' so we're OK with the replace here; makes strpos() below work on all platforms */
+	
+	/*
+	only allow a load when the CSS/JS is indeed within document-root: 
+	
+	as path_remove_dot_segments() will remove ALL '../' directory bits, any attempt to grab, say,
+	  ../../../../../../../../../etc/passwd
+	will fail as path_remove_dot_segments() will have DAMAGED the path and $element
+	does not point within the $root path any more!
+	*/
+	$my_content = null;
+	if (is_file($path) && strpos($path, $root) === 0)
+	{
+		//echo "<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root);
+		$my_content = '';
+		if (!$do_not_load)
+		{
+			$my_content = file_get_contents($path);
+		}
+	}
+	else
+	{
+		die("<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root));
+	}
 	if ($my_content === false)
 	{
 		send_response_status_header(404); // Not Found
@@ -805,11 +1176,11 @@ function load_one($type, $http_base, $base, $element)
 		As the result is cached, this effort is only required once. Which would happen at install time when
 		you run the 'cache priming' action, resulting in a fully set up cache when you go 'live'.
 		*/
-		$my_content = fixup_css($my_content, $http_base, $type, $base, $element);
+		$my_content = fixup_css($my_content, $http_base, $type, $base, $root, $element);
 		break;
 		
 	default:
-		$my_content = fixup_js($my_content, $http_base, $type, $base, $element);
+		$my_content = fixup_js($my_content, $http_base, $type, $base, $root, $element);
 		break;
 	}
 	return $my_content;

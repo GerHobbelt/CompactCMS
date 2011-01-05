@@ -74,7 +74,10 @@ if($do=="backup" && $btn_backup=="dobackup")
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Back-up &amp; Restore module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+	<![endif]-->
 </head>
 <body class="module">
 		

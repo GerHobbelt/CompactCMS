@@ -61,10 +61,17 @@ $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 $pageID	= getGETparam4Filename('file');
 
+if (empty($pageID))
+{
+	die($ccms['lang']['system']['error_forged']);
+}
+
 
 // Get permissions
 $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+
+
 
 
 
@@ -74,106 +81,116 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>News module</title>
-	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css" />
-	<script type="text/javascript" charset="utf-8">
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	return !!answer;
-}
-	</script>
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
+	<![endif]-->
 </head>
 <body>
-	<div class="module">
-		<div class="center <?php echo $status; ?>">
+	<div class="module" id="news-manager">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
 		
-		<div class="span-16 colborder">
+		<div class="span-18 colborder">
 			<h2><?php echo $ccms['lang']['news']['manage']; ?></h2>
 			<?php
 			// Load recordset
 			$i=0;
-			if(!$db->Query("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT)))
+			$newsitems = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+			if ($newsitems === false)
 				$db->Kill();
 
 			// Start switch for news, select all the right details
-			if($db->HasRecords()) 
+			if(count($newsitems) > 0) 
 			{ 
+				$preview_checkcode = GenerateNewPreviewCode(null, $pageID);
+				
 			?>
 				<form action="news.Process.php?action=del-news" method="post" accept-charset="utf-8">
-					<table border="0" cellspacing="5" cellpadding="5">
+				<div class="table_inside">
+					<table cellspacing="0" cellpadding="0">
 						<tr>
-							<?php 
-							if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
-							{ 
-							?>
-								<th class="span-1">&#160;</th>
-							<?php 
-							} 
-							?>
 							<th class="span-1">&#160;</th>
-							<th class="span-7"><?php echo $ccms['lang']['news']['title']; ?></th>
+							<th class="span-1">&#160;</th>
+							<th class="span-14"><?php echo $ccms['lang']['news']['title']; ?></th>
 							<th class="span-5"><?php echo $ccms['lang']['news']['author']; ?></th>
-							<th class="span-4"><?php echo $ccms['lang']['news']['date']; ?></th>
+							<th class="span-4 last"><?php echo $ccms['lang']['news']['date']; ?></th>
 						</tr>
 						<?php
-						while (!$db->EndOfSeek()) 
+						
+						foreach($newsitems as $rsNews)
 						{
-							$rsNews = $db->Row();
-							
 							// Alternate rows
 							if($i%2 != 1) 
 							{
-								echo '<tr style="background-color: #E6F2D9;">';
+								echo '<tr class="altrgb"><td>';
 							} 
 							else 
 							{ 
-								echo '<tr>';
+								echo '<tr><td>';
 							} 
-						
+					
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
-									<td><input type="checkbox" name="newsID[]" value="<?php echo rm0lead($rsNews->newsID); ?>" id="newsID"></td>
+									<label>
+										<input type="checkbox" name="newsID[]" value="<?php echo rm0lead($rsNews->newsID); ?>">
+									</label>
 								<?php 
 								} 
 								?>
-								<td><?php echo "<span class='ss_sprite ".($rsNews->newsPublished!=0?"ss_bullet_green'>":"ss_bullet_red'>")."</span>"; ?></td>
+								</td>
+								<td>
+								<?php
+								
+								echo "<span class='ss_sprite_16 ".($rsNews->newsPublished != 0 ? "ss_bullet_green'>" : "ss_bullet_red'>") . "&#160;</span>"; 
+								
+								// Filter spaces, non-file characters and account for UTF-8
+								$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
+								
+								echo '<a href="' . $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle . '.html?preview=' . $preview_checkcode . '" ' .
+											'title="' . $ccms['lang']['backend']['previewpage'] . '"><span class="ss_sprite_16 ss_eye">&#160;</span></a>'; 
+								?>
+								</td>
+								<td>
 								<?php 
 								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 								{ 
 								?>
-									<td><span class="ss_sprite ss_pencil"><a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20?'...':null); ?></a></span></td>
+									<a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><span class="ss_sprite_16 ss_pencil">&#160;</span><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20 ? '...' : null); ?></a>
 								<?php 
 								} 
 								else 
 								{ 
 								?>
-									<td><?php echo $rsNews->newsTitle; ?></td>
+									<?php echo $rsNews->newsTitle; ?>
 								<?php 
 								} 
-								?>
-								<td><span class="ss_sprite ss_email"><a href="mailto:<?php echo $rsNews->userEmail; ?>"><?php echo substr(ucfirst($rsNews->userFirst),0,1).'. '.ucfirst($rsNews->userLast); ?></a></span></td>
-								<td><span class="ss_sprite ss_calendar"><?php echo date('Y-m-d G:i', strtotime($rsNews->newsModified)); ?></span></td>
+								?>                                       
+								</td>
+								<td class="nowrap"><a href="mailto:<?php echo $rsNews->userEmail; ?>"><span class="ss_sprite_16 ss_email">&#160;</span><?php echo substr(ucfirst($rsNews->userFirst),0,1).'. '.ucfirst($rsNews->userLast); ?></a></td>
+								<td class="nowrap"><span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date('Y-m-d G:i', strtotime($rsNews->newsModified)); ?></td>
 							</tr>
 							<?php 
 							$i++; 
 						}
 						?>
 					</table>
-					<hr />
+				</div>
 					<?php 
 					if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 					{ 
 					?>
-						<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
-						<button type="submit" onclick="return confirmation();" name="deleteNews"><span class="ss_sprite ss_newspaper_delete"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
+					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
+					<div class="right">
+						<button type="submit" onclick="return confirmation_delete();" name="deleteNews"><span class="ss_sprite_16 ss_newspaper_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
+					</div>
 					<?php 
 					} 
 					?>
@@ -181,23 +198,25 @@ function confirmation()
 				<?php
 			} 
 			else 
+			{
 				echo $ccms['lang']['system']['noresults'];  // [i_a] moved OUTSIDE the <form><table> : correct HTML
+			}
 			?>
 		</div>
-		<div class="span-6">
+		<div class="span-6 last">
 			<h2><?php echo $ccms['lang']['news']['addnews']; ?></h2>
 			<?php 
 			if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
 			{ 
 			?>
-				<p><span class="ss_sprite ss_newspaper_add"><a href="news.Write.php?pageID=<?php echo $pageID; ?>"><?php echo $ccms['lang']['news']['addnewslink']; ?></a></span></p>
+				<p class="ss_has_sprite"><a href="news.Write.php?pageID=<?php echo $pageID; ?>"><span class="ss_sprite_16 ss_newspaper_add">&#160;</span><?php echo $ccms['lang']['news']['addnewslink']; ?></a></p>
 			
 				<h2><?php echo $ccms['lang']['news']['settings']; ?></h2>
 				<?php 
-				if (!$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT))))
-					$db->Kill();
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT)));
+				if ($db->ErrorNumber() != 0) $db->Kill();
 					
-				if ($db->HasRecords())
+				if ($rsCfg !== false)
 				{
 					$showmsg = max(1,intval($rsCfg->showMessage)); // always show at least 1 news item on a news page!
 					$locale = $rsCfg->showLocale;
@@ -219,60 +238,88 @@ function confirmation()
 				?>
 				<form action="news.Process.php?action=cfg-news" method="post" accept-charset="utf-8">
 					<label for="messages"><?php echo $ccms['lang']['news']['numbermess']; ?></label>
-					<input type="text" class="text" name="messages" value="<?php echo $showmsg; ?>" id="messages" />
+					<input type="text" class="text span-25 last" name="messages" value="<?php echo $showmsg; ?>" id="messages" />
 					
 					<label for="locale"><?php echo $ccms['lang']['forms']['setlocale']; ?></label>
-					<select name="locale" class="text" id="locale" size="1">
-						<option value="eng" <?php echo ($locale=='eng'?"selected":null); ?>>English</option>
-						<option value="esp" <?php echo ($locale=='esp'?"selected":null); ?>>español</option>
-						<option value="fra" <?php echo ($locale=='fra'?"selected":null); ?>>français</option>
-						<option value="deu" <?php echo ($locale=='deu'?"selected":null); ?>>Deutsch</option>
-						<option value="nld" <?php echo ($locale=='nld'?"selected":null); ?>>Nederlands</option>
-						<option value="ita" <?php echo ($locale=='ita'?"selected":null); ?>>italiano</option>
-						<option value="dan" <?php echo ($locale=='dan'?"selected":null); ?>>dansk</option>
-						<option value="fin" <?php echo ($locale=='fin'?"selected":null); ?>>suomi</option>
-						<option value="nor" <?php echo ($locale=='nor'?"selected":null); ?>>norsk</option>
-						<option value="rus" <?php echo ($locale=='rus'?"selected":null); ?>>русский</option>
-						<option value="sve" <?php echo ($locale=='sve'?"selected":null); ?>>svenska</option>
-						<option value="ind" <?php echo ($locale=='ind'?"selected":null); ?>>Bahasa Indonesia</option>
+					<select name="locale" class="title span-25 last" id="locale" size="1">
+						<?php 
+						// Get current languages
+						$s = (isset($_SESSION['variables']['language']) ? $_SESSION['variables']['language'] : 'en');
+						$lcoll = GetAvailableLanguages();
+						foreach($lcoll as $lcode => $ldesc)
+						{
+							$c = ($lcode == $s ? 'selected="selected"' : null);
+							echo '<option value="'.$ldesc['locale'].'" '.$c.'>'.$ldesc['name'].'</option>';
+						}
+						?>   	
 					</select>
 					
 					<label><?php echo $ccms['lang']['news']['showauthor']; ?></label>
-						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
-						<label style="display:inline;" for="show_author1"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="author" <?php echo ($showauth!=0?"checked":null); ?> value="1" id="author1" />
-							<img src="../../../admin/img/spacer.gif" height="10" width="50" alt=" "/>
-						<label style="display:inline;" for="show_author0"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="author" <?php echo ($showauth==0?"checked":null); ?> value="0" id="author0" />
-					<br/><br/>
+					<div id="show-author" class="span-25">
+						<label><?php echo $ccms['lang']['backend']['yes']; ?>
+							<input type="radio" name="author" <?php echo ($showauth!=0?'checked="checked"':null); ?> value="1" id="author1" />
+						</label>
+						<label><?php echo $ccms['lang']['backend']['no']; ?>
+							<input type="radio" name="author" <?php echo ($showauth==0?'checked="checked"':null); ?> value="0" id="author0" />
+						</label>
+					</div>
 					<label><?php echo $ccms['lang']['news']['showdate']; ?></label>
-						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
-						<label style="display:inline;" for="show_modified1"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="show_modified" <?php echo ($showdate!=0?"checked":null); ?> value="1" id="show_modified1" />
-							<img src="../../../admin/img/spacer.gif" height="10" width="50" alt=" "/>
-						<label style="display:inline;" for="show_modified0"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="show_modified" <?php echo ($showdate==0?"checked":null); ?> value="0" id="show_modified0" />
-					<br/><br/>
+					<div id="show-date" class="span-25">
+						<label><?php echo $ccms['lang']['backend']['yes']; ?>
+							<input type="radio" name="show_modified" <?php echo ($showdate!=0?'checked="checked"':null); ?> value="1" id="show_modified1" />
+						</label>
+						<label><?php echo $ccms['lang']['backend']['no']; ?>
+							<input type="radio" name="show_modified" <?php echo ($showdate==0?'checked="checked"':null); ?> value="0" id="show_modified0" />
+						</label>
+					</div>
 					<label><?php echo $ccms['lang']['news']['showteaser']; ?></label>
-						<img src="../../../admin/img/spacer.gif" height="10" width="20" alt=" "/>
-						<label style="display:inline;" for="show_teaser1"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-						<input type="radio" name="show_teaser" <?php echo ($showteaser!=0?"checked":null); ?> value="1" id="show_teaser1" />
-							<img src="../../../admin/img/spacer.gif" height="10" width="50" alt=" "/>
-						<label style="display:inline;" for="show_modified0"><?php echo $ccms['lang']['backend']['no']; ?></label>
-						<input type="radio" name="show_teaser" <?php echo ($showteaser==0?"checked":null); ?> value="0" id="show_teaser0" />
-					<br/><br/>			
-					<p class="prepend-3">
-						<?php echo ($db->HasRecords()?'<input type="hidden" name="cfgID" value="'.rm0lead($rsCfg->cfgID).'" id="cfgID" />':null); ?>
-						<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
-						<button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton']; ?></span></button>
-					</p>
+					<div id="show-teaser" class="span-25">
+						<label><?php echo $ccms['lang']['backend']['yes']; ?>
+							<input type="radio" name="show_teaser" <?php echo ($showteaser!=0?'checked="checked"':null); ?> value="1" id="show_teaser1" />
+						</label>
+						<label><?php echo $ccms['lang']['backend']['no']; ?>
+							<input type="radio" name="show_teaser" <?php echo ($showteaser==0?'checked="checked"':null); ?> value="0" id="show_teaser0" />
+						</label>
+					</div>
+					<?php 
+					if ($rsCfg !== false)
+					{
+						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />';
+					}
+					?>
+					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
+						<a class="button" href="../../../admin/index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					</div>
 				</form>
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
 			?>
 		</div>
 	</div>
+	<script type="text/javascript" src="../../includes/js/the_goto_guy.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pageID; ?>_ccms');
+	}
+	return false;
+}
+	</script>
 </body>
 </html>

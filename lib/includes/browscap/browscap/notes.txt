@@ -1,0 +1,1323 @@
+Google
+Feedfetcher-Google;*
+Feedfetcher is how Google grabs RSS or Atom feeds when users choose to add them to their Google homepage.
+
+googlebot-urlconsole
+This is Google's service for requesting that they remove a URL from their index.
+
+Mozilla/5.0 (*) AppleWebKit/525.13 (KHTML, like Gecko; Google Web Preview) Version/3.1 Safari/525.13
+
+Here's an interesting discussion about this new bot/prefetcher:
+http://www.webmasterworld.com/search_engine_spiders/4223018.htm
+
+Inktomi
+Mozilla/4.0 (compatible; Yahoo Japan; for robot study; kasugiya)
+Did not read robots.txt which is typical of Y! bots these days.
+
+Mozilla/5.0 (compatible; Yahoo! Slurp China; http://misc.yahoo.com.cn/help.html)
+I wish I could ban this bot, but it uses the same robots name as all the other Inktomi bots!
+
+Yahoo Pipes*
+Pipes is a hosted service that lets you remix feeds and create new data mashups in a visual programming environment.
+
+YahooExternalCache
+
+READ ROBOTS.TXT? No
+OBEYED ROBOTS.TXT? No
+All it seems to want are favicon.ico files.
+
+YahooSeeker/*
+This is Yahoo's user agent for indexing mobile content.
+
+ytndemo bergum@yahoo-inc.com
+
+Shows up within seconds of posting a tweet with a link.
+
+MSN
+Mozilla/5.0 (Danger hiptop 3.*; U; rv:1.7.*) Gecko/*
+http://www.microsoft.com/presspass/press/2008/feb08/02-11Acquisition.mspx
+Danger is part of Microsoft's Premium Mobile Experiences (PMX)
+
+msnbot/2.0b*
+http://blogs.msdn.com/webmaster/archive/2008/12/11/another-crawler-in-your-logs.aspx
+Webmaster Blog confirms this is a legit bot as as December 2008. It's still not very well-behaved though. Normally it only reads robots.txt and sometimes the default root page. Other times it goes wild and reads everything, even stuff that's disallowed.
+
+renlifangbot/1.0 (?http://search.msn.com/msnbot.htm)
+http://research.microsoft.com/en-us/projects/entitycube/
+This is the Chinese version of EntityCube. See the discussion at WMW for more information:
+http://www.webmasterworld.com/search_engine_spiders/3864938.htm
+
+From the MS website: EntityCube is an entity search and summarization engine, which automatically summarizes the Web for the long tail, not just celebrities! The Chinese name of the project is called Renlifang.
+
+I haven't seen an Americanized user agent yet.
+
+Yahoo
+Mozilla/4.0 (compatible; Y!J; for robot study*)
+My sites were hit by two different Yahoo Japan bots at the exact same time. So while it read and respected robots.txt I'm banning it because of abusive behavior.
+
+mp3Spider cn-search-devel at yahoo-inc dot com
+No robots.txt. I'm tired of Yahoo disrespecting robots.txt. I am starting to physically ban large blocks of Yahoo IP Addresses.
+
+My Browser
+I have no idea what this is. More crap from Yahoo! that's for sure. It didn't read robots.txt and it took the default page from each of my sites.
+
+Y!OASIS/*
+I cannot find any solid information on this user agent. It's coming from Yahoo IP Addresses but that doesn't make it an official Yahoo! bot. It also does not request robots.txt which is why it's banned.
+
+YahooYSMcm/2.0.0
+Did not read robots.txt.
+
+Yandex
+Yandex
+Russian search engine.
+
+Best of the Web
+Mozilla/4.0 (compatible; BOTW Spider; *http://botw.org)
+Does not request robots.txt like all BOTW bots.
+
+Entireweb
+Entireweb
+Reads but does respect robots.txt.
+
+Envolk
+Envolk
+Even after an upgrade, and stating on their bot page that they read and respect robots.txt, it's just not true.
+
+Exalead
+Exalead
+French search engine. Does not read or respect robots.txt.
+
+Exalead NG/*
+This is Exalead's image preview bot.
+
+Mozilla/5.0 (compatible; Exabot/3.0;*)
+2007/1/18: They finally created a proper UA so this one isn't banned like the others are.
+
+ng/*
+This is Exalead's image preview bot.
+
+Ilse
+Ilse
+Dutch search engine. Their bot appears to be well-behaved. They get good comments on WMW.
+
+
+iVia Project
+iVia Project
+From their website:  The iVia software is used in a range of projects, including the iVia Virtual Library Software which creates and manages Virtual Libraries, both automatically, and under the direct control of living, breathing, human librarians. iVia can be used to download pages from other Web sites.
+
+Jayde Online
+ExactSeek Crawler/*
+ExactSeek is a Meta-tag search engine. Your site will not be added if it does not have Title and Meta Description tags.
+
+exactseek-pagereaper-* (crawler@exactseek.com)
+ExactSeek is a Meta-tag search engine. Your site will not be added if it does not have Title and Meta Description tags.
+
+Naver
+Cowbot-* (NHN Corp*naver.com)
+Seems to be associated with naver.com.
+
+Yeti/*
+Part of naver.com.
+
+Snap
+Snap
+Snap appears to be an image crawler. All of its bots ignore robots.txt
+
+Sogou
+Sogou
+Chinese search engine. Does not read robots.txt.
+
+YodaoBot
+YodaoBot
+http://www.yodao.com/
+Some kind of Asian search engine. It read robots.txt, but since that's the only files it took I don't know if it respects robots.txt.
+
+DNS Tools
+DNSGroup/*
+Website in URL cannot be accessed. E-mail bounced (This address no longer accepts mail).
+
+Exalead
+NG-Search/*
+German search engine. Well behaved software, respected robots.txt.
+
+General Crawlers
+BabalooSpider/1.*
+Comes from same IP Address as Exploder/0.1. As of 25 February 2007 the website is just a placemarker.
+
+Cynthia 1.0
+From their website: Cynthia is a web content accessibility validation solution, it is designed to identify errors in design related to Section 508 standards and the WCAG guidelines.
+
+cz32ts
+
+SQL Injection
+
+DomainsDB.net MetaCrawler*
+Reverse IP and NS lookup tool.
+
+eventax/*
+Searches for online events, mostly in Germany.
+
+favorstarbot/*
+Didn't read robots.txt until well into its crawl.
+
+Gaisbot*
+From their website: Gaisbot is the agent software of GAIS which crawls web sites all over the world, in order to build a search engine like google or altavista.
+
+Healthbot/Health_and_Longevity_Project_(HealthHaven.com) 
+
+See discussion thread: http://www.webmasterworld.com/search_engine_spiders/3868907.htm#msg3869171
+
+htdig/*
+From their website: a complete indexing and searching system for a domain or intranet.
+
+JetBrains*
+From their website: Omea Pro is a powerful universal client for aggregating and organizing all kinds of information: emails, files, web links, RSS feeds, newsgroups, tasks, contacts, and even custom resource types that you define.
+
+KBeeBot/0.*
+No robots.txt.
+
+Lincoln State Web Browser
+Does not read robots.txt.
+
+LinkedInBot/1.*
+http://www.linkedin.com
+Always visits after a tweet with a link.
+
+Links4US-Crawler,*
+Claims to use data from DMOZ.org so why are they crawling themselves. Especially without reading robots.txt!
+
+Lorkyll *.* -- lorkyll@444.net
+I've had traffic from this bot's netrange and banned individual addresses. But as of February 2007 the number of bad bots coming from the C class is enough for me to ban the C class via firewall.
+
+Made by ZmEu @ WhiteHat v0.* (www.WhiteHat.ro)
+
+Seaerches for ZenCart exploits
+
+magpie-crawler/1.*
+http://www.brandwatch.net
+Excessive fetch speed.
+
+MapoftheInternet.com?(?http://MapoftheInternet.com)
+Does not read robots.txt.
+
+Marvin v0.3
+Marvin (Multi-Agent Retrieval Vagabond on Information Networks) is a medical information spider linked to MedHunt.
+
+metatagsdir/*
+Does not read robots.txt.
+
+Miva (AlgoFeedback@miva.com)
+Did not read robots.txt. From their website: Today we offer a range of products and services through our three industry-facing divisions - MIVA Media, MIVA Small Business and MIVA Direct - aimed at significantly enhancing an advertiser's ability to improve ROI, further minimizing waste and uncertainty.
+
+moget/*
+It is part of the 'InfoBee' project. It is very related to the regular Inktomi db but is branded as an alternative db. It grabs too many pages in a short period of time which is why it's in this category.
+
+Mozdex/0.7.2*
+URL in user agent is 404. From their website: mozDex is a search engine seeded from the dmoz.org directory. mozDex uses open source search technologies to create an open and fair index.
+
+Mozilla Compatible (MS IE 3.01 WinNT)
+The user agent is just too old and odd to be a real browser. That, combined with the fact it ripped valuable content from one of my websites without even reading robots.txt makes me mad. That's why it's banned.
+
+Mozilla/4.0 (compatible; MSIE 4.01; Vonna.com b o t)
+Did not read robots.txt.
+
+Mozilla/4.0 (compatible; MyFamilyBot/*)
+This is apparently the parent company of Ancestry.com and other such sites. What are they crawling my sites for? And why are they taking disallowed files?
+
+Mozilla/4.0 (compatible; N-Stealth)
+From their website: N-Stealth is a vulnerability-assessment product that scans web servers to identify security problems and weaknesses that may allow an attacker to gain privileged access.
+
+Mozilla/4.1
+No robots.txt.
+
+Mozilla/5.0 (compatible; AboutUsBot/*)
+
+Did not read robots.txt. From their website: Gathers descriptive information about a website from several sources to build a Wiki Page.
+
+Mozilla/5.0 (compatible; Crawly/1.*; +http://*/crawler.html)
+
+Did not read or obey robots.txt
+
+Mozilla/5.0 (compatible; Diffbot/0.1; +http://www.diffbot.com)
+http://www.diffbot.com
+Hosted by: Hurricane Electric
+
+Mozilla/5.0 (compatible; FirstSearchBot/1.0; *)
+
+This is one of those screenshot/thumbnail generators. It doesn't read robots.txt. It steals all the artwork on your page and uses it to make a profit for itself.
+
+mozilla/5.0 (compatible; genevabot +http://www.healthdash.com)
+
+From their website: Healthdash is the fastest and easiest way to find, understand and manage information about consumer health.
+
+Mozilla/5.0 (compatible; Kyluka crawl; http://www.kyluka.com/crawl.html; crawl@kyluka.com)
+Questionable practices but for now they're not banned, just requested to go away in robots.txt
+
+Mozilla/5.0 (compatible; LegalAnalysisAgent/1.*; http://www.legalx.net)
+
+Did not read or obey robots.txt.
+
+Mozilla/5.0 (compatible; MJ12bot/v1.*)
+http://www.majestic12.co.uk/bot.php
+This is a wonderful distributed bot that is leading the way in securely identifying itself to websites.
+http://www.webmasterworld.com/search_engine_spiders/3983454.htm
+
+Mozilla/5.0 (compatible; Vermut*)
+From their website: Vermut is a web crawler which collects web content for general analysis and building of search indexes. It appears to be part of AOL, but I can't find absolute proof of that.
+
+n4p_bot*
+From their website: This is a peer-to-peer protocol for distributing files. It makes use of the upstream bandwidth of every downloader to increase the effectiveness of the distribution as a whole, and to gain advantage on the part of the downloader. The term they use to describe this is "torrents" as in BitTorrent software.
+
+nabot*
+Run by Korea Telecom.
+
+NetCarta_WebMapper/*
+Does not read robots.txt. Takes pages too quickly.
+
+nicebot
+This bot has a mixed reputation. In some cases it respects robots.txt. In other cases it doesn't bother reading robots.txt.
+
+niXXieBot?Foster*
+Claims to be the first contextual advertising company in the UK. Their bot was very abusive. For starters it read robots.txt before every single one of the 36,000 pages it crawled. Also, while it was crawling with this user agent it was also crawling from the same IP Address using niXXieBot-Foster as the user agent.
+
+Nozilla/P.N (Just for IDS woring)
+Looking for World of Warcraft vulnerabilities.
+
+NSO_Debugger_User/2.0
+
+Read Robots.txt? NO
+Obeyed Robots.txt? NO
+
+Nudelsalat/*
+Noodle salad? It didn't read robots.txt so it's banned.
+
+NV32ts
+
+SQL Injection
+
+Ocelli/*
+From their website: Ocelli is a Web crawler owned and operated by GlobalSpec®, the leading specialized search engine and information resource for the engineering community. Ocelli's mission is to find and index web pages for The Engineering Web from GlobalSpec, a unique slice of the World Wide Web focusing solely on engineering and technical content.
+
+Based on discussions I've seen on WebmasterWorld this spider is not very good at finding the niche content it claims to be searching for. I have banned it from my sites which have nothing to do with engineering, unless you want to count plastic model cars as being engineering related!
+
+OpenTaggerBot (http://www.opentagger.com/opentaggerbot.htm)
+Social bookmarking site.
+
+Patwebbot (http://www.herz-power.de/technik.html)
+Some type of crawler from Germany. As best I could tell from the site it's just someone who wrote a bot to crawl the web with no real purpose in mind.
+
+PhpDig/*
+This is the default user agent for PhpDig. Usually a client will modify this user agent to reflect their own search engine. From the PhpDig website: PhpDig is a PHP and MySQL web spider and search engine, released under the GNU General Public License.
+
+QuickFinder Crawler
+No robots.txt. The IP Address I saw belonged to Novell, Inc.
+
+RixBot (http://babelserver.org/rix)
+Some sort of search engine for REBOL-related scripts and news.
+
+SBIder/*
+From their website: SiteSell is gathering a statistical representation of topics presented on the Web as a whole. Each Web page visited is categorized under the topics that it represents, allowing our customers to know the percentage of Web pages that are about any particular topic.
+
+ScollSpider/2.*
+Despite the claims on their website this bot does not read robots.txt.
+
+Search Fst
+Seems to follow behind human-powered user agents indexing pages the person has just visited. It never reads robots.txt. The company behind it is an engineering firm called Fay, Spofford & Thorndike, Inc.
+
+searchbot admin@google.com
+Trying to spoof Google and doing a bad job of it!
+
+Seeker.lookseek.com
+Does not read robots.txt.
+
+semanticdiscovery/*
+From their website: The Semantic Discovery robot collects content from the web to be matched into focused "product and service" taxonomies and then published in multiple search engine directories.
+
+shelob v1.*
+No robots.txt.
+
+ShopWiki/1.0*
+Crawler for ShopWiki website. It appears to read and respect robots.txt.
+
+SMBot/*
+Appears to be a tool offered by Amazon.com.
+
+sohu*
+Some sort of Chinese crawler. No robots.txt.
+
+SurveyBot/*
+Domain availability checker. It's dubious why they need to probe my sites each week when other whois services don't need to. Plus I get no traffic from them at all. So they're banned.
+
+SynapticSearch/AI Crawler 1.?
+A search quickly turned up synapticsearch.com which redirects to alpha-leonis.lids.mit.edu/ss/. It's a distributed crawler that is really not ready for prime-time. Most of the links on their website are broken. There is no contact information.
+I'm not sure what to do with this one yet. For now I'm adding it to browscap as a general crawler and flagging it as isBanned.
+If someone from this project at MIT can contact me I'd sure appreciate it. I don't want to ban this bot, but unless it learns how to behave, like reading and respecting robots.txt, that'll be my only option.
+
+Tagyu Agent/1.0
+Converts text or a URL to tags.
+
+Tecomi Bot (http://www.tecomi.com/bot.htm)
+Bot page does not exist. Site is under development.
+
+TheInformant*
+Similar to WebTrends.
+
+Toata dragostea*
+http://www.webmasterworld.com/search_engine_spiders/3821700.htm
+There is a vulnerability in RoundCube Webmail that is currently being exploited if you haven't applied the RoundCube patches.
+
+UbiCrawler/*
+Yet another university project of some kind.
+
+UCmore
+This is a toolbar for IE.
+
+VengaBot/*
+Did not read robots.txt. Appears to be a crawler for the Dutch CMS, Caret Web Content Management. The IP Address is registed to them.
+
+Visicom Toolbar
+An IE toolbar made with Visicom Media Dynamic Toolbar software.
+
+Webclipping.com
+From their website: WebClipping provides clients with news, information, and rumors from every key online source that impacts their business. With critical information collected and delivered to them, decision-makers can spot threats and opportunities in time to act effectively while saving hours of manual research.
+
+WebFilter Robot*
+From their website: WebFilter is an intelligent agent that filters the new pages announced on the NCSA What's New Page, looking for Web resources that match your ongoing interests.
+
+WeBoX/*
+From their website: Web Collector & Text Collector & Web Database & Tab Browser & Tab Editor & RSS Reader.
+
+Basically a general crawler. It's written in Japanese.
+
+WebTrends/*
+Stuff related to WebTrends reports.
+
+West Wind Internet Protocols*
+No robots.txt.
+
+WhizBang
+Corporate Information Crawler
+
+Willow Internet Crawler by Twotrees V*
+Willow Internet Crawler by Twotrees. Content Filtering.
+
+XML Sitemaps Generator*
+Apparently this is the user agent you'll see when creating an XML sitemap via Google, and perhaps others.
+
+Search Engines
+*FDSE robot*
+Fluid Dynamics Search Engine robot. Crawls remote sites as part of a shareware search engine program.
+
+*Fluffy the spider*
+Their own web page about their spider makes no mention at all about robots.txt and my analyzer shows it never even requested it when it visited my site.
+
+Abacho*
+Related to Eule-Robot
+
+ALeadSoftbot/*
+From their website: ALeadSoftbot is ALeadSoft's web-crawling robot. It collects documents from the web to build a searchable index to build site search engine.
+
+Amfibibot/*
+Reads and respects robots.txt although it only read robots.txt and my default page.
+
+antibot-V*
+According to WebmasterWorld this is a French search engine that hasn't crawled since around 2002 but is back again. I could not a URL for it. It did read and respect robots.txt.
+
+ASPSeek/*
+From their website: ASPseek is an Internet search engine software developed by SWsoft and licensed as free software under GNU GPL.
+
+BigCliqueBOT/*
+Seems to be well-behaved.
+
+Deepindex
+French search engine.
+
+Filangy/*
+From their site: Filangy's Patent Pending ActiveWeb search technology allows you to search pages that are most frequently accessed and offer up-to-date, useful information.
+
+Fooky.com/ScorpionBot/ScoutOut;*
+Did not read robots.txt.
+
+FyberSpider*
+The folks at WebmasterWorld seem to like this spider. I disagree. It doesn't read robots.txt. As of 22 Feb 2007 It no longer provides a URL in the user agent.
+
+GOFORITBOT (?http://www.goforit.com/about/?)
+Is this somehow related to GoDaddy? The IP Address is registered to GoDaddy. The user agent starts with the word GO. From their website: GoForIt is an Internet guide ... designed to make it easier for you to search the Internet and quickly find the information you are looking for. GoForIt combines the efficiency of our world-class meta-search engine with the largest and most comprehensive human-edited directory of the World Wide Web.
+
+GurujiBot/1.*
+Indian search engine based in Santa Clara, CA. Did not request robots.txt.
+
+Hotzonu/*
+Sketchy information at best leads me to believe this is a crawler associated with MegaBBS and somehow related to Infoseek in Japan. It does not read robots.txt.
+
+HyperEstraier/*
+Does not request robots.txt. From their website: a full-text search system for communities.
+
+InfociousBot (?http://corp.infocious.com/tech_crawler.php)
+I saw a report about this crawler. The report stated this bot reads robots.txt but does not respect it. I'm currently testing that assertion myself.
+
+iSEEKbot/*
+Search engine under development. It's one of those bots that reads (and obeys so far) robots.txt before every single page. Quite an annoyance and hardly necessary.
+
+Kolinka Forum Search (www.kolinka.com)
+It does not read robots.txt. From their website: At Project Kolinka we are developing a new way to search community driven web forums and message boards. The Kolinka spider only crawls forum content, requesting pages at a moderate rate of 1 page per second.
+
+KRetrieve/
+It took numerous disallowed files before it even read robots.txt. And then it continued to take disallowed files.
+
+LapozzBot/*
+Hungarian search engine.
+
+LocalcomBot/*
+Beta search engine. Claims to index local websites. What the heck are local websites?
+
+MaSagool/*
+Well behaved crawler for Sagoo, a Japanese search engine.
+
+miniRank/*
+You type in a domain and see a page that tells where you rank in their database. Big whoop.
+
+Mozilla/0.9* no dos :) (Linux*)
+Hungarian search engine. Did not read robots.txt.
+
+Mozilla/4.0 (compatible; MSIE *; Windows NT; Girafabot; girafabot at girafa dot com; http://www.girafa.com)
+It read robots.txt but did not respect the defined exclusions.
+
+Mozilla/4.0(?compatible; MSIE 6.0; Qihoo *)
+Very popular Chinese BBS and blog search engine.
+
+Mozilla/5.0 (*) VoilaBot*
+French SE. Only read robots.txt after several minutes of taking pages.
+
+Mozilla/5.0 (compatible; ActiveTouristBot*; http://www.activetourist.com)
+I personally worked with the owner of this bot to help him fine-tune its behavior. I'm satisfied now that it's a well-behaved bot.
+
+Mozilla/5.0 (compatible; Butterfly/1.0; *)*
+http://labs.topsy.com/butterfly.html
+Read and respected robots.txt.
+
+Mozilla/5.0 (compatible; Charlotte/*; *)
+Reads but does not respect robots.txt
+
+Mozilla/5.0 (compatible; CXL-FatAssANT*)
+Columbian search engine.
+
+Mozilla/5.0 (compatible; NLCrawler/*
+Did not read robots.txt.
+
+Mozilla/5.0 (compatible; OsO;*
+Yet another search engine under development. It would be nice if it read robots.txt. It would also be nice if it had a valid UA:
+Mozilla/5.0 (compatible; OsO; http://oso.octopodus.com/abot.html
+is not a valid UA. Replace the oso sub-domain with www and you'll see this UA is actually from a translation service called Silurus.
+
+Mozilla/5.0 (compatible; ParchBot/1.0;*)
+http://www.parchmenthill.com/search.htm
+Well behaved bot whose owner has responded promptly to all issues.
+
+Mozilla/5.0 (compatible; ScoutJet; +http://www.scoutjet.com/)
+http://www.scoutjet.com
+Founded by the guy who wrote the first computer virus, and one of the founders of DMOZ. They use the standard but revolting, next generation search technology, to describe what they're doing. Blekko is the proposed name of the search engine. There was an article about them on TechCrunch over a year ago. http://www.techcrunch.com/2008/01/02/the-next-google-search-challenger-blekko/.
+
+Mozilla/5.0 GurujiBot/1.0 (*)
+ http://www.guruji.com/en/WebmasterFAQ.html
+Read and respected robots.txt.
+
+NavissoBot
+From their website: Navisso, a free search engine with the goal of becoming one of the most relevant and dependable search engines on the web.
+
+Norbert the Spider(Burf.com)
+Did not read robots.txt.
+
+Pagebull http://www.pagebull.com/
+Displays search results as thumbnails of page.
+
+PEERbot*
+It's like a search engine and directory rolled-up into one.
+
+Pompos/*
+Pompos is the spider used by dir.com, a French search engine.
+
+Qweery*
+Qweerybot is Qweery's web-crawling robot. It collects documents from the web (mainly dutch) to build a searchable index for the Qweery search engine (in development).
+
+RedCell/* (*)
+From their website: I am trying to compile a security based search engine that should be pretty inclusive yet have no corporate sponsorship nor any type of advertisement or commericials.
+
+Searchmee! Spider*
+It read robots.txt but I don't know yet if it respects it. From their website: This is a general purpose search engine. The goal is to produce the highest quality search results based on concensus of other web sites.
+
+Sqeobot/0.*
+No robots.txt.
+
+SquigglebotBot/*
+Brought to you by TheCyberWeb. Ugh!
+
+StackRambler/*
+Russian search engine.
+
+Szukacz/*
+From their website: Szukacz specializes in searching for documents prepared in the Polish language. However, Szuakcz also runs searches against "The Best of the World" collection ("Swiat" in Polish).
+
+Tarantula/*
+The bot read and respected robots.txt. But only after it started its crawl. The UA has no URL in it. Only an e-mail address. That's enough for me to ban it.
+
+TerrawizBot/*
+Reads but does obey robots.txt.
+
+Tkensaku/*
+Japanese search engine.
+
+TwengaBot-Discover (http://www.twenga.fr/bot-discover.html)
+http://www.twenga.fr/bot-discover.html
+From their website: Twenga.com is a next generation shopping search engine, giving users extensive choice and unbiased opinions. The site is fuelled by the largest product database online, containing the information collected by the TwengaBot-Discover!
+
+Twingly Recon
+http://www.twingly.com/
+Twiggly is a blog search engine. It did not read robots.txt so I've set isBanned = true.
+
+wadaino.jp-crawler*
+No robots.txt.
+
+WebAlta Crawler/*
+Did not request robots.txt. A Firefox user agent from the same IP Address checks a page to see what happens and if it's same then the SE bot gets the same page.
+
+webcrawl.net
+Search engine that includes a directory based on ODP data.
+
+WISEbot/*
+Did not read robots.txt.
+
+YadowsCrawler*
+Search engine is still under development. I am told it respects robots.txt.
+
+zibber-v*
+Business-related search engine.
+
+Translators
+ATA-Translation-Service
+Looks like an online translation tool similar to Babelfish. Possibly related to www.atanet.org/.
+
+Version Checkers
+GJK_Browser_Check
+This is the user agent checker from my website.
+
+Hatena
+Hatena Bookmark/*
+Appears to be a Japanese link checker and bookmarks manager.
+
+Internet Archive
+*heritrix*
+From the website: Heritrix is the Internet Archive’s web crawler which was specially designed for web archiving. Me again: It's available to anyone who wants to download it and abuse it. That's why I've banned it.
+
+Internet Archive
+
+The web's biggest copyright violator of copyright law. I shall always recommend banning all the user agents from this project. Ultimately, as always, it's up to each webmaster whether to ban it or not.
+
+Nutch
+CazoodleBot/*
+This is Nutch in disguise!
+
+LOOQ/0.1*
+Claims to be Nutch (in disguise).
+
+Nutch
+Does not read robots.txt. I have no idea what this company does. Their website is essentially a blank page.
+
+Webaroo
+Webaroo
+Webaroo steals your content and repackages it for mobile devices.
+
+Copyright/Plagiarism
+iCopyright Conductor*
+http://www.datadepth.com
+iCopyright is a rights and permissions management system for content owners. It helps publishers and content creators of all kinds to maximize the value of their content—from news and editorial articles, to blogs and independent creative works. 
+
+IPiumBot laurion(dot)com
+I see this as a French Plagerism bot, looking for copyright infringements and such. Did not read robots.txt.
+
+oBot
+obot is a spider sent out by a company in Germany called ONLY Solutions. They scan the web looking for sites that infringe on copyrights and logos of their clients.
+
+SlySearch/*
+Works in conjunction with Plagiarism.org and TurnItIn.com
+
+TurnitinBot/*
+Greedy little bastard related to SlySearch and uses the same IP. Does not always respect robots.txt.
+
+DNS Tools
+Domain Dossier utility*
+Free DNS tools. The IP Address for this bot was 70.84.211.98 which has a PTR of mail.webpal.info. If you go to www.webpal.info it's the login page for someone's website control panel.
+
+Download Managers
+AutoMate5
+Part of an automation package from Network Automation that includes FTP downloads.
+
+BitBeamer/*
+BitBeamer is a fully featured FTP client and a download manager that integrates into your web browser.
+
+BitTorrent/*
+P2P Client. Not sure why it's browsing my websites.
+
+FreshDownload/*
+From their website: Fresh Download is an easy-to-use and very fast download manager software that turbo charges downloading files from the Internet, such as your favorite mp3 files, software, picture collections, video, etc.
+
+GetRightPro/*
+This is a download manager. On my site it's being used abusively to repeatedly download my files way too quickly.
+
+Go!Zilla*
+This is made to look like a Go!Zilla clone but it's really checking for formmail vulnerabilities.
+
+Kontiki Client*
+Plain and simple it's a download accelerator. According to PC Magazine, "Kontiki was by far the best program at accelerating transfers. Kontiki significantly speeded up most of our downloads while intruding little on to our test machine."
+
+lftp/3.2.1
+Russian-based FTP program. It seems most folks on WMW don't like it. I haven't decided yet whether or not to ban it.
+
+LMQueueBot/*
+On my site it did obey robots.txt but since it only read the index.asp page after that I can't say conclusively if it obeys robots.txt. Regardless, on my sites all download managers are banned.
+
+Mozilla/4.0 (compatible; Getleft*)
+From their website: So here is my little effort, it is supposed to download complete Web sites. You give it an URL, and down it goes on, happily downloading every linked URL in that site.
+
+NetPumper*
+From their website: It's time to stop downloading and start pumping! NetPumper is a new Download Manager that makes downloading files from the Internet easier, faster and safer. Does not read robots.txt and downloads data at an incredibly fast rate of speed.
+
+Prozilla*
+From their website: ProZilla is a download accelerator for Linux which gives you a 200% to 300% improvement in your file downloading speeds.
+
+shareaza*
+From Wikipedia: Shareaza is a free Windows–based peer-to-peer client which supports the Gnutella, Gnutella2, EDonkey Network, BitTorrent, FTP and HTTP network protocols.
+
+Star*Downloader/*
+From their website: Star Downloader is a download manager that accelerates your downloads by splitting the files into several parts and downloading them simultaneously. Download speeds are increased further by choosing the fastest mirror sites.
+
+Vegas95/*
+Downloads.asp abuser from Japan
+
+Wget*
+GNU file downloader.
+
+Xaldon WebSpider*
+This is a product from Germany that is basically a download manager. It did not read robots.txt so it's a website stripper.
+
+E-Mail Harvesters
+*E-Mail Address Extractor*
+This is one of many products from Bejing Express.
+
+*Larbin*
+General purpose crawler. Can be configured for a variety of tasks including e-mail harvesting. The user agent can be customized but always includes Larbin somewhere in it. It does read robots.txt but I don't know if it fully respects it as all it did was read my robots.txt file before leaving. Besides everything I have ever read about how this bot is used leads me to believe it should be banned.
+
+*www4mail/*
+From their website: www4mail is an open source application, that allows you to navigate off-line and search the whole Internet via electronic mail (e-mail) by using any standard Web browser and a MIME (Multipurpose Internet Mail Exchange) aware e-mail program. It did not request robots.txt.
+
+Franklin Locator*
+See the Links for a discussion on WebmasterWorld.
+
+Mozilla/4.0 (compatible; Advanced Email Extractor*)
+http://www.mailutilities.com/aee/
+
+Feeds Blogs
+BlogPulse (ISSpider-3.*)
+
+Appears related to BlogPulseLive UA.
+From their website: An automated trend discovery system for blogs. It analyzes and reports on daily activity in the blogosphere.
+
+Net::Trackback/*
+From their website: This package is an object-oriented interface for developing Trackback clients and servers.
+
+Feeds Syndicators
+*NetVisualize*
+From their website: NetVisualize Favorites Organizer lets you manage your bookmarks and favorites the way you remember them - visually! NetVisualize creates thumbnail images of your favorite websites, and is as simple to use and familiar as Windows Explorer.
+
+AideRSS 2.* (postrank.com)
+http://gr.aiderss.com/
+From their website: AideRSS is pleased to provide a Firefox extension to harness the power of PostRank™ to score, filter and track performance of any RSS feed directly within GoogleReader. Now GoogleReader users can reclaim their time with a single mouse click to find the best content, boost their productivity and stay on top of the news.
+
+AideRSS/2.0 (aiderss.com)
+http://gr.aiderss.com/
+More crap hosted by Amazon EC2!
+
+From their website: AideRSS is pleased to provide a Firefox extension to harness the power of PostRank™ to score, filter and track performance of any RSS feed directly within GoogleReader.
+
+Akregator/*
+From their website: Akregator is a news feed reader for the KDE desktop.
+
+Cocoal.icio.us/* (*)*
+No robots.txt. This appears to be some sort of RSS/podcast search engine. I have no idea why it's crawling my websites.
+
+Feed43 Proxy/* (*)
+Does not read robots.txt.
+
+FeedBurner/*
+Reads but does not respect robots.txt.
+
+Feedreader * (Powered by Newsbrain)
+I haven't been able to find out any information about Newsbrain. Sure wish they'd include a URL!
+
+intraVnews/*
+From their website: Feed Reader and RSS Aggregator for Outlook.
+
+JetBrains Omea Reader*
+From their website: Omea Reader is an easy to use, all-in-one RSS/ATOM feed reader, newsgroup reader, and web bookmark manager. From my point of view: That may be true but it's being used to check the wrong page for browscap.ini updates so I need to ban it.
+
+Liferea/1.* (Linux; *; http://liferea.sf.net/)
+
+This user agent constantly abuses my version checker so it's banned.
+
+MagpieRSS/* (*)
+Older version of what has become SimplePie.
+
+Mobitype * (compatible; Mozilla/*; MSIE *.*; Windows *)
+Appears to be a France-based mobile RSS Feed Aggregator that focuses on blogs. The site is mostly in French.
+
+Mozilla/5.0 (*aggregator:TailRank; http://tailrank.com/robot)*
+From their website: Tailrank is a service that monitors blogs trying to find interesting memes and hot stories. We have a 'robot' which analyzes blogs periodically trying to find interesting stories. If we find that a story on your site is 'hot' we promoted it to our front page. This is a good thing and can drive a lot traffic to your website.
+
+Mozilla/5.0 (RSS Reader Panel)
+RSS feed reader extension for Mozilla Firefox.
+
+Omnipelagos*
+From their website: Omnipelagos finds the shortest paths between any two things. I don't know what that means.
+
+Particls
+From their website: Particls helps you track your favourite sites, topics and apps by displaying desktop alerts for important changes.
+
+RssBandit/*
+Very abusive bot. I have them banned via my httpd.ini.
+
+
+SimplePie/*
+SimplePie is a very fast and easy-to-use class, written in PHP, for reading RSS and Atom syndication feeds.
+
+Strategic Board Bot (?http://www.strategicboard.com)
+Did not read robots.txt. From their website: Strategic Board is a Web 2.0 search engine that aggregates IT related RSS feeds. We automatically monitor and identify new IT related blogs.
+
+General RSS
+Mozilla/5.0 (compatible) GM RSS Panel
+From their website: RSS Panel is designed as a generic Greasemonkey user script for any website. It's purpose is to display a little floating panel at the left hand top of any web page, for which a RSS feed is available from the same domain. 
+
+Mozilla/5.0 http://www.inclue.com; graeme@inclue.com
+Inclue supposedly went out of business. I'm not sure what purpose this bot serves. It did not read robots.txt.
+
+HTML Validators
+Weblide/2.? beta*
+
+XHTML XML validator.
+
+Image Crawlers
+*PhotoStickies/*
+Used for grabbing webcam images, often against website TOS.
+
+Camcrawler*
+No robots.txt. From their website: The data collected from the crawler is used to find and index webcam pages and images all over the internet.
+
+HTML2JPG Blackbox, http://www.html2jpg.com
+Takes screenshots of websites which is nice. The downside is the program can run in batch mode which makes it a potential image ripper.
+
+Mozilla/5.0 (Macintosh; U; *Mac OS X; *) AppleWebKit/* (*) Pandora/2.*
+From their website: The image collector's web spider and search agent for Mac OS X.
+
+pixfinder/*
+Image stealer.
+
+rssImagesBot/0.1 (*http://herbert.groot.jebbink.nl/?app=rssImages)
+Herbert Jebbink's Website. Image bot does not read robots.txt.
+
+Link Checkers
+!Susie (http://www.sync2it.com/susie)
+Social bookmarking: what a stupid phrase! This is a link checker. See also just plain Susie in this same section.
+
+*Zeus*
+From their website: Using link-building programs that query or use the search engines for finding web sites, data or information can penalize or even get your web site banned.
+
+ActiveBookmark *
+From their website: Main feature of Active Bookmark is ability make bookmark to concrete place of the page.
+
+Bookdog/*
+From their website: Bookdog can sort, organize, eliminate duplicates, automatically verify, migrate  and synchronize bookmarks between Safari, Camino, Firefox, OmniWeb and Opera.
+
+CheckLinks/*
+This does more than the name implies. It can strip entire websites.
+
+DocWeb Link Crawler (http://doc.php.net)
+PHP's documentation link checker.
+
+FavOrg
+Favorites Manager PC Magazine utility
+
+Funnel Web Profiler*
+A legitimate site mapping tool that is often abused.
+
+JRTwine Software Check Favorites Utility
+This bot is checking my downloads page which is a violation of my TOS so it's banned.
+
+Link Valet Online*
+From their website: Link Valet is a WWW Link checker. When you enter the URL of an HTML page on the Web, it will fetch the page, and print a report on it. Link Valet will also spider your site.
+
+Mozilla/4.0 (Compatible); URLBase*
+Bookmarks manager. Seems like a nice product but it's being used to check my downloads page in violation of my TOS.
+
+Mozilla/4.0 (compatible; Link Utility; http://net-promoter.com)
+From their website: Link Utility is a powerful site management and link checker tool that helps webmasters automate the process of web site testing.
+
+Mozilla/4.0 (compatible; smartBot/1.*; checking links; *)
+The UA indicates it's a link checker. On my sites all it did was a HEAD my sitemaps.
+
+Mozilla/4.0 (compatible; SuperCleaner*;*)
+Finds and removes websites from your Favorites list that are no longer working.
+
+Mozilla/5.0 gURLChecker/*
+From their website: gURLChecker is a graphical web links checker for GNU/Linux and other POSIX OS. It can work on a whole site, a single local page or a browser bookmarks file. From my perspective it's being used to automate checks of my downloads page which is a violation of my TOS so it's banned.
+
+onCHECK Linkchecker von www.scientec.de fuer www.onsinn.de
+Seems to be a link checker but the only information I can find is in German.
+
+Robozilla/*
+Visits sites listed in ODP to verify they're still functional.
+
+RPT-HTTPClient/*
+Not sure what this is doing but it didn't read robots.txt first. Usually you see this agent at the end of an agent string along with something like JCheckLinks.
+
+SiteBar/*
+This is a SourceForge bookmarks manager.
+
+Susie (http://www.sync2it.com/bms/susie.php
+Social bookmarking website. From their website: Susie, Sync2It's automated librarian, visits each of the websites bookmarked by our active user community right after it is uploaded to our server.
+
+VSE/*
+The section of the user agent in parenthesis contains custom text entered by each user of the product.
+
+Xenu* Link Sleuth*
+This is, or at least can be a very disrespectful and harmful link checker.
+
+Z-Add Link Checker*
+Web page that lets you check a URL.
+
+Microsoft
+Microsoft BITS/*
+BITS is a system service that applications can use to transfer files asynchronously between a client and an HTTP server.
+
+Miscellaneous Browsers
+EVE-minibrowser/*
+EVE Online is a MMOG. According to Project Honeypot EVE-minibrowser is being used extensively as an e-mail harvester. For that reason I've put it with this parent and banned it.
+
+GreenBrowser
+From their website: GreenBrowser is yet another IE based browser that offers tabbed, multi-page browsing and many additional features including grouped pages, ad filtering, search engine integration, privacy cleaner, form filler and much more.
+
+Kopiczek/* (WyderOS*; *)
+Polish browser using WyderOS. I can't find out anything more about it than that.
+
+Mozilla/* (Win32;*Escape?*; ?)
+Espial Escape, a Java browser with scalable configuration capabilities, can be setup to match the memory requirements of a wide range of devices. Escape allows developers to selectively disable support for certain Internet standards so that browsers can be tailored to run in very resource-constrained designs or offer full functionality for other more powerful devices.
+
+Mozilla/4.0 (compatible; ibisBrowser)
+Japanese language web browser.
+
+Mozilla/5.0 (Macintosh; ?; PPC Mac OS X;*) AppleWebKit/* (*) HistoryHound/*
+Used for going back to websites in History and Bookmarks. Supposedly works with any Mac browser.
+
+NetRecorder*
+Home page is no longer operational.
+
+ogeb browser , Version 1.1.0
+I cannot find any info on this supposed browser. Maybe it's a spoof. Either way it was not badly behaved.
+
+SCEJ PSP BROWSER 0102pspNavigator
+Some sort of web browser for Sony's PSP.
+
+Netcraft
+*Netcraft Webserver Survey*
+Allows you to determine what operating system and web server a given site is running. Also gives uptimes for most sites. Well respected site even though it ignores robots.txt.
+
+Offline Browsers
+*Check&Get*
+From their website: Check&Get is handy and powerful bookmark manager and web monitoring program that lets you organize your browser bookmarks, check your favorite Internet pages and detect if their content has changed or has become unavailable. My comments: While it did not read any excluded files neither did it consult robots.txt first to be certain of that. That's why this ua is in the stripper category.
+
+*HTTrack*
+From their website: HTTrack is a free (GPL, libre/open source) and easy-to-use offline browser utility.
+
+*TweakMASTER*
+Claims to be an Internet connection optimizer and what amounts to an offline browser.
+
+Online Scanners
+Morfeus Fucking Scanner
+Morfeus Fucking Scanner looking for php vulnerabilties from this data center: Coreix Limited Admin (COREIX-DS2).
+
+Mozilla/4.0 (compatible; Trend Micro tmdr 1.*
+This is the HouseCall online virus scanner from Trend Micro.
+
+Titanium 2005 (4.02.01)
+This appears to be Panda Antivirus Titanium 2005. Based on the files it requested it appears to be a human browsing several of my websites. I do not understand why I'm seeing this user agent unless it's spoofed.
+
+virus_detector*
+Sells anti-spam and security products. Not sure why they crawl my website.
+
+Proxy Servers
+CE-Preload
+Cisco Content Engine
+
+Mozilla/5.0 (compatible; del.icio.us-thumbnails/*; *) KHTML/* (like Gecko)
+I am sick of Yahoo's open proxies. I banned the entire netrange for YAHOO-3. Just this week alone my site got ripped by a dozen user agents from this proxy.
+
+ProxyTester*
+Software that looks for proxy servers and uses them to surf more or less anonymously.
+
+SurfControl
+From their website: SurfControl helps companies stop unwanted content. Our highly sophisticated Content Filters understand Internet content, and put you back in control by filtering out the material you don't want, so you can get to what you do want, when you want it.
+
+Research Projects
+Amico Alpha * (*) Gecko/* AmicoAlpha/*
+According to their website this organization dissolved in 2005. Maybe it's coming back to life. Their crawler does not read robots.txt and fell into a spider trap.
+
+CMS crawler (?http://buytaert.net/crawler/)
+This is some university student who is heavily involved with Drupal. The URL in the UA is wrong. No robots.txt.
+
+Forschungsportal/*
+Used by Federal Ministry of Education and Research
+
+HooWWWer/*
+Crawler for a research service called Next Generation Information Retrieval. The author says all the right things about ethical crawling on his site. So far this seems to be a well-behaved crawler. All it's done so far though is read robots.txt. Still, being a research project I choose to ban it.
+
+JUST-CRAWLER(*)
+http://www.justsystems.com/jp/tech/crawler/
+From their website: We are crawling web pages to research and to develop various applications regarding natural language processing technologies.
+
+Taiga web spider
+Yet another annoying and badly behaved bot from the brilliant students at Brown Univeristy. It doesn't request robots.txt until several minutes into the crawl and then it doesn't respect disallowed files and winds up in a bot trap. I have their netrange banned in my firewall.
+
+UofTDB_experiment* (leehyun@cs.toronto.edu)
+Yet another research project from a university. This time it's the University of Toronto.
+
+USyd-NLP-Spider*
+It claims to read and respect robots.txt. It did read it but it did not respect it. From their website: USyd-NLP-Spider gathers HTML pages for the purpose of research in Natural Language Processing at the School of Information Technologies, University of Sydney, Australia.
+
+woriobot*
+University of British Columbia Laboratory for Computational Sciences.
+
+wwwster/* (Beta, mailto:gue@cis.uni-muenchen.de)
+Probably a research bot. Sent an e-mail on 1/15/2006.
+
+Rippers
+*grub*
+They claim to read/respect robots.txt. I have seen no personal evidence of that.
+
+Update: March 23, 2004 a Grub client 1.07 (didn't think that was an official version, s/b 1.0.7 ???) read robots.txt and then got caught up in my trap so it got no further.
+
+*WebGrabber*
+WebGrabber is a utility that you can use to mirror, copy, synchronize, download, scrub or "steal" a web site.
+
+3D-FTP/*
+From their website: 3D-FTP is FTP Client software helping you transfer files up to 20x faster over Internet.
+
+3wGet/*
+From their website: 3wGet is the powerful download manager and websites downloader. It is designed for downloading files and web servers from Internet with the best possible speed which your connection can give you. It's achieved due to splitting downloading file onto several sections, each of which is downloading simultaneously.
+
+ActiveRefresh*
+From their website: ActiveRefresh is a web news monitor which will save you browsing time by monitoring information sources, gathering all of the information that you regularly access and presenting it in comfortable and adjustable way. My comments: It does read robots.txt and I think it should. That makes it a Website Stripper!
+
+Artera (Version *)
+Internet Accelerator
+
+AutoHotkey
+From their website: AutoHotkey is a free, open-source utility for Windows that will let you automate almost anything by sending keystrokes and mouse clicks. You can write a mouse or keyboard macro by hand or use the macro recorder.
+
+b2w/*
+Almost knocked Webmaster World offline with 6K+ requests in under an hour.
+
+BasicHTTP/*
+From their website: A full-featured HTTP socket for REALBasic.
+
+CAST
+Cast Software sells a data-mining application that can also mine websites.
+
+CFNetwork/*
+I'm not positive about this because I can't test it myself. Based on my research it's my understanding this is the user agent that's sent when you use Cocoa's NSURL function to fetch a web page.
+
+CobWeb/*
+HTML editor that can also be used to rip websites.
+
+curl*
+
+From their website: Curl is a command line tool for transferring files with URL syntax, supporting FTP, FTPS, HTTP, HTTPS, GOPHER, TELNET, DICT, FILE and LDAP. Curl supports HTTPS certificates, HTTP POST, HTTP PUT, FTP uploading, kerberos, HTTP form based upload, proxies, cookies, user+password authentication, file transfer resume, http proxy tunneling and a busload of other useful tricks.
+
+Custo*
+From their website:  Capable of reading HTML, CSS, JavaScript, and Shockwave Flash, Custo allows you to quickly retrieve information about the structure of a Web site.
+
+DataCha0s/*
+All reports indicate this crawler is dedicated to finding programs with known vulnerabilities. In particular it seems to like web stats programs and gallery applications. It was originally located at http://datacha0s.50megs.com but that site no longer exists.
+
+ezic.com http agent *
+IP resolves to NetBilling, Inc. but I have no idea what they're doing. There is also a website at www.ezic.com but again I have no idea what they might be up to.
+
+fetch libfetch/*
+IP belongs to Australian Academic and Research Network. No indication of exactly what this ua is.
+
+hcat/*
+A program that uses the Perl socket library to do simple HTTP operations.
+
+Holmes/*
+Holmes is an easy-to-use addition to MacOS 8.5's Sherlock which provides the user with the ability to create search sets with similar Internet search sites (plug-ins) grouped together.
+
+HttpSession
+From their website: The servlet container uses this interface to create a session between an HTTP client and an HTTP server.
+
+httpunit/*
+Site tester being used as a site ripper. Does not read robots.txt
+
+IrssiUrlLog/*
+Irssi-based URL grabber written by Thomas Graf. The URL listed for his website, http://irssi.reeler.org/url/ and the base URL both seem to be offline. DNSReports shows the domain is also blacklisted by DNSBL.SORBS.NET as of August 21, 2005.
+
+JPluck/*
+I am ashamed of SourceForge for allowing such a badly behaved piece of software to be made available through their website. It does not read robots.txt.
+
+Kapere (http://www.kapere.com)
+This is a download accelerator and "website grabber" (their terminology not mine) that does not read robots.txt.
+
+LeechFTP
+Being used via a Thai DC. LeechFTP as a project died in 1999 so I cannot imagine why anyone is still using it.
+
+LeechGet*
+Download manager.
+
+libcurl-agent/*
+A multiprotocol file transfer library related to cURL.
+
+MovableType/*
+Why is someone's blog reading the downloads page on my personal website? The answer doesn't really matter as it didn't read robots.txt first so it's banned.
+
+Mozilla/2.0 (compatible; NEWT ActiveX; Win32)
+This used to be a product from Delphi but the product has been abandoned.
+
+Mozilla/3.0 (compatible; Indy Library)
+This appears to be another automated agent checking my downloads.asp page instead of version.asp as it should be according to my TOS.
+
+Part of a Delphi/C++ builder suite of tools for doing internet stuff. The second Link is where I found out about this potentially nasty little bot.
+
+Mozilla/4.0 (compatible; BorderManager*)
+For some reason I only see this user agent stealing photos from my various websites.
+
+OCN-SOC/*
+Japanese page ripper
+
+Open Web Analytics Bot*
+Originally a reporting system for WordPress. Now it can be used to crawl websites.
+
+PageNest/*
+http://pagenest.com/
+Don'tcha just love these scrapers that advertise themselves as innocent little offline browsers?
+
+pavuk/*
+From their website:  Pavuk is UNIX program used to mirror contents of WWW documents or files. It transfers documents from HTTP, FTP, Gopher and optionaly from HTTPS (HTTP over SSL) servers. Pavuk has an optional GUI based on GTK2 widget set.
+
+PEAR HTTP_Request*
+Full user agent: PEAR HTTP_Request class
+
+PigBlock (Windows NT 5.1; U)*
+PigBlock (Windows NT 5.1; U) [en]
+PigBlock (Windows NT 5.1; U) [en] Gecko
+
+POE-Component-Client-HTTP/*
+From their website: a HTTP user-agent component
+
+Python*
+Python is an interpreted, interactive, object-oriented programming language. It is often compared to Tcl, Perl, Scheme or Java. It does not check robots.txt.
+
+SBL-BOT*
+BlackWidow is a site scanner, a site mapping tool, a site ripper, a site mirroring tool, an offline browser. Use it to scan a site and create a complete profile of the site's structure, files, E-mail addresses, external links and even link errors. BlackWidow will also scan HTTP sites, SSL sites (HTTPS) and FTP sites.
+
+ScoutAbout*
+Word processor that permits Internet serach and rip.
+
+sherlock/*
+Now, instead of tediously selecting Web search sites in Sherlock, simply select a set in No Shoot! Sherlock and launch Sherlock. Your set is now present in Sherlock without all the clutter of your remaining SRC files. Check the program site for more information.
+
+SiteParser/*
+From their website: The SiteParser is a site indexer, it will index your web pages through the internet or locally on your hard drive. I'm banning it because the author asked people to restrict it to domains owned by the user but clearly that's not happening.
+
+Snoopy*
+From their website: Snoopy is a PHP class that simulates a web browser. It automates the task of retrieving web page content and posting forms, for example.
+
+SOFTWING_TEAR_AGENT*
+AspTear from AlphaSierraPapa, Inc. Rips pages from remote websites.
+
+SuperHTTP/*
+Discontinued according to the vendor but still available via other sites.
+
+Twisted PageGetter
+This is a Python Twisted-based spider. It did not read robots.txt.
+
+URL2File/*
+From their website: URL2File is a free 32bit Windows console-mode application able to retrieve and save the content of a given World Wide Web or FTP URL to a local file.
+
+WebSauger*
+German version of HTTrack, a website copier.
+
+WinScripter iNet Tools
+From their website: wsInetTools v0.3 beta: is a COM dll written in C++ that allows you to easily send email and download a web page and binary contents such as images, programs, etc.
+
+Site Monitors
+*EasyRider*
+From their website: Easyrider LAN Pro owns and operates Vigilance Monitoring, a professionally staffed, proactive computer server, applications and network monitoring company. We can use sniffers and other tools to audit sites, measure traffic patterns, identify bottlenecks and recommend improvements.  We can use our professional monitoring tools to baseline your equipment and do capacity planning for future growth.
+
+Net Probe
+From their website: Net Probe is a site list maintenance utility. It scans for FTP and web sites, and checks them to see if they are alive or have changed since the last time the site was checked.
+
+Site Valet Online*
+From their website: Site Valet [is] a deluxe website monitoring service that integrates automated reporting with online tools.
+
+UpTime Checker*
+From the Blue Data Networks website: Uptime Checker is different from other monitoring tools as it checks the uptime on a device using SNMP. Uptime Checker then uses the uptime to determine if a device has just restarted.
+
+Webcheck *
+From their website: WebCheck web server monitoring software is the best and most comprehensive web site monitoring and web server monitoring software around.
+
+WebPatrol/*
+From their website: WebPatrol visits your web site every 5 to 60 minutes, depending on account type, and checks for a pre-defined keyword in your HTML, such as "Acme", or "Widgets". If your web site is unreachable, returns an error message, or does not return your pre-specified keyword, WebPatrol can be configured to: send email messages or send numeric or alphanumeric pages.
+
+Social Networking
+WinkBot/*
+A a bookmark service with a pretty nice search feature.
+
+Translators
+Seram Server
+Server-based translation service from Sunda Systems Oy in Finland.
+
+WebIndexer/* (Web Indexer; *)
+Free text and URL machine translations. Paid human translations.
+
+WebTrans
+I think this is the right website for this user agent. I am awaiting e-mail confirmation from info@webtrans.de.
+
+Version Checkers
+Browscap Mirror System/1.* (browscap.giantrealm.com)
+
+Used with permission by GiantRealm.com
+
+Browscap Mirror v1.30
+
+Used with permission by GiantRealm.com
+
+BrowscapUpdater1.0
+Stephen Smith
+stephen.smith@aquatechnologies.co.uk
+
+Browser Capabilities Project (http://browsers.garykeith.com; http://browsers.garykeith.com/sitemail/contact-me.asp)
+This is the user agent I use when I'm checking for updates for files like the ones at iplists.com and hpc-factor.
+
+browsers.garykeith.com browscap.ini bot BETA
+This is being used by someone at Clarkson University in Potsdam, NY USA. I wish the person using it would contact me so I know who it is. I don't have a problem with it. I just think it's polite to include a URL and a contact e-mail in user agents and I'm disappointed they aren't doing this.
+
+Code Sample Web Client
+Related to Browscap updater. From The Netherlands. This is one of my forum members testing a new application.
+
+Desktop Sidebar*
+
+Banned for abusing my version checkers.
+
+Subtext Version 1.9* - http://subtextproject.com/ (Microsoft Windows NT 5.2.*)
+I'm not sure what this blogging engine is doing. I figured it would be some sort of browscap updating tool but so far it's only requested pages that don't exist.
+
+Become
+MonkeyCrawl/*
+BitTorrent search engine from Exava.
+
+Blue Coat Systems
+Blue Coat Systems
+Content filtering products.
+
+NameProtect
+NP/*
+NP (NameProtect) engages in crawling activity in search of a wide range of brand and other intellectual property violations that may be of interest to their clients. It does seem to read and respect robots.txt but I don't want it crawling my site.
+
+NPBot*
+NPBot (NameProtect Bot) engages in crawling activity in search of a wide range of brand and other intellectual property violations that may be of interest to their clients. It does seem to read and respect robots.txt but I don't want it crawling my site.
+
+NewsGator
+NetNewsWire*/*
+From their website: NetNewsWire is an easy-to-use RSS Web news reader for Mac OS X.
+
+NewsGator/*
+Did not request robots.txt and got caught in a bot trap.
+
+Media Players
+vobsub
+vobsub is a plug-in for VirtualDub that allows you to rip subtitles from DVD VOB files and to use the provided DirectShow filter for DivX playback with subtitles.
+
+Pocket PC
+*(compatible; MSIE *.*; Windows CE; PPC; *)
+Siemens mobile devices running WinCE.
+
+SEMC Browser
+SEMC Browser
+From their website: The SonyEricsson SEMC browser is a XHTML-capable browser. I can find no hint of what this browser supports other than some very simple CSS. So I'm hesitant to say it does anything more than support tables.
+
+ELinks 0.10
+ELinks 0.10
+From their website: ELinks is an advanced and well-established feature-rich text mode webbrowser. ELinks can render both frames and tables, is highly customizable and can be extended via Lua or Guile scripts.
+
+ELinks 0.11
+ELinks 0.11
+From their website: ELinks is an advanced and well-established feature-rich text mode webbrowser. ELinks can render both frames and tables, is highly customizable and can be extended via Lua or Guile scripts.
+
+ELinks 0.12
+ELinks 0.12
+From their website: ELinks is an advanced and well-established feature-rich text mode webbrowser. ELinks can render both frames and tables, is highly customizable and can be extended via Lua or Guile scripts.
+
+ELinks 0.13
+ELinks 0.13
+
+From their website: ELinks is an advanced and well-established feature-rich text mode webbrowser. ELinks can render both frames and tables, is highly customizable and can be extended via Lua or Guile scripts.
+
+ELinks 0.9
+ELinks 0.9
+From their website: ELinks is an advanced and well-established feature-rich text mode webbrowser. ELinks can render both frames and tables, is highly customizable and can be extended via Lua or Guile scripts.
+
+Dillo
+Dillo
+Dillo is a small web browser written in C.
+
+Emacs/W3
+Emacs/W3
+Emacs/W3 is a full-featured web browser, written entirely in Emacs-Lisp.
+
+FrontPage
+FrontPage
+From their website: iSiloX is the desktop application that converts content to the iSilo 3.x/4.x document format, enabling you to carry that content on your Palm OS PDA, Pocket PC PDA, Windows CE Handheld PC, or Windows computer for viewing using iSilo.
+
+iSiloX
+iSiloX
+From their website: iSiloX is the desktop application that converts content to the iSilo 3.x/4.x document format, enabling you to carry that content on your Palm OS PDA, Pocket PC PDA, Windows CE Handheld PC, or Windows computer for viewing using iSilo.
+
+Lycoris Desktop/LX
+Lycoris Desktop/LX
+Lycoris bills itself as a Linux-based but easy to use desktop alternative to Windows including a Mozilla-based web browser.
+
+Shiira
+Shiira
+Shiira is a web browser for the Mac. It is based on Web Kit and written in Cocoa.
+
+Konqueror 3.0
+Konqueror 3.0
+I am only supporting valid Konqueror user agents. If you've modified your user agent so it no longer matches the standard please don't complain to me about it.
+
+SeaMonkey 1.0
+SeaMonkey 1.0
+The SeaMonkey project is a community effort to deliver production-quality releases of code derived from the application formerly known as "Mozilla Application Suite" which has been discontinued.
+
+SeaMonkey 1.1
+SeaMonkey 1.1
+The SeaMonkey project is a community effort to deliver production-quality releases of code derived from the application formerly known as "Mozilla Application Suite" which has been discontinued.
+
+SeaMonkey 2.0
+SeaMonkey 2.0
+The SeaMonkey project is a community effort to deliver production-quality releases of code derived from the application formerly known as "Mozilla Application Suite" which has been discontinued.
+
+Iceweasel
+Iceweasel
+
+IceWeasel is the GNU version of the Firefox browser.
+
+Mozilla 1.9
+Mozilla 1.9
+From their website: Gran Paradiso Alpha 1 is an early developer milestone for the next generation of Mozilla’s layout engine, Gecko 1.9.
+

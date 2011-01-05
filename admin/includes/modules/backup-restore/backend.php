@@ -68,35 +68,14 @@ if ($perm['manageModBackup'] <= 0 || !checkAuth())
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Back-up &amp; Restore module</title>
-		<script type="text/javascript" src="../../../../lib/includes/js/mootools.js" charset="utf-8"></script>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css" />
-		<script type="text/javascript" charset="utf-8">
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	return !!answer;
-}
-
-window.addEvent('domready', function()
-	{
-		$('create-arch').addEvent('click', function()
-			{
-				var el = $('backup-module');
-				el.set('spinner', { 
-						message: "<?php echo $ccms['lang']['backup']['wait4backup']; ?>", 
-						img: {
-							'class': 'loading'
-						},
-					});
-				el.spin(); //obscure the element with the spinner
-
-				return true;
-			});
-	});
-		</script>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<![endif]-->
 	</head>
 <body>
 	<div id="backup-module" class="module">
+
 <?php
 
 
@@ -106,7 +85,7 @@ window.addEvent('domready', function()
  *
  */
 $btn_backup = getPOSTparam4IdOrNumber('btn_backup');
-if($do=="backup" && $btn_backup=="dobackup" && checkAuth()) 
+if($do == "backup" && !empty($btn_backup))
 {
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');
@@ -276,16 +255,16 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
 
 	if (empty($error))
 	{
-		echo "<div class=\"module success center\"><p>".$ccms['lang']['backend']['newfilecreated'].", <a href=\"../../../../media/files/$backupName\">".strtolower($ccms['lang']['backup']['download'])."</a>.</p></div>"; 
+		echo '<div class="success center-text"><p>'.$ccms['lang']['backend']['newfilecreated'].', <a href="../../../../media/files/'.$backupName.'">'.strtolower($ccms['lang']['backup']['download']).'</a>.</p></div>'; 
 	}
 	else
 	{
-		echo "<div class=\"module error center\">\n";
+		echo '<div class="error center-text">';
 		foreach($error as $msg)
 		{
-			echo "<p>".msg."</p>\n";
+			echo '<p>'.msg.'</p>';
 		}
-		echo "</div>"; 
+		echo '</div>'; 
 	}
 }
 
@@ -295,37 +274,37 @@ if($do=="backup" && $btn_backup=="dobackup" && checkAuth())
  *
  */
 $btn_delete = getPOSTparam4IdOrNumber('btn_delete');
-if($do=="delete" && $btn_delete=="dodelete" && checkAuth()) 
+if($do=="delete" && !empty($btn_delete)) 
 {
 	if (!empty($_POST['file']))
 	{
 		// Only if current user has the rights
 		if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
 		{
-			echo "<div class=\"module notice center\">";
+			echo '<div class="notice center-text">';
 			foreach ($_POST['file'] as $value) 
 			{
 				$value = filterParam4Filename($value); // strips any slashes as well, so attacks like '../../../../../../../../../etc/passwords' won't pass
 				if (!empty($value))
 				{
 					unlink('../../../../media/files/'.$value);
-					echo ucfirst($value)." ".$ccms['lang']['backend']['statusremoved'].".<br/>";
+					echo ucfirst($value).' '.$ccms['lang']['backend']['statusremoved'].'.<br/>';
 				}
 				else 
 				{
 					echo $ccms['lang']['auth']['featnotallowed'];
 				}
 			}
-			echo "</div>";
+			echo '</div>';
 		} 
 		else 
 		{
-			echo "<div class=\"module error center\">".$ccms['lang']['auth']['featnotallowed']."</div>";
+			echo '<div class="error center-text">'.$ccms['lang']['auth']['featnotallowed'].'</div>';
 		}
 	} 
 	else 
 	{
-		echo "<div class=\"module error center\">".$ccms['lang']['system']['error_selection']."</div>";
+		echo '<div class="error center-text">'.$ccms['lang']['system']['error_selection'].'</div>';
 	}
 }
 
@@ -361,18 +340,17 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 
 
 ?>
-	
-		<div class="span-6 colborder">
+		<div class="span-8 colborder">
 			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
 			<p><?php echo $ccms['lang']['backup']['explain'];?></p>
-			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8">
-				<p><button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite ss_package_add"><?php echo $ccms['lang']['forms']['createbutton'];?></span></button></p>
+			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8" class="clearfix" >
+				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton'];?></button>
 			</form>
 			<?php
 			if ($show_warn_about_partial_backup)
 			{
 			?>
-				<div class="warning error center">
+				<div class="warning error left-text" id="media-warning">
 					<h2><?php echo $mediawarning[0]; ?></h2>
 					<?php
 					foreach ($mediawarning[1] as $line)
@@ -388,8 +366,9 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 		
 		<div class="span-16 last">
 		<h2><?php echo $ccms['lang']['backup']['currenthd'];?></h2>
-			<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
-				<table border="0" cellspacing="5" cellpadding="5">
+			<form id="delete-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
+				<div class="table_inside">
+				<table cellspacing="0" cellpadding="0">
 					<tr>
 						<?php 
 						if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
@@ -413,7 +392,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 								// Alternate rows
 								if($i%2 != 1) 
 								{
-									echo '<tr style="background-color: #E6F2D9;">';
+									echo '<tr class="altrgb">';
 								} 
 								else 
 								{ 
@@ -427,7 +406,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 								echo "\n";
 								echo '<td>'.$file.'</td>';
 								echo "\n";
-								echo '<td><span class="ss_sprite ss_package_green"><a href="../../../../media/files/'.$file.'" title="'.$file.'">'.$ccms['lang']['backup']['download'].'</a></span></td>';
+								echo '<td><a href="../../../../media/files/'.$file.'" title="'.$file.'"><span class="ss_sprite_16 ss_package_green">&#160;</span>'.$ccms['lang']['backup']['download'].'</a></td>';
 								echo "\n</tr>\n";
 								$i++;
 							} 
@@ -436,24 +415,33 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 					}
 					?>
 				</table>
+				</div>
 			<?php 
 			if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
 			{
 				if($i>0) 
 				{ 
 				?>
-					<p><button type="submit" onclick="return confirmation();" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
+					<div class="right">
+						<button type="submit" onclick="return confirmation_delete();" name="btn_delete" value="dodelete"><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></button>
+						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					</div>
 				<?php   
 				} 
 				else 
+				{
 					echo $ccms['lang']['system']['noresults'];
+				}
 			} 
 			else 
 			{
 			?>
 				<div id="no-delete-action">
-					<h2><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></h2>
+					<h2><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></h2>
 					<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+				</div>
+				<div class="right">
+					<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 				</div>
 			<?php
 			}
@@ -461,5 +449,126 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 			</form>
 		</div>
 	</div>
+<?php
+
+if (0)
+{
+	global $ccms;
+	global $cfg;
+
+	echo '<h1>My Code</h1>';
+	echo "<pre>\nbtn_backup = $btn_backup\ndo = $do\nbtn_delete = $btn_delete\n";
+	echo "</pre>";
+	echo '<h1>$_SERVER</h1>';
+	echo "<pre>";
+	var_dump($_SERVER);
+	echo "</pre>";
+	echo '<h1>$_ENV</h1>';
+	echo "<pre>";
+	var_dump($_ENV);
+	echo "</pre>";
+	echo '<h1>$_SESSION</h1>';
+	echo "<pre>";
+	var_dump($_SESSION);
+	echo "</pre>";
+	echo '<h1>$_POST</h1>';
+	echo "<pre>";
+	var_dump($_POST);
+	echo "</pre>";
+	echo '<h1>$_GET</h1>';
+	echo "<pre>";
+	var_dump($_GET);
+	echo "</pre>";
+	echo '<h1>$cfg</h1>';
+	echo "<pre>";
+	var_dump($cfg);
+	echo "</pre>";
+}
+
+?>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
+	
+<script type="text/javascript" charset="utf-8">
+
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-bck_ccms');
+	}
+	return false;
+}
+
+
+
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../../../../lib/includes/js/mootools-core.js',
+	'../../../../lib/includes/js/mootools-more.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+		$('create-arch').addEvent('click', function()
+			{
+				var el = $('backup-module');
+				el.set('spinner', { 
+						message: "<?php echo $ccms['lang']['backup']['wait4backup']; ?>", 
+						img: {
+							'class': 'loading'
+						}
+					});
+				el.spin(); //obscure the element with the spinner
+
+				//alert('go! ' + el);
+				return true;
+			});
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

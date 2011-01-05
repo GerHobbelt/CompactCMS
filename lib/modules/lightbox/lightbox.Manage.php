@@ -192,63 +192,23 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Lightbox module</title>
-	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,uploader.css" />
-	<script type="text/javascript" src="../../includes/js/mootools.js" charset="utf-8"></script>
-	<?php 
-	// prevent JS errors when permissions don't allow uploading (and all the rest)
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
-	{
-	?>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/FancyUpload2.js"></script>
-		<script type="text/javascript" charset="utf-8">
-function confirmation()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmdelete']; ?>');
-	return !!answer;
-}
-
-function confirm_regen()
-{
-	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmthumbregen']; ?>');
-	if(answer)
-	{
-		try
-		{
-			$('lightbox-pending').setStyle('visibility', 'visible');
-			return true;
-		}
-		catch(e)
-		{
-			$('lightbox-pending').setStyle('visibility', 'hidden');
-			return false;
-		}
-	}
-	else
-	{
-		$('lightbox-pending').setStyle('visibility', 'hidden');
-		return false;
-	}
-}
-		</script>
-	<?php
-	}
-	?>
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,uploader.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
+	<![endif]-->
 </head>
 <body>
-	<div class="module">
-		<div class="center <?php echo $status; ?>">
+	<div class="module" id="lightbox-management">
+		<div class="center-text <?php echo $status; ?>">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
-				echo '<span class="ss_sprite '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">'.$status_message.'</span>'; 
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
 			} 
 			?>
 		</div>
 		
-		<div class="span-14 colborder">
+		<div class="span-16 colborder">
 		<?php 
 		// more secure: only allow showing specific albums if they are in the known list; if we change that set any time later, this code will not let undesirable items slip through
 		$album = getGETparam4Filename('album');
@@ -257,8 +217,9 @@ function confirm_regen()
 		{ 
 		?>
 			<form action="lightbox.Process.php?action=del-album" method="post" accept-charset="utf-8">
-				<h2><?php echo $ccms['lang']['album']['currentalbums']; ?></h2>
-				<table border="0" cellspacing="5" cellpadding="5">
+			<h2><?php echo $ccms['lang']['album']['currentalbums']; ?></h2>
+			<div class="table_inside">
+				<table cellspacing="0" cellpadding="0">
 					<?php 
 					if(count($albums) > 0) 
 					{ 
@@ -282,7 +243,7 @@ function confirm_regen()
 							// Alternate rows
 					    	if($key % 2 != 1) 
 							{
-								echo '<tr style="background-color: #E6F2D9;">';
+								echo '<tr class="altrgb">';
 							} 
 							else 
 							{ 
@@ -292,30 +253,33 @@ function confirm_regen()
 							if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
 							{ 
 							?>
-								<td><input type="checkbox" name="albumID[<?php echo $key+1;?>]" value="<?php echo $value; ?>" id="newsID"></td>
+								<td><input type="checkbox" name="albumID[<?php echo $key+1; ?>]" value="<?php echo $value; ?>" id="newsID"></td>
 							<?php 
 							} 
 							?>
-							<td><span class="ss_sprite ss_folder_picture"><a href="lightbox.Manage.php?album=<?php echo $value;?>"><?php echo $value;?></a></span></td>
-							<td><span class="ss_sprite ss_pictures"><?php echo $count[$key]; ?></span></td>
-							<td><span class="ss_sprite ss_calendar"><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
+							<td><a href="lightbox.Manage.php?album=<?php echo $value;?>"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $value;?></a></td>
+							<td><span class="ss_sprite_16 ss_pictures">&#160;</span><?php echo $count[$key]; ?></td>
+							<td><span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
 						</tr>
 						<?php
 		  				}
 	  				} 
 					else 
+					{
 						echo $ccms['lang']['system']['noresults']; 
+					}
 					?>
 				</table>
-				<hr />
-				<?php 
-				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']&&count($albums)>0) 
-				{ 
-				?>
-					<button type="submit" onclick="return confirmation();" name="deleteAlbum"><span class="ss_sprite ss_bin_empty"><?php echo $ccms['lang']['backend']['delete']; ?></span></button>
-				<?php 
-				} 
-				?>
+			</div>
+			<hr />
+			<?php 
+			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']&&count($albums)>0) 
+			{ 
+			?>
+				<button type="submit" onclick="return confirmation_delete();" name="deleteAlbum"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
+			<?php 
+			} 
+			?>
 			</form>
 		<?php 
 		} 
@@ -337,45 +301,47 @@ function confirm_regen()
 			} 
 			?>
 			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
-			<div class="clear right">
-			<?php
-			if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
-			{
-			?>
-				<span class="ss_sprite ss_arrow_in"><a onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
-				<?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
-				</a></span>
-			<?php
-			}
-			?>
-			<span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php"><?php echo $ccms['lang']['album']['albumlist']; ?></a></span>
+			<form action="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=del-images" accept-charset="utf-8" method="post" id="album-pics">
+			<div class="right">
+				<?php
+				if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+				{
+				?>
+					<a class="button" onclick="delete_these_files(); return false;">
+						<span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?>
+					</a>
+					<a class="button" onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
+						<span class="ss_sprite_16 ss_arrow_in">&#160;</span><?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
+					</a>
+				<?php
+				}
+				?>
+				<a class="button" href="lightbox.Manage.php">
+					<span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?>
+				</a>
 			</div>
-			<div>
+			<div class="clear">
 			<?php 
 			foreach ($images as $key => $value) 
 			{ 
-				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox'])
-				{
-					echo '<a onclick="return confirmation();" href="lightbox.Process.php?album=' . $album . '&amp;image=' . $value . '&amp;action=del-image" title="' . $ccms['lang']['backend']['delete'] . ': ' . $value . '">';
-				} 
-
-				echo '<img src="' . $imagethumbs[$key] . '" class="thumbview" alt="Thumbnail of ' . $value . '" ' . $imginfo[$key]['style'] . ' />';
+				echo '<label class="thumbimgwdel"><span style="background-image: url(' . path2urlencode($imagethumbs[$key]) . ');" class="thumbview" title="Thumbnail of ' . $value . '" ' . /* $imginfo[$key]['style'] . */ ' >&#160;</span>';
 
 				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 				{
-					echo '</a>';
+					echo '<input type="checkbox" name="imageName['. ($key+1) .']" value="' . $value . '">';
 				} 
-				echo "\n";
+				echo "</label>\n";
 			} 
 			?>
 			</div>
+			</form>
+			<hr class="clear space" />
 			<?php
 		} 
 		?>
 		</div>
 	
-		<div class="span-8">
-			
+		<div class="span-8 last">
 		<?php 
 		if(empty($album)) 
 		{ 
@@ -386,16 +352,18 @@ function confirm_regen()
 			{
 			?>
 				<form action="lightbox.Process.php?action=create-album" method="post" accept-charset="utf-8">
-					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" style="width:160px;" name="album" value="" id="album" />
-					<button type="submit"><span class="ss_sprite ss_wand"><?php echo $ccms['lang']['forms']['createbutton']; ?></span></button>
+					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" name="album" value="" id="album" />
+					<button type="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 				</form>
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
 			?>
 		
-			<hr class="space" />
+			<hr class="clear space" />
 		<?php 
 		} 
 		else 
@@ -417,7 +385,7 @@ function confirm_regen()
 						for ($i=0; $i < count($lightboxes); $i++) 
 						{ 
 						?>
-							<option <?php echo (!empty($lines[0])&&trim($lines[0])==$lightboxes[$i]['urlpage']?'selected':null); ?> value="<?php echo $lightboxes[$i]['urlpage'];?>"><?php echo $lightboxes[$i]['urlpage'];?>.html</option>
+							<option <?php echo (!empty($lines[0])&&trim($lines[0])==$lightboxes[$i]['urlpage']?'selected="selected"':null); ?> value="<?php echo $lightboxes[$i]['urlpage'];?>"><?php echo $lightboxes[$i]['urlpage'];?>.html</option>
 						<?php 
 						} 
 						?>
@@ -430,14 +398,22 @@ function confirm_regen()
 					}
 					?>
 					<label for="description"><?php echo $ccms['lang']['album']['description']; ?></label>
-					<textarea name="description" rows="3" cols="40" style="height:50px;width:290px;" id="description"><?php echo $desc; ?></textarea>
+					<textarea name="description" rows="3" cols="40" id="description"><?php echo $desc; ?></textarea>
 					<input type="hidden" name="album" value="<?php echo $album; ?>" id="album" />
-					<p class="prepend-5"><button type="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['forms']['savebutton']; ?></span></button></p>
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
+					</div>
 				</form>
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
+			}
+			?>
+		
+			<hr class="clear space" />
+		<?php
 		} 
 		
 		if(count($albums)>0) 
@@ -460,8 +436,6 @@ function confirm_regen()
 					http://devzone.zend.com/article/1312
 					http://www.php.net/manual/en/session.idpassing.php
 				*/
-				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-
 				$sesid = null;
 				if (defined('SID'))
 				{
@@ -488,8 +462,8 @@ function confirm_regen()
 
 				/* whitespace is important here... */ ?>&action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
 		
-				<label for="album" style="margin-right:5px;display:inline;"><?php echo $ccms['lang']['album']['toexisting']; ?></label>
-				<select name="album" id="album" class="text" style="width:130px;" size="1">
+				<label for="album"><?php echo $ccms['lang']['album']['toexisting']; ?></label>
+				<select name="album" id="album" class="text" size="1">
 					<?php 
 					foreach ($albums as $value) 
 					{ 
@@ -504,23 +478,27 @@ function confirm_regen()
 					<form action="lightbox.Process.php?action=save-files" method="post" accept-charset="utf-8">
 						<?php echo $ccms['lang']['album']['singlefile']; ?>
 						<input id="lightbox-photoupload" type="file" name="Filedata" />
-						<p><button type="submit"><span class="ss_sprite ss_add"><?php echo $ccms['lang']['album']['upload']; ?></span></button></p>
+						<div class="right">
+							<button type="submit"><span class="ss_sprite_16 ss_add"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></button>
+						</div>
 					</form>
 				</div>
 			
-				<div id="lightbox-status" class="hide">
+				<div id="lightbox-status" >
 					<p>
-						<span class="ss_sprite ss_folder_image"><a href="#" id="lightbox-browse"><?php echo $ccms['lang']['album']['browse']; ?></a></span> |
-						<span class="ss_sprite ss_cross"><a href="#" id="lightbox-clear"><?php echo $ccms['lang']['album']['clear']; ?></a></span> |
-						<span class="ss_sprite ss_picture_save"><a href="#" id="lightbox-upload"><?php echo $ccms['lang']['album']['upload']; ?></a></span>
+						<a id="lightbox-browse"><span class="ss_sprite_16 ss_folder_image">&#160;</span><?php echo $ccms['lang']['album']['browse']; ?></a> |
+						<a id="lightbox-clear"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['album']['clear']; ?></a> |
+						<a id="lightbox-upload"><span class="ss_sprite_16 ss_picture_save">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></a>
 					</p>
 					<div>
-						<strong class="overall-title"></strong><br />
-						<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress overall-progress" />
+						<strong class="overall-title"></strong>
+						<br />
+						<img src="../../../lib/includes/js/fancyupload/Assets/bar.gif" class="progress overall-progress" />
 					</div>
 					<div>
-						<strong class="current-title"></strong><br />
-						<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress current-progress" />
+						<strong class="current-title"></strong>
+						<br />
+						<img src="../../../lib/includes/js/fancyupload/Assets/bar.gif" class="progress current-progress" />
 					</div>
 					<div class="current-text"></div>
 				</div>
@@ -530,16 +508,119 @@ function confirm_regen()
 			<?php 
 			} 
 			else 
+			{
 				echo $ccms['lang']['auth']['featnotallowed']; 
-			?>
-			</div>
-		<?php 
+			}
 		} 
 		?>
+		</div>
 			
 		<div id="lightbox-pending" class="lightbox-spinner-bg">
 			<p class="loading-img" ><?php echo $ccms['lang']['album']['please_wait']; ?></p>
 		</div>
+
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+
 	</div>
+	<script type="text/javascript" charset="utf-8">
+	<?php 
+	// prevent JS errors when permissions don't allow uploading (and all the rest)
+	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	{
+	?>
+var js = [
+	'../../includes/js/mootools-core.js,mootools-more.js',
+	'../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js',
+	'../../../lib/includes/js/the_goto_guy.js'
+	];
+	
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+function confirm_regen()
+{
+	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmthumbregen']; ?>');
+	if(answer)
+	{
+		try
+		{
+			$('lightbox-pending').setStyle('visibility', 'visible');
+			return true;
+		}
+		catch(e)
+		{
+			$('lightbox-pending').setStyle('visibility', 'hidden');
+			return false;
+		}
+	}
+	else
+	{
+		$('lightbox-pending').setStyle('visibility', 'hidden');
+		return false;
+	}
+}
+
+function delete_these_files()
+{
+	var go = confirmation_delete();
+	
+	if (go)
+	{
+		var form = $('album-pics');
+		form.submit();
+	}
+}
+
+
+	<?php
+	}
+	?>
+
+
+
+var jsLogEl = document.getElementById('jslog');
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+	lazyload_done_now_init('<?php echo $cfg['rootdir']; ?>');   // defined in modLightbox.js
+	//});
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+</script>
+<script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

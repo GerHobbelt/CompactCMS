@@ -270,7 +270,9 @@ elseif($singleShow==true)
 		}
 		
 		// and augment the breadcrumb trail and other template variables:
-		$preview_qry = ($ccms['preview'] ? '?preview=' . $cfg['authcode'] : '');
+		$preview_checkcode = ($ccms['preview'] ? GenerateNewPreviewCode(null, $pageID) : false);
+		
+		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
 		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a></span>';
 		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
 

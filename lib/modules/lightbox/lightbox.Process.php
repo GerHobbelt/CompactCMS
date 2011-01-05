@@ -34,6 +34,7 @@
  * > W: http://community.CompactCMS.nl/forum
 **/
 
+
 /* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
@@ -56,10 +57,15 @@ if (!defined('BASE_PATH'))
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
+
+class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
+
+
+
 // Some security functions
 if (!checkAuth())
 {
-	die($ccms['lang']['auth']['featnotallowed']);
+	die_and_goto_url(null, $ccms['lang']['auth']['featnotallowed']);
 }
 
 // set jpeg quality for the thumbnails; turns out they are quite reasonable @ 70% quality (and still way smaller than @ 100%)
@@ -69,9 +75,12 @@ define('THUMBNAIL_JPEG_QUALITY', 70);
 $perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
 if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
+
 // Set default variables
 $album_name	= getPOSTparam4Filename('album');
 $do_action	= getGETparam4IdOrNumber('action');
+
+
 
 /**
  *
@@ -88,7 +97,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
 			$dest = BASE_PATH.'/media/albums/'.$album_name;
 			if(!is_dir($dest)) 
 			{
-				if(@mkdir($dest)&&@mkdir($dest.'/_thumbs')&&@fopen($dest.'/info.txt', "w")) 
+				if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w")) 
 				{
 					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
 					exit();
@@ -113,7 +122,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
 	} 
 	else 
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
 	}
 }
 
@@ -144,7 +154,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 					{
 						if ($object != "." && $object != "..") 
 						{
-							if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object); else unlink($dir."/".$object);
+							if (filetype($dir."/".$object) == "dir") 
+							{
+								rrmdir($dir."/".$object); 
+							}
+							else 
+							{
+								unlink($dir."/".$object);
+							}
 						}
 					}
 					reset($objects);
@@ -180,53 +197,92 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
+	}
 }
 
 /**
  *
- * Delete a single image
+ * Delete a one or more images
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "del-image") 
+if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-images") 
 {
-	// Only if current user has the rights
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/lightbox/lightbox.Manage.php');
+	
+	try
 	{
-		$album = getGETparam4Filename('album');
-		$image = getGETparam4Filename('image');
-		
-		if(!empty($album)&&!empty($image)) 
+		// Only if current user has the rights
+		if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 		{
-			$file	= BASE_PATH.'/media/albums/'.$album.'/'.$image;
-			$thumb	= BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$image;
-			if(is_file($file)) 
+			$album = getGETparam4Filename('album');
+			
+			if(!empty($album)) 
 			{
-				if(@unlink($file)&&@unlink($thumb)) 
+				// Number of selected items
+				$total = (!empty($_POST['imageName']) && is_array($_POST['imageName']) ? count($_POST['imageName']) : 0);
+				
+				// If nothing selected, throw error
+				if($total==0) 
 				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved']).'&album='.$album));
-					exit();
-				} 
-				else 
-				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_delete']).'&album='.$album));
-					exit();
+					throw new FbX($ccms['lang']['system']['error_selection'], 'album=' . $album);
 				}
-			}
+				
+				$i=0;
+				foreach ($_POST['imageName'] as $key => $picname) 
+				{
+					$picname = filterParam4FileName($picname);
+					
+					if(!empty($picname)) 
+					{
+						$file	= BASE_PATH.'/media/albums/'.$album.'/'.$picname;
+						$thumb	= BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$picname;
+						if(is_file($file)) 
+						{
+							// first kill the thumbnail: if anything goes wrong then, we always regenerate later.
+							if(@unlink($thumb) && @unlink($file)) 
+							{
+								// good!
+							} 
+							else 
+							{
+								throw new FbX($ccms['lang']['system']['error_delete'] . ': ' . htmlentities($picname), 'album='.$album);
+							}
+						}
+						else 
+						{
+							throw new FbX($ccms['lang']['system']['error_delete'] . '= ' . htmlentities($picname), 'album='.$album);
+						}
+					}
+					else 
+					{
+						throw new FbX($ccms['lang']['system']['error_tooshort'], 'album='.$album);
+					}
+					
+					$i++;
+				}
+				
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'].' ('.$i.' '.$ccms['lang']['album']['files'].')').'&album='.$album));
+				exit();
+			} 
 			else 
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_delete']).'&album='.$album));
-				exit();
+				throw new FbX($ccms['lang']['auth']['featnotallowed'], 'album='.$album);
 			}
-		}
+		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort']).'&album='.$album));
-			exit();
+			throw new FbX($ccms['lang']['auth']['featnotallowed'], 'album='.$album);
 		}
-	} 
-	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 /**
@@ -267,7 +323,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
+	}
 }
 
 /**
@@ -283,18 +342,22 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 {
 	if (!checkAuth() || empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])
 	{
-		$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+		echo "<p>" . (empty($_GET['SIDCHK']) ? '----' : $_GET['SIDCHK']) . ', ' . $_SESSION['fup1'] . "</p>\n";
+		var_dump($_GET);
+		var_dump($_COOKIES);
 	
+		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+		
 		die($ccms['lang']['auth']['featnotallowed']);
 	}
 	
 	/*
 	WARNING: we must NOT reset/alter the extra check session value in here as 
 	         FancyUpload will invoke this code multiple times from the same 
-		 web form when bulk uploads are performed (more then one(1) image file).
+		     web form when bulk uploads are performed (more then one(1) image file).
 	
 	         So we are a little less safe as the extra session var will only 
-		 be regenerated every time the upload form is rerendered.
+		     be regenerated every time the upload form is rerendered.
 		 
 	         Alas.
 	*/
@@ -311,57 +374,112 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	// Validation
 	$error 		= false;
 	$error_code = 0;
+	$size       = false; // init to prevent PHP errors about unknown vars further down
 
-	if (!isset($_FILES['Filedata']) || !is_uploaded_file($_FILES['Filedata']['tmp_name'])) 
+	// get the local (temporary) filename:
+	$uploadedfile = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['tmp_name']) ? $_FILES['Filedata']['tmp_name'] : null); // RAW is okay: it's generated locally (server-side) and contains a temp filename
+	// and what it's supposed to be named (as specced by the uploader):
+	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? filterParam4Filename($_FILES['Filedata']['name']) : null);
+	// Set file and get file extension
+	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
+
+	if (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)) 
 	{
-		$error = 'Invalid Upload';
-		$error_code = $_FILES['Filedata']['tmp_name'];
+		$error = 'Invalid Upload: ';
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
-	if (!$error && !($size = @getimagesize($_FILES['Filedata']['tmp_name']) ) ) 
+	if (empty($error) && !($size = @getimagesize($uploadedfile))) 
 	{
 		$error = 'Please upload only images, no other files are supported.';
-		$error_code = $_FILES['Filedata']['tmp_name'];
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
-	if (!$error && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
+	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
 	{
 		$error = 'Please upload only images of type JPEG, GIF or PNG.';
 		$error_code = $size[2];
 	}
 	
-	if (!$error && ($size[0] < 50) || ($size[1] < 50)) 
+	if (empty($error) && (($size[0] < 50) || ($size[1] < 50)))  // braces for proper evaluation precedence!!
 	{
 		$error = 'Please upload an image bigger than 50px.';
 		$error_code = $size[0] . ':' . $size[1];
 	}
 	
-	// Set file and get file extension
-	$uploadedfile	= $_FILES['Filedata']['tmp_name'];
-	$extension		= strtolower(substr($_FILES['Filedata']['name'], strrpos($_FILES['Filedata']['name'], '.') + 1));
-	
-	// Do resize    
-	if($extension=="jpg" || $extension=="jpeg") 
+	$src = false;
+	if (empty($error)) 
 	{
-		$src = @imagecreatefromjpeg($uploadedfile);
-	} 
-	elseif($extension=="png") 
-	{
-		$src = @imagecreatefrompng($uploadedfile);
-	} 
-	else 
-	{
-		$src = @imagecreatefromgif($uploadedfile);
+		// Do resize    
+		switch ($extension)
+		{
+		case 'jpg':
+		case 'jpeg':
+			$src = @imagecreatefromjpeg($uploadedfile);
+			break;
+			
+		case 'png':
+			$src = @imagecreatefrompng($uploadedfile);
+			break;
+			
+		case 'gif':
+			$src = @imagecreatefromgif($uploadedfile);
+			break;
+			
+		default:
+			$error = 'Unsupported file format.';
+			$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
+			break;
+		}
 	}
-	if ($src == false)
+	
+	if (empty($error) && $src == false)
 	{
 		$error = 'Internal error.';
-		$error_code = $uploadedfile . ' : ' . $extension;
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
-	if (!$error)
+	if (empty($error))
 	{
-		list($width,$height)=getimagesize($uploadedfile);
+		$imginf = getimagesize($uploadedfile);
+		if (!is_array($imginf))
+		{
+			$error = 'Invalid or severely corrupt image file.';
+			$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
+		}
+		else
+		{
+			// make sure image type matches extension:
+			$ok = false;
+			switch ($extension)
+			{
+			case 'jpg':
+			case 'jpeg':
+				$ok = ($imginf[2] == IMAGETYPE_JPEG);
+				break;
+				
+			case 'png':
+				$ok = ($imginf[2] == IMAGETYPE_PNG);
+				break;
+				
+			case 'gif':
+				$ok = ($imginf[2] == IMAGETYPE_GIF);
+				break;
+				
+			default:
+				break;
+			}
+			if (!$ok)
+			{
+				$error = 'File type does not match extension or corrupt file.';
+				$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename . ' : ' . $imginf[2];
+			}
+		}
+	}
+	if (empty($error))
+	{
+		$width = $imginf[0];
+		$height = $imginf[1];
 		
 		$aspect_ratio = (floatval($height)/floatval($width));
 		
@@ -395,26 +513,32 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 			$newwidth_t = intval($newheight_t / $aspect_ratio);
 		}
 		$tmp_t = imagecreatetruecolor($newwidth_t,$newheight_t);
-		imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
+		imagecopyresampled($tmp_t,$tmp,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
 		
 		// Save newly generated versions
-		$thumbnail	= $dest.'/_thumbs/'. $_FILES['Filedata']['name'];
-		$original	= $dest.'/'.$_FILES['Filedata']['name'];
+		$thumbnail	= $dest.'/_thumbs/'. $target_filename;
+		$original	= $dest.'/'.$target_filename;
 		
-		if($extension=="jpg" || $extension=="jpeg") 
+		switch ($extension)
 		{
+		case 'jpg':
+		case 'jpeg':
 			imagejpeg($tmp, $original, 100);
 			imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
-		} 
-		elseif($extension=="png") 
-		{
+			break;
+			
+		case 'png':
 			imagepng($tmp, $original, 9);
 			imagepng($tmp_t, $thumbnail, 9);
-		} 
-		else 
-		{
+			break;
+			
+		case 'gif':
 			imagegif($tmp, $original);
 			imagegif($tmp_t, $thumbnail);
+			break;
+			
+		default:
+			break;
 		}
 		
 		imagedestroy($tmp);
@@ -422,7 +546,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	}
 	
 	// Check for errors
-	if ($error) 
+	if (!empty($error)) 
 	{
 		$return = array(
 			'status' => '0',
@@ -434,8 +558,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files")
 	{
 		$return = array(
 			'status' => '1',
-			'name' => $_FILES['Filedata']['name'],
-			'src' => $dest.'/'.$_FILES['Filedata']['name']
+			'name' => $target_filename,
+			'src' => $dest.'/'.$target_filename
 		);
 		// Our processing, we get a hash value from the file
 		$return['hash'] = md5_file($return['src']);
@@ -497,21 +621,34 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 			{
 				if(is_file($dest.'/'.$f)) 
 				{
-					$extension = strtolower(substr($f, strrpos($f, '.') + 1));
+					$extension = pathinfo($f, PATHINFO_EXTENSION);
+
 					$uploadedfile = $dest . '/' . $f;
 					
 					// Do resize
-					if($extension=="jpg" || $extension=="jpeg") 
+					switch ($extension)
 					{
+					case 'jpg':
+					case 'jpeg':
 						$src = imagecreatefromjpeg($uploadedfile);
-					} 
-					elseif($extension=="png") 
-					{
+						break;
+						
+					case 'png':
 						$src = imagecreatefrompng($uploadedfile);
-					} 
-					else 
-					{
+						break;
+						
+					case 'gif':
 						$src = imagecreatefromgif($uploadedfile);
+						break;
+						
+					default:
+						// skip all other file formats
+						continue;
+					}
+					if (empty($src))
+					{
+						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode('invalid image format for file ' . $uploadedfile . ', type: ' . $extension)));
+						exit();
 					}
 						 
 					list($width,$height)=getimagesize($uploadedfile);
@@ -573,17 +710,23 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 					
 					@unlink($thumbnail);
 					
-					if($extension=="jpg" || $extension=="jpeg" ) 
+					switch ($extension)
 					{
+					case 'jpg':
+					case 'jpeg':
 						imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
-					} 
-					elseif($extension=="png") 
-					{
+						break;
+						
+					case 'png':
 						imagepng($tmp_t, $thumbnail, 9);
-					} 
-					else 
-					{
+						break;
+						
+					case 'gif':
 						imagegif($tmp_t, $thumbnail);
+						break;
+						
+					default:
+						break;
 					}
 					
 					imagedestroy($tmp_t);
@@ -600,7 +743,10 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 		}
 	} 
 	else 
-		die($ccms['lang']['auth']['featnotallowed']);
+	{
+		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
+		exit();
+	}
 }
 
 ?>

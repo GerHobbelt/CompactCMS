@@ -83,6 +83,7 @@ $ccms['lang']['backend']['confirmdelete'] 	= "Please confirm that you want to de
 $ccms['lang']['backend']['confirmthumbregen'] 	= "Please confirm that you want to regenerate all thumbnails.";
 $ccms['lang']['backend']['settingssaved']	= "Your changes have been successfully saved.";
 $ccms['lang']['backend']['must_refresh']	= "Please make sure to reload the main page to see <strong>all</strong> your changes";
+$ccms['lang']['backend']['reload_admin_screen'] = "Refresh the admininistration screen";
 $ccms['lang']['backend']['itemcreated']		= "Successfully processed the submitted item(s).";
 $ccms['lang']['backend']['fullremoved']		= "Successfully deleted the selected item(s).";
 $ccms['lang']['backend']['fullregenerated']	= "Successfully regenerated the thumbnails.";
@@ -308,7 +309,6 @@ $ccms['lang']['guestbook']['rating']	= "Rating";
 $ccms['lang']['guestbook']['avatar']	= "Gravatar.com user avatar";
 $ccms['lang']['guestbook']['wrote']		= "wrote";
 $ccms['lang']['guestbook']['manage']	= "Manage reactions";
-$ccms['lang']['guestbook']['delentry']	= "Delete this entry";
 $ccms['lang']['guestbook']['sendmail']	= "E-mail author";
 $ccms['lang']['guestbook']['removed'] 	= "has been removed from the database.";
 $ccms['lang']['guestbook']['name'] 		= "Your name";
@@ -322,6 +322,10 @@ $ccms['lang']['guestbook']['posted']	= "Your comment has been posted!";
 $ccms['lang']['guestbook']['success']	= "Thank you";
 $ccms['lang']['guestbook']['error']		= "Failures &amp; Rejections";
 $ccms['lang']['guestbook']['rejected']	= "Your comment has been rejected.";
+$ccms['lang']['guestbook']['author']	= "Author";
+$ccms['lang']['guestbook']['date']		= "Date";
+$ccms['lang']['guestbook']['host']		= "IP address";
+$ccms['lang']['guestbook']['configuration'] = "Configuration";
 
 
       /* ### OBSOLETED ENTRIES ### */

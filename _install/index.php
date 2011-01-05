@@ -62,6 +62,17 @@ session_start();
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 
+if (!isset($cfg))
+{
+	?>
+	<h1>Fatal Error</h1>
+	<p>The installer has apparently rewritten the config.inc.php file but failed to rewrite its content. 
+	This is a severe failure and you must restore a backup or re-install the CompactCMS source code, in
+	particular the <file>lib/config.inc.php</file> and <file>.htaccess</file> files!</p>
+	<?php
+	die();
+}
+
 // Load generic functions
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
@@ -69,7 +80,7 @@ session_start();
 $do	= getGETparam4IdOrNumber('do');
 
 // If no step, set session hash
-if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['host'])) 
+if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
 {
 	// Setting safety variables
 	SetAuthSafety();
@@ -300,71 +311,33 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<title>CompactCMS Installation</title>
 		<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 		<link rel="stylesheet" type="text/css" href="./install.css" />
-		<script type="text/javascript" src="../lib/includes/js/mootools.js" charset="utf-8"></script>
-		<script type="text/javascript" src="../admin/includes/modules/user-management/passwordcheck.js" charset="utf-8"></script>
-		<script type="text/javascript" charset="utf-8">
-			window.addEvent('domready', function() {
-				// Process steps
-				var frm = $('installFrm');
-				
-				/* form may NOT exist when the update check has detected an outdated restore SQLdump or config.inc.php file */
-				if (frm)
-				{
-					frm.addEvent('submit', function(install) {
-						new Event(install).stop();
-							
-						var install_div = $('install');
-						var scroll = new Fx.Scroll(window, {wait: false, duration: 500, transition: Fx.Transitions.Quad.easeInOut});
-						
-						new Request.HTML({
-							method: 'post',
-							url: './installer.inc.php',
-							update: install_div,
-							onRequest:  function() { 
-								install_div.empty().addClass('loading');
-							}, 
-							onComplete: function() {
-								install_div.removeClass('loading');
-								scroll.toElement('install-wrapper');
-								build_tips();
-							}
-						}).send(frm);
-					});
-				}
-
-				build_tips();
-			});			
-			
-			function build_tips()
-			{
-				// Tips links
-				$$('span.ss_help').each(function(element,index) {  
-					var content = element.get('title').split('::');  
-					element.store('tip:title', content[0]);  
-					element.store('tip:text', content[1]);  
-				});  
-			  
-				// Create the tooltips  
-				var tipz = new Tips('.ss_help',{  
-					className: 'ss_help_large',  
-					fixed: true,  
-					hideDelay: 50,  
-					showDelay: 50  
-				}); 
-			}
-		</script>
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
+		<![endif]-->
 	</head>
 <body>
 
-<p>&#160;</p>
+<noscript class="noscript" id="noscript">
+	<h1>Your browser does not support JavaScript</h1>
+	<h2>... or has JavaScript disabled.</h2>
+	<p>Both the CompactCMS installer (i.e. this page) and the CompactCMS administration pages require JavaScript 
+	to be enabled in your browser.</p>
+	<p>If, for any reason, you cannot or may not enable JavaScript in your browser (or alternatively, change or 
+	upgrade to another browser that <em>does</em> support JavaScript), then regretably you cannot install nor
+	manage your CompactCMS web site from this location.</p>
+	
+	<hr class="space" />
+</noscript>
 
-<div id="install-wrapper" class="container">
+<div id="install-wrapper" class="container-18" style="display:none;" >
 	<div id="help" class="span-8 colborder">
-		<div id="logo" class="sprite logo"><h1>CompactCMS installation</h1></div>
-		<span class="ss_sprite ss_package_green">&#160;</span><h2 style="display:inline;">Install CompactCMS</h2>
+		<div id="logo" class="sprite logo">
+			<h1>CompactCMS installation</h1>
+		</div>
+		<h2><span class="ss_sprite_16 ss_package_green">&#160;</span>Install CompactCMS</h2>
 		<p>Welcome to the installation wizard of CompactCMS. This wizard will guide you through the five steps required to get CCMS to work on your server.
 		Installing CompactCMS will not take more than five minutes of your time.</p>
-		<span class="ss_sprite ss_tick"></span><h2 style="display:inline;">What steps to expect</h2>
+		<h2><span class="ss_sprite_16 ss_tick">&#160;</span>What steps to expect</h2>
 		<ol>
 			<li><strong>Environment</strong><br/><em>Tell CCMS where your installation is located and what language to speak</em></li>
 			<li><strong>Preferences</strong><br/><em>Indicate how you prefer your CCMS</em></li>
@@ -375,13 +348,13 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<p>If you have any questions, suggestions or perhaps even praise; be sure to <a href="http://www.compactcms.nl/contact.html?subject=My installation feedback" target="_blank" title="Send me an e-mail">let me know</a>!</p>
 		<p>Cheers!<br/><em>Xander</em></p>
 	</div>
-	<div class="span-9">
+	<div class="span-9 last">
 		<?php
 		if ($has_prepped_restore && !$has_uptodate_backup)
 		{
 		?>
 		<div class="error">
-			<h1>Outdated backup or inproper restore preparation</h1>
+			<h1><span class="ss_sprite_16 ss_error">&#160;</span>Outdated backup or inproper restore preparation</h1>
 			<p>It turns out you have:</p>
 			<ol>
 				<li><p>either not performed a backup prior to running this installer.</p>
@@ -459,7 +432,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		else
 		{
 		?>
-		<form action="" method="post" id="installFrm">
+		<form method="post" id="installFrm">
 			<fieldset id="install" style="border:none;" class="none">
 				<legend class="installMsg"><?php echo (!$do_ftp_chmod ? 'Step 1 - Knowing the environment' : 'FTP - Setting permissions right');?></legend>
 				<?php 
@@ -468,15 +441,17 @@ if (empty($_SESSION['variables']['do_upgrade']))
 				?>
 					<p>The details below have been filled-out based on information readily available. Please confirm these settings, select your language and click proceed.</p>
 					
-					<label for="sitename"><span class="ss_sprite ss_pencil">Site name</span></label><input type="text" class="alt title" name="sitename" style="width:300px;" value="<?php echo (!isset($_SESSION['variables']['sitename'])?ucfirst(preg_replace("/^www\./", "", $_SERVER['HTTP_HOST'])):$_SESSION['variables']['sitename']);?>" id="sitename" />
+					<label for="sitename"><span class="ss_sprite_16 ss_pencil">&#160;</span>Site name</label>
+					<input type="text" class="alt title" name="sitename" value="<?php echo (!isset($_SESSION['variables']['sitename'])?ucfirst(preg_replace("/^www\./", "", $_SERVER['HTTP_HOST'])):$_SESSION['variables']['sitename']);?>" id="sitename" />
+					<br/>
 					
-					<label for="rootdir"><span class="ss_sprite ss_application_osx_terminal">Web root directory</span></label>
-					<input type="text" class="alt title" name="rootdir" style="width:300px;" autofocus value="<?php echo $rootdir;?>" id="rootdir" />
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</span>
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Must include trailing slash!</span>
+					<label for="rootdir"><span class="ss_sprite_16 ss_application_osx_terminal">&#160;</span>Web root directory</label>
+					<input type="text" class="alt title" name="rootdir" autofocus value="<?php echo $rootdir;?>" id="rootdir" />
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>When www.domain.ext/ccms/, <strong>/ccms/</strong> is your web root</p>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Must include trailing slash!</p>
 					
-					<label for="language"><span class="ss_sprite ss_comments">CCMS backend language</span></label>
-					<select name="language" class="title" style="padding:5px 10px;width:300px;" id="language" size="1">
+					<label for="language"><span class="ss_sprite_16 ss_comments">&#160;</span>CCMS backend language</label>
+					<select name="language" class="title" id="language" size="1">
 						<?php 
 						// Get current languages
 						$s = (isset($_SESSION['variables']['language'])?$_SESSION['variables']['language']:'en');
@@ -484,7 +459,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 						foreach($lcoll as $lcode => $ldesc)
 						{
 							$c = ($lcode == $s ? 'selected="selected"' : null);
-							echo '<option value="'.$lcode.'" '.$c.'>'.$ldesc.'</option>';
+							echo '<option value="'.$lcode.'" '.$c.'>'.$ldesc['name'].'</option>';
 						}
 						?>   	
 					</select>
@@ -498,28 +473,27 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					<p>Whenever a chmod() command failes through standard procedures, the installer can try to execute the chmod() command over FTP. This requires you to submit your FTP details and full path of your CCMS installation. Any of the data entered below will <strong>never</strong> be saved by the installer.</p>
 					
 					<label for="ftp_host">FTP host</label>
-					<input type="text" class="alt title" name="ftp_host" style="width:300px;" value="" id="ftp_host"/>
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">Often www.domain.ext or ftp.domain.ext</span>
-					
+					<input type="text" class="alt title" name="ftp_host" value="" id="ftp_host"/>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Often www.domain.ext or ftp.domain.ext</p>
 					<label for="ftp_user">FTP username</label>
-					<input type="text" class="alt title" name="ftp_user" style="width:300px;" value="" id="ftp_user"/>
-					
+					<input type="text" class="alt title" name="ftp_user" value="" id="ftp_user"/>
+					<br/>
 					<label for="ftp_pass">FTP password</label>
-					<input type="password" class="title" name="ftp_pass" style="width:300px;" value="" id="ftp_pass"/>
-					
+					<input type="password" class="title" name="ftp_pass" value="" id="ftp_pass"/>
+					<br/>
 					<label for="ftp_path">Installation path</label>
-					<input type="text" class="alt title" name="ftp_path" style="width:300px;" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
-					<br/>&#160;<span class="ss_sprite ss_bullet_star small quiet">CCMS will try to auto-find this using the default value above</span>
+					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
+					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
 					
 					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
 				<?php 
 				} 
 				?>
 				
-				<p class="span-8 right">
-					<button name="submit" type="submit"><span class="ss_sprite ss_lock_go">Proceed</span></button>
-					<span class="ss_sprite ss_cancel"><a href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>">Cancel</a></span>
-				</p>
+				<div class="right">
+					<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
+					<a class="button" href="<?php echo (empty($do) ? 'http://www.compactcms.nl/contact.html?subject=My installation feedback' : 'index.php');?>"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
+				</div>
 			</fieldset>
 		</form>
 		<?php
@@ -527,7 +501,71 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		?>
 	</div>
 </div>
+
+<div>
+  <textarea id="jslog" class="log span-25" readonly="readonly">
+  </textarea>
+</div>
+
+
 <p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
+
+<script type="text/javascript" charset="utf-8">
+var jsLogEl = document.getElementById('jslog');
+var js = [
+	'../lib/includes/js/mootools-core.js',
+	'../lib/includes/js/mootools-more.js',
+	'../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running',
+	'install.js'
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
+}
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
+	}
+}
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
+
+function ccms_combiner_running()
+{
+	jslog("the Combiner is already running; you are installing over an existing installation! :-)");
+}
+
+/* now show the correct DIV, as we do have JavaScript up & running */
+document.getElementById("noscript").style.display = "none";
+document.getElementById("install-wrapper").style.display = "block";
+
+if (typeof window.ccms_lazyload_setup_GHO == 'function')
+{
+	//alert('2');
+}
+
+</script>
+<script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
+
 
 </body>
 </html>

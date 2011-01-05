@@ -28,21 +28,101 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ************************************************************ */
 
 /* === 0. MISC === */
-a.external {
-	background: url('../ccms-sprite.png') no-repeat 100% 50%;
+
+/*
+It turns out not only IE8 but also Chrome & Opera need this to make the overview in step #4 stay close together vertically.
+
+Harmless for FF3.
+*/
+table th, table td
+{
+	height: 18px;
+	line-height: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	/* border: 1px solid red; */
+}
+
+
+a.external 
+{
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
 	background-position: 0 -159px;
 	padding: 0 0 0 13px;
 }
-.sprite{background: url('../ccms-sprite.png') no-repeat top left;}
-.sprite-hover:hover{background: url('../ccms-sprite.png') no-repeat top left;}
-.info{background-position: 0 -178px;padding: 0 0 0 20px;}
+/*
+IE6 fix:
+
+See also: 
+http://www.webdevout.net/css-hacks#conditional_comments-stand_alone
+
+THANK YOU, David Hammond! I'm glad I finally found that page. !@#$%^ MSIE!
+*/
+* html a.external
+{
+	background-image: url('../ccms-sprite.gif');
+}
+
+
+.sprite
+{
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
+}
+/*
+IE6 fix:
+*/
+* html .sprite
+{
+	background-image: url('../ccms-sprite.gif');
+	background-repeat: no-repeat;
+}
+
+.sprite-hover:hover
+{
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
+}
+/*
+IE6 fix:
+*/
+* html .sprite-hover:hover
+{
+	background-image: url('../ccms-sprite.gif');
+	background-repeat: no-repeat;
+}
+
+.info
+{
+	background-position: 0 -178px;
+	padding: 0 0 0 20px;
+}
 
 /* === 1. CORE === */
 /* === LAY-OUT === */
-#wrapper {padding: 20px 0;}
-#footer {text-align: right;margin-bottom:20px;}
-#menudepth {margin-right:0;}
-#createnew, #menudepth {margin-top:10px;}
+#wrapper 
+{
+	padding: 20px 0;
+}
+#footer 
+{
+	text-align: right;
+	margin-bottom: 20px;
+}
+/*
+blueprint CSS calls this 'last':
+
+#menudepth 
+{
+	margin-right: 0;
+}
+*/
+#createnew, #menudepth 
+{
+	margin-top: 10px;
+}
+
 .ff{display:inline-block;width:80px;height:15px;background-position: 0 0;}
 .ie{display:inline-block;width:80px;height:15px;background-position: 0 -20px;}
 .opera{display:inline-block;width:80px;height:15px;background-position: 0 -40px;}
@@ -59,44 +139,81 @@ Make sure the admin content has a scrollbar when needed. Override body+html:over
 
 /* === 1. CORE === */
 /* === TAGS === */
-#dyn_list.loading {
+#dyn_list.loading 
+{
 	background: #ECC6CD url('../spinner.gif') no-repeat center center;
 	border: #D37A8A 4px solid;
 	padding: 10px;
 	min-height: 45px;
 }
-#notify.loading {background: #EED9BA url('../spinner.gif') no-repeat 50% 70%;}
-#notify span.right {margin-right:200px;}
+a#clockLink
+{
+	text-decoration: none;
+}
+#notify.loading 
+{
+	background: #EED9BA url('../spinner.gif') no-repeat 50% 70%;
+}
+#notify a.right 
+{
+	/* undo the p .right BluePrint CSS rule as well! */
+	/* margin: 0 200px 0 0; */
+	/* padding-left: 20px; */
+	text-align:left;
+}
 .printloading {background: url('../saving.gif') no-repeat 50% 70%;}
-fieldset { 
+#desktop fieldset 
+{ 
 	padding: 0 10px 10px 10px;
 	margin-bottom: 10px;
-	background: #E6F5D6;
+	background-color: #E6F5D6; 
+	/* 
+	^^^^ thanks to the negative margin of the <legend> the background shows above 
+	     the border for IE8/IE7/IE6; the only way to fix it that (that I can see) is 
+	     assign a background image with repeat-x for those ones only.
+	*/
 	border: 3px solid #90D244;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
-legend, .loginMsg, .installMsg {
-	background-color: rgba(201,211,217,0.2);
+legend, .installMsg 
+{
+	background-color: #F4F6F7; /* <-- effective color with opacity applied to white BG for color #C9D3D9; */
 	font-size:1.1em;
 	font-weight: bold;
-	margin: 0 15px;
-	padding: 0.4em 1em;
+	margin: 0 10px;
+	padding: 0.4em 0.7em; /* no more as Install Step #3 has a text that otherwise will make the fieldset ever so slightly run over the div width */
 	border: 2px solid #9DAFBB;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
+}
+legend, .installMsg 
+{
+	/*
+	See also:
+	  http://css-tricks.com/rgba-browser-support/
+	  http://css-tricks.com/non-transparent-elements-inside-transparent-elements/
+	  http://css-tricks.com/ie-background-rgb-bug/
+	
+	This assumes the .legend class should NOT propagate the opacity setting.
+	
+	Turns out you must put this in a separate scope to make the color fallback work as expected.
+	*/
+	background-color: rgba(201,211,217,0.2);
 }
 
 /* === 1. CORE === */
 /* === INSIDE SUB-DIVS === */
-#dyn_list td, th {
+#dyn_list td, th 
+{
 	vertical-align: top;
 	height: 22px;
 	padding: 5px 0;
 }
-#dyn_list {
+#dyn_list th 
+{
+	border-bottom: #9ACC66 2px solid;
+}
+#dyn_list 
+{
 	display: block;
 	min-width: 800px;
 	background: #CDE6B3;
@@ -104,9 +221,42 @@ legend, .loginMsg, .installMsg {
 	min-height: 30px;
 	height: auto;
 }
-#menuFields { border: #9ACC66 4px solid; }
-a.editinplace{background-position: 0 100px;}
-a.edit, a.editinplace:hover {
+
+#menuFields 
+{ 
+	border: #9ACC66 4px solid; 
+}
+#table_menu th 
+{
+	background: #CDE6B3;
+	border-bottom: #9ACC66 2px solid;
+}
+
+/*
+make sure all padding of the TH/TD for the menu table is GONE, as the TDs carry same-width SELECT elements:
+*/
+#menuFields table th, #menuFields table td
+{ 
+	/*
+	also reduce the interline padding: top/bottom=0
+	*/
+	margin: 0;
+	padding: 0;
+}
+/*
+further reduction of the vertical spacing:
+*/
+#menuFields select
+{
+	margin: 0.25em 0;
+}
+
+a.editinplace
+{
+	background-position: 0 100px;
+}
+a.edit, a.editinplace:hover 
+{
 	cursor: pointer;
 	font-weight: bold;
 	background-position: 0 -121px;
@@ -115,39 +265,84 @@ a.edit, a.editinplace:hover {
 
 /* === 1. CORE === */
 /* === STATUS BARS === */
-#logo {
-	height: 100px;
+#logo 
+{
+	/* height: 100px; */
 	padding-top: 10px;
-	margin: 5px 20px;
+	/* margin: 5px 20px; -- nukes the blueprint layout */
+	display: block;
+	border-radius: 10px;
 }
-.logo {background-position: 0 -228px;}
-#logo h1 {display: none;}
-#logo p {text-align:center;margin-top: 65px;font-weight: bold;}
-.twittlogo {display:block;width:26px;height:25px;background-position: 0 -199px;}
-#notify {
-	float: left;
-	position: relative;
+/* #logo{display:block;height:77px} */
+.logo 
+{
+	/* display: inline; */
+	height: 67px;
+	overflow: hidden;
+	padding-left: 20px;
+
+	background-position: 0 -228px;
+}
+.logo h1 
+{
+	display: none;
+}
+#logo p 
+{
+	text-align:center;
+	margin-top: 35px;
+	font-weight: bold;
+}
+.twittlogo 
+{
+	display:block;
+	width:26px;
+	height:25px;
+	background-position: 0 -199px;
+}
+#notify .rounded-border 
+{
 	background-color: #EED9BA;
 	border: 2px solid #C7892E;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	min-height: 95px;
-	margin: 0 15px 10px 0;
-	padding: 0 0 10px 0;
-	text-align: right;
+	margin: 0;
+	padding: 0;
+	text-align: left; 
 }
-.notify{background-position: 0 -449px;}
-#advanced {
+.notify
+{
+	background-position: 0 -510px;
+}
+#notify_icon
+{
+	background-image: url('../ccms-sprite.png');
+	background-repeat: no-repeat;
+	background-position: 0 -510px;
+	height: 65px;
+	width: 65px;
+	float:left;
+	margin-top: 20px;
+}
+/*
+IE6 fix:
+*/
+* html #notify_icon
+{
+	background-image: url('../ccms-sprite.gif');
+	background-repeat: no-repeat;
+}
+
+#advanced .rounded-border 
+{
 	background-color: #EDE2F8;
-	margin: 0 auto;
+	margin: 0;
 	padding: 0;
 	border: 2px solid #9E65D7;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
-#notify p, #advanced h2 {
+#notify .header, #advanced .header
+{
 	background: #DFB77C;
 	margin: 0;
 	padding: 3px;
@@ -156,18 +351,45 @@ a.edit, a.editinplace:hover {
 	font-size: 1em;
 	text-align: center;
 }
-#advanced h2{
+#advanced .header
+{
 	background: #C6A5E9;
 	border-bottom-color: #E5D6F5;
 }
-#advanced ul{margin:5px;list-style-type:none;}
-#advanced li{line-height:1.8em;}
-#notify_res {
+#notify_res 
+{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+#notify_res p
+{
+	/* background-color: #EED9BA; */
+	font-variant: normal;
+	text-align: left;
+	/* border-bottom: 0; */
+}
+#notify_res p.versionstatus
+{
+	font-weight: bold;
+	text-align: center;
+	padding: 20px 0 0 0;
+}
+#advanced ul
+{
+	margin: 5px;
+	list-style-type:none;
+}
+#advanced li
+{
+	line-height: 1.8em;
+}
+#notify_res 
+{
 	min-height: 60px;
 	margin-left: 80px;
-	text-align: left;
 }
-#notify_res p.h1 {
+#notify_res p.h1 
+{
 	background: none;
 	border: 0;
 	text-align: left;
@@ -176,19 +398,82 @@ a.edit, a.editinplace:hover {
 
 /* === 1. CORE === */
 /* === ADD PAGE / MANAGE MENU === */
-#fields label {
+#fields label 
+{
 	float: left;
 	padding-top: 3px;
 	width: 85px;
 }
-input[type="text"]{width: 200px;}
-button {margin-right: 15px;}
-optgroup option {padding-left: 10px;}
+/*
+This collides with the installer layout. Use an appropriate span-x class instead where this is needed.
+
+input[type="text"]
+{
+	width: 200px;
+}
+*/
+button 
+{
+	margin-right: 15px;
+}
+optgroup option 
+{
+	padding-left: 10px;
+}
+/*
+We 'solve' this in a more generic way as we need to style all the input/textarea fields in there anyway
+
 #f_de 
 {
 	width: 200px;
 	height: 50px;
 }
+*/
+#fields input.text
+{
+	/* keep room for the HELP icon at right */
+	width: 200px;
+}
+#fields select
+{
+	/* keep room for the HELP icon at right */
+	width: 208px;
+}
+#fields textarea
+{
+	/* also keep space for the HELP icon at right; size should suffice for about 4 lines of text */
+	width: 200px;
+	height: 50px;
+}
+#editor-options
+{
+}
+/* #fields */ #editor-options input
+{
+	/* keep a little distance between the 'yes' and 'no' choices */
+	margin-right: 30px; 
+}
+#editor-options span.ss_sprite_16
+{
+	float: right;
+	margin-right: 0;
+	margin-top: 5px;
+}
+#editor-options label
+{
+	/* clear: both;   -- done by the <br> in the HTML */
+	/* margin-top: -2px; */ /* pull up the baseline so it aligns with the rest (yes/no radios) */
+	vertical-align: baseline;
+}
+#editor-options label.yesno
+{
+	/* force these to display inline in the second 'column' of the form (the float:left labels  being the 1st 'column') */
+	float: none;
+	margin: 5px 3px 0px 0px;
+	font-weight: normal;
+}
+
+
 
 /* [i_a] fix the default edit_area monospace font to be the admin page's regular serif: */
 /* <div id="fields"> */
@@ -243,16 +528,29 @@ optgroup option {padding-left: 10px;}
 }
 
 /* === CODING PRE-TAG === */
-pre {
+pre 
+{
 	font-size: 12px;
 	padding: 0 5px;
 	margin: 5px;
 	background: #f0f0f0 url('../pre_bg.gif') repeat left top;
 	border: 1px solid #ccc;
-	line-height: 18px;
-	width: 95%;
+	width: 95%; /* WARNING: to make sure the scrollbars show up, you'll need to style your <pre> with a FIXED WIDTH IN PIXELS. With just this 95% width, FF3 will expand the box and break the layout */
 	overflow: auto;
-	overflow-Y: hidden;
+	/* overflow-y: hidden; -- not CSS2.1; we don't want to hide, we want a scrollbar, if we need one */
+}
+pre.small
+{
+	font-size: 9px;
+	line-height: 17px;
+	background-image: url('../pre_bg_small.gif');
+}
+/*
+use a hard width to make sure FF3 adds a scrollbar instead of growing the box 
+*/
+#installFrm pre
+{
+	width: 300px; 
 }
 
 /* === 1. CORE === */
@@ -271,8 +569,6 @@ div.ss_help
 	border-right: 5px solid #F7D5D5;
 	border-top: 5px solid #F7D5D5;
 	border-bottom: 5px solid #EFAAAB;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 /* for large tip boxes, i.e. boxes with lots of content: */
@@ -286,8 +582,6 @@ div.ss_help_large
 	border-right: 5px solid #F7D5D5;
 	border-top: 5px solid #F7D5D5;
 	border-bottom: 5px solid #EFAAAB;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
 div.tip-title {
@@ -297,8 +591,6 @@ div.tip-title {
 	color: #FFFFFF;
 	padding: 5px;
 	background: #DB7075;
-	-webkit-border-radius: 20px;
-	-moz-border-radius: 20px;
 	border-radius: 20px;
 }
 div.tip-text {
@@ -311,32 +603,56 @@ div.tip-text {
 
 /* === 1. CORE === */
 /* LOGIN && INSTALL === */
-#logo{display:block;height:77px}
-#logo h1{display:none;}
-#login-wrapper{
-	width:750px;
+#login-wrapper
+{
+	/* width:750px;  -- use the blueprint CSS containers! */
 	background-color:#E6F5D6;
 	border:10px solid #90D244;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	padding:10px;
 }
-#install-wrapper{
-	width:750px;
+#install-wrapper
+{
+	/* width:750px;  -- use the blueprint CSS containers! */
 	background-color:#E6F5D6;
 	border:10px solid #90D244;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	padding:10px;
 }
-#loginFrm label {display: block;}
-#installFrm label {display: block;margin-top:10px;}
-#login-wrapper h2, #install-wrapper h2 {font-size:1.2em;border-bottom:solid 1px #90D244;}
-.loginMsg, .installMsg {background-color:rgba(229,215,238,0.8);margin-bottom:15px;}
-#install.loading {display:block;height:300px;background:transparent url('../spinner.gif') no-repeat 50% 50%;}
-#install {margin-top:10px;}
+#loginFrm label 
+{
+	display: block;
+}
+#installFrm label 
+{
+	display: block;
+	margin-top:10px;
+}
+#login-wrapper h2, #install-wrapper h2 
+{
+	font-size:1.2em;
+	border-bottom:solid 1px #90D244;
+}
+.loginMsg, .installMsg 
+{
+	background-color:#e5d7ee;
+	margin-bottom:15px;
+}
+/* rgba() in a separate scope so IE6/IE7 can run with the basic color instead. */
+.loginMsg, .installMsg 
+{
+	background-color:rgba(229,215,238,0.8); /* is rejected for IE6/IE7; they'll use the rgb color defined above instead */
+}
+#install.loading 
+{
+	display:block;
+	height:300px;
+	background:transparent url('../spinner.gif') no-repeat 50% 50%;
+}
+#install 
+{
+	margin-top:10px;
+}
 
 /* === 1. CORE === */
 /* === MODULES === */
@@ -361,14 +677,14 @@ div.module
 	background-color:#e6f5d6;
 	border:1px solid #9ACC66;
 	text-align:center;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 .module h2 
 {
 	font-size:1em;
 }
+
+
 .hover
 {
 	height:32px;
@@ -380,6 +696,9 @@ div.module
 	background-color:#E2EAF3;
 }
 
+
+
+
 /* === USER MANAGEMENT === */
 #passwordStrength{height:10px;display:block;float:left;}
 .strength0{width:212px;background:#cccccc;}
@@ -389,18 +708,43 @@ div.module
 .strength4{background:#4dcd00;width:166px;}
 .strength5{background:#399800;width:212px;}
 
+
+
 /* === 2. MODULE === */
 /* === LIGHTBOX === */
 .thumbview {
 	width:80px;
 	height:80px;
 	border:solid #E3E3E3 3px;
-	margin: 5px 1px;
+	margin: 5px 1px 1px 1px;
 	padding: 1px;
 	text-align:center;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	display: block;
 }
-.thumbview:hover{background-color:#E6F2D9;border:solid #A5D611 3px;}
-.albumbox img{border:1px solid #000;}
+.thumbview:hover
+{
+	/* background-color: #E6F2D9; */
+	border:solid #A5D611 3px;
+}
+.thumbimgwdel
+{
+	float: left;
+	text-align:center;
+}
+.thumbimgwdel:hover
+{
+	background-color: #E6F2D9;
+}
+.thumbimgwdel input
+{
+	margin: 0;
+	padding: 0;
+	line-height: 1em;
+	height: 1em;
+}
+
 
 /* === BACKUPS === */
 #no-delete-action 
@@ -414,10 +758,16 @@ div.module
 .spinner  
 {
 	z-index: 9998;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
-	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
+	/* 
+	see also why we removed the MSIE filter lines in here:
+	
+	http://developer.yahoo.com/performance/rules.html
+	  (section: Avoid Filters)
+	
+	we can add the opacity filters back in through fixup_css() in 
+	the Combiner, as all CSS travels through there anyway.
+	*/
 	opacity: 0.8;	
-	-moz-opacity: 0.8;
 	background-color: #fff;
 	
     display:block;
@@ -458,21 +808,17 @@ div.warning
 	margin-bottom:1em;
 	border:2px solid #FBC2C4;
 
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 .warning h1,.warning h2 
 {
-	font-size:1.2em;
-	padding:2px 5px;
+	font-size: 1.2em;
+	padding: 2px 5px;
 	margin: 0;
-	background-color:#FBE3E4;
-	border:2px solid #FBC2C4;
-	color:#8a1f11;
-	text-align:center;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
+	background-color: #FBE3E4;
+	border: 2px solid #FBC2C4;
+	color: #8a1f11;
+	text-align: center;
 	border-radius: 5px;
 }
 .warning h2 
@@ -482,4 +828,468 @@ div.warning
 .warning p
 {
 	padding:2px .8em;
+}
+
+
+
+
+.center-text
+{
+	text-align: center;
+}
+.right-text
+{
+	text-align: right;
+}
+.left-text
+{
+	text-align: left;
+}
+.signal-coding
+{
+	color: #8F0000;
+	font-weight: bold;
+}
+
+/*
+table layout
+*/
+tr.unpub_altrgb
+{
+	background-color: #F2D9DE;
+}
+tr.altrgb
+{
+	background-color: #E6F2D9;
+}
+tr.unpub
+{
+	background-color: #EBC6CD;
+}
+
+/* removed from the PHP code: styled now */
+tr.altcolor
+{
+	background-color: #CDE6B3;
+}
+
+td.leftpad-2
+{
+	padding-left: 2px;
+}
+
+
+/* required for IE8/FF3/... to render the 'Create' button in the 'create page' admin screen section */
+div#fields
+{
+	overflow: hidden;
+}
+/* 
+... same for the 'manage menu' section.
+*/
+form#menuForm
+{
+	overflow: hidden;
+}
+/*
+'Manage Current Pages' section doesn't need the hack==fix, as the button isn't in a float:right <div> there.
+For consistency's sake we style it like that anyway!
+*/
+form#delete
+{
+	overflow: hidden;
+}
+/*
+and the other victims of layout: 
+
+the backup management page...
+*/
+form#create-arch, form#delete-arch
+{
+	overflow: hidden;
+	height: 1%;				/* IE6 needs this */
+}
+
+
+
+#permission-manager table th
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#permission-manager table td
+{
+	height: 18px;
+}
+#permission-manager table th.permission-name
+{
+	padding-left: 2px;
+	border-right: solid #AD8CCF 2px;
+	border-bottom: 0;
+}
+#permission-manager table td.altrgb
+{
+	background-color: #EAF3E2;
+}
+#permission-manager table td.regrgb
+{
+	background-color: #fff;
+}
+#permission-manager .hover
+{
+	height: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+#permission-manager .hover:hover
+{
+	border:solid 2px red;
+	/* compensate for the thicker border: */
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+
+
+
+#content-owners table th
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#content-owners table td
+{
+	height: 18px;
+}
+#content-owners table th.pagename
+{
+	padding-left: 2px;
+	border-right: solid #AD8CCF 2px;
+	border-bottom: 0;
+	font-weight: normal;
+}
+#content-owners table td.altrgb
+{
+	background-color: #EAF3E2;
+}
+#content-owners table td.regrgb
+{
+	background-color: #fff;
+}
+#content-owners .hover
+{
+	height: 18px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+#content-owners .hover:hover
+{
+	border:solid 2px red;
+	/* compensate for the thicker border: */
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+
+
+
+
+#template-editor #changeTmp label 
+{
+	display: inline;
+}
+#template-editor #changeTmp select
+{
+	margin-top: 0;
+	margin-bottom: 0;
+}
+#template-editor textarea
+{
+	height:400px;
+	width:99%;
+	color:#000;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/*
+hack to make sure that the extra checkmark label generated/injected by edit_Area renders correctly 
+*/
+#EditAreaArroundInfos_content label
+{
+	float: none;
+	display: inline;
+}
+
+
+
+
+
+/*
+remember that 'create-user' is a <div> in a 'liquid' layout!
+
+same goes for #edit-user-details, which sits in a subpage of the user management.
+*/
+#create-user input.text, #edit-user-details input.text
+{
+	width: 98%;
+}
+#create-user select, #edit-user-details select
+{
+	width: 99%;
+}
+/* prevent the 'buttons' from wrapping too early: */
+#create-user button, #edit-user-details button
+{
+	margin-left: 0;
+}
+#create-user .button, #edit-user-details .button
+{
+	margin-right: 0;
+}
+/*
+The 'password strength' bar in a liquid design is just like a 'liquid two column design':
+
+we have one part floating left, the other right, and we make sure both occupy the entire 
+height available to them.
+
+The trick here is that the color remains in the parent, and the right-most 'column' is
+resized to 'erase' that color again.
+
+To make the liquid layout work for this strength bar, we must 'resize' BOTH left and right
+column so both keep a total of width=100%.
+
+NOTE: to compensate for testing with borders and IE vs. FF calculation mishaps, we keep
+      the total at 99% instead of 100%!
+	  
+	  IE6 has a bit of a drawing issue as it doesn't give the second column a real 100%
+	  height; this cannot be remedied by giving it a 100.1% height; instead, putting
+	  some actual content in each column (a non-breaking space) resolves the issue!
+
+PLUS: same password strength liquid layout story again for #edit-user-details
+*/
+#create-user #passwordStrength, #edit-user-details #passwordStrength
+{ 
+	width: 100%; 
+	height: 10px;
+	line-height: 10px; /* <-- needed for IE6 to ensure the bar is /thin/ instead of some thick block! */
+}
+#create-user #passwordStrength #pws1, #edit-user-details #passwordStrength #pws1
+{
+	height: 100%;
+	float: left;
+	margin: 0;
+	/* border: 1px solid red; */
+}
+#create-user #passwordStrength #pws2, #edit-user-details #passwordStrength #pws2
+{
+	background-color: #fff;
+	height: 100%;
+	float: right;
+	margin: 0;	
+	/* border: 1px solid blue; */
+}
+#create-user .strength0 #pws1, #edit-user-details .strength0 #pws1
+{
+	width: 99%;
+}
+#create-user .strength1 #pws1, #edit-user-details .strength1 #pws1
+{
+	width: 20%;
+}
+#create-user .strength2 #pws1, #edit-user-details .strength2 #pws1
+{
+	width: 40%;
+}
+#create-user .strength3 #pws1, #edit-user-details .strength3 #pws1
+{
+	width: 60%;
+}
+#create-user .strength4 #pws1, #edit-user-details .strength4 #pws1
+{
+	width: 80%;
+}
+#create-user .strength5 #pws1, #edit-user-details .strength5 #pws1
+{
+	width: 99%;
+}
+#create-user .strength0 #pws2, #edit-user-details .strength0 #pws2
+{
+	width: 40.1%;
+}
+#create-user .strength1 #pws2, #edit-user-details .strength1 #pws2
+{
+	width: 79.1%;
+}
+#create-user .strength2 #pws2, #edit-user-details .strength2 #pws2
+{
+	width: 59.1%;
+}
+#create-user .strength3 #pws2, #edit-user-details .strength3 #pws2
+{
+	width: 39.1%;
+}
+#create-user .strength4 #pws2, #edit-user-details .strength4 #pws2
+{
+	width: 19.1%;
+}
+#create-user .strength5 #pws2, #edit-user-details .strength5 #pws2
+{
+	width: .1%;
+}
+
+
+
+
+
+
+
+#refresh_everytin_form button
+{
+	margin: 0 auto;
+	width: 50%;    /* without the 'width', the button is NOT placed center, despite the 'auto' margin! */
+	float: none;
+}
+
+
+
+
+
+
+
+/* === 2. MODULE === */
+/* === PAGE EDITOR (DEFAULT MODULE) === */
+#edit-page textarea#content
+{
+	height:345px;
+	width:100%;
+	color:#000;
+}
+
+
+
+
+
+/* === 2. MODULE === */
+/* === NEWS === */
+#news-manager div#show-author label, #news-manager div#show-date label, #news-manager div#show-teaser label
+{
+	display: inline;
+	padding-left: 20%;
+	padding-right: 1%;
+}
+
+#news-writer #newsTeaser
+{
+	height: 100px;
+}
+
+#news-writer #newsContent
+{
+	height: 350px;
+}
+
+
+
+
+
+/* === 2. MODULE === */
+/* === GUESTBOOK / COMMENTS === */
+/*
+#comment-manager table tr.head0 th
+{
+	border-top: solid #AD8CCF 1px;
+}
+*/
+#comment-manager table tr.head0 th.rowspan2
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#comment-manager table tr.head1 th
+{
+	border-bottom: solid #AD8CCF 2px;
+}
+#comment-manager table tr.head1 th
+{
+	border-top: dotted #AD8CCF 1px;
+}
+#comment-manager table tr.row1 td
+{
+	border-top: dotted #AD8CCF 1px;
+}
+#comment-manager .hover
+{
+	padding-top: 2px;
+	padding-bottom: 2px;
+	vertical-align: top;
+}
+#comment-manager .hover label
+{
+	width: 100%;
+	height: 100%;
+	margin: 0;
+}
+#comment-manager .hover:hover
+{
+	border:solid 2px red;
+	/* compensate for the thicker border: */
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+
+
+
+
+
+
+
+/*
+Because tables can only shrink so much and laptop/PC displays aren't always HDready ;-)
+you may find a few liquid layout situations where the table 'overflows' into the next column
+of the liquid layout.
+
+To prevent this from happening (screwing the display hopelessly), we just allow a table,
+when in dire need, to add a horizontal scrollbar.
+*/
+.module form div.table_inside
+{
+	overflow-x: auto;
+	overflow-y: hidden;	/* needed for IE6 */
+	border: 1px solid #AD8CCF;
+	width: 99.7%;			/* must be less than 100% for IE6/7/8 to ensure the border is shown on all sides! */
+	margin-left: 0;
+	margin-right: 0;
+}
+.module form div.table_inside table
+{
+	margin-left: 0;
+	margin-right: 0;
+	width: 100%;
+}
+
+
+
+
+.nowrap 
+{
+	white-space: nowrap; 
+}
+
+
+
+
+.log 
+{
+	font: 10pt Consolas, Monaco, fixed;
+	width: 100%;
+}
+
+
+
+
+body
+{
+/*
+  background-image: url(src/grid10.png);
+  background-repeat: repeat;
+*/
 }

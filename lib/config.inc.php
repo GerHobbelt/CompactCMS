@@ -48,7 +48,7 @@ This config file is only loaded /once/ during regular web site operation.
 $cfg['sitename']    = "";           // Your site name - this will show in the front-end, e.g. "CompactCMS"
 $cfg['language']    = "en";         // Select the language of your (front-end) website - en, nl, de, es.
 $cfg['rootdir']     = "/";          // The root directory where CCMS is installed under, must include trailing slash ('/').
-$cfg['authcode']    = "";           // Add ?preview=X (where X is your authcode) to your address bar to preview unpublished items, e.g. "12345". 
+$cfg['authcode']    = "";           // The salt for the user password hashes and preview authorization code. Add ?preview=X (where X is your authcode-based hash) to your address bar to preview unpublished items. 
 
 // Detailed configuration. By default shouldn't need adjusting.
 $cfg['version']     = true;         // Check for the latest CompactCMS version [true/false]
@@ -72,6 +72,7 @@ $cfg['default_template'] = 'ccms';  // pick your default template, e.g. 'ccms', 
 $cfg['enable_gravatar'] = true;  // set to 'false' if you don't want to show 'gravatars' in your comment pages for each commenter.
 
 $cfg['admin_page_dynlist_order'] = 'FTS0';    // default sort order for the page list in the admin screen: F=file name, T=title, S=subtitle, D=description, A=active/published, P=printable, C=coding, H=[hyper]link, I=menu ID, 1=toplevel, 2=sublevel, L=template, M=module (plugin), 0 = page_id
+$cfg['verify_alert'] = '';    	// whether you want to see 'are you sure' dialogs pooping up for: 'X': close window (and discard edits which have not yet been saved), 'D': delete selected items
 
 
 $cfg['IN_DEVELOPMENT_ENVIRONMENT'] = false; // set to FALSE for any release install (where you are not developing on a local & very safe machine)
