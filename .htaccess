@@ -22,7 +22,7 @@ Options +FollowSymLinks
 
 <IfDefine CCMS_installed>
 
-RewriteEngine On 
+RewriteEngine On
 # RewriteLog         /var/log/apache2/example.com.mod_rewrite.log
 # RewriteLogLevel    7
 
