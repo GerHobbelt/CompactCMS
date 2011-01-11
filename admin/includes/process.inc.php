@@ -1325,11 +1325,18 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 		if ($handle) 
 		{
 			// PHP5+ Feature
-			// $contents = stream_get_contents($handle);
-			// PHP4 Compatibility
-			$contents = fread($handle, filesize($filename));
-			$contents = str_replace("<br />", "<br>", $contents);
+			$contents = stream_get_contents($handle);
+			if (0)
+			{
+				// PHP4 Compatibility
+				$flen = filesize($filename);
+				if ($flen > 0)
+				{
+					$contents = fread($handle, $flen);
+				}
+			}
 			fclose($handle);
+			$contents = str_replace('<br />', '<br>', $contents);
 		} 
 		else 
 		{ 

@@ -75,11 +75,18 @@ if(!empty($get_temp))
 	{
 		$handle = fopen($dir_temp.$get_temp, "r");
 		// PHP5+ Feature
-		// $contents = stream_get_contents($handle);
-		// PHP4 Compatibility
-		$contents = @fread($handle, filesize($dir_temp.$get_temp));
-		$contents = str_replace("<br />", "<br>", $contents);
+		$contents = stream_get_contents($handle);
+		if (0)
+		{
+			// PHP4 Compatibility
+			$flen = filesize($dir_temp.$get_temp);
+			if ($flen > 0)
+			{
+				$contents = @fread($handle, $flen);
+			}
+		}
 		fclose($handle);
+		$contents = str_replace("<br />", "<br>", $contents);
 	} 
 } 
 
