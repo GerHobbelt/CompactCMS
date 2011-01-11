@@ -59,7 +59,7 @@ if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 $do	= getGETparam4IdOrNumber('do');
 $btn_backup = getPOSTparam4IdOrNumber('btn_backup');
 
-if($do=="backup" && $btn_backup=="dobackup") 
+if($do=='backup' && $btn_backup=='dobackup') 
 {
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');

@@ -39,7 +39,7 @@ if(is_file($mod_structure)) {
 	$mod_query 	= file_get_contents($mod_structure);
 	$tok 		= strtok($mod_query, ";");
 	while ($tok !== false) {
-		$results = $db->Query("$tok");
+		$results = $db->Query($tok);
 		$tok = strtok(";");
 	}
 } // Else no database structure file was found (depends on module, no check possible).
