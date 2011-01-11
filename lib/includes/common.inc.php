@@ -68,7 +68,7 @@ empty strings equal zero as well as "0" strings do.
 
 @remark This function is used, among other things, in various spots to provide backwards compatibility 
         with older CCMS releases which had 'zerofill'ed numeric columns in 
-		the database.
+        the database.
 */
 function rm0lead($str)
 {
@@ -325,14 +325,14 @@ accept '../' directory parts anywhere in the path.
 
 WARNING: setting $accept_parent_dotdot = TRUE can be VERY DANGEROUS
          without further checking the result whether it's trying to
-		 go places we don't them to go! 
+         go places we don't them to go! 
 		 
-		 Be vewey vewey caweful!
+         Be vewey vewey caweful!
 		 
-		 Just to give you an idea:
-		     ../../../../../../../../../../../../etc/passwords
-		 would be LEGAL *AND* VERY DANGEROUS if the accepted path is not
-		 validated further upon return from this function!
+         Just to give you an idea:
+           ../../../../../../../../../../../../etc/passwords
+         would be LEGAL *AND* VERY DANGEROUS if the accepted path is not
+         validated further upon return from this function!
 */
 function filterParam4FullFilePath($value, $def = null, $accept_parent_dotdot = false)
 {
@@ -1582,18 +1582,41 @@ function merg_path_elems( /* ... */ )
 	{
 		return false;
 	}
-	
-	$path = str_replace("\\", '/', func_get_arg(0));
-	
-	for($i = 1; $i < func_num_args(); $i++) 
+
+	/*                                                                                                                       \    |    |
+	 * PHP 5.2.x and before:                                                                                                    \ """""""""  /
+	 *                                                                                                                  \  """""""'""""/
+	 * See  http://nl2.php.net/manual/en/function.func-get-arg.php                                                            \""""'"|'"""""----
+	 * where the NOTES section says:                                                                                          "\""'""|""'"""
+	 *                                                                                                              -----"""\""'"""""""\
+	 *                                                                                                                  """'""'""'"""   \
+	 *  Because this function depends on the current scope to determine parameter details, it cannot         e@@@@@@@@@^"""'"""""'""      \
+	 *  be used as a function parameter in versions prior to 5.3.0. If this value must be passed, the    _@@@@@@@@@@@  ee""""e"""".@e
+	 *  results should be assigned to a variable, and that variable should be passed.                  _e@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	 *                                                                                                  @@@@@@"@~~~~~~~~@@@.@@~~~~~~.@@e
+	 *                                                                                                  @ @@@@.@     . ..@@@@ .    . ..@
+	 * NOW I recall why I hated PHP! !@#$%^&*!                                                            @ @@@@."   ... ..@@@@e.   . ...@
+	 *                                                                                                  @."@@@@@eeeeeeee@@~ ~@@eeeeee@@@
+	 *                                              [Ger Hobbelt]                                       @e.@@@@@@@@@@@@@@ | @@@@@@@@@'
+	 *                                                                                                  @eeeeeee@@@@@@@[ : ]@@@@@'
+	 *                                                                                                      "'"""@@@@@@@::@::@@@@@
+	 *                                                                                                      '"""" @@@@@@@@@@@@@@@@@
+	 *                                                                                                  ""'"   v@@@@@@@@@v@@@v@@
+	 *                                                                                                  "'"      V  VV  V  V    V
+	 */
+	$arg = func_get_arg(0);
+	$path = str_replace("\\", '/', $arg);
+
+	for($i = 1; $i < func_num_args(); $i++)
 	{
-		$part = str_replace("\\", '/', func_get_arg($i));
+		$arg = func_get_arg($i);
+		$part = str_replace("\\", '/', $arg);
 		if (empty($part)) continue;
-		
+
 		if (substr($path, -1, 1) != '/') $path .= '/';
 		// strip off leading '/' of any subpart!
 		if ($part[1] == '/') $part = substr($part, 1);
-		
+
 		$path .= $part;
 	}
 	
