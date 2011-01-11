@@ -62,9 +62,9 @@ class ccmsParser
 		$chh = $cond[1];
 		$wert = $cond[2];
 		$wert = preg_replace("( ['|\"] )","",$wert);
-		if($chh == "gt") return ($value >   $wert);
+		if($chh == "gt") return ($value >  $wert);
 		if($chh == "ge") return ($value >= $wert);
-		if($chh == "lt") return ($value <   $wert);
+		if($chh == "lt") return ($value <  $wert);
 		if($chh == "le") return ($value <= $wert);
 		if($chh == "eq") return ($value == $wert);
 		if($chh == "ne") return ($value != $wert);
@@ -301,7 +301,7 @@ class ccmsParser
 				# The point?
 				#
 				# Watch out for recursive {%tag%} self-references: they will make the 
-				# engine run until it hits the 
+				# engine run until it hits the edge.
 				#
 				# print variable value by replacing the tag with its value (split up in chunks), then rewinding the index by -1, so this template entry will be hit another time, now with altered content
 				$a = $this->splitTemplate(strval($this->getvar($vars, $matches[1])));
