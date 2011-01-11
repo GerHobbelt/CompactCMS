@@ -845,7 +845,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		if (!preg_match('/@import\s+url\(([^)]+)\);?(.*)/s', $contents, $matches))
 		{
 			send_response_status_header(500); // Internal Failure
-			die();
+			die('import url regex croaked');
 		}
 		$url = trim($matches[1]);
 		$contents = $matches[2];

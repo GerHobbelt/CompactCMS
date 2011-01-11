@@ -714,9 +714,9 @@ function getPOSTparam4HumanName($name, $def = null)
 	return filterParam4HumanName($_POST[$name], $def);
 }
 
-/*
-Accepts any text
-*/
+/**
+ * Accepts any text, just as long as it doesn't come with HTML tags
+ */
 function filterParam4HumanName($value, $def = null)
 {
 	if (!isset($value))
