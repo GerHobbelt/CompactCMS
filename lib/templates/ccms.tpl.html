@@ -35,13 +35,16 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <title>{%title%}</title>
 <meta name="description" content="{%sitename%} | {%desc%}" />
 <meta name="keywords" content="{%keywords%}" />
-<link href="{%rootdir%}lib/templates/ccms/base.css,layout.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/base.css,layout.css,last_minute_fixes.css" />
+<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/ie.css" />
+<![endif]-->
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
 <body>
 <div class="container-25">
-	<div id="header" class="span-25">
+	<div id="header" class="span-25 last">
 		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
 		<div class="span-20 last" id="navigation">
 			<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
@@ -57,7 +60,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 		
 	</div>
 
-	<div id="content" class="span-21 last">
+	<div id="content" class="span-20 last">
 		<div id="printable" class="span-21 last" style="text-align: right;">
 			{%breadcrumb%}
 			{%IF printable (eq Y)%}

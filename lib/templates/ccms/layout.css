@@ -2,6 +2,30 @@
 Template and CCMS output specific styling to make it look good.
 */
 
+
+
+
+
+
+
+/* override style */
+body {font-family: "Myriad Pro",helvetica,arial,sans-serif;background: url('body-bg.gif') repeat-x;width: 100%;}
+#header {background: transparent url('header.jpg') no-repeat 0 0;padding-top: 10px;height: 114px;}
+#navigation a {padding: 5px 13px;text-decoration: none;color: #FFFFFF;}
+#navigation a:hover {text-decoration: underline;color: #FFFFFF;}
+#content {margin-top: 20px;}
+#footer {background: url('footer-bg.gif') repeat-x;width: 100%;text-align: center;padding-top: 15px;}
+#footer p {height: 25px; background: url('icon-wa.gif') no-repeat 60% 0;}
+#header h1 {background: url('logo.gif') no-repeat;height: 81px;}
+#header h1 span {display: none;}
+
+
+
+
+
+
+
+
 /*
 warning from sitemap.php when you're previewing content which has its 'published' flag set to NO.
 */
@@ -28,3 +52,33 @@ Styling the back-to-overview text for a lightbox album
 	text-align:right;
 	clear:both;
 }
+
+
+
+
+.nowrap 
+{
+	white-space: nowrap; 
+}
+
+
+
+
+.log 
+{
+	font: 10pt Consolas, Monaco, fixed;
+	width: 100%;
+}
+
+
+
+
+body
+{
+/*
+  background-image: url(src/grid10.png);
+  background-repeat: repeat;
+*/
+}
+
+
