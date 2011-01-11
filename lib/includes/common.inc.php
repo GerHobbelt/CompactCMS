@@ -535,7 +535,7 @@ function filterParam4DisplayHTML($value, $def = null)
 	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
 if (0)
 {
-	$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+	$value = htmlentities($value, ENT_NOQUOTES, 'UTF-8');
 }
 else
 {
@@ -727,7 +727,7 @@ function filterParam4HumanName($value, $def = null)
 	if (empty($value))
 		return $def;
 	
-	return htmlentities($value, ENT_NOQUOTES, "UTF-8");
+	return htmlentities($value, ENT_NOQUOTES, 'UTF-8');
 }
 
 
@@ -810,7 +810,7 @@ function filterParam4EmailBody($value, $def = null)
 		return $def;
 
 	// TODO: real email message body filter?
-	return htmlspecialchars($value);
+	return htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
 }
 
 

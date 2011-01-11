@@ -654,7 +654,7 @@ if($nextstep == md5('final') && CheckAuth())
 			<pre class="small"><?php
 				foreach($sqldump as $line)
 				{
-					echo htmlspecialchars($line);
+					echo htmlspecialchars($line, ENT_COMPAT, 'UTF-8');
 				}
 			?></pre>
 <?php
@@ -885,7 +885,7 @@ if($nextstep == md5('final') && CheckAuth())
 			{
 ?>
 				<h2>config.inc.php Configuration Values - after modification</h2>
-				<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
+				<pre class="small"><?php echo htmlspecialchars($configinc, ENT_COMPAT, 'UTF-8'); ?></pre>
 <?php
 			}
 			
@@ -945,7 +945,7 @@ if($nextstep == md5('final') && CheckAuth())
 					{
 ?>
 						<h2>.htaccess Rewrite Rules - after modification</h2>
-						<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
+						<pre class="small"><?php echo htmlspecialchars($htaccess, ENT_COMPAT, 'UTF-8'); ?></pre>
 <?php
 					}
 					

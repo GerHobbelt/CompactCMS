@@ -202,7 +202,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		</div>
 		
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
-			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 			
 			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
 			<div class="right">

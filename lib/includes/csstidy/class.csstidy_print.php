@@ -382,7 +382,7 @@ class csstidy_print
     function _htmlsp($string, $plain)
     {
         if (!$plain) {
-            return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
+            return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
         }
         return $string;
     }

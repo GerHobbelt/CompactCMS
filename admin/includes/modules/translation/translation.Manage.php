@@ -311,7 +311,7 @@ if ($do == 'update')
 						}
 						
 						//$content .= "\n".$entry_phpcode.' = /* BABELFISH */ "'.$entry.'";';
-						//$content .= "\n:::".htmlspecialchars($orig_str);
+						//$content .= "\n:::".htmlspecialchars($orig_str, ENT_COMPAT, 'UTF-8');
 					}
 				}
 				//file_put_contents(BASE_PATH . '/media/files/trial.html', $content);
@@ -349,7 +349,7 @@ if ($do == 'update')
 				file_put_contents(BASE_PATH . '/media/files/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
 				if (0)
 				{
-					echo "<html><body><pre>" . htmlspecialchars($orig_content);
+					echo "<html><body><pre>" . htmlspecialchars($orig_content, ENT_COMPAT, 'UTF-8');
 				}
 
 

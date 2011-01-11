@@ -169,7 +169,7 @@ if ($do_update_or_livefilter && checkAuth())
 		
 		if (!empty($name) && !empty($_SESSION[$name]))
 		{
-			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
+			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name], ENT_COMPAT, 'UTF-8') . '\'">&#160;</span>';
 		}
 		else
 		{
@@ -1386,7 +1386,7 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
 		
 		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
-			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 			<!--<br/>-->
 			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
 			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
