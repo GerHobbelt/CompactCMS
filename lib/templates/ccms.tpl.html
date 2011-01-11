@@ -47,17 +47,21 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 	<div id="header" class="span-25 last">
 		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
 		<div class="span-20 last" id="navigation">
-			<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
+			{%IF extramenu (eq ())%} 
+				<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
+			{%ELSE%} 
+				{%extramenu%}
+			{%/IF extramenu%} 
 		</div>
 	</div>
 
 	<h2>{%subheader%}</h2>
 
 	<div id="left" class="span-4 colborder">
-		<p style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
+		<div style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
 			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="{%lang:backend:administration!quoteprotect%}">{%lang:login:login%}</a>
-		</p>
-		
+		</div>
+		{%leftmenu%}
 	</div>
 
 	<div id="content" class="span-20 last">
@@ -69,12 +73,16 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 		</div>
 		
 		{%content%}
-		
-		{%leftmenu%}
+
+		<div id="rightmenu">
+		{%rightmenu%}
+		</div>
 	</div>
 </div>
 
 <div id="footer" class="quiet small">
+	{%footermenu%}
+	
 	<p>&copy; <?php echo date('Y'); ?> {%sitename%} | Maintained with <a href="http://www.compactcms.nl">CompactCMS</a></p>
 </div>
 
