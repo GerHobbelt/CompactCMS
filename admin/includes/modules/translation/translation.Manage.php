@@ -389,22 +389,6 @@ if ($do == 'update')
 				
 				@mkdir(BASE_PATH . '/media/files/lang-babel');
 				file_put_contents(BASE_PATH . '/media/files/lang-babel/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
-				if (0)
-				{
-					echo "<html><body><pre>" . htmlspecialchars($orig_content);
-
-
-
-					if (0)
-					{
-						echo '<h1>$_POST</h1>';
-						echo "<pre>";
-						var_dump($_POST);
-						echo "</pre>";
-					}
-
-					die();
-				}
 				$status_message = "The augmented translation data has been written to the file " . BASE_PATH . '/lib/languages/' . 'en' . '.inc.php';
 				$status = 'notice';
 				$error = false;
