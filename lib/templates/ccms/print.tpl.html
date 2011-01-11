@@ -85,7 +85,7 @@ global $db,$cfg,$ccms;
 
 	<div id="content" class="span-25">
 		<div id="printable" style="text-align: right;">
-			<span id="pageref"><a href="{%rootdir%}{%urlpage%}.html">{%lang:system:tooriginal%}</a></span>
+			<span id="pageref"><a href="{%rootdir%}{%urlpage%}.html{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:system:tooriginal%}</a></span>
 		</div>
 		
 		{%content%}

@@ -159,7 +159,7 @@ $ccms['printing'] = getGETparam4boolYN('printing', 'N');
 
 $preview = getGETparam4IdOrNumber('preview'); // in fact, it's a hash plus ID!
 $preview = IsValidPreviewCode($preview);
-$ccms['preview'] = $preview;
+$ccms['preview'] = ($preview ? 'Y' : 'N');
 
 
 // This files' current version
@@ -399,6 +399,7 @@ if (0)
 		// BREADCRUMB ==
 		// Create breadcrumb for the current page
 		$preview_checkcode = GenerateNewPreviewCode($row->page_id, null);
+		$ccms['previewcode'] = $preview_checkcode;
 		
 		$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
 

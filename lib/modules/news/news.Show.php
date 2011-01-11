@@ -87,7 +87,8 @@ if ($newsrows === false)
 
 
 // generate the preview code when applicable:
-$preview_checkcode = ($ccms['preview'] ? GenerateNewPreviewCode(null, $pageID) : false);
+$preview_checkcode = ($ccms['preview'] == 'Y' ? GenerateNewPreviewCode(null, $pageID) : false);
+$ccms['previewcode'] = $preview_checkcode;
 
 
 ?>
@@ -168,7 +169,7 @@ if(count($newsrows) > 0)
 					if ($i == 0)
 					{
 						// and augment the breadcrumb trail and other template variables:
-						$preview_qry = ($ccms['preview'] ? '?preview=' . $preview_checkcode : '');
+						$preview_qry = ($ccms['preview'] == 'Y' ? '?preview=' . $preview_checkcode : '');
 						$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a></span>';
 						$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
 
