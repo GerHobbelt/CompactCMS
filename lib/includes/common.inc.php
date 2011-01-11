@@ -530,10 +530,60 @@ function filterParam4DisplayHTML($value, $def = null)
 	if (empty($value))
 		return $def;
 	
-	// TODO: use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
+	// use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
 	
 	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
-	//$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+if (0)
+{
+	$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+}
+else
+{
+    $config = array(
+				  'safe' => 1
+				// , 'elements' => 'a, em, strong'
+				);
+    $value = htmLawed($value, $config);
+}
+	
+	return $value;
+}
+
+
+
+
+
+function getGETparam4RAWHTML($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4RAWHTML(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4RAWHTML($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4RAWHTML($_POST[$name], $def);
+}
+
+/*
+Accepts any non-aggressive HTML
+*/
+function filterParam4RAWHTML($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	// use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
+	
+	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
     $config = array(
 				  'safe' => 1
 				// , 'elements' => 'a, em, strong'
@@ -542,6 +592,53 @@ function filterParam4DisplayHTML($value, $def = null)
 	
 	return $value;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getGETparam4RAWCONTENT($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4RAWCONTENT(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4RAWCONTENT($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4RAWCONTENT($_POST[$name], $def);
+}
+
+/*
+Accepts ANY CONTENT
+*/
+function filterParam4RAWCONTENT($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = strval($value); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	return $value;
+}
+
+
+
+
 
 
 

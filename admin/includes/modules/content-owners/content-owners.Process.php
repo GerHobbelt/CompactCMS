@@ -69,7 +69,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
  * Either INSERT or UPDATE preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
 	// Only if current user has the rights
 	if($_SESSION['ccms_userLevel']>=$perm['manageOwners']) 

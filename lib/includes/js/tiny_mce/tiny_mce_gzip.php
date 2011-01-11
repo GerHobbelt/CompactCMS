@@ -1,6 +1,22 @@
 <?php
 
-// $Id: tiny_mce_gzip.php 315 2007-10-25 14:03:43Z spocke $
+/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
+if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
+
+/**
+ * tiny_mce_gzip.php
+ *
+ * Copyright 2009, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://tinymce.moxiecode.com/license
+ * Contributing: http://tinymce.moxiecode.com/contributing
+ *
+ * This file compresses the TinyMCE JavaScript using GZip and
+ * enables the browser to do two requests instead of one for each .js file.
+ *
+ * It's a good idea to use the diskcache option since it reduces the servers workload.
+ */
 
 	// Set the error reporting to minimal.
 	@error_reporting(E_ERROR | E_WARNING | E_PARSE);
@@ -25,8 +41,8 @@
 		$suffix = "";
 		break;
 	}
-	$cachePath = "../cache/"; // Cache path, this is where the .gz files will be stored
-	$expiresOffset = 3600 * 24 * 7; // Cache for 7 days in browser cache
+	$cachePath = realpath("../cache/"); // Cache path, this is where the .gz files will be stored
+	$expiresOffset = 3600 * 24 * 10; // Cache for 10 days in browser cache
 	$content = "";
 	$encodings = array();
 	$supportsGzip = false;
@@ -40,10 +56,13 @@
 	*/);
 
 	// Headers
-	header("Content-type: text/javascript");
-	header("Vary: Accept-Encoding");  // Handle proxies
-	header("Expires: " . gmdate("D, d M Y H:i:s", time() + $expiresOffset) . " GMT");
-
+	if (0)
+	{
+		header("Content-type: text/javascript");
+		header("Vary: Accept-Encoding");  // Handle proxies
+		header("Expires: " . gmdate("D, d M Y H:i:s", time() + $expiresOffset) . " GMT");
+	}
+	
 	// Is called directly then auto init with default settings
 	if (!$isJS) {
 		echo getFileContents("tiny_mce_gzip.js");
@@ -55,6 +74,12 @@
 	if ($diskCache) {
 		if (!$cachePath)
 			die("alert('Real path failed.');");
+		if (!is_dir($cachePath))
+		{
+			@mkdir($cachePath);
+			if (!is_dir($cachePath))
+				die("alert('server-side mkdir failed.');");
+		}
 
 		$cacheKey = getParam("plugins", "") . getParam("languages", "") . getParam("themes", "") . $suffix;
 

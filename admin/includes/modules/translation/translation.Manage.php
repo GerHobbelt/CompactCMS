@@ -235,7 +235,7 @@ if ($do == 'update')
 {
 	$error = true;
 	
-	$content = (!empty($_POST['content']) ? $_POST['content'] : ''); // must be RAW CONTENT
+	$content = getPOSTparam4RAWHTML('content'); // must be RAW CONTENT
 	if (!empty($content))
 	{
 		$to_lang_arr = collect_translations($to_lang);
@@ -389,22 +389,6 @@ if ($do == 'update')
 				
 				@mkdir(BASE_PATH . '/media/files/lang-babel');
 				file_put_contents(BASE_PATH . '/media/files/lang-babel/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
-				if (0)
-				{
-					echo "<html><body><pre>" . htmlspecialchars($orig_content);
-
-
-
-					if (0)
-					{
-						echo '<h1>$_POST</h1>';
-						echo "<pre>";
-						var_dump($_POST);
-						echo "</pre>";
-					}
-
-					die();
-				}
 				$status_message = "The augmented translation data has been written to the file " . BASE_PATH . '/lib/languages/' . 'en' . '.inc.php';
 				$status = 'notice';
 				$error = false;
@@ -507,8 +491,15 @@ if ($do == 'update')
 	}
 	?>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 </div>
 <script type="text/javascript">

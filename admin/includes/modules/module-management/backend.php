@@ -32,6 +32,12 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 /* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
+
+// the code on this page is currently unused!
+die('Illegal entry point!'); 
+
+
+
 /*
 We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
 */
@@ -59,7 +65,7 @@ if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 $do	= getGETparam4IdOrNumber('do');
 $btn_backup = getPOSTparam4IdOrNumber('btn_backup');
 
-if($do=="backup" && $btn_backup=="dobackup") 
+if($do=='backup' && $btn_backup=='dobackup') 
 {
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');
