@@ -1,16 +1,13 @@
 /*
  ---
 
- file: Desktop.css
+ file: desktop.css
 
- description: MUI - Desktop, column, and panel css.
+ description: MUI - Desktop css.
 
  copyright: (c) 2010 Contributors in (/AUTHORS.txt).
 
  license: MIT-style license in (/MIT-LICENSE.txt).
-
- note:
- This documentation is taken directly from the javascript source files. It is built using Natural Docs.
 
  provides: css for default theme
 
@@ -31,7 +28,7 @@ html, body { overflow: hidden; height: 100%; margin: 0; background: #fff; }
 #topNav a:hover { text-decoration: none; }
 
 /* Navbar */
-#desktopNavbar { background: #f2f2f2; height: 30px; margin: 0 0px; overflow: hidden; /* Remove this line if you want the menu to be backward compatible with Firefox 2 */ }
+#desktopNavbar { background: #f2f2f2; height: 30px; margin: 0 0; overflow: hidden; /* Remove this line if you want the menu to be backward compatible with Firefox 2 */ }
 #desktopNavbar ul { padding: 0; margin: 0; list-style: none; font-size: 12px; }
 #desktopNavbar li { float: left; }
 #desktopNavbar a { display: block; }
@@ -47,6 +44,7 @@ html, body { overflow: hidden; height: 100%; margin: 0; background: #fff; }
 #desktopNavbar li ul li a:hover .check { background: #fff; }
 #desktopNavbar li:hover ul, #desktopNavbar li.ieHover ul, #desktopNavbar li li.ieHover ul, #desktopNavbar li li li.ieHover ul, #desktopNavbar li li:hover ul, #desktopNavbar li li li:hover ul { /* lists nested under hovered list items */ left: auto; }
 #desktopNavbar li:hover { /* For IE7 */ position: static; }
+
 li.divider { margin-top: 2px; padding-top: 3px; border-top: 1px solid #ebebeb; }
 #pageWrapper { position: relative; overflow: hidden; /* This can be set to hidden or auto */ border-top: 1px solid #909090; border-bottom: 1px solid #909090; }
 
@@ -59,13 +57,13 @@ li.divider { margin-top: 2px; padding-top: 3px; border-top: 1px solid #ebebeb; }
 .column { position: relative; float: left; overflow: hidden; /* Required by IE6 */ }
 
 /* Panels */
-.panel { position: relative; overflow: auto; background: #f8f8f8; border-bottom: 1px solid #b9b9b9; }
+.panel { position: relative; overflow: auto; background: #f8f8f8; border-bottom: 1px solid #b9b9b9; clear:both; }
 .panelWrapper.collapsed .panel-header { border-bottom: 0; }
 .panelAlt { background: #f2f2f2; }
 .bottomPanel .panel { border-bottom: 0; }
 .pad { padding: 8px; }
 #mainPanel2 { background: #fff; }
-.panel-header { position: relative; background: #f1f1f1 url(../images/bg-panel-header.gif) repeat-x; height: 30px; overflow: hidden; border-bottom: 1px solid #d3d3d3; }
+.panel-header { position: relative; background: #f1f1f1 url(../images/bg-panel-header.gif) repeat-x; height: 30px; border-bottom: 1px solid #d3d3d3; }
 .panel-headerContent { padding-top: 2px; display: table-cell }
 .panel-header h2 { display: inline-block; font-size: 12px; margin: 0; padding: 3px 8px 0 8px; height: 22px; overflow: hidden; color: #333; }
 .panel-collapse { background: url(../images/collapse-expand.gif) left top no-repeat; padding-right:5px }

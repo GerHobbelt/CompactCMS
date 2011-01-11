@@ -155,12 +155,12 @@ if($newsID != null)
 				</table>
 			</div>
 				<label class="clear" for="newsTeaser"><?php echo $ccms['lang']['news']['teaser']; ?></label>
-				<textarea name="newsTeaser" id="newsTeaser" style="height:50px;" class="minLength:3 text span-25" rows="4" cols="40"><?php
+				<textarea name="newsTeaser" id="newsTeaser" class="minLength:3 text span-25" rows="4" cols="40"><?php
 					echo (isset($news) ? $news->newsTeaser : null);
 				?></textarea>
 
 				<label for="newsContent"><?php echo $ccms['lang']['news']['contents']; ?></label>
-				<textarea name="newsContent" id="newsContent" style="height:290px;color:#000;" class="text span-25" rows="8" cols="40"><?php
+				<textarea name="newsContent" id="newsContent" class="text span-25" rows="8" cols="40"><?php
 					echo (isset($news) ? $news->newsContent : null);
 				?></textarea>
 				<hr class="space"/>
@@ -187,8 +187,15 @@ if($newsID != null)
 			</form>
 		</div>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	</div>
 	<script type="text/javascript">
@@ -241,7 +248,7 @@ function jsComplete(user_obj, lazy_obj)
 				<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
 				skin: 'o2k7',
 				skin_variant: 'silver',
-				plugins: 'safari,table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
+				plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
 				theme_advanced_toolbar_location: 'top',
 				theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
 				theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
@@ -281,7 +288,7 @@ function jsComplete(user_obj, lazy_obj)
 						};
 					})
 			});
-
+			
 
 
 
@@ -290,6 +297,7 @@ function jsComplete(user_obj, lazy_obj)
 			{
 				onFormValidate:function(passed,form,event)
 				{
+					event.stop();
 					if(passed)
 						form.submit();
 				}
@@ -313,7 +321,6 @@ function ccms_lazyload_setup_GHO()
 	jslog('loading JS (sequential calls)');
 
 
-
 	/*
 	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
 	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
@@ -324,7 +331,7 @@ function ccms_lazyload_setup_GHO()
 		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
 		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
-
+	
 	LazyLoad.js(js, jsComplete);
 }
 </script>

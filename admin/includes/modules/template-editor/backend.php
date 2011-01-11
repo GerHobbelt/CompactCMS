@@ -75,11 +75,18 @@ if(!empty($get_temp))
 	{
 		$handle = fopen($dir_temp.$get_temp, "r");
 		// PHP5+ Feature
-		// $contents = stream_get_contents($handle);
-		// PHP4 Compatibility
-		$contents = @fread($handle, filesize($dir_temp.$get_temp));
-		$contents = str_replace("<br />", "<br>", $contents);
+		$contents = stream_get_contents($handle);
+		if (0)
+		{
+			// PHP4 Compatibility
+			$flen = filesize($dir_temp.$get_temp);
+			if ($flen > 0)
+			{
+				$contents = @fread($handle, $flen);
+			}
+		}
 		fclose($handle);
+		$contents = str_replace("<br />", "<br>", $contents);
 	} 
 } 
 
@@ -211,8 +218,15 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 			</div>
 		</form>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	</div>
 <?php
@@ -259,28 +273,28 @@ function jsComplete(user_obj, lazy_obj)
 	// window.addEvent('domready',function()
 	//{
 		// initialisation
-		
-// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!		
-var supported_syntaxes = ','+editAreaLoader.default_settings.syntax_selection_allow+',';
-var desired_syntax = '<?php echo $temp_extension; ?>';
-desired_syntax = (supported_syntaxes.indexOf(','+desired_syntax+',') >= 0 ? desired_syntax : "");
+				
+		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!		
+		var supported_syntaxes = ','+editAreaLoader.default_settings.syntax_selection_allow+',';
+		var desired_syntax = '<?php echo $temp_extension; ?>';
+		desired_syntax = (supported_syntaxes.indexOf(','+desired_syntax+',') >= 0 ? desired_syntax : "");
 
-editAreaLoader.init(
-	{
-		id:"content",
-		start_highlight:true,
-		allow_resize:'both',
-		allow_toggle:true,
-		word_wrap:true,
-		<?php echo 'language: "'.$cfg['editarea_language'].'",'; ?>
-		syntax: desired_syntax
-	});
-/*
-for (syn in editAreaLoader.load_syntax)
-{
-	alert("syntax: " + syn);
-}
-*/
+		editAreaLoader.init(
+			{
+				id:"content",
+				start_highlight:true,
+				allow_resize:'both',
+				allow_toggle:true,
+				word_wrap:true,
+				<?php echo 'language: "'.$cfg['editarea_language'].'",'; ?>
+				syntax: desired_syntax
+			});
+		/*
+		for (syn in editAreaLoader.load_syntax)
+		{
+			alert("syntax: " + syn);
+		}
+		*/
 
 	//});
 }

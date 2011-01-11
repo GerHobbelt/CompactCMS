@@ -80,7 +80,17 @@
 /* Alert/Confirm */
 .clearlooks2 .mceButton {font-weight:bold; bottom:10px; width:80px; height:30px; background:url(img/button.gif); line-height:30px; vertical-align:middle; text-align:center; outline:0}
 .clearlooks2 .mceMiddle .mceIcon {left:15px; top:35px; width:32px; height:32px}
-.clearlooks2 .mceAlert .mceMiddle span, .clearlooks2 .mceConfirm .mceMiddle span {background:transparent;left:60px; top:35px; width:320px; height:50px; font-weight:bold; overflow:auto; white-space:normal}
+.clearlooks2 .mceAlert .mceMiddle span, .clearlooks2 .mceConfirm .mceMiddle span 
+{
+	background:transparent;
+	left:60px; 
+	top:35px; 
+	width:320px; 
+	height:150px;  /* [i_a] was: 50 px but advimage alert doesn't fit, for example */
+	font-weight:bold; 
+	overflow:auto; 
+	white-space:normal;
+}
 .clearlooks2 a:hover {font-weight:bold;}
 .clearlooks2 .mceAlert .mceMiddle, .clearlooks2 .mceConfirm .mceMiddle {background:#D6D7D5}
 .clearlooks2 .mceAlert .mceOk {left:50%; top:auto; margin-left: -40px}

@@ -24,9 +24,11 @@ sources:
   - "Source/Core/Canvas.js"
   - "Source/Core/Content.js"
   - "Source/Core/Desktop.js"
-  - "Source/Core/Column.js"
-  - "Source/Core/Panel.js"
-  - "Source/Core/Dock.js"
-  - "Source/Core/Window.js"
-  - "Source/Core/Modal.js"
+  - "Source/Controls/column/Column.js"
+  - "Source/Controls/panel/Panel.js"
+  - "Source/Controls/taskbar/Taskbar.js"
+  - "Source/Controls/window/Window.js"
+  - "Source/Controls/window/Modal.js"
   - "Source/Core/Themes.js"
+  
+  

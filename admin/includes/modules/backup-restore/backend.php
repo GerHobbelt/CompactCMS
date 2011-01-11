@@ -155,31 +155,23 @@ if($do == "backup" && !empty($btn_backup))
 		}
 	}
 	
-	$backup = new MySQL_Backup(); 
-	$backup->server   = $cfg['db_host'];
-	$backup->username = $cfg['db_user'];
-	$backup->password = $cfg['db_pass'];
-	$backup->database = $cfg['db_name'];
-	
-	// Get all current tables in database
-	$tables = $db->GetTables();
-	foreach ($tables as $table) 
+	$sqldump = $db->Dump();
+	if ($sqldump === false)
 	{
-		$backup->tables[] = $table;
+		$error[] = $db->Error();
 	}
-	
-	$backup->backup_dir = $configBackupDir;
-	$sqldump = $backup->Execute(MSB_STRING,"",false);
-	
-	/*
-	And make sure we 'position' the .sql file just right for a subsequent 
-	restore through our installer/wizard: to make that happen it has to live
-	in the /_docs/ directory.
-	*/
-	$createZip->addDirectory('media');
-	$createZip->addDirectory('media/files');
-	$createZip->addDirectory('media/files/ccms-restore');
-	$createZip->addFile($sqldump, 'media/files/ccms-restore/compactcms-sqldump.sql');
+	else
+	{
+		/*
+		And make sure we 'position' the .sql file just right for a subsequent 
+		restore through our installer/wizard: to make that happen it has to live
+		in the /_docs/ directory.
+		*/
+		$createZip->addDirectory('media');
+		$createZip->addDirectory('media/files');
+		$createZip->addDirectory('media/files/ccms-restore');
+		$createZip->addFile($sqldump, 'media/files/ccms-restore/compactcms-sqldump.sql');
+	}
 	
 	$fileName = $configBackupDir.$backupName;
 	$fd = @fopen($fileName, "wb");
@@ -237,22 +229,26 @@ if($do == "backup" && !empty($btn_backup))
 		fclose($fd);
 	}
 
-	$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/compactcms-sqldump.sql';
-	$fd = @fopen($sqldumpfile, "wb");
-	if (!$fd)
+	if ($sqldump !== false)
 	{
-		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;
-	}
-	else
-	{
-		$out = fwrite($fd, $sqldump);
-		if (!$out)
+		$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/compactcms-sqldump.sql';
+		$fd = @fopen($sqldumpfile, "wb");
+		if (!$fd)
 		{
-			$error[] = $ccms['lang']['system']['error_write'] . ": " . $sqldumpfile;
+			$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;
 		}
-		fclose($fd);
+		else
+		{
+			$out = fwrite($fd, $sqldump);
+			if (!$out)
+			{
+				$error[] = $ccms['lang']['system']['error_write'] . ": " . $sqldumpfile;
+			}
+			fclose($fd);
+		}
 	}
-
+	// else: error has already been registered before, no sweat, mate!
+	
 	if (empty($error))
 	{
 		echo '<div class="success center-text"><p>'.$ccms['lang']['backend']['newfilecreated'].', <a href="../../../../media/files/'.$backupName.'">'.strtolower($ccms['lang']['backup']['download']).'</a>.</p></div>'; 
@@ -484,11 +480,18 @@ if (0)
 	var_dump($cfg);
 	echo "</pre>";
 }
-
 ?>
 
+
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	
 <script type="text/javascript" charset="utf-8">
@@ -514,8 +517,7 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../../../lib/includes/js/mootools-core.js',
-	'../../../../lib/includes/js/mootools-more.js',
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
 	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 

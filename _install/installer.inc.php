@@ -554,7 +554,7 @@ if($nextstep == md5('final') && CheckAuth())
 		if ($err == 0 && $_SESSION['variables']['do_upgrade'])
 		{
 			$sql = file_get_contents(BASE_PATH.'/media/files/ccms-restore/compactcms-sqldump.sql');
-			// $sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql); -- all tables herin will already have the correct prefix: we're doing a restore anyway, so we have this info from the config.inc.php file
+			$sql = preg_replace('/\\bccms_\\B/', $_SESSION['variables']['db_prefix'], $sql); // all tables here-in will get the correct prefix: we're doing a restore, so we have this info from the config.inc.php file, but we may have changed our setup in the install run just before!
 			$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
 			// note that the passwords for the other users in the backup may be invalid IFF you changed the authcode!
 			$sql = str_replace("\r\n", "\n", $sql);
@@ -591,15 +591,20 @@ if($nextstep == md5('final') && CheckAuth())
 				  after all, they will soon be followed up with INSERT INTO queries and we don't 
 				  want the 'fresh install' records to linger in there when performing 
 				  an upgrade/restore.
+				  
+				  NOTE that SQL dumps since 1.4.2 (rev. 2011/01/11) do contain their own TRUNCATE TABLE
+				  statements, and we do know that is so, but here we wish to be as backwards compatible
+				  as humanly possible. Besides a dual TRUNCATE TABLE doesn't hurt, so we don't filter
+				  those TRUNCATE statements when they exist in the original SQL script.
 				*/
-				if (preg_match('/DROP\sTABLE/i', $tok))
+				if (preg_match('/DROP\s+TABLE/i', $tok))
 					continue;
 					
-				if (preg_match('/CREATE\sTABLE\s`?([a-zA-Z0-9_\-]+)`?\s\(/is', $tok, $matches))
+				if (preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([a-zA-Z0-9_\-]+)`?\s+\(/is', $tok, $matches))
 				{
 					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 					{
-						$results = $db->TruncateTable($matches[1]);
+						$results = $db->TruncateTable($matches[2]);
 						if ($results == false)
 						{
 							$errors[] = 'Error: executing query: ' . $db->GetLastSQL();
@@ -609,7 +614,7 @@ if($nextstep == md5('final') && CheckAuth())
 					}
 					else
 					{
-						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[1] . "`\n---------------------------------------\n";
+						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[2] . "`\n---------------------------------------\n";
 					}
 				}
 				else
@@ -898,8 +903,8 @@ if($nextstep == md5('final') && CheckAuth())
 		if(strpos($htaccess, $newline)===false)
 		{
 			// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
-			$htaccess = str_replace('<IfDefine CCMS_installed>', '', $htaccess);
-			$htaccess = str_replace('</IfDefine> # CCMS_installed', '', $htaccess);
+			$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
+			$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
 
 			// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
 			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);

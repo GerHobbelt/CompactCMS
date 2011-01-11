@@ -104,7 +104,11 @@ if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOP
 	exit();
 }
 
-// initiate database connection; do this AFTER checking for the _install directory, because otherwise error reports from this init will have precendence over the _install-dir-exists error report!
+/*
+ initiate database connection; do this AFTER checking for the _install directory, because 
+ otherwise error reports from this init will have precedence over the _install-dir-exists 
+ error report!
+*/
 $db = new MySQL();
 
 
@@ -145,6 +149,10 @@ $current = basename(filterParam4FullFilePath($_SERVER['REQUEST_URI']));
 
 // [i_a] $curr_page was identical (enough) to $pagereq before
 $pagereq = getGETparam4Filename('page');
+if (empty($pagereq) || in_array($pagereq, array('home', 'index')))
+{
+	$pagereq = 'home';
+}
 $ccms['pagereq'] = $pagereq;
 
 $ccms['printing'] = getGETparam4boolYN('printing', 'N');
@@ -210,7 +218,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT'))
 // OPERATION MODE ==
 // 1) Start normal operation mode (if sitemap.php is not requested directly).
 // This will fill all variables based on the requested page, or throw a 403/404 error when applicable.
-if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitemap") 
+if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitemap') 
 {
 	function setup_ccms_for_40x_error($code, $pagereq)
 	{
@@ -327,7 +335,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	{
 		$menu_in_set .= ',' . $i;
 	}
-	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE `published`='Y' AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
+	$pagelist = $db->SelectArray($cfg['db_prefix'].'pages', "WHERE (`published`='Y'" . ($preview ? " OR `page_id`=" . MySQL::SQLValue($preview, MySQL::SQLVALUE_NUMBER) : '') . ") AND `menu_id` IN (".$menu_in_set.")", null, cvt_ordercode2list('I120'));
 	if ($db->ErrorNumber()) $db->Kill();
 
 	// Select the appropriate statement (home page versus specified page)
@@ -335,7 +343,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 	// This is a separate query for two reasons:
 	// (1) the above might be cached as a whole one day, and 
 	// (2) the requested page doesn't necessarily need to appear in any menu!
-	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue((!empty($pagereq) ? $pagereq : 'home'), MySQL::SQLVALUE_TEXT))); 
+	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($pagereq, MySQL::SQLVALUE_TEXT))); 
 	if ($db->ErrorNumber()) $db->Kill();
 
 	// Start switch for pages, select all the right details
@@ -355,7 +363,7 @@ if($current != "sitemap.php" && $current != "sitemap.xml" && $pagereq != "sitema
 		$ccms['pagetitle']  = $row->pagetitle;
 		$ccms['subheader']  = $row->subheader;
 		
-		// mirror the menu bielder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
+		// mirror the menu builder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
 		$msg = explode(' ::', $row->description, 2);
 		$ccms['desc']       = $msg[0];
 		$ccms['desc_extra'] = (!empty($msg[1]) ? trim($msg[1]) : '');
@@ -393,7 +401,8 @@ if (0)
 		$preview_checkcode = GenerateNewPreviewCode($row->page_id, null);
 		
 		$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
-		if($row->urlpage=="home") 
+
+		if($row->urlpage == 'home') 
 		{
 			$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' Home">Home</a></span>';
 		}
@@ -551,7 +560,7 @@ if (0)
 			$current_class = '';
 			$current_extra = '';
 			$current_link = '';
-			if ($row['urlpage'] == $pagereq || (empty($pagereq) && $row['urlpage'] == "home"))
+			if ($row['urlpage'] == $pagereq)
 			{
 				// 'home' has a pagereq=='', but we still want to see the 'current' class for that one.
 				// (The original code didn't do this, BTW!)
@@ -577,8 +586,9 @@ if (0)
 			{
 				$current_class = 'to_external_url';
 				$menu_item_class = 'menu_item_extref';
+				$current_link = $msg[0];
 			}
-			else if ($row['urlpage'] == "home")
+			else if ($row['urlpage'] == 'home')
 			{
 				$current_link = $cfg['rootdir'];
 				$menu_item_class = 'menu_item_home';
@@ -611,15 +621,15 @@ if (0)
 			if ($dummy_top_written)
 			{
 				$menu_item_text = '<span ' . $current_link_classes . '>-</span>';
-				$ccms[$current_structure] .= '<li class="' . /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim( /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 			else if ($row['sublevel'] != 0)
 			{
-				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 			else
 			{
-				$ccms[$current_structure] .= '<li class="' . $current_class . ' ' . $menu_top_class . ' ' . $menu_item_class . '">' . $menu_item_text;
+				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
 			}
 		}
 		
@@ -692,7 +702,7 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 		if(!regexUrl($row->description)) 
 		{
 			echo "<url>\n";
-				if($row->urlpage == "home") 
+				if($row->urlpage == 'home') 
 				{
 					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."</loc>\n";
 					echo "<priority>0.80</priority>\n";

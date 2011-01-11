@@ -1,0 +1,1992 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  >
+
+<head>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Bloody Hell</title>
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/base.css" />
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/liquid.css" />
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/layout.css" />
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/sprite.css" />
+<link rel="stylesheet" type="text/css" href="./documentation.css" />
+<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
+	<script type="text/javascript" src="../lib/includes/js/excanvas.js" charset="utf-8"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="../admin/img/styles/last_minute_fixes.css" />
+<style type="text/css">
+.ms-grid5-1001-main {
+	border-left: .75pt solid black;
+	border-right: 1.5pt solid black;
+	border-top: 1.5pt solid black;
+	border-bottom: .75pt solid black;
+	background-color: white;
+}
+.ms-grid5-1001-top {
+	color: black;
+	border-left: .75pt solid black;
+	border-right-style: none;
+	border-top-style: none;
+	border-bottom: 1.5pt solid black;
+	background-color: white;
+}
+.ms-grid5-1001-even {
+	color: black;
+	border-left: .75pt solid black;
+	border-right-style: none;
+	border-top-style: none;
+	border-bottom: .75pt solid black;
+	background-color: white;
+}
+.light_up_editing {
+	color: #FF0000;
+}
+.style2 {
+	font-family: Wingdings;
+}
+</style>
+</head>
+
+<body>
+<div id="the_oddities_log">
+<h1 class="center-text">Issues overview</h1>
+<p>(I tend to write these things on paper (haven&#39;t got the same issue tracker 
+around everywhere I go); moved the paper notes here for easier transportation.)</p>
+<p>These issues have been identified and need to be fixed. Issues may be bugs, 
+&#39;oddities&#39; or change requests. When done, an issue is marked as such:
+<span class="style2">þ</span></p>
+<table cellspacing="0" cellpadding="0" class="ms-grid5-1001-main">
+	<!-- fpstyle: 20,010011000 -->
+	<tr>
+		<th class="ms-grid5-1001-top span-2"><p>Done</p></th>
+		<th class="ms-grid5-1001-top"><p>Description</p></th>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p><span class="style2">þ</span></p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>installer: add &lt;IfDef&gt; around Rewrite 
+		rules to DISable these until we arrive at a point in time where we can 
+		be sure the rules are valid.</p><p>Symptom: when installing/upgrading over 
+		an existing site or a straight copy of one, the rewrite rules may be 
+		completely wrong to start with and thus obstruct the installer 
+		operations themselves in all sorts of unpredictable ways.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>installer sets $cfg[] entries to 1 
+		instead of boolean true/false.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">ý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>In production setting the 
+		/admin/index.php does <em>not</em> warn about the _install directory 
+		still existing.</p>
+		<p>Rejected: must&#39;ve been some cache issue in my FF3.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>MochaUI windows are too high for lorez 
+		laptop screen.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>Image upload doesn&#39;t work in tinyMCE 
+		&#39;insert image&#39;: empty content (no text, just formatting) visible for the 
+		FileManager.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>News items are stored twice 
+		(duplicated!) when adding these using IE8.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>Inconsistent width for dyn_list in 
+		admin screen: header differs from content columns.</p>
+		<p>Fixed: pulled the header into the generated page list table, so the 
+		entire list is now exactly 1(one) table instead of two: this reduces the 
+		alignment hassles <em>significantly</em>. Same has been done for the 
+		menu management table (which was two tables as well).</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>backup-restore (a.k.a. &#39;upgrade&#39;) 
+		cycle damages UTF-8 characters. Must be some encoding issue b0rking 
+		somewhere.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2010/12/29</p></td>
+		<td class="ms-grid5-1001-even"><p>Xander says: CCMS fails when using a 
+		different table prefix than ccms_ and/or a different database name (&#39;compactcms&#39;).</p>
+		<p>Fixed. Tested this with bleeding edge today and it&#39;s not 
+		reproducible, at least not now any more.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2010/12/28</p></td>
+		<td class="ms-grid5-1001-even"><p>preview codes don&#39;t work.</p>
+		<p>Update: Well... they do work now (didn&#39;t before), but there&#39;s still 
+		the issues with news items and such: those are really SUBpages and the 
+		previewcode acts on a PAGE scope; should we include SUBpage treatment to 
+		make a preview for a single news item possible (before, news didn&#39;t have 
+		any &#39;preview&#39; ability available <em>at all</em>!) or should we keep the 
+		preview scope as it is now? I&#39;d like to have it as tight as possible, so 
+		that would mean restricted to a single news item, however that would 
+		mean a few more spots in the CCMS code needs to be intimately aware of 
+		the what and how of the (news) module(s) internals. ==&gt; stick with the 
+		current state of affairs.</p>
+		<p>Fixed. change suggested in update: Rejected.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/29</p></td>
+		<td class="ms-grid5-1001-even"><p>Editor (WYSIWYG) doesn&#39;t work.</p>
+		<p>Fixed. Don&#39;t know how I &#39;did it&#39; exactly as the problem got reduced 
+		to being an issue with the tinyMCE plugins (specify none (plugins: &#39;&#39;) 
+		and the editor is shown as expected) but after a simultaneous tinyMCE 
+		upgrade to latest GIT it worked with plugins without me having to do 
+		anything else.</p>
+		<p>Note that during the update I switched from moxie:master to 
+		ephox:accessibility branch and there&#39;s sufficient change there to 
+		include any tweaks to make the plugins work for me again...</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>lazyloading doesn&#39;t happen 
+		consistently for <em>all</em> JavaScript -- we still get timing issues 
+		for some pages and JS addons.</p>
+		<p>Update: largely fixed, but needs a review to make sure.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/28</p></td>
+		<td class="ms-grid5-1001-even"><p>Add preview to news items as well as 
+		regular pages. Treat news items as first class page citizens.</p>
+		<p>Fixed.</p>
+		<p>Note that it&#39;s a wee bit hackish in my opinion: you must save the 
+		news item (overwriting a previous <em>revision</em> if there was one) 
+		before you can preview.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>On-line Help tips are not shown 
+		properly formatted in the admin screen.</p>
+		<p>Fixed. Cause was that the Tipz assignment JS code was not re-run on 
+		every dyn-list / menu magement table load.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>Delete a page and below the dyn-list 
+		there&#39;s a PHP report about &#39;Warning: using side-effect which existed 
+		until 4.2.3&#39; or thereabouts. What&#39;s wrong in process.inc.php?</p>
+		<p>&nbsp;</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>lightbox management: click on image 
+		and checkbox is <em>not</em> marked in latest FF3.</p>
+		<p>Fixed. Adjusted HTML and CSS.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>Todo: sprite the lightbox thumbnails 
+		in a 84x84 grid. Problem: background color is dependent on admin and 
+		regular template colors!</p>
+		<p>In fact, this request is triggered by the fact that for large image 
+		collections, IE8 doesn&#39;t seem to load all the thumbnails every time.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>Test install from github using a (hackish)&nbsp; 
+		Alias /c&nbsp; /www/c&nbsp; apache line instead of a name- or IP-based 
+		virtual host. http://&lt;ip-number&gt;/c/ 
+		shows as &#39;cannot connect to database&#39;.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>@paul: 
+		http://c/_install/ shows up in FF4beta (with lots of GreaseMonkey 
+		addons, Skype and more addon cruft :-( ) as 1(one) column instead of 2 
+		-- must be the layout is damaged somehow, but where and by whom?!</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>@paul: when user rights (on Windows 
+		and UNIX) are not as you might want for apache, then the installer will 
+		try to rewrite the config.inc.php file, but will produce an EMPTY file. 
+		Which produces an EMPTY installer screen when you retry/rerun the CCMS 
+		installer as the $ccms[] array is now <em>gone</em>.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2"></p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>.sh scripts in _install will need to 
+		have their a+x attributes set when we generate a distro package from 
+		this.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2"></p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>the usual issues with getting the 
+		RewriteEngine running: do not forget to run</p>
+		<pre>a2enmod rewrite</pre>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>@paul: FF4beta admin screen create 
+		page and menu mgt. divs jump around when you create a page and hit the 
+		&#39;create&#39; button there: next thing you know the create page div is moved 
+		to the middle of the screen, ruining the admin screen layout.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>tinyMCE: add an image: select an 
+		image, don&#39;t add an &#39;alt&#39; text and hit &#39;insert&#39;: the message box shown 
+		next will be to small to fit the text. Adjust the CSS to make it large 
+		enough.</p>
+		<p>Update: fixed preliminary by adjusting the relevant CSS. Must be 
+		tested.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>feature add: add image view option to 
+		lightbox management page: right now you can only look at the thumbnails, 
+		but you may want to have a look at the &#39;full size&#39; image before you 
+		decide to delete it (or do something else).</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>Create an empty album directory, go to 
+		the lightbox management where this directory will turn up as an empty 
+		album, try to delete it and you get a crash and your session is ditched 
+		alongside. ==&gt; The next round, you get the auth/login screen as the 
+		session has been destroyed.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/28</p></td>
+		<td class="ms-grid5-1001-even"><p>mochaUI: path/plugin directories are 
+		not configured correctly it seems as a sniffer shows that invalid URLs 
+		are requested; one of the consequences of that seems to be that the 
+		admin session is destroyed, so you get the auth/login page shown in 
+		various spots in the admin screen.</p>
+		<p>Fixed.</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/30</p></td>
+		<td class="ms-grid5-1001-even"><p>admin page crashes and renders 
+		incorrectly (dyn_list and such is not loaded!) on IE6. (v6.0.900.5512)</p>
+		<p>Fixed. Turns out IE6 doesn&#39;t like trailing commas in object 
+		definitions at all: those superfluous ones have been removed. Another 
+		crash occurred in mochaUI while testing, due to an undefined object. 
+		Fixed as well. (see Window.js in the mochaUI sources)</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>news items: calendar icon is shown 
+		with a non-transparent background in IE6 -- probably due to IE6 not 
+		supporting PNG transparency.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>compactCMS default template (&#39;ccms&#39;) 
+		is not okay; bottom menu and breadcrumb lines mix with the content; 
+		others issues as well.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2010/12/30</p></td>
+		<td class="ms-grid5-1001-even"><p>request the default page start: /c/index.html 
+		and you get a 404 instead of the home page. In effect, &#39;/index.html&#39; 
+		produces a 404, where &#39;/&#39; does not. Rewrite rules forward to index.html, 
+		but apparently the backend doesn&#39;t cope correctly with a page called 
+		&#39;index&#39;.</p>
+		<p>Fixed: now home.html, index.html are both recognized as &#39;home page 
+		requests&#39;. The VHOST rewrite rules have been adjusted as well to make 
+		sure the home page always is the &#39;/&#39; URL (though, of course, /home.html 
+		and /index.html are both accepted as well -- it&#39;s better to have unique 
+		front for SEO reasons)</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/10</p></td>
+		<td class="ms-grid5-1001-even"><p>Bug: Open the lightbox admin page for 
+		an album (which you created previously), e.g.
+		<a href="http://example.com/c/lib/modules/lightbox/lightbox.Manage.php?album=0rn3">
+		http://example.com/c/lib/modules/lightbox/lightbox.Manage.php?album=0rn3</a> 
+		and then click on the &#39;Start Upload&#39; button without browsing/picking a 
+		couple of images first. The result will be a little JSON dump instead of 
+		a properly HTML formatted page avec du error report:</p>
+		<pre>{&quot;status&quot;:&quot;0&quot;,&quot;error&quot;:&quot;Invalid Upload: &quot;,&quot;code&quot;:&quot; : : &quot;}</pre>
+		<p>&nbsp;</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/11</p></td>
+		<td class="ms-grid5-1001-even"><p>Feature request: event calendar. 
+		Something along the lines of the
+		<a href="http://wordpress.org/extend/plugins/events-calendar/">Wordpress 
+		one</a>, I&#39;d say. There&#39;s of course a few mootools-based ones out there:
+		<a href="http://www.electricprism.com/aeron/calendar/">here</a> (and the
+		<a href="https://github.com/aglemann/calendar">GIT repo</a> of that one,
+		<a href="http://dansnetwork.com/mootools/events-calendar/demo/">demo 
+		here</a>),
+		<a href="http://www.webresourcesdepot.com/mootools-ajax-calendar-vista-like/">
+		here</a> and
+		<a href="http://dev.base86.com/scripts/vista-like_ajax_calendar_version_2.html">
+		here</a> (where the latter is really a date picker, if you ask me:
+		<a href="http://dev.base86.com/app/pages/scripts/vista-like_ajax_calendar_version_2/">
+		demo</a>)</p>
+		<p>However, what I&#39;m really looking for is an extra module which can 
+		manage events with both time and duration (imagine festivals lasting 
+		several days and how to show those in a printable event calendar!)</p>
+		<p>Examples to look at:</p>
+		<p><a href="http://dansnetwork.com/mootools/events-calendar/demo/">
+		http://dansnetwork.com/mootools/events-calendar/demo/</a></p>
+		<p>
+		<a href="http://www.netbanker.com/2007/04/updated_online_banking_payment.html">
+		http://www.netbanker.com/2007/04/updated_online_banking_payment.html</a></p>
+		<p><a href="http://www.expo70.or.jp/e/park/park_events.html">
+		http://www.expo70.or.jp/e/park/park_events.html</a> (note the 
+		particularly beautiful event rendering here, which is not suitable for 
+		everything, but is very nice nevertheless)</p>
+		<p><a href="http://www.avonvale.co.uk/index.php/events_calendar_2009/">
+		http://www.avonvale.co.uk/index.php/events_calendar_2009/</a></p>
+		<p>
+		<a href="http://www.trumba.com/connect/onlinecalendars/new_york_times.aspx">
+		http://www.trumba.com/connect/onlinecalendars/new_york_times.aspx</a> 
+		(now these are serious buggers! :-) If possible, let&#39;s do something like 
+		this, eh?)</p>
+		<p><a href="https://events.rit.edu/help.cfm">
+		https://events.rit.edu/help.cfm</a> (and if you&#39;ld get on-line help of a 
+		quality like this, then we&#39;re absolutely super-fine!)</p>
+		<p>&nbsp;</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
+		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
+		not patched correctly.</p>
+		<p>Fixed.</p></td>
+	</tr>
+</table>
+</div>
+</body>
+</html>

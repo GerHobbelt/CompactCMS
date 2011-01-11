@@ -502,10 +502,17 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	</div>
 </div>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 <div>
   <textarea id="jslog" class="log span-25" readonly="readonly">
   </textarea>
 </div>
+<?php
+}
+?>
 
 
 <p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>

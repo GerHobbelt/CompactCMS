@@ -182,6 +182,10 @@ if (!is_array($users)) $db->Kill();
 	}
 	?>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<hr class="clear" />
 	
 	<textarea id="jslog" class="log span-25" readonly="readonly">
@@ -200,7 +204,9 @@ if (!is_array($users)) $db->Kill();
 	</textarea>
 
 	<hr class="clear" />
-	
+<?php
+}
+?>
 
 	</div>
 	<script type="text/javascript">
@@ -216,11 +222,16 @@ function confirmation()
 
 
 
-
-
 var jsLogEl = document.getElementById('jslog');
 var js = [
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
+<?php
+}
+?>
 	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 
@@ -238,6 +249,10 @@ function jsComplete(user_obj, lazy_obj)
 		jslog('All JS has been loaded!');
 	}
 	
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	// window.addEvent('domready',function()
 	//{
 	tinyMCE.init({
@@ -247,6 +262,9 @@ function jsComplete(user_obj, lazy_obj)
 		theme : "simple"
 	});
 	//});
+<?php
+}
+?>
 }
 
 
@@ -265,6 +283,10 @@ function ccms_lazyload_setup_GHO()
 	jslog('loading JS (sequential calls)');
 
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	/*
 	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
 	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
@@ -275,6 +297,9 @@ function ccms_lazyload_setup_GHO()
 		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
 		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
+<?php
+}
+?>
 	
 	LazyLoad.js(js, jsComplete);
 }

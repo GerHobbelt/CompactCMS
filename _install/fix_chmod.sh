@@ -20,6 +20,11 @@ cd ../
 
 rm -rf ./lib/includes/cache
 
+
+# make sure the owner equals the apache user:
+find ./ -exec chown www-data.www-data "{}" \;
+
+
 mkdir ./content ./media ./media/albums ./media/files ./lib/includes/cache 
 
 find ./ -type f -exec chmod 0644 "{}" \;

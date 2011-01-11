@@ -422,9 +422,15 @@ if (0)
 	</div>
 
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
-
+<?php
+}
+?>
 	
 	<?php // Footer block ?>
 	<div id="footer" class="span-25">
@@ -469,13 +475,30 @@ function get_total_page_count()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../lib/includes/js/mootools-core.js,mootools-more.js,mocha.js',
 	'../lib/includes/js/excanvas.js?only-when=%3d%3d+IE',
+	'../lib/includes/js/mootools-core.js,mootools-more.js',
+	/*--MOCHAUI--*/
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
+	'../lib/includes/js/mochaui/Source/dummy.js,Core/Core.js,Core/Canvas.js,Core/Content.js,Core/Desktop.js,Controls/column/Column.js,Controls/panel/Panel.js,Controls/taskbar/Taskbar.js,Controls/window/Window.js,Controls/window/Modal.js,Core/Themes.js',
+<?php
+}
+else
+{
+?>
+	'../lib/includes/js/mochaUI.js',
+<?php
+}
+?>
+	/* '../lib/includes/js/mochaui/Source/Utility/window-from-html.js', */
 	'../lib/includes/js/common.js'
 	];
 
 function jsComplete(user_obj, lazy_obj)
 {
+	//alert('done count: ' + lazy_obj.done_count + ', todo count: ' + lazy_obj.todo_count);
     if (lazy_obj.todo_count)
 	{
 		/* nested invocation of LazyLoad added one or more sets to the load queue */
@@ -491,11 +514,19 @@ function jsComplete(user_obj, lazy_obj)
 	//{
 		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
 		{
-			new FormValidator($('addForm')); 
+			new FormValidator($('addForm') /* , 
+			{
+				onFormValidate: function(passed, form, event)
+				{
+					event.stop();
+					if (passed) 
+						form.submit();
+				}
+			} */ ); 
 		}
+		
+		lazyloading_commonJS_done();
 	//});
-
-	lazyloading_commonJS_done();
 }
 
 

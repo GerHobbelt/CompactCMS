@@ -71,9 +71,9 @@ function SESSION2str($var, $def = '')
 echo "<p>$action_type=='send' + ".!empty($_POST)." + ".!empty($_SESSION)." + ".POST2str('verification', 'x')==SESSION2str('ccms_captcha', 'y')."</p>"; 
 
 // If the action type is equal to send, then continue
-if($action_type=='send' 
-	&& $_SERVER['REQUEST_METHOD'] == "POST" 
-	&& POST2str('verification', 'x')==SESSION2str('ccms_captcha', 'y')) 
+if($action_type == 'send' 
+	&& $_SERVER['REQUEST_METHOD'] == 'POST' 
+	&& POST2str('verification', 'x') == SESSION2str('ccms_captcha', 'y')) 
 {
 	$subject = getPOSTparam4EmailSubjectLine('subject');
 	$message = getPOSTparam4EmailBody('message');
@@ -170,10 +170,13 @@ window.addEvent('domready', function(){
 	}
 	
 	// Do: send contact form
-	new FormValidator.Inline($('contactForm'), {
-		onFormValidate: function(passed, form, event){
+	new FormValidator.Inline($('contactForm'), 
+	{
+		onFormValidate: function(passed, form, event)
+		{
 			event.stop();
-			if (passed) sendForm();
+			if (passed) 
+				sendForm();
 		}
 	});
 });

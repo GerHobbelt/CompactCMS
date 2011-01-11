@@ -31,6 +31,8 @@ if (!defined('BASE_PATH'))
 
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/email-validator/EmailAddressValidator.php');
 
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/htmLawed/htmLawed.php');
+
 
 
 
@@ -528,13 +530,115 @@ function filterParam4DisplayHTML($value, $def = null)
 	if (empty($value))
 		return $def;
 	
-	// TODO: use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
+	// use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
 	
 	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
+if (0)
+{
 	$value = htmlentities($value, ENT_NOQUOTES, "UTF-8");
+}
+else
+{
+    $config = array(
+				  'safe' => 1
+				// , 'elements' => 'a, em, strong'
+				);
+    $value = htmLawed($value, $config);
+}
 	
 	return $value;
 }
+
+
+
+
+
+function getGETparam4RAWHTML($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4RAWHTML(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4RAWHTML($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4RAWHTML($_POST[$name], $def);
+}
+
+/*
+Accepts any non-aggressive HTML
+*/
+function filterParam4RAWHTML($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = trim(strval($value)); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	// use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
+	
+	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
+    $config = array(
+				  'safe' => 1
+				// , 'elements' => 'a, em, strong'
+				);
+    $value = htmLawed($value, $config);
+	
+	return $value;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getGETparam4RAWCONTENT($name, $def = null)
+{
+	if (!isset($_GET[$name]))
+		return $def;
+
+	return filterParam4RAWCONTENT(rawurldecode($_GET[$name]), $def);
+}
+
+function getPOSTparam4RAWCONTENT($name, $def = null)
+{
+	if (!isset($_POST[$name]))
+		return $def;
+
+	return filterParam4RAWCONTENT($_POST[$name], $def);
+}
+
+/*
+Accepts ANY CONTENT
+*/
+function filterParam4RAWCONTENT($value, $def = null)
+{
+	if (!isset($value))
+		return $def;
+
+	$value = strval($value); // force cast to string before we do anything
+	if (empty($value))
+		return $def;
+	
+	return $value;
+}
+
+
+
+
 
 
 
@@ -1425,6 +1529,32 @@ function path2urlencode($path, $specialcharset = ':/')
 
 
 
+/*
+Convert any text (including any HTML) to a legible bit of text to act as part of a URL
+*/
+function cvt_text2legibleURL($text)
+{
+	// Limited characters
+	static $special_chars = array("#","$","%","@","^","&","*","!","~","‘","\"","’","'","=","?","/","[","]","(",")","|","<",">",";","\\",",");
+
+	$text = trim(strip_tags($text));
+	$a1 = strtolower(str2USASCII($text));
+	// Filter spaces, non-file characters and account for UTF-8
+	$a1 = str_replace($special_chars, "", $a1); 
+	$a1 = trim(str_replace(array(' ', '~'),'-',$a1), '-');
+	
+	if (empty($a1))
+	{
+		// the alternative is URLencoding the whole shebang!
+		$a1 = strtolower($text);
+		// Filter spaces, non-file characters and account for UTF-8
+		$a1 = str_replace($special_chars, "", $a1); 
+		$a1 = trim(str_replace(array(' ', '~'),'-',$a1), '-');
+	}
+	
+	return rawurlencode($a1);
+}
+
 
 
 /**
@@ -2000,6 +2130,25 @@ Return the list of fields as indicated by the 'ordercode' parameter
 as an array.
 
 Can, for example, be used to pass this set in the 'ordering' argument for any SQL query.
+
+@param $ordercode   A character series determining the generated field order:
+
+                    Code      	Field Name
+					
+					F			urlpage
+					T			pagetitle
+					S			subheader
+					D			description
+					P			printable
+					A			published
+					C			iscoding
+					H			islink
+					I			menu_id
+					1			toplevel
+					2			sublevel
+					M			module
+					L			variant
+					0			page_id
 */
 function cvt_ordercode2list($ordercode)
 {
@@ -2222,6 +2371,15 @@ function GenerateNewPreviewCode($page_id = null, $page_name = null, $this_run_is
 	return $preview_checkcode;
 }
 
+
+/**
+Return FALSE when the specified preview code is invalid; otherwise return the page number encoded with the preview code.
+
+Note: as the page number will NEVER be zero, you can simply check for a valid preview code (if that's all you need) by
+      comparing the function return value like this:
+	  
+	    if (IsValidPreviewCode($code)) { ... }
+*/
 function IsValidPreviewCode($previewCode)
 {
 	if (empty($previewCode))
@@ -2238,7 +2396,7 @@ function IsValidPreviewCode($previewCode)
 	if ($sollwert === false)
 		return false;
 	
-	return ($sollwert === $previewCode);
+	return ($sollwert === $previewCode ? $orig_page_id : false);
 }
 
 ?>

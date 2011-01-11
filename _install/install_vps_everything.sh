@@ -10,7 +10,7 @@ for pkg in `grep -v -h '#' install_vps_everything.txt | tr -s '[\r\n]' ' ' ` ; d
 	# skip the newlines produced by the for+grep combo: only do real packages!
 	if test "$pkg" '>' 'a' ; then 
 		echo --- apt-get install [$pkg]
-		apt-get install $pkg
+		apt-get --yes install $pkg
 	fi
 done
 

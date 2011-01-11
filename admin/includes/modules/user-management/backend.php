@@ -246,8 +246,15 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			?>
 		</div>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	</div>	
 	<script type="text/javascript" charset="utf-8">
@@ -299,9 +306,10 @@ function jsComplete(user_obj, lazy_obj)
 	//{
 		new FormValidator($('addUser'),
 		{
-			onFormValidate:function(passed,form,event)
+			onFormValidate: function(passed, form, event)
 			{
-				if(passed)
+				event.stop();
+				if (passed)
 					form.submit();
 			}
 		});

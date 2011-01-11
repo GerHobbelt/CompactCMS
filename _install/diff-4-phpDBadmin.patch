@@ -1,0 +1,13 @@
+--- /etc/apache2/sites-available/default	2011-01-02 17:10:53.000000000 +0100
++++ default	2011-01-02 17:10:41.000000000 +0100
+@@ -38,4 +38,10 @@
+         Allow from 127.0.0.0/255.0.0.0 ::1/128
+     </Directory>
+ 
++# phpMyAdmin access from the default site:
++Include /etc/phpmyadmin/apache.conf
++
++#phppgAdmin access from the default site (PostgreSQL management):
++Include /etc/phppgadmin/apache.conf
++
+ </VirtualHost>
