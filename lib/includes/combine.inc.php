@@ -102,9 +102,9 @@ define('COMBINER_DEV_DUMP_OUTPUT', true); // dump generated content to cache dir
 
 
 $optimize = array();
-$optimize['css'] = false; // 'csstidy';    // possible values: false, 'csstidy', 'css-compressor'
-$optimize['javascript'] = false; // 'JSmin';       // possible values: false, 'JSmin'
-$optimize['css3'] = 'remove';            // possible values: false, 'remove', 'browser-fix'
+$optimize['css'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? false : 'css-compressor');    // possible values: false, 'csstidy', 'css-compressor'
+$optimize['javascript'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? false : 'JSmin');       // possible values: false, 'JSmin'
+$optimize['css3'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? 'remove' : 'browser-fix');            // possible values: false, 'remove', 'browser-fix'
 
 
 $cache		= !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
@@ -171,7 +171,7 @@ comment:
 
 <--[equ IEx] .... -->
 
-For this we 'fake; a wee bit of content (a single line) and see whether the filter leaves it be, or not:
+For this we 'fake'; a wee bit of content (a single line) and see whether the filter leaves it be, or not:
 */
 if (!empty($only_when_expression))
 {
@@ -257,27 +257,33 @@ foreach($elements as $element)
  This includes the current minification settings in $optimize[]!
  
  And since we now have server-side Browser-dependent filtering enabled in here
- (to filter CSS and JS depending on who's visiting), plus we have lazyload/loadorder-safe
- JS invocation through the request-definable JS callback, all those should taken into
+ (to filter CSS depending on who's visiting), plus we have lazyload/loadorder-safe
+ JS invocation through the request-definable JS callback, all those should be taken into
  account for the indentifying hash code as well.
  
  This basically means we'll need to include the browscap record and the $_SERVER['QUERY_STRING']
- both to cover all bases.
+ both to cover all bases for CSS.
  
  However, since our current filter is limited to checking against major brands and versions
  only, we can significantly cut down on the number of variations which should co-exist 
  by only including just those particular browscap elements in the hash!
  
- That way we can be sure that each browser brand gets served the appropriate pre-filtered CSS/JS
+ That way we can be sure that each browser brand gets served the appropriate pre-filtered CSS
  from cache!
+
+ NOTE: JavaScript doesn't get processed in a browser-dependent way, so we don't need 
+       multiple copies of those JS files! This significantly improves our ability to 
+	   'prime the cache' at startup as the largest files are the JS ones, and minifying
+	   those can take quite a long time...
 */
 $hash = $lastmodified . '-' . 
 		md5($base . ':' . implode(':', $optimize) . ':' . 
-			$_SERVER['QUERY_STRING'] /* this includes all 'files'! */ . '::' . 
-			$client_browser->Browser . '::' .
-			$client_browser->Version 
+			$_SERVER['QUERY_STRING'] /* this includes all 'files'! */ . 
+			($type == 'css'
+			? '::' . $client_browser->Browser . '::' . $client_browser->Version 
+			: '')
 		);
-header("Etag: \"" . $hash . "\"");
+header('Etag: "' . $hash . '"');
 
 if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && 
 	stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == '"' . $hash . '"' &&
@@ -428,7 +434,7 @@ else
 			break;
 			
 		case 'css-compressor':
-			// http://www.phphulp.nl/php/script/php-algemeen/css-compressor/1145/
+			// http://www.phphulp.nl/php/script/php-algemeen/css-compressor/1145/   + [i_a]
 			
 			/**
 			 * Remove superfluous characters from CSS.
@@ -449,6 +455,12 @@ else
 				
 				# Verwijder alle dubbele spaties
 				$sContent = preg_replace('/ {2,}/', '', $sContent);
+				
+				# Vervang alle '0px' door '0'
+				$sContent = preg_replace('/\b0 *px/', '0', $sContent);
+				
+				# Vervang alle '0.x' floating point values door '.x' values
+				$sContent = preg_replace('/\b0\./', '.', $sContent);
 				
 				# Grijp alle {....} blokken
 				if( preg_match_all('/{.*?}/s', $sContent, $aMatch) )
@@ -854,11 +866,11 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			//echo "<pre>@import\n";
 			if (0)
 			{
-			echo "<pre>@import: $type, $http_base, \n$base, \n$root, $url, $element";
-			$rfn = merg_path_elems($base, $element, '../', $url);
-			echo "<pre>makes: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
-			$rfn = path_remove_dot_segments($rfn);
-			echo "<pre>makes 2: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
+				echo "<pre>@import: $type, $http_base, \n$base, \n$root, $url, $element";
+				$rfn = merg_path_elems($base, $element, '../', $url);
+				echo "<pre>makes: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
+				$rfn = path_remove_dot_segments($rfn);
+				echo "<pre>makes 2: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
 			}
 			
 			$imported_content = load_one($type, $http_base, $base, $root, $url);
@@ -884,10 +896,36 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 	switch ($optimize['css3'])
 	{
 	case 'browser-fix':
+		$is_IE = (0 == strcasecmp('IE', $client_browser->Browser));
+		$is_FF = (0 == strcasecmp('Firefox', $client_browser->Browser));
+		/*
+		we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
+		but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
+		
+		On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
+		stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an 
+		entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
+		past the second '.' dot in there.
+		*/
+		if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
+		{
+			// illegal format: report this and fail dramatically
+			send_response_status_header(500); 
+			die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
+		}
+		$sniffed_version = floatval($vmp[1]);
+		
 		// fix CSS3 border-radius for IE:
-		$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
+		if ($is_IE)
+		{
+			$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
 
-		$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+			$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+		}
+		else if ($is_FF)
+		{
+			$contents = preg_replace('/\sborder-radius/', "-moz-border-radius", $contents);
+		}
 		
 		/* fix opacity for IE: */
 		// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */		
@@ -908,6 +946,8 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		//-webkit-border-radius: 5px [5px 5px 5px];
 		//-moz-border-radius: 5px [5px 5px 5px];
 		//border-radius: 5px [5px 5px 5px];
+
+		$contents = '/* Browser: ' . $client_browser->Browser . ' ' . $client_browser->Version . " */\n" . $contents;
 		break;
 		
 	case 'remove':
