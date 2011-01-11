@@ -87,7 +87,7 @@ $do_action	= getGETparam4IdOrNumber('action');
  * Create a new album
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album") 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album') 
 {
 	// Only if current user has the rights
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
@@ -132,7 +132,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "create-album")
  * Delete a current album (including all of its files)
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album") 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album') 
 {
 	// Only if current user has the rights
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
@@ -208,7 +208,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-album")
  * Delete a one or more images
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-images") 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images') 
 {
 	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/lightbox/lightbox.Manage.php');
 	
@@ -290,7 +290,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "del-images")
  * Apply album to page
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album") 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album') 
 {
 	// Only if current user has the rights
 	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
@@ -338,7 +338,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "apply-album")
  * As we like to play it safe when uploading files, we'll add another check right 
  * here to ensure this action is only allowed once per form rendering.
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action == "save-files") 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files') 
 {
 	if (!checkAuth() || empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])
 	{

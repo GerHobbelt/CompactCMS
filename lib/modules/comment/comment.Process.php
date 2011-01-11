@@ -201,7 +201,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
  * Delete comments (one or more)
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-comments" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && checkAuth()) 
 {
 	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/comment/comment.Manage.php');
 	
@@ -272,7 +272,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-comments" && checkAu
  * Add comment
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-comment" && $_POST['verification']==$_SESSION['ccms_captcha'] && !empty($_SESSION['ccms_captcha']) /* && checkAuth() */ ) // there's not necessarily an *authenticated* SESSION going on here...  
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-comment' && $_POST['verification'] == $_SESSION['ccms_captcha'] && !empty($_SESSION['ccms_captcha']) /* && checkAuth() */ ) // there's not necessarily an *authenticated* SESSION going on here...  
 {
 	$error = '';
 	
@@ -322,7 +322,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-comment" && $_POST['
  * Save configuration
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="save-cfg" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-cfg' && checkAuth()) 
 {
 	$showMessage = getPOSTparam4Number('messages');
 	$showLocale = getPOSTparam4IdOrNumber('locale');

@@ -1,0 +1,69 @@
+
+<p>The submit and reset Events do not bubble up to the window/document in IE by default. Our Element Delegation should fix this</p>
+
+<div id="myContainer">
+
+	<p>Clicking one of the buttons should fire the submit or reset events. For the <strong>submit</strong> event: Try tabbing to the buttons and press enter, or tabbing to the element and press enter.</p>
+
+	<form action="#foo" id="myForm">
+
+		<input type="text" value="some text" />
+		<input type="submit" value="Submit" />
+		<input type="reset" value="reset" />
+
+	</form>
+
+	<p>This form has another ID, so only the reset button should delegate</p>
+
+	<form action="#foo" id="myForm2">
+
+		<input type="text" value="some text" />
+		<input type="submit" value="Submit" />
+		<input type="reset" value="reset" />
+
+	</form>
+
+	<p>Change the text. When you blur the input field, the change event should fire</p>
+
+	<form action="#foo" id="myForm3">
+		<input type="text" value="some text" class="someClass" />
+	</form>
+
+</div>
+
+<p>This should remove all events so none of them are delegated anymore:</p>
+
+<button id="removeEvents">Remove Events</button> -
+<button id="addEvents">Add Events</button>
+
+<pre id="output"></pre>
+
+<script src="/depender/build?require=More/Element.Delegation"></script>
+<script>
+
+var output = $('output');
+
+var events = {
+	'submit:relay(form#myForm)': function(event){
+		event.stop();
+		output.appendText('\nSuccesfully delegated and stopped the ' + event.type + ' event');
+	},
+	'reset:relay(form)': function(event){
+		event.stop();
+		output.appendText('\nSuccesfully delegated and stopped the ' + event.type + ' event');
+	},
+	'change:relay(input.someClass)': function(event){
+		output.appendText('\nSuccesfully delegated the ' + event.type + ' event');
+	}
+};
+
+var container = $('myContainer').addEvents(events);
+
+$('removeEvents').addEvent('click', function(){
+	container.removeEvents(events);
+});
+$('addEvents').addEvent('click', function(){
+	container.addEvents(events);
+});
+
+</script>

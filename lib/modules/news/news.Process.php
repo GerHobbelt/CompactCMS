@@ -78,7 +78,7 @@ $do_action 	= getGETparam4IdOrNumber('action');
  * Either INSERT or UPDATE news article
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-edit-news' && checkAuth()) 
 {
 	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/news/news.Manage.php');
 	
@@ -141,7 +141,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="add-edit-news" && checkA
  * Delete current news item
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-news' && checkAuth()) 
 {
 	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/news/news.Manage.php');
 	
@@ -199,7 +199,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="del-news" && checkAuth()
  * Save configuration preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "POST" && $do_action=="cfg-news" && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth()) 
 {
 	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/news/news.Manage.php');
 	

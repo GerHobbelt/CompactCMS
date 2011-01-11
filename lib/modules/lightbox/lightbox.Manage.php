@@ -519,16 +519,23 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			<p class="loading-img" ><?php echo $ccms['lang']['album']['please_wait']; ?></p>
 		</div>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	</div>
+<?php 
+// prevent JS errors when permissions don't allow uploading (and all the rest)
+if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+{
+?>
 	<script type="text/javascript" charset="utf-8">
-	<?php 
-	// prevent JS errors when permissions don't allow uploading (and all the rest)
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
-	{
-	?>
 var js = [
 	'../../includes/js/mootools-core.js,mootools-more.js',
 	'../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js',
@@ -576,9 +583,6 @@ function delete_these_files()
 }
 
 
-	<?php
-	}
-	?>
 
 
 
@@ -622,5 +626,8 @@ function ccms_lazyload_setup_GHO()
 }
 </script>
 <script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
+<?php
+}
+?>
 </body>
 </html>

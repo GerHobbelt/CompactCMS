@@ -33,13 +33,17 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
+// the code on this page is currently unused!
+die('Illegal entry point!'); 
+
+
 // Read SQL info & execute
 $mod_structure = "../../lib/modules/".strtolower($post_module)."/mod_structure.sql";
 if(is_file($mod_structure)) {
 	$mod_query 	= file_get_contents($mod_structure);
 	$tok 		= strtok($mod_query, ";");
 	while ($tok !== false) {
-		$results = $db->Query("$tok");
+		$results = $db->Query($tok);
 		$tok = strtok(";");
 	}
 } // Else no database structure file was found (depends on module, no check possible).

@@ -72,7 +72,7 @@ $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
 // Do authentication
-if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD']=="POST") 
+if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST') 
 {                               
 	/*
 	This code does NOT require that the submitted data (user+pass) originates from the
