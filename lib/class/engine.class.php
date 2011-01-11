@@ -162,6 +162,19 @@ class ccmsParser
 			{
 				return $this->getvar($vars[$v[0]], $v[1]);
 			}
+			/* else: postprocessing required --> '!'-bang postfixed variable reference? */
+			$v = explode('!', $var, 2);
+			if (is_array($v) && count($v) == 2 && array_key_exists($v[0], $vars))
+			{
+				$rv = $this->getvar($vars, $v[0]);
+				switch ($v[1])
+				{
+				default:
+				case 'quoteprotect':
+					/* data must have its quotes transformed to HTML entities! */
+					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
+				}
+			}
 			return '';
 		}
 	}
