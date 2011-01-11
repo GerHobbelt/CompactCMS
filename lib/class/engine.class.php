@@ -108,7 +108,7 @@ class ccmsParser
 		$template = array();
 		while ($str != '') 
 		{
-			$result = preg_match('/^([^{<]*)({%.*?%}|<!--.*?-->|{[^%][^{<]*|<[^{<]*|)/s', $str, $matches);
+			$result = preg_match('/^([^{]*)({%.*?%}|{[^%{]*|)/s', $str, $matches);
 			$str = substr($str, strlen($matches[0]));
 			if (strlen($matches[1])) $template[] = $matches[1];
 			if (preg_match('/{%INCLUDE (.*)%}/', $matches[2], $matches2)) 
