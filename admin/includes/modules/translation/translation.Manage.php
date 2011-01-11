@@ -235,7 +235,7 @@ if ($do == 'update')
 {
 	$error = true;
 	
-	$content = (!empty($_POST['content']) ? $_POST['content'] : ''); // must be RAW CONTENT
+	$content = getPOSTparam4RAWHTML('content'); // must be RAW CONTENT
 	if (!empty($content))
 	{
 		$to_lang_arr = collect_translations($to_lang);

@@ -1019,7 +1019,7 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
 			$filenoext	= getGETparam4FullFilePath('template');
 			$filename	= BASE_PATH . '/lib/templates/' . $filenoext;
 			
-			$content	= $_POST['content']; // RAW CONTENT: the template may contain ANYTHING.
+			$content	= getPOSTparam4RAWCONTENT('content'); // RAW CONTENT: the template may contain ANYTHING.
 			
 			if (is_writable_ex($filename)) 
 			{
@@ -1063,6 +1063,11 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		//$i=count(array_filter($_POST));
 		//if($i <= 6) error
 		
+		if (empty($_POST['userPass']))
+		{
+			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
+			exit();
+		}
 		$userName = strtolower(getPOSTparam4IdOrNumber('user'));
 		$userPass = md5($_POST['userPass'].$cfg['authcode']);
 		$userFirst = getPOSTparam4HumanName('userFirstname');
@@ -1070,7 +1075,7 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		$userEmail = getPOSTparam4Email('userEmail');
 		$userActive = getPOSTparam4boolean('userActive');
 		$userLevel = getPOSTparam4Number('userLevel');
-		if (empty($userName) || empty($_POST['userPass']) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
+		if (empty($userName) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
 		{
 			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
 			exit();
@@ -1170,6 +1175,12 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
 	// Only if current user has the rights
 	if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID']==$userID) 
 	{
+		if (empty($_POST['userPass']) || empty($_POST['cpass']))
+		{
+			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passshort'])));
+			exit();
+		}
+		
 		$passphrase_len = strlen($_POST['userPass']);
 		
 		if($passphrase_len > 6 && md5($_POST['userPass']) === md5($_POST['cpass'])) 
@@ -1614,7 +1625,7 @@ if($do_action == 'save-changes' && checkAuth())
 	$name 		= getGETparam4Filename('page');
 	$active		= getGETparam4boolYN('active', 'N');
 	$type		= (getPOSTparam4boolean('code') ? "code" : "text");
-	$content	= $_POST['content']; // [i_a] must be RAW HTML, no htmlspecialchars(). Filtering required if malicious input risk expected.
+	$content	= getPOSTparam4RAWHTML('content'); // [i_a] must be RAW HTML, no htmlspecialchars(). Filtering required if malicious input risk expected.
 	$filename	= BASE_PATH . '/content/' . $name . '.php';
 	$keywords	= getPOSTparam4DisplayHTML('keywords');
 
