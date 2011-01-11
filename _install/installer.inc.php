@@ -591,6 +591,11 @@ if($nextstep == md5('final') && CheckAuth())
 				  after all, they will soon be followed up with INSERT INTO queries and we don't 
 				  want the 'fresh install' records to linger in there when performing 
 				  an upgrade/restore.
+				  
+				  NOTE that SQL dumps since 1.4.2 (rev. 2011/01/11) do contain their own TRUNCATE TABLE
+				  statements, and we do know that is so, but here we wish to be as backwards compatible
+				  as humanly possible. Besides a dual TRUNCATE TABLE doesn't hurt, so we don't filter
+				  those TRUNCATE statements when they exist in the original SQL script.
 				*/
 				if (preg_match('/DROP\s+TABLE/i', $tok))
 					continue;
