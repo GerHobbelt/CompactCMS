@@ -300,8 +300,9 @@ if (isset($_SERVER['HTTP_IF_NONE_MATCH']) &&
 	// Return visit and no modifications, so do not send anything
 	send_response_status_header(304); // Not Modified
 	header('Content-Length: 0');
-} 
-else 
+	exit();
+}
+else
 {
 	// Determine supported compression method
 	if (!empty($_SERVER['HTTP_ACCEPT_ENCODING']))
