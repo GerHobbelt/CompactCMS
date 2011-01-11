@@ -1379,8 +1379,15 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 			</div>
 		</form>
 
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	</div>
 	<script type="text/javascript">

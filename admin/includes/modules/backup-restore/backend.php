@@ -482,8 +482,16 @@ if (0)
 }
 ?>
 
+
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
+<?php
+}
+?>
 
 	
 <script type="text/javascript" charset="utf-8">
@@ -509,8 +517,7 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../../../lib/includes/js/mootools-core.js',
-	'../../../../lib/includes/js/mootools-more.js',
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
 	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 
