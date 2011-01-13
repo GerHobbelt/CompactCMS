@@ -142,9 +142,9 @@ pre{
 	padding: 0;
 }
 
-.hidden
-{
+.hidden{
 	opacity: 0.2; 
+	filter:alpha(opacity=20);
 }
 
 #result .edit_area_cursor{
@@ -353,6 +353,8 @@ table.statusbar{
 }
 
 .editAreaButtonDisabled {
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity:0.3;
 	opacity: 0.3;
 	border: 1px solid #F0F0EE !important;
 	cursor: pointer;
