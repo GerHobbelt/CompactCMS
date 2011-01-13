@@ -59,10 +59,10 @@ $dump_queries_n_stuff_in_devmode = false;
 
 
 /**
-*
-* Per step processing of input
-*
-**/
+ *
+ * Per step processing of input
+ *
+ **/
 
 // Step two
 if($nextstep == md5('2') && CheckAuth())
@@ -260,18 +260,18 @@ if($nextstep == md5('4') && CheckAuth())
 	//
 	$chfile = array();
 	/*
-	Note that the 'required' 0666/0777 access rights are, in reality, overdoing it. To be more precise:
-	these files and directories should have [W]rite access enabled for the user the php binary is running
-	under. Generally that user would be the user under which the webserver, e.g. apache, is running
-	(CGI may be a different story!)
-
-	Next to that, the directories tested here need e[X]ecutable access for that same user as well.
-
-	This is /less/ than the 0666/0777 splattergun, but the latter is easier to grok and do for novices.
-	So the message can remain 0666/0777 but in here we're performing the stricter check, as 'is_writable_ex()'
-	is the one which really counts after all: that's the very same check performed by the PHP engine on
-	open-for-writing any file/directory.
-	*/
+	 * Note that the 'required' 0666/0777 access rights are, in reality, overdoing it. To be more precise:
+	 * these files and directories should have [W]rite access enabled for the user the php binary is running
+	 * under. Generally that user would be the user under which the webserver, e.g. apache, is running
+	 * (CGI may be a different story!)
+     * 
+	 * Next to that, the directories tested here need e[X]ecutable access for that same user as well.
+     * 
+	 * This is /less/ than the 0666/0777 splattergun, but the latter is easier to grok and do for novices.
+	 * So the message can remain 0666/0777 but in here we're performing the stricter check, as 'is_writable_ex()'
+	 * is the one which really counts after all: that's the very same check performed by the PHP engine on
+	 * open-for-writing any file/directory.
+	 */
 	if(!is_writable_ex(BASE_PATH.'/.htaccess')) { $chfile[] = '.htaccess (0666)'; }
 	if(!is_writable_ex(BASE_PATH.'/lib/config.inc.php')) { $chfile[] = '/lib/config.inc.php (0666)'; }
 	if(!is_writable_ex(BASE_PATH.'/content/home.php')) { $chfile[] = '/content/home.php (0666)'; }
@@ -415,10 +415,10 @@ if($nextstep == md5('4') && CheckAuth())
 } // Close step four
 
 /**
-*
-* Do the actual configuration
-*
-**/
+ *
+ * Do the actual configuration
+ *
+ **/
 
 // Final step
 if($nextstep == md5('final') && CheckAuth())
@@ -570,10 +570,10 @@ if($nextstep == md5('final') && CheckAuth())
 				if ($currently_in_sqltextdata)
 				{
 					/*
-					MySQL supports multiline texts in queries; apparently we have a text here which has a line ending with a semicolon :-(
-					
-					We can only be certain it's a b0rked query by the time we've reached the very end of the SQL file!
-					*/
+					 * MySQL supports multiline texts in queries; apparently we have a text here which has a line ending with a semicolon :-(
+					 * 
+					 * We can only be certain it's a b0rked query by the time we've reached the very end of the SQL file!
+					 */
 					$query_so_far .= implode("\n", $lines) . ";\n";
 					continue;
 				}
@@ -585,18 +585,18 @@ if($nextstep == md5('final') && CheckAuth())
 					continue;
 
 				/*
-				- ignore 'DROP TABLE' queries
-				
-				- process 'CREATE TABLE' queries by REPLACING them with 'TRUNCATE TABLE' queries; 
-				  after all, they will soon be followed up with INSERT INTO queries and we don't 
-				  want the 'fresh install' records to linger in there when performing 
-				  an upgrade/restore.
-				  
-				  NOTE that SQL dumps since 1.4.2 (rev. 2011/01/11) do contain their own TRUNCATE TABLE
-				  statements, and we do know that is so, but here we wish to be as backwards compatible
-				  as humanly possible. Besides a dual TRUNCATE TABLE doesn't hurt, so we don't filter
-				  those TRUNCATE statements when they exist in the original SQL script.
-				*/
+				 * - ignore 'DROP TABLE' queries
+				 * 
+				 * - process 'CREATE TABLE' queries by REPLACING them with 'TRUNCATE TABLE' queries; 
+				 *   after all, they will soon be followed up with INSERT INTO queries and we don't 
+				 *   want the 'fresh install' records to linger in there when performing 
+				 *   an upgrade/restore.
+				 *   
+				 *   NOTE that SQL dumps since 1.4.2 (rev. 2011/01/11) do contain their own TRUNCATE TABLE
+				 *   statements, and we do know that is so, but here we wish to be as backwards compatible
+				 *   as humanly possible. Besides a dual TRUNCATE TABLE doesn't hurt, so we don't filter
+				 *   those TRUNCATE statements when they exist in the original SQL script.
+				 */
 				if (preg_match('/DROP\s+TABLE/i', $tok))
 					continue;
 					

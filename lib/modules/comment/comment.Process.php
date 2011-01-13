@@ -90,19 +90,19 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
 	$rsLoc	= $rs->showLocale;
 	$max 	= ($rsCfg > 0 ? $rsCfg : 10);
 	/*
-	The next query is a nice example about the MySQL class 'enhanced' use: by 
-	passing a prefab string instead of an array of fields, it is copied 
-	literally into the query, without quoting it.
-	
-	This produces the following query as a result:
-	
-	  SELECT COUNT(commentID) FROM ccms_modcomment WHERE pageID = 'xyz'
-	  
-	NOTE that this type of usage assumes the 'raw string' has been correctly
-	processed by the caller, i.e. all SQL injection attack prevention precautions
-	have been taken. (Well, /hardcoding/ it like this is the safest possible
-	thing right there, so no worries, mate! ;-) )
-	*/
+	 * The next query is a nice example about the MySQL class 'enhanced' use: by 
+	 * passing a prefab string instead of an array of fields, it is copied 
+	 * literally into the query, without quoting it.
+	 * 
+	 * This produces the following query as a result:
+	 * 
+	 *   SELECT COUNT(commentID) FROM ccms_modcomment WHERE pageID = 'xyz'
+	 *   
+	 * NOTE that this type of usage assumes the 'raw string' has been correctly
+	 * processed by the caller, i.e. all SQL injection attack prevention precautions
+	 * have been taken. (Well, /hardcoding/ it like this is the safest possible
+	 * thing right there, so no worries, mate! ;-) )
+	 */
 	$total = $db->SelectSingleValue($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), 'COUNT(commentID)');
 	if ($db->ErrorNumber()) 
 		$db->Kill();

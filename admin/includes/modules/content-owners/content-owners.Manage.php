@@ -288,10 +288,10 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
+	 * when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
+	 * however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
+	 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
+	 */
 	tinyMCEPreInit = {
 		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
 		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>

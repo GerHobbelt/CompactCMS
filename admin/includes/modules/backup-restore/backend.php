@@ -95,11 +95,11 @@ if($do == "backup" && !empty($btn_backup))
 	$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
 
 	/*
-	Also backup the config php file: that one contains critical data, such as 
-	the auth code, without which, the backup is not complete: the authcode is
-	required to ensure the MD5 hashes stored in the DB per user are still valid
-	when the backup is restored at an unfortunate moment later in time.
-	*/
+	 * Also backup the config php file: that one contains critical data, such as 
+	 * the auth code, without which, the backup is not complete: the authcode is
+	 * required to ensure the MD5 hashes stored in the DB per user are still valid
+	 * when the backup is restored at an unfortunate moment later in time.
+	 */
 	$configBackup       = array('../../../../content/','../../../../lib/templates/','../../../../lib/config.inc.php','../../../../media/albums/:/\.txt$/i','../../../../media/albums/:/\/_thumbs\//i');
 	$configBackupDir    = '../../../../media/files/';
 	$backupName         = date('Ymd_His').'-data'.$current_user.'.zip';
@@ -130,10 +130,10 @@ if($do == "backup" && !empty($btn_backup))
 				$createZip->addDirectory($basename);
 				$files = directoryToArray($dir, true, $regex_to_match);
 				/*
-				opendir+readdir deliver the file set in arbitrary order.
-				
-				In order for this code to work, we'll need a known order of the files.
-				*/
+				 * opendir+readdir deliver the file set in arbitrary order.
+				 * 
+				 * In order for this code to work, we'll need a known order of the files.
+				 */
 				sort($files, SORT_STRING);
 				//$files = array_reverse($files);
 
@@ -163,10 +163,10 @@ if($do == "backup" && !empty($btn_backup))
 	else
 	{
 		/*
-		And make sure we 'position' the .sql file just right for a subsequent 
-		restore through our installer/wizard: to make that happen it has to live
-		in the /_docs/ directory.
-		*/
+		 * And make sure we 'position' the .sql file just right for a subsequent 
+		 * restore through our installer/wizard: to make that happen it has to live
+		 * in the /_docs/ directory.
+		 */
 		$createZip->addDirectory('media');
 		$createZip->addDirectory('media/files');
 		$createZip->addDirectory('media/files/ccms-restore');
@@ -190,18 +190,18 @@ if($do == "backup" && !empty($btn_backup))
 	}
 
 	/*
-	To facilitate the auto-upgrade path we copy the current config.inc.php 
-	and write the SQL dump to another location: 
-	  /media/files/ccms-restore/config.inc.php
-	  /media/files/ccms-restore/compactcms-sqldump.sql
-	These files will be picked up by the installer/wizard to perform an
-	automated upgrade when the admin so desires.
-	
-	Note the comment in /_install/inde.php: the SQL DUMP must be the
-	VERY LAST FILE WRITTEN during the backup action (as we depend on 
-	its 'last modified' timestamp to be the latest thing in the 
-	content/media zone!
-	*/
+	 * To facilitate the auto-upgrade path we copy the current config.inc.php 
+	 * and write the SQL dump to another location: 
+	 *   /media/files/ccms-restore/config.inc.php
+	 *   /media/files/ccms-restore/compactcms-sqldump.sql
+	 * These files will be picked up by the installer/wizard to perform an
+	 * automated upgrade when the admin so desires.
+	 * 
+	 * Note the comment in /_install/inde.php: the SQL DUMP must be the
+	 * VERY LAST FILE WRITTEN during the backup action (as we depend on 
+	 * its 'last modified' timestamp to be the latest thing in the 
+	 * content/media zone!
+	 */
 	if (!file_exists(BASE_PATH . '/media/files/ccms-restore'))
 	{
 		@mkdir(BASE_PATH . '/media/files/ccms-restore', fileperms(BASE_PATH . '/media/files'));
@@ -308,9 +308,9 @@ if($do=="delete" && !empty($btn_delete))
 
 
 /*
-See if the site uses the lightbox or any other 'predefined' plugin/module: if so, warn
-about those bits not being backed up entirely (or not at all).
-*/
+ * See if the site uses the lightbox or any other 'predefined' plugin/module: if so, warn
+ * about those bits not being backed up entirely (or not at all).
+ */
 $modules_in_use = $db->SelectArray($cfg['db_prefix'].'pages', null, 'DISTINCT module');
 if (!$modules_in_use)
 	$db->Kill();

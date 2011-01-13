@@ -55,10 +55,10 @@ function check_session_sidpatch_and_start()
 		$sesid = preg_replace('/[^A-Za-z0-9]/', 'X', $_GET[$getid]);
 
 		/*
-		Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
-		
-		however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
-		*/
+		 * Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
+		 * 
+		 * however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
+		 */
 		session_id($sesid);
 		session_start();
 		//session_write_close();
@@ -105,10 +105,10 @@ if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOP
 }
 
 /*
- initiate database connection; do this AFTER checking for the _install directory, because 
- otherwise error reports from this init will have precedence over the _install-dir-exists 
- error report!
-*/
+ * initiate database connection; do this AFTER checking for the _install directory, because 
+ * otherwise error reports from this init will have precedence over the _install-dir-exists 
+ * error report!
+ */
 $db = new MySQL();
 
 
@@ -280,10 +280,10 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	function ccmsContent($page, $published, $preview, $force_load = false) 
 	{
 		/*
-		Add every item which we have around here and want present in the module page being loaded in here.
-		-->
-		We want the db connection and the config ($cfg) and content ($ccms) arrays available anywhere inside the include()'d content.
-		*/
+		 * Add every item which we have around here and want present in the module page being loaded in here.
+		 *   -->
+		 * We want the db connection and the config ($cfg) and content ($ccms) arrays available anywhere inside the include()'d content.
+		 */
 		global $ccms, $cfg, $db, $modules, $v;
 		
 		$content = false;
@@ -647,14 +647,14 @@ if (0)
 	}
 	
 	/*
-	The CONTENT collection should be the very last thing happening. 
-	
-	This is important for 'code' pages: these can only now assume that all
-	$ccms[] entries for the current page have been set up completely.
-	ATM no modules use this assumption (for example to modify/postprocess the $ccms[]
-	data) but this code flow enables the existence of such modules (plugins)
-	as they are loaded through the 'iscoding'-marked page.
-	*/
+	 * The CONTENT collection should be the very last thing happening. 
+	 * 
+	 * This is important for 'code' pages: these can only now assume that all
+	 * $ccms[] entries for the current page have been set up completely.
+	 * ATM no modules use this assumption (for example to modify/postprocess the $ccms[]
+	 * data) but this code flow enables the existence of such modules (plugins)
+	 * as they are loaded through the 'iscoding'-marked page.
+	 */
 	$ccms['content'] = ccmsContent($ccms['urlpage'], $ccms['published'], $preview);
 	if ($ccms['content'] === false)
 	{

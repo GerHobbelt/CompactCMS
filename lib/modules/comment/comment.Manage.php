@@ -116,11 +116,11 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 						<th class="rowspan2" rowspan="2">&#160;</th>
 						<?php
 						/*
-						Do NOT spec any span-X's widths for these columns: let the table settle on its
-						own. The input data shown here is way to varying and screen width (on laptops
-						at least) is too costly a realty to enforce some pre-determined ratios on these
-						columns....
-						*/
+						 * Do NOT spec any span-X's widths for these columns: let the table settle on its
+						 * own. The input data shown here is way to varying and screen width (on laptops
+						 * at least) is too costly a realty to enforce some pre-determined ratios on these
+						 * columns....
+						 */
 						?>
 						<th class="nowrap"><?php echo $ccms['lang']['guestbook']['rating']; ?></th>
 						<th class="nowrap"><?php echo $ccms['lang']['guestbook']['author']; ?></th>
@@ -187,12 +187,12 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							<td class="email-col nowrap small">
 								<?php 
 								/* 
-								show email in title~tooltip, for otherwise the table will be too wide even on 1024px 
-								wide screens for 'usual' data in the table. We DO have an overflow-y for the <table>
-								but that doesn't mean you'll be happy about it when you need to scroll to the bottom
-								of the comment collection, just to move left & right. The scrollbar/overflow-x is
-								there for those occasions where we would be in trouble otherwise, i.e. use sparingly...
-								*/
+								 * show email in title~tooltip, for otherwise the table will be too wide even on 1024px 
+								 * wide screens for 'usual' data in the table. We DO have an overflow-y for the <table>
+								 * but that doesn't mean you'll be happy about it when you need to scroll to the bottom
+								 * of the comment collection, just to move left & right. The scrollbar/overflow-x is
+								 * there for those occasions where we would be in trouble otherwise, i.e. use sparingly...
+								 */
 								?>
 								<a href="mailto:<?php echo $rsComment->commentEmail; ?>" title="<?php echo $rsComment->commentEmail; ?>"><span class="ss_sprite_16 ss_email">&#160;</span></a>
 							</td>
