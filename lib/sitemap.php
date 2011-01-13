@@ -230,6 +230,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		$ccms['module']      = 'error';
 		$ccms['module_path'] = null;
 
+		$ccms['cfg']        = $cfg;
 		$ccms['language']   = $cfg['language'];
 		$ccms['tinymce_language']   = $cfg['language'];
 		$ccms['editarea_language']   = $cfg['language'];
@@ -241,7 +242,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		// [i_a] fix: close <span> here as well
 		$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' Home">Home</a> &raquo '.$ccms['lang']['system']['error_404title'].'</span>';
 		$ccms['iscoding']   = "Y";
-		$ccms['rootdir']    = (substr($cfg['rootdir'],-1)!=='/'?$cfg['rootdir'].'/':$cfg['rootdir']);
+		$ccms['rootdir']    = (substr($cfg['rootdir'],-1) !== '/' ? $cfg['rootdir'].'/' : $cfg['rootdir']);
 		$ccms['urlpage']    = $pagereq; // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
 		$ccms['desc']       = $ccms['lang']['system']['error_404title'];
 		$ccms['keywords']   = strval($code);
@@ -367,6 +368,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		$ccms['iscoding']   = $row->iscoding;
 
 		// Content variables
+		$ccms['cfg']        = $cfg;
 		$ccms['language']   = $cfg['language'];
 		$ccms['tinymce_language']   = $cfg['language'];
 		$ccms['editarea_language']   = $cfg['language'];
@@ -394,7 +396,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		// Check whether template exists, specify default or throw "no templates" error.
 		$ccms['template'] = DetermineTemplateName($row->variant, $ccms['printing']);
 
-		$ccms['module']      = $row->module;
+		$ccms['module']     = $row->module;
 		
 if (0)
 {
