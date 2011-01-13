@@ -512,20 +512,7 @@ function jsComplete(user_obj, lazy_obj)
 
 	// window.addEvent('domready',function()
 	//{
-		if ($('addForm')) /* [i_a] extra check due to permissions cutting out certain parts of the page */
-		{
-			new FormValidator($('addForm') /* , 
-			{
-				onFormValidate: function(passed, form, event)
-				{
-					event.stop();
-					if (passed) 
-						form.submit();
-				}
-			} */ ); 
-		}
-		
-		lazyloading_commonJS_done();
+		lazyloading_commonJS_done("<?php echo $cfg['rootdir']; ?>");
 	//});
 }
 
