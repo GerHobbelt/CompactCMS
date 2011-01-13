@@ -114,7 +114,19 @@ function str2USASCII($src)
 	return trim($src);
 }
 
-function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false)
+/**
+Convert any input text ($src) to a decent identifier which can serve as variable name and/or filename.
+
+Hence, any characters in the input text which are not suitable to both situations are replaced by the
+ubiquitous underscore character. Any runs of multiple occurrences of that one are reduced to a single
+one each.
+
+When the transformation would produce an identifier longer than a specified number of characters
+(default: 32), it is forcibly shortened to that length and the last 8 characters are replaced by the
+characters produced by the hash of the input text in order to deliver an identifier with quite
+tolerable uniqueness guarantees.
+*/
+function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false, $max_outlen = 32)
 {
 	static $regex4var;
 
@@ -129,26 +141,34 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		$regex4var[0][] = "'";
 	}
 
-	$src = str2USASCII($src);
+	$dst = str2USASCII($src);
 
-	$src = str_replace($regex4var[0], $regex4var[1], $src);
+	$dst = str_replace($regex4var[0], $regex4var[1], $dst);
 
-	$src = preg_replace('/(?:[^\-A-Za-z0-9_' . $extra_accept_set . ']|_)+/', '_', $src);
+	$dst = preg_replace('/(?:[^\-A-Za-z0-9_' . $extra_accept_set . ']|_)+/', '_', $dst);
 	// reduce series of underscores to a single one:
-	$src = preg_replace('/_+/', '_', $src);
+	$dst = preg_replace('/_+/', '_', $dst);
 
 	// remove leading and trailing underscores (which may have been whitespace or other stuff before)
 	// except... we have directories which start with an underscore. So I guess a single
 	// leading underscore should be okay. And so would a trailing underscore...
-	//$src = trim($src, '_');
+	//$dst = trim($dst, '_');
 
 	// We NEVER tolerate a leading dot:
-	$src = preg_replace('/^\.+/', '', $src);
+	$dst = preg_replace('/^\.+/', '', $dst);
 	if (!$accept_leading_minus)
 	{
-		$src = preg_replace('/^-+/', '', $src);
+		$dst = preg_replace('/^-+/', '', $dst);
 	}
-	return $src;
+	
+	if ($max_outlen < strlen($dst))
+	{
+		$h = md5($src);
+		$tl = max(32, intval(($max_outlen + 3) / 4)); // round up tail len (the hash-replaced bit), so for very small sizes it's still > 0
+		$dst = substr($dst, 0, $max_outlen - $tl) . substr($h, -$tl);
+	}
+	
+	return $dst;
 }
 
 /*
