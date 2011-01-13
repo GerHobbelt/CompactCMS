@@ -332,12 +332,12 @@ if ($db->ErrorNumber())
 		<form action="index.php" id="delete">
 		<?php
 		/*
-		With lining the header texts with the data and everything, it's simply way too much hassle to keep them in separate tables:
-		you never get the laignment right.
-		
-		So starting with this edition, the header is regenerated with each reload. This has an impact on the filters, but we can fix them
-		easily there by re-registering those nodes in the JS code.
-		*/
+		 * With lining the header texts with the data and everything, it's simply way too much hassle to keep them in separate tables:
+		 * you never get the laignment right.
+		 * 
+		 * So starting with this edition, the header is regenerated with each reload. This has an impact on the filters, but we can fix them
+		 * easily there by re-registering those nodes in the JS code.
+		 */
 		?>
 		<div id="dyn_list">
 			<?php echo $ccms['lang']['system']['error_misconfig']; ?> <a href="http://community.compactcms.nl/forum/"><strong><?php echo $ccms['lang']['backend']['see_forum']; ?></strong></a>.
