@@ -275,7 +275,13 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	
 
 	/**
-	 Parse contents function
+	 * Load the page ($page) Parse contents function when it is either signalled as published ($published),
+	 * identified by the preview page ID code ($preview) or instructed to load anyhow ($force_load).
+	 *
+	 * Return FALSE when the page does not exist or could not be loaded due to either the restrictions above 
+	 * or file system access rights denying the web server read access to the specified page.
+	 *
+	 * Return the rendered page content otherwise.
 	 */
 	function ccmsContent($page, $published, $preview, $force_load = false) 
 	{
@@ -287,7 +293,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		global $ccms, $cfg, $db, $modules, $v;
 		
 		$content = false;
-		$failure = false;
+		$ccms_load_failure = false; // this variable should have a name that will not get used/redefined inadvertedly in the loaded PHP page!
 		$msg = explode(' ::', $ccms['lang']['hints']['published']);
 		ob_start();
 			// Check for preview variable
@@ -305,25 +311,32 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				
 				if (is_file($filepath))
 				{
-					/*MARKER*/include($filepath);
+					if (is_readable($filepath))
+					{
+						/*MARKER*/include($filepath);
+					}
+					else
+					{
+						$ccms_load_failure = 403;
+					}
 				}
 				else
 				{
-					$failure = 404;
+					$ccms_load_failure = 404;
 				}
 			}
 			else  
 			{ 
 				// Parse 403 contents (disabled and no preview token)
-				$failure = 403;
+				$ccms_load_failure = 403;
 			}
 			// All parsed function contents to $content variable
 			$content = ob_get_contents();
 		ob_end_clean();
 		
-		if ($failure && empty($ccms['responsecode']))
+		if ($ccms_load_failure && empty($ccms['responsecode']))
 		{
-			$ccms['responsecode'] = $failure;
+			$ccms['responsecode'] = $ccms_load_failure;
 			return false;
 		}
 		return $content;
