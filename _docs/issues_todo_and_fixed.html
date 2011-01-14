@@ -398,28 +398,85 @@ around everywhere I go); moved the paper notes here for easier transportation.)<
 		</td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/14</p></td>
+		<td class="ms-grid5-1001-even"><p>Feature Request: new module called 
+		Mixer: generates pages by &#39;mixing&#39; other pages into a single entity. The 
+		idea originated from pondering how one would be able to (ab)use 
+		CompactCMS as a blog system, which would require each article (~ page) 
+		to come with a comment section. In other words: a &#39;blog page&#39; would be a 
+		regular page and a comments page combined into one! The Mixer can do 
+		that for us by having a &#39;mixed page&#39; row, which has this module 
+		assigned. Then the module can check another table (ccms_modmixer) to see 
+		which pages must be loaded to render the requested &#39;mixed&#39; page. That 
+		would make the ccms_modmixer table a N:M relational table (with 
+		attributes).</p>
+		<p>Of course the Mixer could also be the answer to my question how we 
+		might be able to put page-based content in other spots in the template 
+		then just the &#39;content&#39; section. E.g. &#39;mixing&#39; a regular page with a 
+		&#39;news&#39; page and a &#39;event calendar&#39; page, thus presenting a complex 
+		events announcement page.</p>
+		<p>The approach has one drawback: for the &#39;blog solution&#39;, you&#39;ld need 
+		to have two pages: the article itself and the mix page. Next to that, 
+		you need one comments page (not included in <em>any</em> menu) in order 
+		to be able to manage the comments (though the Mixer module would have 
+		its own management page which can forward management to the comments 
+		page for ease of use).</p>
+		<p>This means that the number of &#39;pages&#39; in the admin section will grow 
+		quite quickly for a busy site and that would make them hard to manage. 
+		The filtering feature in there can help, but it&#39;s not ideal. Besides, 
+		there&#39;s no ability to filter on &#39;is published&#39;, &#39;is in menu X&#39;, etc. 
+		selections (yet). Maybe it would work better if we had one mixer page 
+		and managed all &#39;mixes&#39; from there. How we&#39;d go about keeping the page 
+		list small while sticking with the CCMS page approach is still a 
+		conundrum; I can&#39;t see a way out of that without some sort of filtering 
+		being applied to the page list (dyn_list) in the admin screen.</p>
+		<pre>CREATE TABLE IF NOT EXISTS `ccms_modmixer` (
+`MixerID` int(5) unsigned NOT NULL AUTO_INCREMENT COMMENT &#39;record index&#39;,
+`UserID` int(5) DEFAULT NULL COMMENT &#39;user for which this mix applies&#39;,
+`PageID` int(5) NOT NULL COMMENT &#39;reference to the MixIn page itself&#39;,
+`MixIn_PageID` int(5) NOT NULL COMMENT &#39;reference to the page which will be placed at this location/position&#39;,
+`location` smallint(5) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;0: main section; 1..N: menu structure; 100: head; 200: header; 1000: footer&#39;,
+`position` smallint(5) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;order = 0: main/center stage; -1000..-1: before; 1..1000: after&#39;,
+`published` enum(&#39;Y&#39;,&#39;N&#39;) NOT NULL DEFAULT &#39;Y&#39; COMMENT &#39;is this part included in the generated page?&#39;,
+`printable` enum(&#39;Y&#39;,&#39;N&#39;) NOT NULL DEFAULT &#39;Y&#39; COMMENT &#39;is this part included in the generated page when rendering a page for print?&#39;,
+`last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`MixerID`),
+KEY `PageID` (`PageID`),
+KEY `UserID` (`UserID`),
+KEY `MixIn_PageID` (`MixIn_PageID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT=&#39;N:M relationships which define the page layout mix per page/&#39; AUTO_INCREMENT=1 ;</pre>
+		<p>&nbsp;</p>
+		</td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/14</p></td>
+		<td class="ms-grid5-1001-even"><p>Feature Request: integrate
+		<a href="https://github.com/paulirish/html5-boilerplate">HTML5 
+		Boilerplate</a> in admin and templates?</p>
+		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/14</p></td>
+		<td class="ms-grid5-1001-even"><p>Feature Request: seen on orther sites: 
+		use lazy image loading for when we don&#39;t want a lightbox-ed image 
+		gallery (or for pages which show lots of (large) images).</p>
+		<p>
+		<a href="http://www.webresourcesdepot.com/lazy-loading-of-images-resources-you-need/">
+		http://www.webresourcesdepot.com/lazy-loading-of-images-resources-you-need/</a></p>
+		<p><a href="http://davidwalsh.name/mootools-lazyload">
+		http://davidwalsh.name/mootools-lazyload</a></p>
+		<p><a href="http://www.appelsiini.net/projects/lazyload">
+		http://www.appelsiini.net/projects/lazyload</a></p>
+		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/14</p></td>
+		<td class="ms-grid5-1001-even"><p>Template generator? Or a dynamic 
+		template which uses PHP/MySQL + asset collections to produce different 
+		&#39;templates&#39; suitable for the CompactCMS render engine?</p>
+		<p>Something that starts like this: <a href="http://www.mycelly.com/">
+		http://www.mycelly.com/</a></p>
+		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
