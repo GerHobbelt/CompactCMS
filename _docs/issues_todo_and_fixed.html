@@ -479,16 +479,20 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/14</p></td>
+		<td class="ms-grid5-1001-even"><p>Bug: tinyMCE calculates an internal 
+		editable content iframe width based on screen width or something like 
+		that; it certainly does NOT look at the mochaUI window width.</p>
+		<p>Question is: how do we tell tinyMCE what the &#39;screen&#39; width is, then?</p>
+		<p>Answer: specify an explicit width (and height?) in the init() invocation.</p>
 		<p>Fixed.</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/15</p></td>
+		<td class="ms-grid5-1001-even"><p>tinyMCE does not resize when the browser 
+		window is resized. With a liquid layout (like the module management windows) 
+		the rest of the pages resizes, but tinyMCE editors do not.</p>
+		<p></p></td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
