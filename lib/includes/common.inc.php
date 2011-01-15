@@ -164,7 +164,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	if ($max_outlen < strlen($dst))
 	{
 		$h = md5($src);
-		$tl = max(32, intval(($max_outlen + 3) / 4)); // round up tail len (the hash-replaced bit), so for very small sizes it's still > 0
+		$tl = min(32, intval(($max_outlen + 3) / 4)); // round up tail len (the hash-replaced bit), so for very small sizes it's still > 0
 		$dst = substr($dst, 0, $max_outlen - $tl) . substr($h, -$tl);
 	}
 	

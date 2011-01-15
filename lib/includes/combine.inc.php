@@ -546,7 +546,7 @@ else
 
 	if (COMBINER_DEV_DUMP_OUTPUT && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	{
-		$dump_filename = str2VarOrFileName($_GET['files']);
+		$dump_filename = str2VarOrFileName($_GET['files']) . '.' . ($type == 'javascript' ? 'js' : $type);
 
 		if ($fp = @fopen($cachedir . '/' . $dump_filename, 'wb'))
 		{
