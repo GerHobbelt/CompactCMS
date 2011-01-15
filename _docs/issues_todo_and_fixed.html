@@ -479,7 +479,7 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/14</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2011/01/14</p></td>
 		<td class="ms-grid5-1001-even"><p>Bug: tinyMCE calculates an internal 
 		editable content iframe width based on screen width or something like 
 		that; it certainly does NOT look at the mochaUI window width.</p>
@@ -495,16 +495,28 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 		<p></p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/15</p></td>
+		<td class="ms-grid5-1001-even"><p>news module: the &lt;meta description&gt; 
+		tag is filled directly from the content, screwing up the page render 
+		severely when there&#39;s any HTML in the content of the news article. </p>
+		<pre id="line1">&lt;<span class="start-tag">meta</span><span class="attribute-name"> name</span>=<span class="attribute-value">&quot;description&quot; </span><span class="attribute-name">content</span>=<span class="attribute-value">&quot;{site} | {content}&quot; /&gt;</span></pre>
+		<p>What <em>should</em> happen is that the news module produces a 
+		(reduced) strip of text for the description, preferably the 
+		preview/teaser text instead of the content itself, as the content can be 
+		quite large!</p>
+		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/15</p></td>
+		<td class="ms-grid5-1001-even"><p>Feature Request: use a different 
+		lightbox (e.g. a la the one used at bakabt.org) or no lightbox at all: a 
+		configurable option how we want our images displayed. Regular, 
+		thumbnails with one image per page in full view, or a kanochan-like 
+		N-thumbs per page display, or a &#39;all full sized images in one page, but 
+		using image lazy loading&#39;).</p>
+		<p>(The thought is that once we got that down, we can either copy or 
+		extend the module to provide generic downloads.)</p>
+		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
