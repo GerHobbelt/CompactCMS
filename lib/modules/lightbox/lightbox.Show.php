@@ -111,7 +111,7 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	$height = null;
 	$width = null;
 	$aspect_ratio = null;
-	if(!empty($thumb_path) && file_exists($thumb_path))
+	if(!empty($thumb_path) && file_exists($thumb_path) && is_readable($thumb_path))
 	{
 		$imginfo = @getimagesize($thumb_path);
 		if (!empty($imginfo[0]))
@@ -126,7 +126,7 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	if ($show_thumb != 1)
 	{
 		$thumb_path = $img_path;
-		if(file_exists($thumb_path)) 
+		if(file_exists($thumb_path) && is_readable($thumb_path)) 
 		{
 			$imginfo = @getimagesize($thumb_path);
 			if (!empty($imginfo[0]))
@@ -245,7 +245,9 @@ if(count($albums)>1 && $singleShow==false)
 		} 
 	} 
 	else 
+	{
 		echo $ccms['lang']['album']['noalbums'];
+	}
 } 
 elseif($singleShow==true) 
 {
