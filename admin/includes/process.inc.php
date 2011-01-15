@@ -1426,129 +1426,76 @@ var jsLogEl = document.getElementById('jslog');
 
 
 	<?php 
-	// Load TinyMCE (compressed for faster loading) 
 	if($cfg['wysiwyg'] && $iscoding != 'Y')
 	{
+	// -------------------------------------------------
+	// Load TinyMCE (compressed for faster loading) 
 	?>
+	
 var js = [
 	'../../lib/includes/js/the_goto_guy.js',
-	'../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
 	'../../lib/includes/js/mootools-core.js,mootools-more.js',
-	'../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
-	if ($cfg['fancyupload_language'] != 'en')
-	{
-		echo 'Language/Language.en.js,';
-	}
-	?>Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'
+	<?php echo generateJS4TinyMCEinit(0, 'content'); ?>
 	];
 		
-function jsComplete(user_obj, lazy_obj)
+function jsCompleteDone(user_obj)
 {
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
 	// window.addEvent('domready',function()
 	//{
-tinyMCE.init(
-	{
-		mode: 'exact',
-		elements: 'content',
-		theme: 'advanced',
-		<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
-		skin: 'o2k7',
-		skin_variant: 'silver',
-		plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		theme_advanced_toolbar_location: 'top',
-		theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
-		theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
-		theme_advanced_buttons3: '',
-		theme_advanced_toolbar_align: 'left',
-		theme_advanced_statusbar_location: 'bottom',
-		dialog_type: 'modal',
-		paste_auto_cleanup_on_paste:true,
-		theme_advanced_resizing:true,
-		relative_urls:true,
-		convert_urls:false,
-		remove_script_host:true,
-		document_base_url: '<?php echo $cfg['rootdir']; ?>',
-		<?php
-		if($cfg['iframe'])
-		{
-		?>
-		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',
-		<?php
-		}
-		?>
-		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
-		file_browser_callback:FileManager.TinyMCE(
-			function(type)
-			{
-				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-					baseURL: '<?php echo $cfg['rootdir']; ?>',
-					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
-					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
-					selectable: true,
-					uploadAuthData:
-					{
-						session:'ccms_userLevel',
-						sid:'<?php echo session_id(); ?>'
-					}
-				};
-			})
-	});
-
+		<?php echo generateJS4TinyMCEinit(2, 'content'); ?>
 	//});
 }
+		
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	<?php echo generateJS4TinyMCEinit(1, 'content'); ?>
+
+	LazyLoad.js(js, jsComplete);
+}
 	<?php 
+	// -------------------------------------------------
 	} 
 	else 
 	{ 
-		// Alternative to tinyMCE: load Editarea for code editing
-		?>
+	// -------------------------------------------------
+	// Alternative to tinyMCE: load Editarea for code editing
+	?>
 	
 var js = [
 	'../../lib/includes/js/the_goto_guy.js',
 	'../../lib/includes/js/edit_area/edit_area_full.js'
 	];
 		
-function jsComplete(user_obj, lazy_obj)
+function jsCompleteDone(user_obj)
 {
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
 	// window.addEvent('domready',function()
 	//{
-editAreaLoader.init(
-	{
-		id:"content",
-		is_multi_files:false,
-		allow_toggle:false,
-		word_wrap:true,
-		start_highlight:true,
-		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
-		syntax:"html"
-	});
-
+	editAreaLoader.init(
+		{
+			id:"content",
+			is_multi_files:false,
+			allow_toggle:false,
+			word_wrap:true,
+			start_highlight:true,
+			<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
+			syntax:"html"
+		});
 	//});
 }
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
 	<?php 
+	// -------------------------------------------------
 	} 
 	?>
 	
@@ -1567,28 +1514,22 @@ function jslog(message)
 	}
 }
 
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
+function jsComplete(user_obj, lazy_obj)
 {
-	jslog('loading JS (sequential calls)');
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
 
-
-
-
-	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-
-	LazyLoad.js(js, jsComplete);
+	jsCompleteDone(user_obj);
 }
+
 	</script>
 	<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 	</body>

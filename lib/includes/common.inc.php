@@ -2441,4 +2441,414 @@ function IsValidPreviewCode($previewCode)
 	return ($sollwert === $previewCode ? $orig_page_id : false);
 }
 
+
+
+
+
+
+
+function get_tinyMCE_plugin_list()
+{
+	/*
+	 * available plugins:
+	 *   advhr
+	 *   advimage
+	 *   advlink
+	 *   advlist
+	 *   autolink
+	 *   autoresize
+	 *   autosave
+	 *   bbcode
+	 *   contextmenu
+	 *   directionality
+	 *   emotions
+	 *   example
+	 *   fullpage
+	 *   fullscreen
+	 *   iespell
+	 *   inlinepopups
+	 *   insertdatetime
+	 *   layer
+	 *   legacyoutput
+	 *   lists
+	 *   media
+	 *   nonbreaking
+	 *   noneditable
+	 *   pagebreak
+	 *   paste
+	 *   preview
+	 *   print
+	 *   save
+	 *   searchreplace
+	 *   spellchecker
+	 *   style
+	 *   tabfocus
+	 *   table
+	 *   template
+	 *   visualchars
+	 *   wordcount
+	 *   xhtmlxtras
+	 */
+	static $mce_plugins = array(
+		'advhr' => 1,
+		'advimage' => 1,
+		'advlink' => 1,
+		'advlist' => 1,
+		'autolink' => 0,
+		'autoresize' => 0,
+		'autosave' => 1,
+		'bbcode' => 0,
+		'contextmenu' => 0,
+		'directionality' => 0,
+		'emotions' => 0,
+	    'example' => 0,
+		'fullpage' => 0,
+		'fullscreen' => 1,
+		'iespell' => 0,
+		'inlinepopups' => 1,
+		'insertdatetime' => 0,
+		'layer' => 0,
+		'legacyoutput' => 0,
+		'lists' => 1,
+		'media' => 1,
+		'nonbreaking' => 1,
+		'noneditable' => 0,
+		'pagebreak' => 1,
+		'paste' => 1,
+		'preview' => 1,
+		'print' => 1,
+		'save' => 0,
+		'searchreplace' => 1,
+		'spellchecker' => 1,
+		'style' => 1,
+		'tabfocus' => 0,
+		'table' => 1,
+		'template' => 0,
+		'visualchars' => 1,
+		'wordcount' => 0,
+		'xhtmlxtras' => 0
+		);
+
+	$rv = array();
+	foreach ($mce_plugins as $plugin => $in_use)
+	{
+		if (!$in_use) continue;
+
+		$rv[] = $plugin;
+	}
+	return $rv;
+}
+
+
+
+
+
+function get_tinyMCE_button_list($plugin = null)
+{
+	/*
+	 * available plugins:
+	 *   advhr
+	 *   advimage
+	 *   advlink
+	 *   advlist
+	 *   autolink
+	 *   autoresize
+	 *   autosave
+	 *   bbcode
+	 *   contextmenu
+	 *   directionality
+	 *   emotions
+	 *   example
+	 *   fullpage
+	 *   fullscreen
+	 *   iespell
+	 *   inlinepopups
+	 *   insertdatetime
+	 *   layer
+	 *   legacyoutput
+	 *   lists
+	 *   media
+	 *   nonbreaking
+	 *   noneditable
+	 *   pagebreak
+	 *   paste
+	 *   preview
+	 *   print
+	 *   save
+	 *   searchreplace
+	 *   spellchecker
+	 *   style
+	 *   tabfocus
+	 *   table
+	 *   template
+	 *   visualchars
+	 *   wordcount
+	 *   xhtmlxtras
+	 */
+	static $mce_plugin_buttons = array(
+		'advhr' => 'advhr',  // search for .addButton() invocations in the plugins to dig out the button names
+		'advimage' => 'image',
+		'advlink' => 'link',
+		'advlist' => '',
+		'autolink' => '',
+		'autoresize' => '',
+		'autosave' => 'restoredraft',
+		'bbcode' => '',
+		'contextmenu' => '',
+		'directionality' => 'ltr,rtl',
+		'emotions' => 'emotions',
+	    'example' => 'example',
+		'fullpage' => 'fullpage',
+		'fullscreen' => 'fullscreen',
+		'iespell' => 'iespell',
+		'inlinepopups' => '',
+		'insertdatetime' => 'insertdate,inserttime',
+		'layer' => 'insertlayer,moveforward,movebackward,absolute',
+		'legacyoutput' => '',
+		'lists' => '',
+		'media' => 'media',
+		'nonbreaking' => 'nonbreaking',
+		'noneditable' => 'noneditable',
+		'pagebreak' => 'pagebreak',
+		'paste' => 'selectall,pastetext,pasteword',
+		'preview' => 'preview',
+		'print' => 'print',
+		'save' => 'save,cancel',
+		'searchreplace' => 'search,replace',
+		'spellchecker' => 'spellchecker',
+		'style' => 'styleprops',
+		'tabfocus' => '',
+		'table' => 'table,delete_table,delete_col,delete_row,col_after,col_before,row_after,row_before,row_props,cell_props,split_cells,merge_cells',
+		'template' => 'template',
+		'visualchars' => 'visualchars',
+		'wordcount' => '',
+		'xhtmlxtras' =>'cite,acronym,abbr,del,ins,attribs',
+		'.1' => 'newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull',
+		'.2' => 'styleselect,formatselect,fontselect,fontsizeselect,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
+		'.3' => 'bullist,numlist,|,outdent,indent,|,cut,copy,paste,|,undo,redo,|,link,unlink,anchor,image,|,cleanup,shortcuts,code,help',
+		'.4' => 'sub,sup,|,blockquote,hr,removeformat,visualaid,|,charmap'
+		);
+
+	$active_plugins = null;
+	if (is_array($plugin))
+	{
+		$active_plugins = $plugin;
+	}
+	else if (!empty($plugin))
+	{
+		$active_plugins = explode(',', strval($plugin));
+	}
+	else
+	{
+		$active_plugins = get_tinyMCE_plugin_list();
+	}
+	
+	$rv = array();
+	foreach ($mce_plugin_buttons as $plugin => $buttons)
+	{
+		if (!in_array($plugin, $active_plugins)) continue;
+
+		$rv[$plugin] = $buttons;
+	}
+	return $rv;
+}
+
+
+
+
+
+/**
+Generate the load code sections for tinyMCE:
+
+state == 0: the lazyload filespec
+
+state == 1: the PREinit code section
+
+state == 2: the init() code section
+*/
+function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true, $js_load_callback = 'jsComplete')
+{
+	global $cfg;
+
+	switch ($state)
+	{
+	default:
+		return false;
+		
+	case 0:
+		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
+		$rv = "'" . $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js'";
+		if ($with_fancyupload)
+		{
+			/* File uploader JS */
+			$rv .= ",\n";
+			$rv .= "'" . $cfg['rootdir'] . "lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,";
+			if ($cfg['fancyupload_language'] != 'en')
+			{
+				$rv .= "Language/Language.en.js,";
+			}
+			$rv .= "Language/Language." . $cfg['fancyupload_language'] . ".js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'";
+		}
+		return $rv;
+	
+	case 1:
+		/*
+		 * when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
+		 * however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
+		 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
+		 */
+		$rv = "";
+		$rv .= "tinyMCEPreInit = {\n";
+		$rv .= "	  suffix: '_src'\n"; /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
+		$rv .= "	, base: '" . $cfg['rootdir'] . "lib/includes/js/tiny_mce'\n";
+		$rv .= "	, query: 'load_callback=" . $js_load_callback . "'\n"; /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+		$rv .= "};\n";
+		return $rv;
+		
+	case 2:
+		$rv = "";
+		// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
+		$rv .= "var dimensions;\n";
+		$rv .= "var editwinwidth;\n";
+		$rv .= "dimensions = window.getSize();\n";
+		$rv .= "editwinwidth = dimensions.x - 20;\n";
+		$rv .= "dimensions = \$('" . $editarea_tag . "').getSize();\n";
+		$rv .= "editwinwidth = dimensions.x;\n";
+		//$rv .= "alert('width: ' + editwinwidth + 'px');\n";
+		$rv .= "\n";
+		$rv .= "tinyMCE.init(\n";
+		$rv .= "	{\n";
+		$rv .= "		mode: 'exact',\n";
+		$rv .= "		elements: '" . $editarea_tag . "',\n";
+		$rv .= "		theme: 'advanced',\n";
+		$rv .= "		language: '" . $cfg['tinymce_language'] ."',\n";
+		$rv .= "		skin: 'o2k7',\n";
+		$rv .= "		skin_variant: 'silver',\n";
+		
+		$pluginarr = get_tinyMCE_plugin_list();
+		$pstr = implode(',', $pluginarr);
+		
+		$rv .= "		plugins: '" . $pstr . "',\n";
+		$rv .= "		theme_advanced_toolbar_location: 'top',\n";
+		
+		$rv .= "		theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
+		$rv .= "		theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
+		$rv .= "		theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
+		$rv .= "		theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
+		
+		$rv .= "		theme_advanced_toolbar_align: 'left',\n";
+		$rv .= "		theme_advanced_statusbar_location: 'bottom',\n";
+		$rv .= "		dialog_type: 'modal',\n";
+		$rv .= "		paste_auto_cleanup_on_paste: true,\n";
+		$rv .= "		theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+		$rv .= "		theme_advanced_resize_horizontal : 1,\n";
+		$rv .= "		theme_advanced_resizing_use_cookie : 1,\n";
+		$rv .= "		theme_advanced_resize_horizontal: false,\n";
+		$rv .= "		theme_advanced_resizing_min_width: 400,\n";
+		$rv .= "		theme_advanced_resizing_min_height: 100,\n";
+		$rv .= "		theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+		$rv .= "		theme_advanced_resizing_max_height: 0xFFFF,\n";
+		$rv .= "		relative_urls: true,\n";
+		$rv .= "		convert_urls: false,\n";
+		$rv .= "		remove_script_host: true,\n";
+		$rv .= "		document_base_url: '" . $cfg['rootdir'] . "',\n";
+		if($cfg['iframe'])
+		{
+			$rv .= "		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
+		}
+ 		$rv .= "		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
+		if ($with_fancyupload)
+		{
+			$rv .= "		file_browser_callback: FileManager.TinyMCE(\n";
+			$rv .= "			function(type)\n";
+			$rv .= "			{\n";
+			$rv .= "				return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+			$rv .= "					url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
+			$rv .= "					baseURL: '" . $cfg['rootdir'] . "',\n";
+			$rv .= "					assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
+			$rv .= "					language: '" . $cfg['fancyupload_language'] . "',\n";
+			$rv .= "					selectable: true,\n";
+			$rv .= "					uploadAuthData: {\n";
+			$rv .= "						session: 'ccms_userLevel',\n";
+			$rv .= "						sid: '" . session_id() . "'\n";
+			$rv .= "					}\n";
+			$rv .= "				};\n";
+			$rv .= "			}),\n";
+		}
+		$rv .= "		width: editwinwidth,\n"; // default: width in pixels
+		//$rv .= "		height: '300px',\n";
+		$rv .= "	});\n";
+		return $rv;
+
+		/*
+		plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,autosave",
+
+		// Theme options
+		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
+		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+		theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+		theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak,restoredraft",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_resizing : true,
+
+		// Example content CSS (should be your site CSS)
+		content_css : "css/content.css",
+
+		// Drop lists for link/image/media/template dialogs
+		template_external_list_url : "lists/template_list.js",
+		external_link_list_url : "lists/link_list.js",
+		external_image_list_url : "lists/image_list.js",
+		media_external_list_url : "lists/media_list.js",
+
+		// Style formats
+		style_formats : [
+			{title : 'Bold text', inline : 'b'},
+			{title : 'Red text', inline : 'span', styles : {color : '#ff0000'}},
+			{title : 'Red header', block : 'h1', styles : {color : '#ff0000'}},
+			{title : 'Example 1', inline : 'span', classes : 'example1'},
+			{title : 'Example 2', inline : 'span', classes : 'example2'},
+			{title : 'Table styles'},
+			{title : 'Table row 1', selector : 'tr', classes : 'tablerow1'}
+		],
+
+		// Replace values for the template plugin
+		template_replace_values : {
+			username : "Some User",
+			staffid : "991234"
+		}
+
+
+
+		// Patch callbacks, make them point to window.opener
+		patchCallback(settings, 'urlconverter_callback');
+		patchCallback(settings, 'insertlink_callback');
+		patchCallback(settings, 'insertimage_callback');
+		patchCallback(settings, 'setupcontent_callback');
+		patchCallback(settings, 'save_callback');
+		patchCallback(settings, 'onchange_callback');
+		patchCallback(settings, 'init_instance_callback');
+		patchCallback(settings, 'file_browser_callback');
+		patchCallback(settings, 'cleanup_callback');
+		patchCallback(settings, 'execcommand_callback');
+		patchCallback(settings, 'oninit');
+
+		// Set options
+		delete settings.id;
+		settings['mode'] = 'exact';
+		settings['elements'] = 'fullscreenarea';
+		settings['add_unload_trigger'] = false;
+		settings['ask'] = false;
+		settings['document_base_url'] = window.opener.tinyMCE.activeEditor.documentBaseURI.getURI();
+		settings['fullscreen_is_enabled'] = true;
+		settings['fullscreen_editor_id'] = oeID;
+		settings['theme_advanced_resizing'] = false;
+		settings['strict_loading_mode'] = true;
+		*/
+	}
+}
+
+
+
 ?>

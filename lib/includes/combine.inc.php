@@ -1056,77 +1056,11 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 		}
 	}
 	// Add plugins
-	/*
-	 * available plugins:
-	 *     advhr,advimage,advlink,advlist,autoresize,autosave,
-	 *     bbcode,
-	 *     contextmenu,
-	 *     directionality,
-	 *     emotions,
-	 *     fullpage,fullscreen,
-	 *     iespell,inlinepopups,insertdatetime,
-	 *     layer,legacyoutput,
-	 *     media,
-	 *     nonbreaking,noneditable,
-	 *     pagebreak,paste,preview,print,
-	 *     save,searchreplace,spellchecker,style,
-	 *     tabfocus,table,template,tinyautosave,
-	 *     visualchars,
-	 *     wordcount,
-	 *     xhtmlxtras,
-	 *
-	 * used:
-	 *     advimage,advlink,
-	 *     fullscreen,
-	 *     inlinepopups,
-	 *     media,
-	 *     paste,print,
-	 *     searchreplace,spellchecker,
-	 *     table,tinyautosave,
-	 *     visualchars,
-	 */
-	$mce_plugins = array(
-		'advhr' => 0,
-		'advimage' => 1,
-		'advlink' => 1,
-		'advlist' => 0,
-		'autoresize' => 0,
-		'autosave' => 0,
-		'bbcode' => 0,
-		'contextmenu' => 0,
-		'directionality' => 0,
-		'emotions' => 0,
-		'fullpage' => 0,
-		'fullscreen' => 1,
-		'iespell' => 0,
-		'inlinepopups' => 1,
-		'insertdatetime' => 0,
-		'layer' => 0,
-		'legacyoutput' => 0,
-		'media' => 1,
-		'nonbreaking' => 0,
-		'noneditable' => 0,
-		'pagebreak' => 0,
-		'paste' => 1,
-		'preview' => 0,
-		'print' => 1,
-		'safari' => 1,
-		'save' => 0,
-		'searchreplace' => 1,
-		'spellchecker' => 1,
-		'style' => 0,
-		'tabfocus' => 0,
-		'table' => 1,
-		'template' => 0,
-		'tinyautosave' => 1,
-		'visualchars' => 1,
-		'wordcount' => 0,
-		'xhtmlxtras' => 0
-		);
-	foreach ($mce_plugins as $plugin => $in_use)
-	{
-		if (!$in_use) continue;
+	
+	$pluginarr = get_tinyMCE_plugin_list();
 
+	foreach ($pluginarr as $plugin)
+	{
 		$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
 
 		foreach ($languages as $lang)

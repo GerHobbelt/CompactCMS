@@ -224,15 +224,13 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
+	'../../../../lib/includes/js/the_goto_guy.js'
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-?>
-	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
-<?php
+	echo ",\n" . generateJS4TinyMCEinit(0, "elm1");
 }
 ?>
-	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 
 
@@ -286,21 +284,10 @@ function ccms_lazyload_setup_GHO()
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-?>
-	/*
-	 * when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	 * however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	 */
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-<?php
+	echo generateJS4TinyMCEinit(1, "elm1"); 
 }
 ?>
-	
+		
 	LazyLoad.js(js, jsComplete);
 }
 </script>
