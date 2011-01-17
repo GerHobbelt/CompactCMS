@@ -384,7 +384,7 @@ if (0)
 		$dest = BASE_PATH.'/media/albums/'.$album_name;
 		if(!is_dir($dest)) 
 		{
-			$error = $ccms['lang']['system']['error_write']);
+			$error = $ccms['lang']['system']['error_write'];
 			$error_code = $dest;
 		} 
 	}
@@ -411,7 +411,7 @@ if (0)
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
-	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
+	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM))) 
 	{
 		$error = 'Please upload only images of type JPEG, GIF or PNG.';
 		$error_code = $size[2];
