@@ -161,31 +161,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
 			} 
 			else 
 			{
-			function rrmdir($dir) 
-			{
-				if (is_dir($dir)) 
-				{
-					$objects = scandir($dir);
-					
-					foreach ($objects as $object) 
-					{
-						if ($object != "." && $object != "..") 
-						{
-							if (filetype($dir."/".$object) == "dir") 
-							{
-								rrmdir($dir."/".$object); 
-							}
-							else 
-							{
-								unlink($dir."/".$object);
-							}
-						}
-					}
-					reset($objects);
-					rmdir($dir);
-				} 
-				return true;
-		 	}
 				$total 	= count($_POST['albumID']);
 				$i		= 0;
 				foreach ($_POST['albumID'] as $key => $value) 
@@ -198,7 +173,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
 						$dest = BASE_PATH.'/media/albums/'.$value;
 						if(is_dir($dest)) 
 						{
-							if(rrmdir($dest)) 
+							if(recrmdir($dest)) 
 							{
 								$i++;
 							}

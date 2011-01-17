@@ -1905,6 +1905,39 @@ function is_writable_ex($path)
 
 
 
+function recrmdir($dir) 
+{
+	if (is_dir($dir)) 
+	{
+		$objects = scandir($dir);
+		
+		foreach ($objects as $object) 
+		{
+			if ($object != "." && $object != "..") 
+			{
+				if (is_dir($dir."/".$object)) 
+				{
+					recrmdir($dir."/".$object); 
+				}
+				else 
+				{
+					@unlink($dir."/".$object);
+				}
+			}
+		}
+		reset($objects);
+		@rmdir($dir);
+	} 
+	return true;
+}
+
+
+
+
+
+
+
+
 
 
 /**
