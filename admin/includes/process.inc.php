@@ -1010,7 +1010,7 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
  */
 if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	FbX::SetFeedbackLocation($cfg['rootdir'] . '/admin/includes/modules/template-editor/backend.php');
+	FbX::SetFeedbackLocation('./modules/template-editor/backend.php');
 	try
 	{
 		// Only if current user has the rights
@@ -1057,59 +1057,65 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
  */
 if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		//$i=count(array_filter($_POST));
-		//if($i <= 6) error
-		
-		if (empty($_POST['userPass']))
+		// Only if current user has the rights
+		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
-		}
-		$userName = strtolower(getPOSTparam4IdOrNumber('user'));
-		$userPass = md5($_POST['userPass'].$cfg['authcode']);
-		$userFirst = getPOSTparam4HumanName('userFirstname');
-		$userLast = getPOSTparam4HumanName('userLastname');
-		$userEmail = getPOSTparam4Email('userEmail');
-		$userActive = getPOSTparam4boolean('userActive');
-		$userLevel = getPOSTparam4Number('userLevel');
-		if (empty($userName) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
-		}
+			//$i=count(array_filter($_POST));
+			//if($i <= 6) error
 			
-		// Set variables
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values['userName']		= MySQL::SQLValue($userName,MySQL::SQLVALUE_TEXT);
-		$values['userPass']		= MySQL::SQLValue($userPass,MySQL::SQLVALUE_TEXT);
-		$values['userFirst']	= MySQL::SQLValue($userFirstname,MySQL::SQLVALUE_TEXT);
-		$values['userLast']		= MySQL::SQLValue($userLastname,MySQL::SQLVALUE_TEXT);
-		$values['userEmail']	= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
-		$values['userActive']	= MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
-		$values['userLevel']	= MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-		// TODO: userToken is currently UNUSED. -- should be used to augment the $cfg['authcode'] where applicable
-		$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
-		
-		// Execute the insert
-		$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
-		
-		// Check for errors
-		if($result) 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-			exit();
+			if (empty($_POST['userPass']))
+			{
+				throw new FbX($ccms['lang']['system']['error_tooshort']);
+			}
+			$userName = strtolower(getPOSTparam4IdOrNumber('user'));
+			$userPass = md5($_POST['userPass'].$cfg['authcode']);
+			$userFirst = getPOSTparam4HumanName('userFirstname');
+			$userLast = getPOSTparam4HumanName('userLastname');
+			$userEmail = getPOSTparam4Email('userEmail');
+			$userActive = getPOSTparam4boolean('userActive');
+			$userLevel = getPOSTparam4Number('userLevel');
+			if (empty($userName) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
+			{
+				throw new FbX($ccms['lang']['system']['error_tooshort']);
+			}
+				
+			// Set variables
+			$values = array(); // [i_a] make sure $values is an empty array to start with here
+			$values['userName']		= MySQL::SQLValue($userName,MySQL::SQLVALUE_TEXT);
+			$values['userPass']		= MySQL::SQLValue($userPass,MySQL::SQLVALUE_TEXT);
+			$values['userFirst']	= MySQL::SQLValue($userFirstname,MySQL::SQLVALUE_TEXT);
+			$values['userLast']		= MySQL::SQLValue($userLastname,MySQL::SQLVALUE_TEXT);
+			$values['userEmail']	= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
+			$values['userActive']	= MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
+			$values['userLevel']	= MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
+			// TODO: userToken is currently UNUSED. -- should be used to augment the $cfg['authcode'] where applicable
+			$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
+			
+			// Execute the insert
+			$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
+			
+			// Check for errors
+			if($result) 
+			{
+				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+				exit();
+			} 
+			else 
+			{
+				throw new FbX($db->MyDyingMessage());
+			}
 		} 
 		else 
 		{
-			$db->Kill();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
 
@@ -1120,45 +1126,54 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
  */
 if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	$userID = getPOSTparam4Number('userID');
-	$userFirst = getPOSTparam4HumanName('first');
-	$userLast = getPOSTparam4HumanName('last');
-	$userEmail = getPOSTparam4Email('email');
-	
-	// Only if current user has the rights
-	if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID'] == $userID) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		// Check length of values
-		if(strlen($userFirst)>2&&strlen($userLast)>2&&strlen($userEmail)>6) 
+		$userID = getPOSTparam4Number('userID');
+		$userFirst = getPOSTparam4HumanName('first');
+		$userLast = getPOSTparam4HumanName('last');
+		$userEmail = getPOSTparam4Email('email');
+		
+		// Only if current user has the rights
+		if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID'] == $userID) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userFirst']= MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);
-			$values['userLast']	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
-			$values['userEmail']= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
-			
-			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			// Check length of values
+			if(strlen($userFirst)>2&&strlen($userLast)>2&&strlen($userEmail)>6) 
 			{
-				if($userID==$_SESSION['ccms_userID']) 
-				{
-					$_SESSION['ccms_userFirst']	= $userFirst; // getPOSTparam4HumanName already does the htmlentities() encoding, so we're safe to use & display these values as they are now.
-					$_SESSION['ccms_userLast']	= $userLast;
-				}
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userFirst']= MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);
+				$values['userLast']	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
+				$values['userEmail']= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
 				
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				{
+					if($userID==$_SESSION['ccms_userID']) 
+					{
+						$_SESSION['ccms_userFirst']	= $userFirst; // getPOSTparam4HumanName already does the htmlentities() encoding, so we're safe to use & display these values as they are now.
+						$_SESSION['ccms_userLast']	= $userLast;
+					}
+					
+					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					exit();
+				}
+				else
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
+			} 
+			else 
+			{
+				throw new FbX($ccms['lang']['system']['error_tooshort']);
 			}
-			else
-				$db->Kill();
 		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
  
@@ -1171,47 +1186,54 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
 	$userID = getPOSTparam4Number('userID');
-	
-	// Only if current user has the rights
-	if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID']==$userID) 
+		
+	FbX::SetFeedbackLocation('./modules/user-management/user.Edit.php', 'userID='.$userID);
+	try
 	{
-		if (empty($_POST['userPass']) || empty($_POST['cpass']))
+		// Only if current user has the rights
+		if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID']==$userID) 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passshort'])));
-			exit();
-		}
-		
-		$passphrase_len = strlen($_POST['userPass']);
-		
-		if($passphrase_len > 6 && md5($_POST['userPass']) === md5($_POST['cpass'])) 
-		{
-			$userPassHash = md5($_POST['userPass'].$cfg['authcode']);
-			
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
-			
-			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if (empty($_POST['userPass']) || empty($_POST['cpass']))
 			{
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				throw new FbX($ccms['lang']['system']['error_passshort']);
 			}
-			else
-				$db->Kill();
+			
+			$passphrase_len = strlen($_POST['userPass']);
+			
+			if($passphrase_len > 6 && md5($_POST['userPass']) === md5($_POST['cpass'])) 
+			{
+				$userPassHash = md5($_POST['userPass'].$cfg['authcode']);
+				
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
+				
+				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				{
+					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					exit();
+				}
+				else
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
+			} 
+			elseif($passphrase_len <= 6) 
+			{
+				throw new FbX($ccms['lang']['system']['error_passshort']);
+			} 
+			else 
+			{
+				throw new FbX($ccms['lang']['system']['error_passnequal']);
+			}
 		} 
-		elseif($passphrase_len <= 6) 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passshort'])));
-			exit();
-		} 
-		else 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passnequal'])));
-			exit();
+		else
+		{	
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else
-	{	
-		die($ccms['lang']['auth']['featnotallowed']);
+	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
 	}
 }
 
@@ -1223,41 +1245,49 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
  
 if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		$userID = getPOSTparam4Number('userID');
-		$userActive = getPOSTparam4boolean('userActive');
-		$userLevel = getPOSTparam4Number('userLevel');
-		if ($userLevel > 0)
+		// Only if current user has the rights
+		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userLevel'] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-			$values['userActive'] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
-				
-			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			$userID = getPOSTparam4Number('userID');
+			$userActive = getPOSTparam4boolean('userActive');
+			$userLevel = getPOSTparam4Number('userLevel');
+			if ($userLevel > 0)
 			{
-				if($userID==$_SESSION['ccms_userID']) 
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userLevel'] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
+				$values['userActive'] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
+					
+				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 				{
-					$_SESSION['ccms_userLevel'] = $userLevel;
+					if($userID==$_SESSION['ccms_userID']) 
+					{
+						$_SESSION['ccms_userLevel'] = $userLevel;
+					}
+				
+					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					exit();
 				}
-			
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				else
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
 			}
-			else
+			else 
 			{
-				$db->Kill();
+				throw new FbX($ccms['lang']['system']['error_forged']);
 			}
-		}
+		} 
 		else 
 		{
-			die($ccms['lang']['system']['error_forged']);
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
 
@@ -1268,42 +1298,49 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
  */
 if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		$total = (isset($_POST['userID']) ? count($_POST['userID']) : 0);
-		
-		if($total==0) 
+		// Only if current user has the rights
+		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_selection'])));
-			exit();
-		}
-		
-		// Delete details from the database
-		$i=0;
-		foreach ($_POST['userID'] as $user_num) 
-		{
-			$user_num = filterParam4Number($user_num);
+			$total = (isset($_POST['userID']) ? count($_POST['userID']) : 0);
 			
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
-			$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
-			$i++;
-		}
-		// Check for errors
-		if($result && $i == $total) 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
-			exit();
+			if($total==0) 
+			{
+				throw new FbX($ccms['lang']['system']['error_selection']);
+			}
+			
+			// Delete details from the database
+			$i=0;
+			foreach ($_POST['userID'] as $user_num) 
+			{
+				$user_num = filterParam4Number($user_num);
+				
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
+				$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
+				$i++;
+			}
+			// Check for errors
+			if($result && $i == $total) 
+			{
+				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+				exit();
+			} 
+			else 
+			{
+				throw new FbX($db->MyDyingMessage());
+			}
 		} 
 		else 
 		{
-			$db->Kill();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
 

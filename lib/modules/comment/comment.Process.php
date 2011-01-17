@@ -79,7 +79,7 @@ $do_action 	= getGETparam4IdOrNumber('action');
  * Show comments
  *
  */
-if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty($_SESSION['ccms_captcha']) /* && checkAuth() */ ) // there's not necessarily an *authenticated* SESSION going on here... 
+if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action=='show-comments' && !empty($_SESSION['ccms_captcha']) /* && checkAuth() */ ) // there's not necessarily an *authenticated* SESSION going on here... 
 {
 	// Pagination variables
 	$pageID	= getGETparam4Filename('page');
@@ -203,15 +203,17 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action=="show-comments" && !empty(
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && checkAuth()) 
 {
-	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/comment/comment.Manage.php');
+	$pageID	= getPOSTparam4Filename('pageID');
 	
+	FbX::SetFeedbackLocation('comment.Manage.php');
 	try
 	{
-		// Only if current user has the rights
-		if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+		if (!empty($pageID))
 		{
-			$pageID	= getPOSTparam4Filename('pageID');
-			if (!empty($pageID))
+			FbX::SetFeedbackLocation('comment.Manage.php', 'file=' . $pageID);
+			
+			// Only if current user has the rights
+			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
 			{
 				// Number of selected items
 				$total = (!empty($_POST['commentID']) && is_array($_POST['commentID']) ? count($_POST['commentID']) : 0);
@@ -219,7 +221,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && check
 				// If nothing selected, throw error
 				if($total==0) 
 				{
-					throw new FbX($ccms['lang']['system']['error_selection'], 'file=' . $pageID);
+					throw new FbX($ccms['lang']['system']['error_selection']);
 				}
 				
 				// Delete details from the database
@@ -246,17 +248,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && check
 				} 
 				else 
 				{
-					throw new FbX($db->MyDyingMessage(), 'file=' . $pageID);
+					throw new FbX($db->MyDyingMessage());
 				}
 			} 
 			else 
 			{
-				throw new FbX($ccms['lang']['auth']['featnotallowed'], 'file=' . $pageID);
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
 			}
 		} 
 		else 
 		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed'], 'file=' . $pageID);
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -314,6 +316,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-comment' && $_POST
 	// assert(!empty($error));
 	echo '<h2>' . $ccms['lang']['guestbook']['error'] . '</h2>';
 	echo '<div id="sent-comment-fail">' . $error . '</div>';
+
 	exit();
 }
 
@@ -324,32 +327,59 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-comment' && $_POST
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-cfg' && checkAuth()) 
 {
-	$showMessage = getPOSTparam4Number('messages');
-	$showLocale = getPOSTparam4IdOrNumber('locale');
-
-	if (!empty($showMessage) && !empty($showLocale))
+	$pageID	= getPOSTparam4Filename('pageID');
+	
+	FbX::SetFeedbackLocation('comment.Manage.php');
+	try
 	{
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values['pageID'] = MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
-		$values['showMessage'] = MySQL::SQLValue($showMessage, MySQL::SQLVALUE_NUMBER);
-		$values['showLocale'] = MySQL::SQLValue($showLocale, MySQL::SQLVALUE_TEXT);
-
-		// Insert or update configuration
-		if($db->AutoInsertUpdate($cfg['db_prefix'].'cfgcomment', $values, array('cfgID' => MySQL::BuildSQLValue($cfgID)))) 
+		if (!empty($pageID))
 		{
-			header('Location: ' . makeAbsoluteURI('comment.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-			exit();
+			FbX::SetFeedbackLocation('comment.Manage.php', 'file=' . $pageID);
+			
+			// Only if current user has the rights
+			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+			{
+				$showMessage = getPOSTparam4Number('messages');
+				$showLocale = getPOSTparam4IdOrNumber('locale');
+
+				if (!empty($showMessage) && !empty($showLocale))
+				{
+					$values = array(); // [i_a] make sure $values is an empty array to start with here
+					$values['pageID'] = MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+					$values['showMessage'] = MySQL::SQLValue($showMessage, MySQL::SQLVALUE_NUMBER);
+					$values['showLocale'] = MySQL::SQLValue($showLocale, MySQL::SQLVALUE_TEXT);
+
+					// Insert or update configuration
+					if($db->AutoInsertUpdate($cfg['db_prefix'].'cfgcomment', $values, array('cfgID' => MySQL::BuildSQLValue($cfgID)))) 
+					{
+						header('Location: ' . makeAbsoluteURI('comment.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+						exit();
+					} 
+					else 
+					{
+						throw new FbX($db->MyDyingMessage());
+					}
+				}
+				else
+				{
+					throw new FbX($ccms['lang']['system']['error_forged']);
+				}
+			} 
+			else 
+			{
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
+			}
 		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('comment.Manage.php?file='.$pageID.'&status=error&msg='.rawurlencode($db->Error())));
-			exit();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
 	}
-	else
+	catch (CcmsAjaxFbException $e)
 	{
-		header('Location: ' . makeAbsoluteURI('comment.Manage.php?file='.$pageID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_forged'])));
-		exit();
+		$e->croak();
 	}
+	
+	exit();
 }
 ?>
