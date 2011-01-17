@@ -401,7 +401,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 if (0)
 {
 		// create a plugin/module instance tailored to this particular page
-		if($row->module != "editor" && is_object($modules[$row->module]) && method_exists($modules[$row->module], 'getInstance')) 
+		if($row->module != 'editor' && is_object($modules[$row->module]) && method_exists($modules[$row->module], 'getInstance')) 
 		{
 			$ccms['module_instance'] = $modules[$row->module]->getInstance($ccms);
 			if (!is_object($ccms['module_instance']))
@@ -699,7 +699,7 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 	 
 	 See also: http://hsivonen.iki.fi/producing-xml/
 	*/
-	header ("content-type: application/xml");
+	header("content-type: application/xml");
 
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	?>
