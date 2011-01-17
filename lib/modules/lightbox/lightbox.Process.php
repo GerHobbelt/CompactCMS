@@ -620,18 +620,13 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 			{
 				$dest = BASE_PATH.'/media/albums/'.$album;
-				if(!is_dir($dest)) 
+				if(!is_dir($dest) && is_writable_ex($dest)) 
 				{
 					throw new FbX($ccms['lang']['system']['error_dirwrite']);
 				} 
 				if(!is_dir($dest.'/_thumbs')) 
 				{
-					if(@mkdir($dest.'/_thumbs')) 
-					{
-						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
-						exit();
-					} 
-					else 
+					if(!@mkdir($dest.'/_thumbs')) 
 					{
 						throw new FbX($ccms['lang']['system']['error_dirwrite']);
 					}
