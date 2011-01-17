@@ -167,11 +167,52 @@ class ccmsParser
 			if (is_array($v) && count($v) == 2 && array_key_exists($v[0], $vars))
 			{
 				$rv = $this->getvar($vars, $v[0]);
-				switch ($v[1])
+				$pm = preg_match('/^(\w+)(\s*\(\s*([^,]*)(\s*,\s*([^,]*))*\s*\))?$/s', trim($v[1]), $fbits);
+				if (!$pm)
+					return 'regex match failure for "' . $v[1] . '"';
+					
+				switch ($fbits[0])
 				{
 				default:
 				case 'quoteprotect':
 					/* data must have its quotes transformed to HTML entities! */
+					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
+
+				case 'protect4attr':
+					/* make data suitable for an attribute value: strip tags and encode quotes! */
+					$rv = strip_tags($rv);
+					$rv = preg_replace('/\s+/', ' ', $rv);
+					if (count($fbits) > 2)
+					{
+						// reduce the data string to a maximum length; clip at the last whitespace when this is required.
+						$maxlen = intval($fbits[2]);
+						$clip_on_ws = $fbits[4];
+						if ($maxlen > 0)
+						{
+							if ($clip_on_ws == 'true' || $clip_on_ws == '1')
+							{
+								$rv = substr($rv, 0, $maxlen + 1);
+								/*
+								 * since all whitespace has been transformed to regular spaces, we can simply look for 
+								 * the last space in there.
+								 * 
+								 * NOTE: we previously clipped to MAXLEN PLUS ONE so this subsequent check for last 
+								 *       whitespace position can still produce the MAXLEN position when a space is
+								 * 	     positioned there! This prevent undue length reduction of the result.
+								 */
+								$lwspos = strrpos($rv, ' ');
+								if ($lwspos > 0)
+								{
+									$rv = substr($rv, 0, $lwspos);
+								}
+							}
+							else
+							{
+								$rv = substr($rv, 0, $maxlen);
+							}
+						}
+						// else: do not clip
+					}
 					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
 				}
 			}

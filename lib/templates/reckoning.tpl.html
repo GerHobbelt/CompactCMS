@@ -13,8 +13,8 @@ Modified   : For CompactCMS.nl 1.4.0+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="keywords" content="{%keywords%}" />
-	<meta name="description" content="{%sitename%} | {%desc%}" />
+	<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
+	<meta name="keywords" content="{%keywords!protect4attr%}" />
 	<title>{%title%}</title>
 	<link href="{%rootdir%}lib/templates/reckoning/style.css,layout.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Enable the <link> below to view this template in your WYSIWYG editor offline -->
@@ -153,4 +153,4 @@ function ccms_lazyload_setup_GHO()
 </script>
 <script type="text/javascript" src="{%rootdir%}lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
-</html>
+</html><!-- comment -->
