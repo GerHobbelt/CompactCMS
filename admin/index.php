@@ -498,12 +498,14 @@ else
 
 function jsComplete(user_obj, lazy_obj)
 {
+	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');
+	
 	//alert('done count: ' + lazy_obj.done_count + ', todo count: ' + lazy_obj.todo_count);
     if (lazy_obj.todo_count)
 	{
 		/* nested invocation of LazyLoad added one or more sets to the load queue */
 		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
+		return false;
 	}
 	else
 	{
@@ -514,6 +516,8 @@ function jsComplete(user_obj, lazy_obj)
 	//{
 		lazyloading_commonJS_done("<?php echo $cfg['rootdir']; ?>");
 	//});
+	
+	return stop_loading;
 }
 
 
