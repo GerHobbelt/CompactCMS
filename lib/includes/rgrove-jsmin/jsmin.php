@@ -166,8 +166,8 @@ class JSMin {
 
     if ($c === null) {
       if ($this->inputIndex < $this->inputLength) {
-        // $c = substr($this->input, $this->inputIndex, 1);
-        $c = $this->input[$this->inputIndex];
+        $c = substr($this->input, $this->inputIndex, 1);
+        //$c = $this->input[$this->inputIndex];
         $this->inputIndex += 1;
       } else {
         $c = null;
@@ -295,6 +295,8 @@ class JSMin {
           return "\n";
           
 
+if (0)
+{
           for (;;) {
             $c = $this->get();
 
@@ -302,6 +304,7 @@ class JSMin {
               return $c;
             }
           }
+}
 
         case '*':
           $this->get(); // flush the lookAhead value
@@ -317,6 +320,8 @@ class JSMin {
           return ' ';
           
 
+if (0)
+{
           for (;;) {
             switch($this->get()) {
               case '*':
@@ -330,6 +335,7 @@ class JSMin {
                 throw new JSMinException('Unterminated comment.');
             }
           }
+}
 
         default:
           return $c;
