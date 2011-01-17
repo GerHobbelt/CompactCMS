@@ -2815,8 +2815,8 @@ function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true,
 			$rv .= "				};\n";
 			$rv .= "			}),\n";
 		}
-		$rv .= "		width: editwinwidth,\n"; // default: width in pixels
 		//$rv .= "		height: '300px',\n";
+		$rv .= "		width: editwinwidth\n"; // default: width in pixels
 		$rv .= "	});\n";
 		return $rv;
 
