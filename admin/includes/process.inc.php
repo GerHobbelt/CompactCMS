@@ -1360,11 +1360,6 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 	// Check for editor.css in template directory
 	$template	= $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('variant'));
 	if (!$template) $db->Kill();
-	$css = "";
-	if (is_file($cfg['rootdir'] . '/lib/templates/'.$template.'/editor.css')) 
-	{
-		$css = $cfg['rootdir'] . '/lib/templates/'.$template.'/editor.css';
-	}
 	
 	// Check for filename	
 	if(!empty($filename)) 
