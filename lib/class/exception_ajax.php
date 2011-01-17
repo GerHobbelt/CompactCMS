@@ -97,7 +97,7 @@ class CcmsAjaxFbException extends Exception
 	{
 		if (!empty(self::$feedback_url))
 		{
-			$q = self::url_query_data;
+			$q = self::$url_query_data;
 			if (!empty($q))
 			{
 				$q .= '&';
