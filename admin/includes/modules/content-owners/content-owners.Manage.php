@@ -228,7 +228,14 @@ var js = [
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	echo ",\n" . generateJS4TinyMCEinit(0, "elm1");
+	echo ",\n";
+	$with_fancyuploader = false;
+	if ($with_fancyuploader)
+	{
+		// if you want to test with the fancy-uploader, you'll need mootools in here as well.
+		echo "'../../../../lib/includes/js/mootools-core.js,mootools-more.js',\n"; 
+	}
+	echo generateJS4TinyMCEinit(0, "elm1", $with_fancyuploader);
 }
 ?>
 	];
@@ -256,8 +263,16 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	tinyMCE.init({
 		mode : "exact",
 		elements : "elm1",
-		theme : "advanced",
-		theme : "simple"
+		//theme : "advanced",
+		theme : "simple",
+		skin: 'o2k7',
+		skin_variant: 'silver',
+		//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
+		//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
+		//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
+		//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
+		//theme_advanced_toolbar_location: 'top'
+		theme_simple_toolbar_location: 'top'
 	});
 	//});
 <?php
@@ -284,7 +299,7 @@ function ccms_lazyload_setup_GHO()
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	echo generateJS4TinyMCEinit(1, "elm1"); 
+	echo generateJS4TinyMCEinit(1, "elm1", false); 
 }
 ?>
 		
