@@ -553,16 +553,35 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 		<p>&nbsp;</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/16</p></td>
+		<td class="ms-grid5-1001-even"><p>Feed edit_area JS load requests 
+		through its won Compressor; include that one in the combiner and mix in 
+		the code to make it adapt to the dev/dbg settings -- reason: right now 
+		the dev/dbg version also delivers a minified edit_area script and that&#39;s 
+		dang right bothersome to debug when you got a b0rk inside edit_area.</p>
+		<p>.</p></td>
 	</tr>
 	<tr>
-		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
-		<td class="ms-grid5-1001-even"><p>ErrorDocument lines in .htaccess are 
-		not patched correctly.</p>
-		<p>Fixed.</p></td>
+		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>2011/01/16</p></td>
+		<td class="ms-grid5-1001-even"><p>Bug: open multiple mochaUI windows, 
+		while the first is a window with the edit_area control in it (e.g. 
+		template editor window); open other mochaUI window after that one and 
+		edit_area b0rks in the template editor window about some undefined 
+		element.</p>
+		<p>&nbsp;</p></td>
+	</tr>
+	<tr>
+		<td class="ms-grid5-1001-even"><p class="style2">þ</p><p>2011/01/16</p></td>
+		<td class="ms-grid5-1001-even"><p>Bug: mochaUI comes with those dreaded 
+		green edges and red corners again.</p>
+		<p>Fixed: turns out to be part of the mochaUI CSS files: .mocha .corner 
+		and .mocha .handler styles do that to you. The skins and our own 
+		&#39;last_minute_fixes.css&#39; takes care of those two, but then it MUST load 
+		as the last CSS in the set. Which isn&#39;t so when you&#39;re messing around 
+		with mochaUI errors elsewhere and decide the @import&#39;s inside editor.css 
+		can be commented out and shifted to extra &lt;link&gt; statements -- which, of 
+		course, tickly Murphy as they FOLLOW that last_minute_fixes.css file!</p>
+		</td>
 	</tr>
 	<tr>
 		<td class="ms-grid5-1001-even"><p class="style2">þý</p><p>date</p></td>
