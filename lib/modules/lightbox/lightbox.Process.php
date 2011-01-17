@@ -350,40 +350,46 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files') 
 {
+	$error 		= false;
+	$error_code = 0;
+
 	if (!checkAuth() || empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])
 	{
+if (0)
+{
 		echo "<p>" . (empty($_GET['SIDCHK']) ? '----' : $_GET['SIDCHK']) . ', ' . $_SESSION['fup1'] . "</p>\n";
 		var_dump($_GET);
 		var_dump($_COOKIES);
-	
+}	
 		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 		
-		die($ccms['lang']['auth']['featnotallowed']);
+		$error = $ccms['lang']['auth']['featnotallowed'];
+		$error_code = 403;
 	}
 	
-	/*
-	 * WARNING: we must NOT reset/alter the extra check session value in here as 
-	 *          FancyUpload will invoke this code multiple times from the same 
-	 * 	        web form when bulk uploads are performed (more then one(1) image file).
-	 * 
-	 *          So we are a little less safe as the extra session var will only 
-	 * 	        be regenerated every time the upload form is rerendered.
-	 * 	 
-	 *          Alas.
-	 */
-	//$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-	
-	$dest = BASE_PATH.'/media/albums/'.$album_name;
-	if(!is_dir($dest)) 
+	if (empty($error))
 	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_write'])));
-		exit();
-	} 
-	// else ...    [i_a] dangling else removed
+		/*
+		 * WARNING: we must NOT reset/alter the extra check session value in here as 
+		 *          FancyUpload will invoke this code multiple times from the same 
+		 * 	        web form when bulk uploads are performed (more then one(1) image file).
+		 * 
+		 *          So we are a little less safe as the extra session var will only 
+		 * 	        be regenerated every time the upload form is rerendered.
+		 * 	 
+		 *          Alas.
+		 */
+		//$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+		
+		$dest = BASE_PATH.'/media/albums/'.$album_name;
+		if(!is_dir($dest)) 
+		{
+			$error = $ccms['lang']['system']['error_write']);
+			$error_code = $dest;
+		} 
+	}
 	
 	// Validation
-	$error 		= false;
-	$error_code = 0;
 	$size       = false; // init to prevent PHP errors about unknown vars further down
 
 	// get the local (temporary) filename:
@@ -393,7 +399,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files')
 	// Set file and get file extension
 	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
 
-	if (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)) 
+	if (empty($error) && (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile))) 
 	{
 		$error = 'Invalid Upload: ';
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
@@ -587,6 +593,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files')
 	if ($response == 'xml') 
 	{
 		/* do nothing */
+		die($ccms['lang']['auth']['featnotallowed']);
 	} 
 	else 
 	{
