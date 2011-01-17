@@ -92,7 +92,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 	FbX::SetFeedbackLocation('lightbox.Manage.php');
 	try
 	{
-		if($album_name != null) 
+		if(!empty($album_name)) 
 		{
 			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
 					
@@ -297,7 +297,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 	FbX::SetFeedbackLocation('lightbox.Manage.php');
 	try
 	{
-		if($album_name != null) 
+		if(!empty($album_name)) 
 		{
 			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
 			
