@@ -8,9 +8,9 @@ require dirname(__FILE__) . '/Packager/packager.php';
 $executable = array_shift($argv);
 $package = dirname(__FILE__);
 
-$pkg = new Packager($package . '/package-GHO.yml');
+$pkg = new Packager($package . '/package.yml');
 
-fwrite($stderr, "Packager is building MochaUI (GHo)\n\n");
+fwrite($stderr, "Packager is building MochaUI\n\n");
 fwrite($stderr, "Included Components:\n");
 
 $no_compat = false;
