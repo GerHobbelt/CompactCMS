@@ -7,7 +7,41 @@
 	 *	v1.1.3 (2007/01/18)	 
 	 *
 	******/
-	
+
+if (0) // if (1) when you need to diagnose your environment
+{	
+	echo "_SERVER:\n";
+	var_dump($_SERVER);
+	echo "_ENV:\n";
+	var_dump($_ENV);
+	echo "ours:\n";
+	echo "\n argv[0] = " . (empty($argv[0]) ? "(NULL)" : $argv[0]);
+	echo "\n SHELL = " . (!array_key_exists('SHELL', $_ENV) ? "(NULL)" : $_ENV['SHELL']);
+	echo "\n SESSIONNAME = " . (!array_key_exists('SESSIONNAME', $_SERVER) ? "(NULL)" : $_SERVER['SESSIONNAME']);
+	echo "\n HTTP_HOST = " . (!array_key_exists('HTTP_HOST', $_SERVER) ? "(NULL)" : $_SERVER['HTTP_HOST']);
+	echo "\n QUERY_STRING = " . (!array_key_exists('QUERY_STRING', $_SERVER) ? "(NULL)" : $_SERVER['QUERY_STRING']);
+	echo "\n REQUEST_METHOD = " . (!array_key_exists('REQUEST_METHOD', $_SERVER) ? "(NULL)" : $_SERVER['REQUEST_METHOD']);
+	die();
+}
+
+/*
+only run the compressor in here when executed from the commandline; otherwise we'll only
+define the compressor class and wait for the other code out there to call us:
+
+Tests turn out that $_SERVER['SESSIONNAME'] == 'Console' only on Windows machines, while
+UNIX boxes don't need to present $_ENV['SHELL']. Hence this check to see whether we're
+running from a console or crontab:
+
+- argv[0] WILL be set when run from the command line (it should list our PHP file)
+- $_SERVER['HTTP_HOST'] does NOT EXIST when run from the console
+- $_SERVER['QUERY_STRING'] does NOT EXIST when run from the console (it may very well be EMPTY when run by the web server!)
+- $_SERVER['REQUEST_METHOD'] does NOT EXIST when run from the console
+*/	
+if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
+	!array_key_exists('HTTP_HOST', $_SERVER) &&
+	!array_key_exists('QUERY_STRING', $_SERVER) &&
+	!array_key_exists('REQUEST_METHOD', $_SERVER))
+{
 	// CONFIG
 	$param['cache_duration']= 3600 * 24 * 10;		// 10 days util client cache expires
 	$param['compress'] = true;						// Enable the code compression, should be activated but it can be useful to deactivate it for easier error diagnostics (true or false)
@@ -17,6 +51,7 @@
 	// END CONFIG
 	
 	$compressor = new Compressor($param);
+}
 	
 	class Compressor
 	{
