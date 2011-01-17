@@ -253,8 +253,17 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../../../lib/includes/js/edit_area/edit_area_full.js',
-	'../../../../lib/includes/js/the_goto_guy.js'
+	'../../../../lib/includes/js/the_goto_guy.js',
+<?php
+	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+	{
+		echo "	'../../../../lib/includes/js/edit_area/edit_area_full.js'\n";
+	}
+	else
+	{
+		echo "	'../../../../lib/includes/js/edit_area/edit_area_full.js'\n";
+	}
+?>
 	];
 
 function jsComplete(user_obj, lazy_obj)

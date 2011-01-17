@@ -76,6 +76,7 @@ $cfg['verify_alert'] = '';    	// whether you want to see 'are you sure' dialogs
 
 
 $cfg['IN_DEVELOPMENT_ENVIRONMENT'] = false; // set to FALSE for any release install (where you are not developing on a local & very safe machine)
+$cfg['USE_JS_DEVELOPMENT_SOURCES'] = true; // set to FALSE when the pre-flattened, possibly pre-minified JavaScript sources should be used. This also means fewer individual JS files will be fetched from the server.
 $cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'] = true; // set to FALSE when your httpd doesn't have gzip/deflate compression enabled, e.g. through mod_deflate configuration for your vhost */
 
 ?>

@@ -1499,7 +1499,16 @@ function ccms_lazyload_setup_GHO()
 	
 var js = [
 	'../../lib/includes/js/the_goto_guy.js',
-	'../../lib/includes/js/edit_area/edit_area_full.js'
+<?php
+	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+	{
+		echo "	'../../lib/includes/js/edit_area/edit_area_full.js'\n";
+	}
+	else
+	{
+		echo "	'../../lib/includes/js/edit_area/edit_area_full.js'\n";
+	}
+?>
 	];
 		
 function jsCompleteDone(user_obj)

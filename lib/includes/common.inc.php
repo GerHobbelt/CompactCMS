@@ -2710,7 +2710,14 @@ function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true,
 		
 	case 0:
 		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
-		$rv = "'" . $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js'";
+		if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+		{
+			$rv = "'" . $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js'";
+		}
+		else
+		{
+			$rv = "'" . $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js'";
+		}
 		if ($with_fancyupload)
 		{
 			/* File uploader JS */
