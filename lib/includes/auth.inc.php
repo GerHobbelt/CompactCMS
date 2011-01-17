@@ -196,13 +196,15 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 	</head>
 <body>
 
-<div class="center-text <?php echo $status; ?>">
-	<?php 
-	if(!empty($status_message)) 
-	{ 
-		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
-	} 
-	?>
+<div id="logon-error-report-wrapper" class="container-18">
+	<div class="center-text <?php echo $status; ?>">
+		<?php 
+		if(!empty($status_message)) 
+		{ 
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+		} 
+		?>
+	</div>
 </div>
 
 <div id="login-wrapper" class="container-18">
