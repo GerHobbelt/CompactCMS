@@ -515,7 +515,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 <div>
-  <textarea id="jslog" class="log span-25" readonly="readonly">
+  <textarea id="jslog" class="log span-25 clear" readonly="readonly">
   </textarea>
 </div>
 <?php
@@ -523,7 +523,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 ?>
 
 
-<p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
+<p class="quiet small clear" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
 
 <script type="text/javascript" charset="utf-8">
 var jsLogEl = document.getElementById('jslog');
@@ -572,11 +572,6 @@ function ccms_combiner_running()
 /* now show the correct DIV, as we do have JavaScript up & running */
 document.getElementById("noscript").style.display = "none";
 document.getElementById("install-wrapper").style.display = "block";
-
-if (typeof window.ccms_lazyload_setup_GHO == 'function')
-{
-	//alert('2');
-}
 
 </script>
 <script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
