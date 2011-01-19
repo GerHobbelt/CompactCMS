@@ -318,7 +318,7 @@ if ($db->ErrorNumber())
 	?>
 	</div>
 
-	<div id="menudepth" class="span-16 last clear-right">
+	<div id="menudepth" class="span-16 last">
 	<?php 
 
 	// Manage menu depths & languages 
