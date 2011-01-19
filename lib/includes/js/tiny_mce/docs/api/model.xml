@@ -1470,36 +1470,6 @@ If the function then returns true indicating that it has found what it was looki
               <description>Element matching the specified id or null if it wasn't found.</description>
             </return>
           </method>
-          <method name="getNext" summary="Returns the next node that matches selector or function">
-            <description>Returns the next node that matches selector or function
-</description>
-            <param name="node" type="Node">
-              <description>Node to find siblings from.</description>
-            </param>
-            <param name="selector">
-              <type fullname="String"/>
-              <type fullname="function"/>
-              <description>Selector CSS expression or function.</description>
-            </param>
-            <return type="Node">
-              <description>Next node item matching the selector or null if it wasn't found.</description>
-            </return>
-          </method>
-          <method name="getPrev" summary="Returns the previous node that matches selector or function">
-            <description>Returns the previous node that matches selector or function
-</description>
-            <param name="node" type="Node">
-              <description>Node to find siblings from.</description>
-            </param>
-            <param name="selector">
-              <type fullname="String"/>
-              <type fullname="function"/>
-              <description>Selector CSS expression or function.</description>
-            </param>
-            <return type="Node">
-              <description>Previous node item matching the selector or null if it wasn't found.</description>
-            </return>
-          </method>
           <method name="select" summary="Selects specific elements by a CSS level 3 pattern.">
             <description>Selects specific elements by a CSS level 3 pattern. For example "div#a1 p.test".
 This function is optimized for the most common patterns needed in TinyMCE but it also performes good enough
@@ -2744,9 +2714,6 @@ that is styled to look like a button or icon.
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
             </param>
-            <param name="ed" type="Editor">
-              <description>Optional the editor instance this button is for.</description>
-            </param>
           </method>
           <method name="renderHTML" summary="Renders the button as a HTML string.">
             <description>Renders the button as a HTML string. This method is much faster than using the DOM and when
@@ -2788,9 +2755,6 @@ when you press the open menu.
             </param>
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
-            </param>
-            <param name="ed" type="Editor">
-              <description>The editor instance this button is for.</description>
             </param>
           </method>
           <property name="settings" summary="Settings object." type="Object">
@@ -3124,23 +3088,6 @@ context menu, or a menu for a list box or a menu bar.
           <class-ref class="tinymce.ui.Control"/>
         </super-classes>
       </class>
-      <class fullname="tinymce.ui.KeyboardNavigation" name="KeyboardNavigation" summary="This class provides basic keyboard navigation using the arrow keys to children of a component.">
-        <description>This class provides basic keyboard navigation using the arrow keys to children of a component.
-For example, this class handles moving between the buttons on the toolbars.
-</description>
-        <members>
-          <method constructor="true" name="KeyboardNavigation" summary="Create a new KeyboardNavigation instance to handle the focus for a specific element.">
-            <description>Create a new KeyboardNavigation instance to handle the focus for a specific element.
-</description>
-            <param name="settings" type="Object">
-              <description>the settings object to define how keyboard navigation works.</description>
-            </param>
-            <param name="dom" type="DOMUtils">
-              <description>the DOMUtils instance to use.</description>
-            </param>
-          </method>
-        </members>
-      </class>
       <class extends="tinymce.ui.Control" fullname="tinymce.ui.ListBox" name="ListBox" summary="This class is used to create list boxes/select list.">
         <description>This class is used to create list boxes/select list. This one will generate
 a non native control. This one has the benefits of having visual items added.
@@ -3154,9 +3101,6 @@ a non native control. This one has the benefits of having visual items added.
             </param>
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
-            </param>
-            <param name="ed" type="Editor">
-              <description>Optional the editor instance this button is for.</description>
             </param>
           </method>
           <property name="items" summary="Array of ListBox items." type="Array">
@@ -3384,9 +3328,6 @@ that is styled to look like a button or icon.
             </param>
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
-            </param>
-            <param name="ed" type="Editor">
-              <description>Optional the editor instance this button is for.</description>
             </param>
           </method>
           <event name="onRenderMenu" summary="Fires when the menu is rendered.">
@@ -3629,9 +3570,6 @@ creating a whole toolbar with buttons it does make a lot of difference.
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
             </param>
-            <param name="ed" type="Editor">
-              <description>Optional the editor instance this button is for.</description>
-            </param>
           </method>
           <method name="renderHTML" summary="Renders the split button as a HTML string.">
             <description>Renders the split button as a HTML string. This method is much faster than using the DOM and when
@@ -3668,36 +3606,6 @@ rendered so that events can be added.
           <method name="renderHTML" summary="Renders the toolbar as a HTML string.">
             <description>Renders the toolbar as a HTML string. This method is much faster than using the DOM and when
 creating a whole toolbar with buttons it does make a lot of difference.
-</description>
-            <return type="String">
-              <description>HTML for the toolbar control.</description>
-            </return>
-          </method>
-          <property inherited-from="tinymce.ui.Container" name="controls"/>
-          <method inherited-from="tinymce.ui.Container" name="add"/>
-          <method inherited-from="tinymce.ui.Container" name="get"/>
-          <method inherited-from="tinymce.ui.Control" name="setDisabled"/>
-          <method inherited-from="tinymce.ui.Control" name="isDisabled"/>
-          <method inherited-from="tinymce.ui.Control" name="setActive"/>
-          <method inherited-from="tinymce.ui.Control" name="isActive"/>
-          <method inherited-from="tinymce.ui.Control" name="setState"/>
-          <method inherited-from="tinymce.ui.Control" name="isRendered"/>
-          <method inherited-from="tinymce.ui.Control" name="renderTo"/>
-          <method inherited-from="tinymce.ui.Control" name="postRender"/>
-          <method inherited-from="tinymce.ui.Control" name="remove"/>
-          <method inherited-from="tinymce.ui.Control" name="destroy"/>
-        </members>
-        <super-classes>
-          <class-ref class="tinymce.ui.Container"/>
-          <class-ref class="tinymce.ui.Control"/>
-        </super-classes>
-      </class>
-      <class extends="tinymce.ui.Container" fullname="tinymce.ui.ToolbarGroup" name="ToolbarGroup" summary="This class is used to group a set of toolbars together and control the keyboard navigation and focus.">
-        <description>This class is used to group a set of toolbars together and control the keyboard navigation and focus.
-</description>
-        <members>
-          <method name="renderHTML" summary="Renders the toolbar group as a HTML string.">
-            <description>Renders the toolbar group as a HTML string.
 </description>
             <return type="String">
               <description>HTML for the toolbar control.</description>
