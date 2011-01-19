@@ -312,7 +312,7 @@ if($do=="delete" && !empty($btn_delete))
  * about those bits not being backed up entirely (or not at all).
  */
 $modules_in_use = $db->SelectArray($cfg['db_prefix'].'pages', null, 'DISTINCT module');
-if (!$modules_in_use)
+if ($db->ErrorNumber())
 	$db->Kill();
 $show_warn_about_partial_backup = false;
 foreach($modules_in_use as $row)
