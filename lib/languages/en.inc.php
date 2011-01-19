@@ -134,6 +134,8 @@ $ccms['lang']['backend']['translation']     = "Translations";
 $ccms['lang']['backend']['hello'] = "Hi";
 $ccms['lang']['backend']['logout'] = "Log-out";
 $ccms['lang']['backend']['see_forum'] = "See forum";
+$ccms['lang']['backend']['warning'] = "Warning";
+$ccms['lang']['backend']['js_loading'] = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']			= "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";

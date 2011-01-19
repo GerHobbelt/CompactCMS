@@ -98,7 +98,7 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
-define('COMBINER_DEV_DUMP_OUTPUT', true); // dump generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
+define('COMBINER_DEV_DUMP_OUTPUT', false); // dump generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
 
 
 $optimize = array();

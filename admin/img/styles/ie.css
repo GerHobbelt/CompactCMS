@@ -84,6 +84,11 @@ table th, td
 {
 	background-position: 0px 0px; /* shift down for IE6 */
 }
+#desktop #load_notice fieldset
+{
+	background-image: url('../admin_panel_bg_red.gif');
+	background-color: #fdd;
+}
 
 
 /*

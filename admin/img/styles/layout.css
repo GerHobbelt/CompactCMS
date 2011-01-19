@@ -134,9 +134,22 @@ blueprint CSS calls this 'last':
 	margin-right: 0;
 }
 */
-#createnew, #menudepth 
+#createnew, #menudepth, #load_notice 
 {
-	margin-top: 10px;
+	/* margin-top: 10px; */
+}
+
+#load_notice #notice_wrapper
+{
+	padding-top: 10px;
+}
+/*
+override the green colors of the (#desktop fieldset)
+*/
+#desktop #load_notice fieldset
+{
+	border-color: #f00;
+	background-color: #fdd;
 }
 
 .ff{display:inline-block;width:80px;height:15px;background-position: 0 0;}

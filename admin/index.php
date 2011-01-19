@@ -107,87 +107,96 @@ if ($db->ErrorNumber())
 		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
 	</div>
 	<div id="notify" class="span-12">
-	<div class="rounded-border">
-		<div class="header">
-			<?php 
-			if($cfg['protect'])
-			{
-			?>
-				<a class="right span-6" href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
-			<?php 
-			} 
-			?>
-			<a id="clockLink" class="clock"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
-		</div>
-		<div id="notify_icon">&#160;</div>
-		<div id="notify_res">
-			<?php 
-			if(!empty($version_recent) && !empty($v) && $cfg['version']) 
-			{ 
-			?>
-				<p><?php echo $ccms['lang']['backend']['currentversion']." ".$v; ?>. <?php echo $ccms['lang']['backend']['mostrecent']." ".$version_recent; ?>.</p>
-				<p class="versionstatus"><?php echo $ccms['lang']['backend']['versionstatus']." ".$version; ?></p>
-			<?php 
-			} 
-			else 
-				echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>'; 
-			?>
-		</div>
-	</div>
-	</div>
-	<div id="advanced" class="prepend-1 span-6 last">
-	<div class="rounded-border">
-		<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
-		<div id="advanced_res">
-			<ul>
+		<div class="rounded-border">
+			<div class="header">
 				<?php 
-				if($_SESSION['ccms_userLevel']>=4) 
-				{ 
+				if($cfg['protect'])
+				{
 				?>
-					<li><a id="sys-perm" href="./includes/modules/permissions/permissions.Manage.php" rel="<?php echo $ccms['lang']['backend']['permissions']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['permissions']; ?></a></li>
-				<?php 
-				} 
-				if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
-				{ 
-				?>
-					<li><a id="sys-pow" href="./includes/modules/content-owners/content-owners.Manage.php" rel="<?php echo $ccms['lang']['backend']['contentowners']; ?>" class="tabs"><span class="ss_sprite_16 ss_folder_user">&#160;</span><?php echo $ccms['lang']['backend']['contentowners']; ?></a></li>
-				<?php 
-				} 
-				if($perm['manageTemplate']>0 && $_SESSION['ccms_userLevel']>=$perm['manageTemplate'])  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
-				{ 
-				?>
-					<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
-				<?php 
-				} 
-				// if($perm['manageUsers']>0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
-				{ 
-				?>
-					<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
-				<?php 
-				} 
-				if($perm['manageModBackup']>0 /* && $_SESSION['ccms_userLevel']>=$perm['manageModBackup'] */ ) 
-				{ 
-				?>
-					<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
-				<?php 
-				} 
-				if($_SESSION['ccms_userLevel']>=4 && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
-				{ 
-				?>
-					<li><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['translation']; ?></a></li>
+					<a class="right span-6" href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
 				<?php 
 				} 
 				?>
-			</ul>
+				<a id="clockLink" class="clock"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
+			</div>
+			<div id="notify_icon">&#160;</div>
+			<div id="notify_res">
+				<?php 
+				if(!empty($version_recent) && !empty($v) && $cfg['version']) 
+				{ 
+				?>
+					<p><?php echo $ccms['lang']['backend']['currentversion']." ".$v; ?>. <?php echo $ccms['lang']['backend']['mostrecent']." ".$version_recent; ?>.</p>
+					<p class="versionstatus"><?php echo $ccms['lang']['backend']['versionstatus']." ".$version; ?></p>
+				<?php 
+				} 
+				else 
+					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>'; 
+				?>
+			</div>
 		</div>
 	</div>
+	<div id="advanced" class="prepend-1 span-6 last clear-right">
+		<div class="rounded-border">
+			<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
+			<div id="advanced_res">
+				<ul>
+					<?php 
+					if($_SESSION['ccms_userLevel']>=4) 
+					{ 
+					?>
+						<li><a id="sys-perm" href="./includes/modules/permissions/permissions.Manage.php" rel="<?php echo $ccms['lang']['backend']['permissions']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['permissions']; ?></a></li>
+					<?php 
+					} 
+					if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
+					{ 
+					?>
+						<li><a id="sys-pow" href="./includes/modules/content-owners/content-owners.Manage.php" rel="<?php echo $ccms['lang']['backend']['contentowners']; ?>" class="tabs"><span class="ss_sprite_16 ss_folder_user">&#160;</span><?php echo $ccms['lang']['backend']['contentowners']; ?></a></li>
+					<?php 
+					} 
+					if($perm['manageTemplate']>0 && $_SESSION['ccms_userLevel']>=$perm['manageTemplate'])  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
+					{ 
+					?>
+						<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
+					<?php 
+					} 
+					// if($perm['manageUsers']>0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
+					{ 
+					?>
+						<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
+					<?php 
+					} 
+					if($perm['manageModBackup']>0 /* && $_SESSION['ccms_userLevel']>=$perm['manageModBackup'] */ ) 
+					{ 
+					?>
+						<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
+					<?php 
+					} 
+					if($_SESSION['ccms_userLevel']>=4 && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+					{ 
+					?>
+						<li><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['translation']; ?></a></li>
+					<?php 
+					} 
+					?>
+				</ul>
+			</div>
+		</div>
 	</div>
 	
 <!--[if lt IE 7]>
 <hr class="clear space" />
 <![endif]-->
 
-	<div id="createnew" class="span-9">
+	<div id="load_notice" class="span-25 last clear">
+	<fieldset>
+		<legend><a rel="notice_wrapper"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['warning']; ?></a></legend>
+		<div id="notice_wrapper">
+			<p class="center-text"><?php echo $ccms['lang']['backend']['js_loading']; ?></p>
+		</div>
+	</fieldset>
+	</div>
+
+	<div id="createnew" class="span-9 clear">
 	<?php 
 	
 	// Start main management section 
@@ -288,7 +297,7 @@ if ($db->ErrorNumber())
 	?>
 	</div>
 
-	<div id="menudepth" class="span-16 last">
+	<div id="menudepth" class="span-16 last clear-right">
 	<?php 
 
 	// Manage menu depths & languages 
@@ -328,7 +337,7 @@ if ($db->ErrorNumber())
 
 		
 	?>
-	<div id="manage" class="span-25">
+	<div id="manage" class="span-25 last">
 	<fieldset>
 		<legend><a class="toggle" rel="filelist_wrapper"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
 		<div id="filelist_wrapper">
@@ -437,7 +446,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 ?>
 	
 	<?php // Footer block ?>
-	<div id="footer" class="span-25">
+	<div id="footer" class="span-25 clear">
 		<div class="prepend-11 span-11 colborder">
 			&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl">CompactCMS.nl</a>. <?php echo $ccms['lang']['system']['message_rights']; ?>.<br/>
 			<em><?php echo $ccms['lang']['backend']['gethelp']; ?></em>
