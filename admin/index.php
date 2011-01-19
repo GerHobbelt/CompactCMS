@@ -94,6 +94,27 @@ if ($db->ErrorNumber())
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
 	<![endif]-->
+	<style type="text/css">
+		#democlock_collective .clock 
+		{
+			float:left; 
+			display:block; 
+			margin:10px; 
+			padding:10px; 
+			background-color:#777;
+			-moz-box-shadow: 3px 3px 3px #999; -moz-border-radius:5px;
+			-webkit-box-shadow: 3px 3px 3px #999; -webkit-border-radius:5px;
+		}
+		#democlock_collective .skintitle
+		{
+			float:left; 
+			display:block; 
+			margin:10px; 
+			padding:10px; 
+			border: 3px solid black;
+			background-color: #577a9e;
+		}
+	</style>
 </head>
 
 <body id="desktop">
@@ -439,6 +460,8 @@ if (0)
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
+	<div id="democlock_collective" class="span-25 clear"> </div>
+	
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 <?php
