@@ -185,7 +185,9 @@ until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuc
 Make sure the outer scrollbars disappear in IE6; they screw up the screen on 1024px wide 
 displays.
 */
+/*
 html
 {
-	overflow: hidden;
+	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should! 
 }
+*/
