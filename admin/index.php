@@ -94,6 +94,10 @@ if ($db->ErrorNumber())
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
 	<![endif]-->
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
 	<style type="text/css">
 		#democlock_collective .clock 
 		{
@@ -102,6 +106,7 @@ if ($db->ErrorNumber())
 			margin:10px; 
 			padding:10px; 
 			background-color:#eee;
+			box-shadow: 3px 3px 3px #999; border-radius:5px;
 			-moz-box-shadow: 3px 3px 3px #999; -moz-border-radius:5px;
 			-webkit-box-shadow: 3px 3px 3px #999; -webkit-border-radius:5px;
 		}
@@ -115,6 +120,9 @@ if ($db->ErrorNumber())
 			background-color: #577a9e;
 		}
 	</style>
+<?php
+}
+?>
 </head>
 
 <body id="desktop">

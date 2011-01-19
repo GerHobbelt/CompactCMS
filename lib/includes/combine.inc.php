@@ -104,7 +104,7 @@ define('COMBINER_DEV_DUMP_OUTPUT', false); // dump generated content to cache di
 $optimize = array();
 $optimize['css'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? false : 'css-compressor');    // possible values: false, 'csstidy', 'css-compressor'
 $optimize['javascript'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? false : 'JSmin');       // possible values: false, 'JSmin'
-$optimize['css3'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? 'remove' : 'browser-fix');            // possible values: false, 'remove', 'browser-fix'
+$optimize['css3'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] ? 'browser-fix' : 'browser-fix');            // possible values: false, 'remove', 'browser-fix'
 
 
 $cache      = !$cfg['IN_DEVELOPMENT_ENVIRONMENT']; // only disable cache when in development environment
@@ -907,6 +907,10 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 	case 'browser-fix':
 		$is_IE = (0 == strcasecmp('IE', $client_browser->Browser));
 		$is_FF = (0 == strcasecmp('Firefox', $client_browser->Browser));
+		$is_Chrome = (0 == strcasecmp('Chrome', $client_browser->Browser));
+		$is_Opera = (0 == strncasecmp('Opera', $client_browser->Browser, 5)); 
+		$is_Safari = (0 == strcasecmp('Safari', $client_browser->Browser)); 
+		$is_mobile = !!$client_browser->isMobileDevice;
 		/*
 		 * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
 		 * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
@@ -924,37 +928,100 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		}
 		$sniffed_version = floatval($vmp[1]);
 
-		// fix CSS3 border-radius for IE:
+		/*
+		 fix CSS3 border-radius for IE:
+		 
+		 we DON'T. It's a mess and frankly, I can do without the hassle right now. So MSIE6/7/8 do NOT support rounded corners
+		 like that in the admin screens.
+		*/
 		if ($is_IE)
 		{
-			$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
+			/* fix opacity for IE: */
+			// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */
+			// filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
+			// filter:alpha(opacity=80);
+			// -ms-filter:'alpha(opacity=80)';
+			/*
+			 * see also why we removed the MSIE filter lines in the CSS file 'originals':
+			 *
+			 * http://developer.yahoo.com/performance/rules.html
+			 *   (section: Avoid Filters)
+			 *
+			 * we can add the opacity filters back in through fixup_css() in
+			 * the Combiner, as all CSS travels through there anyway.
+			 */
 
-			$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
+			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
+			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
+
+			if (0)
+			{
+				$fixup = "    behavior: url('" . $cfg['rootdir'] . "admin/img/styles/PIE.php');\n";
+
+				$contents = preg_replace('/\sborder-radius/', "\t". $fixup . "\tborder-radius", $contents);
+			}
 		}
 		else if ($is_FF)
 		{
-			$contents = preg_replace('/\sborder-radius/', "-moz-border-radius", $contents);
+			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
+			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
+
+			// strip off MSIE filter bits
+			$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*\w\([^)]+\)[\'"]?\s*;?/', ' ', $contents); // alpha, mask
+			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
+
+			// FireFox/Chrome fixes
+			//-webkit-border-radius: 5px [5px 5px 5px];
+			//-moz-border-radius: 5px [5px 5px 5px];
+			//border-radius: 5px [5px 5px 5px];
+			//-moz-opacity: 0.8;                  ??
+			
+			$contents = preg_replace('/\sborder-radius:/', "-moz-border-radius:", $contents);
+			$contents = preg_replace('/\sborder-shadow:/', "-moz-border-shadow:", $contents);
 		}
+		else if ($is_Chrome)
+		{
+			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
+			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
 
-		/* fix opacity for IE: */
-		// -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; /* IE8 */
-		// filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80); /* IE6 and 7*/
-		// filter:alpha(opacity=80);
-		// -ms-filter:'alpha(opacity=80)';
-		/*
-		 * see also why we removed the MSIE filter lines in the CSS file 'originals':
-		 *
-		 * http://developer.yahoo.com/performance/rules.html
-		 *   (section: Avoid Filters)
-		 *
-		 * we can add the opacity filters back in through fixup_css() in
-		 * the Combiner, as all CSS travels through there anyway.
-		 */
+			// strip off MSIE filter bits
+			$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*\w\([^)]+\)[\'"]?\s*;?/', ' ', $contents); // alpha, mask
+			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
 
-		// FireFox/Chrome fixes
-		//-webkit-border-radius: 5px [5px 5px 5px];
-		//-moz-border-radius: 5px [5px 5px 5px];
-		//border-radius: 5px [5px 5px 5px];
+			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
+		}
+		else if ($is_Opera)
+		{
+			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
+			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
+
+			// strip off MSIE filter bits
+			$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*\w\([^)]+\)[\'"]?\s*;?/', ' ', $contents); // alpha, mask
+			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
+
+			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
+			
+			/*
+			Opera (11.0 build 1156) does not render border-radius correctly for <fieldset> borders (the background fill is correctly rendered, amazingly).
+			*/
+		}
+		else if ($is_Safari)
+		{
+			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
+			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
+
+			// strip off MSIE filter bits
+			$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*\w\([^)]+\)[\'"]?\s*;?/', ' ', $contents); // alpha, mask
+			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
+			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
+
+			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
+		}
 
 		$contents = '/* Browser: ' . $client_browser->Browser . ' ' . $client_browser->Version . " */\n" . $contents;
 		break;

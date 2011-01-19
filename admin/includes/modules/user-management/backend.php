@@ -80,7 +80,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 </head>
 <body>
 	<div class="module" id="user-management">
-		<div class="center-text <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?> clear">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
@@ -89,7 +89,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 			?>
 		</div>
 		
-		<div class="span-18 colborder">
+		<div class="span-18 colborder clear-left">
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
 			<form action="../../process.inc.php?action=delete-user" method="post" accept-charset="utf-8">
 				<div class="table_inside">
@@ -250,7 +250,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
 	</textarea>
 <?php
 }

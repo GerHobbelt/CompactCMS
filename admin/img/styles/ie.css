@@ -61,13 +61,17 @@ table th, td
 
 
 
+legend     /* IE8 */
+{ 
+	margin-left: .7em;
+} 
 *:first-child+html legend  /* IE7 */
 { 
-	margin-top:-0.4em; 
+	margin-top: -0.4em; 
 }
 * html legend     /* IE6 */
 { 
-	margin-top:0; 
+	margin-top: 0; 
 	/* also fix padding which is completely destroyed on IE6 */
 	padding: .2em 1em; 
 } 
@@ -172,6 +176,24 @@ until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuc
 	zoom: 1; /* force hasLayout */
 }
 * html #template-editor /* IE6 */
+{
+	zoom: 1; /* force hasLayout */
+}
+
+
+
+
+
+/*
+Add a <hr class="space clear" /> between the <div>s and MSIE7 renders an entire white screen. :-(
+
+The solution there is to have the parent node have hasLayout:
+*/
+*:first-child+html #edit-user-details /* IE7 only */
+{
+	zoom: 1; /* force hasLayout */
+}
+* html #edit-user-details /* IE6 */
 {
 	zoom: 1; /* force hasLayout */
 }

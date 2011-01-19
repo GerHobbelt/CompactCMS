@@ -101,7 +101,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		} 
 		?>
 		
-		<div class="center-text <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?> clear">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
@@ -117,7 +117,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		</div>
 -->
 		
-		<div class="span-15 colborder">
+		<div class="span-15 colborder clear">
 			<h2><?php echo $ccms['lang']['users']['editdetails']; ?></h2>
 			<form action="../../process.inc.php?action=edit-user-details" id="userDetailForm" method="post" accept-charset="utf-8">
 				<label><?php echo $ccms['lang']['users']['username']; ?></label>
@@ -152,7 +152,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 					<div class="clear strength0" id="passwordStrength">
 						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
 					</div>
-					</br class="clear"/>
+					<br class="clear"/>
 					<label for="cpass"><?php echo $ccms['lang']['users']['cpassword']; ?></label>
 						<input type="password" class="validate-match matchInput:'userPass' matchName:'Password' required minLength:6 text" name="cpass" value="" id="cpass" />
 					
@@ -222,7 +222,9 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			?>
 		</div>
 		
-		<div class="clear right">
+		<hr class="space clear" />
+		
+		<div class="right">
 			<a href="backend.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
 		</div>
 
