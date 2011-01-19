@@ -92,7 +92,7 @@ table th, td
 
 
 /*
-Only IE7 shows a horizon scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
+Only IE7 shows a horizontal scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
 
 Here we tweak the margin to make that useless scrollbar disappear at that resolution.
 

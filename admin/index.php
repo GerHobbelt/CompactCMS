@@ -358,7 +358,7 @@ if ($db->ErrorNumber())
 
 		
 	?>
-	<div id="manage" class="span-25 last">
+	<div id="manage" class="span-25 last clear">
 	<fieldset>
 		<legend><a class="toggle" rel="filelist_wrapper"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
 		<div id="filelist_wrapper">
@@ -406,7 +406,7 @@ if ($db->ErrorNumber())
 	</fieldset>
 	</div>
 
-	<div id='debugMsg' class="span-25">
+	<div id='debugMsg' class="span-25 last clear">
 
 <?php
 
@@ -460,16 +460,16 @@ if (0)
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<div id="democlock_collective" class="span-25 clear"> </div>
+	<div id="democlock_collective" class="span-25 last clear"> </div>
 	
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last" readonly="readonly">
 	</textarea>
 <?php
 }
 ?>
 	
 	<?php // Footer block ?>
-	<div id="footer" class="span-25 clear">
+	<div id="footer" class="span-25 last clear">
 		<div class="prepend-11 span-11 colborder">
 			&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl">CompactCMS.nl</a>. <?php echo $ccms['lang']['system']['message_rights']; ?>.<br/>
 			<em><?php echo $ccms['lang']['backend']['gethelp']; ?></em>

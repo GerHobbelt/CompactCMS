@@ -124,7 +124,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		<?php 
 		} 
 		?>	
-		<div class="span-15">
+		<div class="span-15 clear">
 			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
 		</div>
 		
@@ -183,7 +183,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 				</select>
 			</form>
 		</div>
-		<hr class="space"/>
+		<hr class="space span-25 clear"/>
 		
 		<?php 
 		/*
@@ -192,7 +192,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		Changed to mimic the layout in the other files...
 		*/                 
 		?>                              
-		<div class="center-text <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?> span-25 clear">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
@@ -222,7 +222,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
 	</textarea>
 <?php
 }
