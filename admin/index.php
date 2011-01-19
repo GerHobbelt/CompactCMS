@@ -101,7 +101,7 @@ if ($db->ErrorNumber())
 			display:block; 
 			margin:10px; 
 			padding:10px; 
-			background-color:#777;
+			background-color:#eee;
 			-moz-box-shadow: 3px 3px 3px #999; -moz-border-radius:5px;
 			-webkit-box-shadow: 3px 3px 3px #999; -webkit-border-radius:5px;
 		}
