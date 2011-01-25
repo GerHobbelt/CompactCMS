@@ -87,9 +87,9 @@ function options($options, $selected = null, $labelIsValue = false)
             $value = $label[0];
             $label = $label[1];
         }
-        $label = htmlspecialchars($label, ENT_QUOTES, 'utf-8');
+        $label = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
         $value = $labelIsValue ? $label
-                               : htmlspecialchars($value, ENT_QUOTES, 'utf-8');
+                               : htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 
         $html .= '<option value="'.$value.'"';
         if (in_array($value, $selected)) {
@@ -231,10 +231,10 @@ else {
       <div>
         <fieldset id="field_input">
           <legend><?php echo $lang[$l][8]; ?></legend> <label for="css_text"
-          class="block"><?php echo $lang[$l][9]; ?></label><textarea id="css_text" name="css_text" rows="20" cols="35"><?php if(isset($_REQUEST['css_text'])) echo htmlspecialchars($_REQUEST['css_text'], ENT_QUOTES, "utf-8"); ?></textarea>
+          class="block"><?php echo $lang[$l][9]; ?></label><textarea id="css_text" name="css_text" rows="20" cols="35"><?php if(isset($_REQUEST['css_text'])) echo htmlspecialchars($_REQUEST['css_text'], ENT_QUOTES, 'UTF-8'); ?></textarea>
             <label for="url"><?php echo $lang[$l][10]; ?></label> <input type="text"
           name="url" id="url" <?php if(isset($_REQUEST['url']) &&
-          !empty($_REQUEST['url'])) echo 'value="',htmlspecialchars($_REQUEST['url'], ENT_QUOTES, 'utf-8'),'"'; ?>
+          !empty($_REQUEST['url'])) echo 'value="',htmlspecialchars($_REQUEST['url'], ENT_QUOTES, 'UTF-8'),'"'; ?>
           size="35" /><br />
           <input type="submit" value="<?php echo $lang[$l][35]; ?>" id="submit" />
         </fieldset>
@@ -252,10 +252,10 @@ else {
             <?php echo $lang[$l][18]; ?> </label> <textarea id="custom"
             name="custom" cols="33" rows="4"><?php
                if($is_custom) echo
-              htmlspecialchars($_REQUEST['custom'], ENT_QUOTES, 'utf-8');
+              htmlspecialchars($_REQUEST['custom'], ENT_QUOTES, 'UTF-8');
                elseif(isset($_COOKIE['custom_template']) &&
               !empty($_COOKIE['custom_template'])) echo
-				htmlspecialchars($_COOKIE['custom_template'], ENT_QUOTES, 'utf-8');
+				htmlspecialchars($_COOKIE['custom_template'], ENT_QUOTES, 'UTF-8');
                ?></textarea>
           </fieldset>
           <fieldset id="options">
@@ -450,11 +450,11 @@ else {
         echo '<textarea rows="10" cols="80">';
 		
 		if(isset($_REQUEST['whole_file'])) {
-			echo htmlspecialchars($css->print->formatted_page('xhtml1.1', false, '', 'en'), ENT_QUOTES, 'utf-8');
+			echo htmlspecialchars($css->print->formatted_page('xhtml1.1', false, '', 'en'), ENT_QUOTES, 'UTF-8');
 		}
 		else {
-			echo htmlspecialchars('<code id="copytext">', ENT_QUOTES, 'utf-8'),"\n";
-			echo htmlspecialchars($css->print->formatted()."\n".'</code>', ENT_QUOTES, 'utf-8');
+			echo htmlspecialchars('<code id="copytext">', ENT_QUOTES, 'UTF-8'),"\n";
+			echo htmlspecialchars($css->print->formatted()."\n".'</code>', ENT_QUOTES, 'UTF-8');
 		}
 		echo '</textarea></fieldset>';
 		echo '<fieldset class="code_output"><legend>',$lang[$l][65],'</legend>';

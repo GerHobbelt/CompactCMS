@@ -33,8 +33,8 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
-*/
+ * We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+ */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
@@ -47,12 +47,12 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
 /*
-NOTICE:
-
-as this file can be loaded as part of /anything/, you CANNOT SPECIFY RELATIVE PATHS FOR URLs IN HERE AND EXPECT TO LIVE!
-
-URLs and local paths in here MUST be absolute: use $cfg['rootdir'] and BASE_PATH respectively to make it so.
-*/
+ * NOTICE:
+ * 
+ * as this file can be loaded as part of /anything/, you CANNOT SPECIFY RELATIVE PATHS FOR URLs IN HERE AND EXPECT TO LIVE!
+ * 
+ * URLs and local paths in here MUST be absolute: use $cfg['rootdir'] and BASE_PATH respectively to make it so.
+ */
 
 // If session already exists
 if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
@@ -75,24 +75,24 @@ $status_message = getGETparam4DisplayHTML('msg');
 if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST') 
 {                               
 	/*
-	This code does NOT require that the submitted data (user+pass) originates from the
-	web form below and was entered in the same session (as we don't have the CheckAuth()
-	condition checked in the if(...) above).
-	
-	This is intentional: users may store the login credentials in any form and still log
-	in. However, it also means that we must be aware that the current POST data can be
-	entirely malicious, hence we MUST perform rigorous checks -- which one would require
-	anyhow when logging in.
-	
-	To prevent SQL injection attacks against this form, we make sure the POST-ed data
-	does not contain any wildcards or trickery which makes our validation query below
-	produce multiple records. If for some other reason we get multiple user records
-	from the database then this is clearly a security/safety violation!
-	
-	Only when everything check out do we set the session validation items 'id' and 'host'
-	which will be used to validate basic website interaction security for the remainder 
-	of this session.
-	*/
+	 * This code does NOT require that the submitted data (user+pass) originates from the
+	 * web form below and was entered in the same session (as we don't have the CheckAuth()
+	 * condition checked in the if(...) above).
+	 * 
+	 * This is intentional: users may store the login credentials in any form and still log
+	 * in. However, it also means that we must be aware that the current POST data can be
+	 * entirely malicious, hence we MUST perform rigorous checks -- which one would require
+	 * anyhow when logging in.
+	 * 
+	 * To prevent SQL injection attacks against this form, we make sure the POST-ed data
+	 * does not contain any wildcards or trickery which makes our validation query below
+	 * produce multiple records. If for some other reason we get multiple user records
+	 * from the database then this is clearly a security/safety violation!
+	 * 
+	 * Only when everything check out do we set the session validation items 'id' and 'host'
+	 * which will be used to validate basic website interaction security for the remainder 
+	 * of this session.
+	 */
 	$userPass = md5($_POST['userPass'].$cfg['authcode']);
 	$logmsg = null;
 	
@@ -196,13 +196,15 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 	</head>
 <body>
 
-<div class="center-text <?php echo $status; ?>">
-	<?php 
-	if(!empty($status_message)) 
-	{ 
-		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
-	} 
-	?>
+<div id="logon-error-report-wrapper" class="container-18">
+	<div class="center-text <?php echo $status; ?>">
+		<?php 
+		if(!empty($status_message)) 
+		{ 
+			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
+		} 
+		?>
+	</div>
 </div>
 
 <div id="login-wrapper" class="container-18">
@@ -236,11 +238,11 @@ we're parsed before the external file will be; make it call back to us to execut
 function jump_if_not_top()
 {
 	/* 
-	make sure we are NOT loaded in a [i]frame (~ MochaUI window) 
-	
-	code bit taken from mootools 'domready' internals; rest derived from
-	  http://tjkdesign.com/articles/frames/4.asp#breaking
-	*/
+	 * make sure we are NOT loaded in a [i]frame (~ MochaUI window) 
+	 * 
+	 * code bit taken from mootools 'domready' internals; rest derived from
+	 *   http://tjkdesign.com/articles/frames/4.asp#breaking
+	 */
 	var isFramed = false;
 	// Thanks to Rich Dougherty <http://www.richdougherty.com/>
 	try 

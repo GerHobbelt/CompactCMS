@@ -75,23 +75,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 	if($_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
 	{
 		/*
-		Since the number of items to process is PAGES x USERS, this number can become rather large, even for moderately small sites.
-		
-		Hence we do this in two phases: 
-		
-		1) first we collect the user=owner set per page in an associative array.
-		
-		2) next, we update the database for each page collected in phase 1.
-		
-		This is different from the original approach in that:
-		
-		a) it cuts down the number of queries by a factor of USERS
-		
-		b) it does NOT reset the ownership of ALL pages at the start with another query --> unmentioned pages don't change.
-		
-		Particularly (b) plays well into our hands when we expand the notion of 'filtered page sets' in the admin section, i.e.
-		an admin section which currently only shows a SUBSET of all the pages available on the site.
-		*/
+		 * Since the number of items to process is PAGES x USERS, this number can become rather large, even for moderately small sites.
+		 * 
+		 * Hence we do this in two phases: 
+		 * 
+		 * 1) first we collect the user=owner set per page in an associative array.
+		 * 
+		 * 2) next, we update the database for each page collected in phase 1.
+		 * 
+		 * This is different from the original approach in that:
+		 * 
+		 * a) it cuts down the number of queries by a factor of USERS
+		 * 
+		 * b) it does NOT reset the ownership of ALL pages at the start with another query --> unmentioned pages don't change.
+		 * 
+		 * Particularly (b) plays well into our hands when we expand the notion of 'filtered page sets' in the admin section, i.e.
+		 * an admin section which currently only shows a SUBSET of all the pages available on the site.
+		 */
 		
 		// If all empty, we're done here
 		if(empty($_POST['owner'])) 

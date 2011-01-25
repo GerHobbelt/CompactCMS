@@ -1,87 +1,394 @@
-/* Blueprint CSS Framework */
+/* *****************************************************
+Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
+Revision:   CompactCMS - v 1.4.2
 
-/* reset.css */
-html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {margin:0;padding:0;border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline;}
-body {line-height:1.5;}
-table {border-collapse:separate;border-spacing:0;}
-caption, th, td {text-align:left;font-weight:normal;}
-table, td, th {vertical-align:middle;}
-blockquote:before, blockquote:after, q:before, q:after {content:"";}
-blockquote, q {quotes:"" "";}
-a img {border:none;}
+This file is part of CompactCMS.
 
-/* typography.css */
-body {font-size:75%;color:#222;background:#fff;font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;}
-h1, h2, h3, h4, h5, h6 {font-weight:normal;color:#111;}
-h1 {font-size:3em;line-height:1;margin-bottom:0.5em;}
-h2 {font-size:2em;margin-bottom:0.75em;font-family:"Myriad Pro",helvetica,arial,sans-serif;border-bottom:1px solid #E8E8E8;color:#25394A;}
-p {margin:0 0 1.5em;}
-p img {float:left;margin:1.5em 1.5em 1.5em 0;padding:0;}
-p img.right {float:right;margin:1.5em 0 1.5em 1.5em;}
-a:focus, a:hover {color:#000;}
-a {color:#009;text-decoration:underline;}
-strong {font-weight:bold;}
-em, dfn {font-style:italic;}
-del {color:#666;}
-li ul, li ol {margin:0 1.5em;}
-ul, ol {margin:0 1.5em 1.5em 1.5em;}
-ul {list-style-type:disc;}
-ol {list-style-type:decimal;}
-.small {font-size:.8em;margin-bottom:1.875em;line-height:1.875em;}
-.quiet {color:#666;}
+CompactCMS is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-/* grid.css */
-.container {width:950px;margin:0 auto;}
-body {margin:0;}
-div.span-1, div.span-2, div.span-3, div.span-4, div.span-5, div.span-6, div.span-7, div.span-8, div.span-9, div.span-10, div.span-11, div.span-12, div.span-13, div.span-14, div.span-15, div.span-16, div.span-17, div.span-18, div.span-19, div.span-20, div.span-21, div.span-22, div.span-23, div.span-24 {float:left;margin-right:10px;}
-div.last {margin-right:0;}
-.span-4 {width:150px;}
-.span-18 {width:710px;}
-.span-23 {width:910px;}
-.span-24, div.span-24 {width:950px;margin:0;}
-div.border {padding-right:4px;margin-right:5px;border-right:1px solid #eee;}
-div.colborder {padding-right:24px;margin-right:25px;border-right:1px solid #eee;}
-.border {padding-right:16px;margin-right:17px;border-right:1px solid #ddd;}
-.box {padding:1.5em;margin-bottom:1.5em;background:#E5ECF9;}
-hr {background:#ddd;color:#ddd;clear:both;float:none;width:100%;height:.1em;margin:0 0 1.45em;border:none;}
-hr.space {background:#fff;color:#fff;}
-.clearfix:after, .container:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
-.clearfix, .container {display:inline-block;}
-* html .clearfix, * html .container {height:1%;}
-.clearfix, .container {display:block;}
-.clear {clear:both;}
+CompactCMS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-/* forms.css */
-label {font-weight:bold;}
-fieldset {padding:1.4em;margin:0 0 1.5em 0;border:1px solid #ccc;}
-legend {font-weight:bold;font-size:1.2em;}
-input.text, input.title, textarea, select {margin:0.5em 0;border:1px solid #bbb;}
-input.text:focus, input.title:focus, textarea:focus, select:focus {border:1px solid #666;}
-input.text, input.title {width:300px;padding:5px;}
-input.title {font-size:1.5em;}
-textarea {width:300px;height:250px;padding:5px;}
-.error, .notice, .success {padding:.8em;margin-bottom:1em;border:2px solid #ddd;}
-.error {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
-.notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
-.success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
-.error a {color:#8a1f11;}
-.notice a {color:#514721;}
-.success a {color:#264409;}
+A reference to the original author of CompactCMS and its copyright
+should be clearly visible at all times for the user of the back-
+end. You are not allowed to remove all references to the original
+author, communicating the product to be your own.
 
-/* contact form */
+You should have received a copy of the GNU General Public License
+along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
+	
+> Contact me for any inquiries.
+> E: Xander@CompactCMS.nl
+> W: http://community.CompactCMS.nl/forum
+****************************************************** */
+
+/* --------------------------------------------------------------
+
+   reset.css
+   * Resets default browser CSS.
+
+-------------------------------------------------------------- */
+
+@import url(src/reset.css);
+
+
+
+
+
+/* --------------------------------------------------------------
+
+   typography.css
+   * Sets up some sensible default typography.
+
+-------------------------------------------------------------- */
+
+@import url(src/typography.css);
+
+body 
+{
+  /* font-size: 75%; */
+  font-size:0.825em;
+  /* font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; */
+  font-family:'Palatino Linotype',Palatino, Baskerville, 'Book Antiqua', Georgia,serif;
+  line-height:1.5; /* was: 1.6em in CCMS before */
+}
+
+
+a:focus,
+a:hover     { color: #09f; } /* was: #000 for CCMS */
+a           { color: #06c; text-decoration: underline; } /* color was: #009 for CCMS */
+
+abbr,
+acronym     
+{ 
+	cursor: help;
+}
+
+table       
+{ 
+	margin-bottom: 0.1em; 
+}
+
+
+
+
+
+
+/* --------------------------------------------------------------
+
+   grid.css
+   * Sets up an easy-to-use grid of 24 columns.
+
+   By default, the grid is 950px wide, with 24 columns
+   spanning 30px, and a 10px margin between columns.
+
+   If you need fewer or more columns, namespaces or semantic
+   element names, use the compressor script (lib/compress.rb)
+
+-------------------------------------------------------------- */
+
+@import url(src/grid.css);
+
+/*
+EXTRA:
+
+- define containers for each 'width' (column count); we don't have 'a container' but we use various
+  widths on the site: allow for that.
+
+- introduce a 25th column (+40px --> 990px)
+*/
+
+/* A container should group all your columns. */
+.container-1, .container-2, .container-3, .container-4, .container-5, .container-6, 
+.container-7, .container-8, .container-9, .container-10, .container-11, .container-12,
+.container-13, .container-14, .container-15, .container-16, .container-17, .container-18,
+.container-19, .container-20, .container-21, .container-22, .container-23, .container-24,
+.container-25
+{
+  margin: 0 auto;
+}
+.container-1 {width: 30px;}
+.container-2 {width: 70px;}
+.container-3 {width: 110px;}
+.container-4 {width: 150px;}
+.container-5 {width: 190px;}
+.container-6 {width: 230px;}
+.container-7 {width: 270px;}
+.container-8 {width: 310px;}
+.container-9 {width: 350px;}
+.container-10 {width: 390px;}
+.container-11 {width: 430px;}
+.container-12 {width: 470px;}
+.container-13 {width: 510px;}
+.container-14 {width: 550px;}
+.container-15 {width: 590px;}
+.container-16 {width: 630px;}
+.container-17 {width: 670px;}
+.container-18 {width: 710px;}
+.container-19 {width: 750px;}
+.container-20 {width: 790px;}
+.container-21 {width: 830px;}
+.container-22 {width: 870px;}
+.container-23 {width: 910px;}
+.container-24 {width: 950px;}
+.container-25 {width: 990px;}
+
+/* Columns
+-------------------------------------------------------------- */
+
+.span-25 
+{
+  float: left;
+  margin-right: 10px;
+}
+
+/* Use these classes to set the width of a column. */
+.span-1-1 {width:40px;}
+.span-2-1 {width: 85px;}
+.span-25 {width: 990px; } /* was: margin: 0 for CCMS */
+
+/* Use these classes to set the width of an input. */
+input.span-25, textarea.span-25 
+{
+  border-left-width: 1px;
+  border-right-width: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+input.span-25, textarea.span-25 { width: 968px; }
+
+/* Add these to a column to append empty cols. */
+
+.append-24 { padding-right: 960px;}
+
+/* Add these to a column to prepend empty cols. */
+
+.prepend-24 { padding-left: 960px;}
+
+
+/* Use these classes on an element to push it into the
+next column, or to pull it into the previous column.  */
+
+
+.pull-25 { margin-left: -1000px; }
+
+.pull-25 
+{
+	float: left; 
+	position:relative;
+}
+
+
+.push-25 { margin: 0 -1000px 1.5em 1000px; }
+
+.push-25
+{
+	float: left; 
+	position:relative;
+}
+
+
+/* Misc classes and elements
+-------------------------------------------------------------- */
+
+
+/* Clearing floats without extra markup
+   Based on How To Clear Floats Without Structural Markup by PiE
+   [http://www.positioniseverything.net/easyclearing.html] */
+
+.container-1:after, .container-2:after, .container-3:after, .container-4:after, .container-5:after, 
+.container-6:after, .container-7:after, .container-8:after, .container-9:after, .container-10:after, 
+.container-11:after, .container-12:after, .container-13:after, .container-14:after, .container-15:after, 
+.container-16:after, .container-17:after, .container-18:after, .container-19:after, .container-20:after, 
+.container-21:after, .container-22:after, .container-23:after, .container-24:after, .container-25:after
+{
+  content: "\0020";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+  overflow:hidden;
+}
+.container-1, .container-2, .container-3, .container-4, .container-5, .container-6, .container-7, 
+.container-8, .container-9, .container-10, .container-11, .container-12, .container-13, .container-14, 
+.container-15, .container-16, .container-17, .container-18, .container-19, .container-20, .container-21, 
+.container-22, .container-23, .container-24, .container-25
+{
+	display: block;
+}
+
+/* Regular clearing
+   apply to column that should drop below previous ones. */
+
+.clear-left { clear:left; }
+.clear-right { clear:right; }
+
+/* --------------------------------------------------------- */
+
+
+.block 
+{
+	border:3px solid #B3E813; 
+	padding: 10px;
+}
+
+.page-break 
+{
+	page-break-before:always;
+}
+/*
+::selection{background:#c3effd;color:#000;}
+::-moz-selection{background:#c3effd;color:#000;}
+*/
+
+
+
+
+
+/* --------------------------------------------------------------
+
+   forms.css
+   * Sets up some default styling for forms
+   * Gives you classes to enhance your forms
+
+   Usage:
+   * For text fields, use class .title or .text
+   * For inline forms, use .inline (even when using columns)
+
+-------------------------------------------------------------- */
+
+@import url(src/forms.css);
+
+#contact label
+{
+	font-weight:bold;
+	float:left;
+	width:90px;
+	text-align: right;
+	margin-right:5px;
+	padding-top:7px;
+}
+
+/* Form fields
+-------------------------------------------------------------- */
+
+/* 
+  Attribute selectors are used to differentiate the different types 
+  of input elements, but to support old browsers, you will have to 
+  add classes for each one. ".title" simply creates a large text  
+  field, this is purely for looks.
+ */
+input[type="text"], input[type="password"]
+{
+	margin:0.2em 0;
+}
+input.text, input.title, textarea 
+{
+	margin:0.2em 0;
+}
+/*
+The new default from blueprint CSS is more sensible
+
+textarea 
+{
+	height: 150px;
+}
+*/
+input.text,
+input.title   { padding: 3px; }
+textarea      { padding: 3px; }
+
+select.text 
+{
+	/* width: 210px;   -- use the span-x classes! */
+	padding: 3px;
+}
+select.title   
+{ 
+	/* width: 300px;   -- use the span-x classes! */
+	padding: 3px; 
+}
+select.text, select.title
+{
+  background-color:#fff;
+  border:1px solid #bbb;
+}
+
+/* 
+  This is to be used on forms where a variety of elements are 
+  placed side-by-side. Use the p tag to denote a line. 
+ */
+form.inline { line-height:3; }
+form.inline p { margin-bottom:0; }
+
+
+/* Success, info, notice and error/alert boxes
+-------------------------------------------------------------- */
+
+.fault 
+{
+	color:#8a1f11;
+}
+
+
+
+
+
+
+
+
+
+/* -------------------------------------------------------------- 
+  
+   buttons.css
+   * Gives you some great CSS-only buttons.
+   
+   Created by Kevin Hale [particletree.com]
+   * particletree.com/features/rediscovering-the-button-element
+
+   See Readme.txt in this folder for instructions.
+
+-------------------------------------------------------------- */
+
+@import url(plugins/buttons/screen.css);
+
+label,select,.pointer 
+{
+	cursor:pointer;
+}
+
+/* validation */
 .validation-failed {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
 .validation-passed {background:#E6EFC2;color:#264409;border-color:#C6D880;}
 .validation-advice {font-style:italic;color:#CC0000;margin-left:150px;padding-left:17px;font-size:0.825em;}
-label{float:left;margin-top:10px;width:150px;}
-.success{padding:.8em;margin-bottom:1em;border:2px solid #C6D880;background:#E6EFC2;color:#264409;}
 
-/* override style */
-body {font-family: "Myriad Pro",helvetica,arial,sans-serif;background: url('body-bg.gif') repeat-x;width: 100%;}
-#header {background: transparent url('header.jpg') no-repeat 0 0;padding-top: 10px;height: 114px;}
-#navigation a {padding: 5px 13px;text-decoration: none;color: #FFFFFF;}
-#navigation a:hover {text-decoration: underline;color: #FFFFFF;}
-#content {margin-top: 20px;}
-#footer {background: url('footer-bg.gif') repeat-x;width: 100%;text-align: center;padding-top: 15px;}
-#footer p {height: 25px; background: url('icon-wa.gif') no-repeat 60% 0;}
-#header h1 {background: url('logo.gif') no-repeat;height: 81px;}
-#header h1 span {display: none;}
+
+
+
+
+
+/* --------------------------------------------------------------
+
+   fancy-type.css
+   * Lots of pretty advanced classes for manipulating text.
+
+   See the Readme file in this folder for additional instructions.
+
+-------------------------------------------------------------- */
+
+@import url(plugins/fancy-type/screen.css);
+
+
+
+
+
+.redbox
+{
+	border: 1px solid red;
+}

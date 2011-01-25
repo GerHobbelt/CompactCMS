@@ -2382,6 +2382,16 @@ can then be used to restore the selection after some content modification to the
               <description>true/false if it was successful or not.</description>
             </return>
           </method>
+          <method name="moveAfterNode" summary="Moves the selection to be collapsed immediately after the node.">
+            <description>Moves the selection to be collapsed immediately after the node.
+</description>
+            <param name="node" type="Element">
+              <description>HTML DOM element to position caret after.</description>
+            </param>
+            <return type="Element">
+              <description>the same element as the one that got passed in.</description>
+            </return>
+          </method>
           <method name="select" summary="Selects the specified element.">
             <description>Selects the specified element. This will place the start and end of the selection range around the element.
 </description>
@@ -2782,6 +2792,13 @@ doesn't close them menu if it was a event inside the menu.
           </method>
           <method name="setColor" summary="Sets the current color for the control and hides the menu if it should be visible.">
             <description>Sets the current color for the control and hides the menu if it should be visible.
+</description>
+            <param name="c" type="String">
+              <description>Color code value in hex for example: #FF00FF</description>
+            </param>
+          </method>
+          <method name="displayColor" summary="Change the currently selected color for the control.">
+            <description>Change the currently selected color for the control.
 </description>
             <param name="c" type="String">
               <description>Color code value in hex for example: #FF00FF</description>

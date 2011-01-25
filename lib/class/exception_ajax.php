@@ -70,11 +70,13 @@
 class CcmsAjaxFbException extends Exception
 {
 	protected static $feedback_url = null;
+	protected static $url_query_data = null;
 	protected $extra_url_query_data = null;
 
-	public static function SetFeedbackLocation($location)
+	public static function SetFeedbackLocation($location, $query_data = null)
 	{
 		self::$feedback_url = $location;
+		self::$url_query_data = $query_data;
 	}
 	
     // Redefine the exception so message isn't optional
@@ -95,13 +97,19 @@ class CcmsAjaxFbException extends Exception
 	{
 		if (!empty(self::$feedback_url))
 		{
+			$q = self::$url_query_data;
+			if (!empty($q))
+			{
+				$q .= '&';
+			}
+			
 			$extraq = $this->extra_url_query_data;
 			if (!empty($extraq))
 			{
 				$extraq .= '&';
 			}
 
-			header('Location: ' . makeAbsoluteURI(self::$feedback_url . '?' . $extraq . 'status=error&msg=' . rawurlencode($this->message)));
+			header('Location: ' . makeAbsoluteURI(self::$feedback_url . '?' . $q . $extraq . 'status=error&msg=' . rawurlencode($this->message)));
 			exit();
 		}
 		// if we get here, this exception class hasn't been set up according to requirements. Barf a hairball.

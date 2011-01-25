@@ -24,6 +24,8 @@
 	text-align: left;
 }
 
+
+
 * html .span-25 { display:inline; overflow-x: hidden; }
 
 
@@ -59,13 +61,17 @@ table th, td
 
 
 
+legend     /* IE8 */
+{ 
+	margin-left: .7em;
+} 
 *:first-child+html legend  /* IE7 */
 { 
-	margin-top:-0.4em; 
+	margin-top: -0.4em; 
 }
 * html legend     /* IE6 */
 { 
-	margin-top:0; 
+	margin-top: 0; 
 	/* also fix padding which is completely destroyed on IE6 */
 	padding: .2em 1em; 
 } 
@@ -82,10 +88,15 @@ table th, td
 {
 	background-position: 0px 0px; /* shift down for IE6 */
 }
+#desktop #load_notice fieldset
+{
+	background-image: url('../admin_panel_bg_red.gif');
+	background-color: #fdd;
+}
 
 
 /*
-Only IE7 shows a horizon scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
+Only IE7 shows a horizontal scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
 
 Here we tweak the margin to make that useless scrollbar disappear at that resolution.
 
@@ -170,3 +181,35 @@ until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuc
 }
 
 
+
+
+
+/*
+Add a <hr class="space clear" /> between the <div>s and MSIE7 renders an entire white screen. :-(
+
+The solution there is to have the parent node have hasLayout:
+*/
+*:first-child+html #edit-user-details /* IE7 only */
+{
+	zoom: 1; /* force hasLayout */
+}
+* html #edit-user-details /* IE6 */
+{
+	zoom: 1; /* force hasLayout */
+}
+
+
+
+
+
+
+/*
+Make sure the outer scrollbars disappear in IE6; they screw up the screen on 1024px wide 
+displays.
+*/
+/*
+html
+{
+	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should! 
+}
+*/

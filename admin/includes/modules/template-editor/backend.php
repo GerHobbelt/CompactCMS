@@ -124,7 +124,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		<?php 
 		} 
 		?>	
-		<div class="span-15">
+		<div class="span-15 clear">
 			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
 		</div>
 		
@@ -183,7 +183,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 				</select>
 			</form>
 		</div>
-		<hr class="space"/>
+		<hr class="space span-25 clear"/>
 		
 		<?php 
 		/*
@@ -192,7 +192,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		Changed to mimic the layout in the other files...
 		*/                 
 		?>                              
-		<div class="center-text <?php echo $status; ?>">
+		<div class="center-text <?php echo $status; ?> span-25 clear">
 			<?php 
 			if(!empty($status_message)) 
 			{ 
@@ -202,7 +202,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 		</div>
 		
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
-			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 			
 			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
 			<div class="right">
@@ -222,7 +222,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
 	</textarea>
 <?php
 }
@@ -253,8 +253,17 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
-	'../../../../lib/includes/js/edit_area/edit_area_full.js',
-	'../../../../lib/includes/js/the_goto_guy.js'
+	'../../../../lib/includes/js/the_goto_guy.js',
+<?php
+	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+	{
+		echo "	'../../../../lib/includes/js/edit_area/edit_area_full.js'\n";
+	}
+	else
+	{
+		echo "	'../../../../lib/includes/js/edit_area/edit_area_full.js'\n";
+	}
+?>
 	];
 
 function jsComplete(user_obj, lazy_obj)

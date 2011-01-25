@@ -20,7 +20,7 @@ class TinyGoogleSpell {
 		$matches = $this->_getMatches($wordstr);
 
 		for ($i=0; $i<count($matches); $i++)
-			$words[] = $this->unhtmlentities(mb_substr($wordstr, $matches[$i][1], $matches[$i][2], "UTF-8"));
+			$words[] = $this->unhtmlentities(mb_substr($wordstr, $matches[$i][1], $matches[$i][2], 'UTF-8'));
 
 		return $words;
 	}

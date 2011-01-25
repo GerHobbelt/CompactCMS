@@ -55,10 +55,10 @@ function check_session_sidpatch_and_start()
 		$sesid = preg_replace('/[^A-Za-z0-9]/', 'X', $_GET[$getid]);
 
 		/*
-		Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
-		
-		however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
-		*/
+		 * Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
+		 * 
+		 * however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
+		 */
 		session_id($sesid);
 		session_start();
 		//session_write_close();
@@ -105,10 +105,10 @@ if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOP
 }
 
 /*
- initiate database connection; do this AFTER checking for the _install directory, because 
- otherwise error reports from this init will have precedence over the _install-dir-exists 
- error report!
-*/
+ * initiate database connection; do this AFTER checking for the _install directory, because 
+ * otherwise error reports from this init will have precedence over the _install-dir-exists 
+ * error report!
+ */
 $db = new MySQL();
 
 
@@ -159,7 +159,7 @@ $ccms['printing'] = getGETparam4boolYN('printing', 'N');
 
 $preview = getGETparam4IdOrNumber('preview'); // in fact, it's a hash plus ID!
 $preview = IsValidPreviewCode($preview);
-$ccms['preview'] = $preview;
+$ccms['preview'] = ($preview ? 'Y' : 'N');
 
 
 // This files' current version
@@ -230,6 +230,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		$ccms['module']      = 'error';
 		$ccms['module_path'] = null;
 
+		$ccms['cfg']        = $cfg;
 		$ccms['language']   = $cfg['language'];
 		$ccms['tinymce_language']   = $cfg['language'];
 		$ccms['editarea_language']   = $cfg['language'];
@@ -241,7 +242,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		// [i_a] fix: close <span> here as well
 		$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' Home">Home</a> &raquo '.$ccms['lang']['system']['error_404title'].'</span>';
 		$ccms['iscoding']   = "Y";
-		$ccms['rootdir']    = (substr($cfg['rootdir'],-1)!=='/'?$cfg['rootdir'].'/':$cfg['rootdir']);
+		$ccms['rootdir']    = (substr($cfg['rootdir'],-1) !== '/' ? $cfg['rootdir'].'/' : $cfg['rootdir']);
 		$ccms['urlpage']    = $pagereq; // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
 		$ccms['desc']       = $ccms['lang']['system']['error_404title'];
 		$ccms['keywords']   = strval($code);
@@ -275,19 +276,25 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	
 
 	/**
-	 Parse contents function
+	 * Load the page ($page) Parse contents function when it is either signalled as published ($published),
+	 * identified by the preview page ID code ($preview) or instructed to load anyhow ($force_load).
+	 *
+	 * Return FALSE when the page does not exist or could not be loaded due to either the restrictions above 
+	 * or file system access rights denying the web server read access to the specified page.
+	 *
+	 * Return the rendered page content otherwise.
 	 */
 	function ccmsContent($page, $published, $preview, $force_load = false) 
 	{
 		/*
-		Add every item which we have around here and want present in the module page being loaded in here.
-		-->
-		We want the db connection and the config ($cfg) and content ($ccms) arrays available anywhere inside the include()'d content.
-		*/
+		 * Add every item which we have around here and want present in the module page being loaded in here.
+		 *   -->
+		 * We want the db connection and the config ($cfg) and content ($ccms) arrays available anywhere inside the include()'d content.
+		 */
 		global $ccms, $cfg, $db, $modules, $v;
 		
 		$content = false;
-		$failure = false;
+		$ccms_load_failure = false; // this variable should have a name that will not get used/redefined inadvertedly in the loaded PHP page!
 		$msg = explode(' ::', $ccms['lang']['hints']['published']);
 		ob_start();
 			// Check for preview variable
@@ -305,25 +312,32 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				
 				if (is_file($filepath))
 				{
-					/*MARKER*/include($filepath);
+					if (is_readable($filepath))
+					{
+						/*MARKER*/include($filepath);
+					}
+					else
+					{
+						$ccms_load_failure = 403;
+					}
 				}
 				else
 				{
-					$failure = 404;
+					$ccms_load_failure = 404;
 				}
 			}
 			else  
 			{ 
 				// Parse 403 contents (disabled and no preview token)
-				$failure = 403;
+				$ccms_load_failure = 403;
 			}
 			// All parsed function contents to $content variable
 			$content = ob_get_contents();
 		ob_end_clean();
 		
-		if ($failure && empty($ccms['responsecode']))
+		if ($ccms_load_failure && empty($ccms['responsecode']))
 		{
-			$ccms['responsecode'] = $failure;
+			$ccms['responsecode'] = $ccms_load_failure;
 			return false;
 		}
 		return $content;
@@ -354,6 +368,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		$ccms['iscoding']   = $row->iscoding;
 
 		// Content variables
+		$ccms['cfg']        = $cfg;
 		$ccms['language']   = $cfg['language'];
 		$ccms['tinymce_language']   = $cfg['language'];
 		$ccms['editarea_language']   = $cfg['language'];
@@ -381,12 +396,12 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		// Check whether template exists, specify default or throw "no templates" error.
 		$ccms['template'] = DetermineTemplateName($row->variant, $ccms['printing']);
 
-		$ccms['module']      = $row->module;
+		$ccms['module']     = $row->module;
 		
 if (0)
 {
 		// create a plugin/module instance tailored to this particular page
-		if($row->module != "editor" && is_object($modules[$row->module]) && method_exists($modules[$row->module], 'getInstance')) 
+		if($row->module != 'editor' && is_object($modules[$row->module]) && method_exists($modules[$row->module], 'getInstance')) 
 		{
 			$ccms['module_instance'] = $modules[$row->module]->getInstance($ccms);
 			if (!is_object($ccms['module_instance']))
@@ -399,6 +414,7 @@ if (0)
 		// BREADCRUMB ==
 		// Create breadcrumb for the current page
 		$preview_checkcode = GenerateNewPreviewCode($row->page_id, null);
+		$ccms['previewcode'] = $preview_checkcode;
 		
 		$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
 
@@ -646,14 +662,14 @@ if (0)
 	}
 	
 	/*
-	The CONTENT collection should be the very last thing happening. 
-	
-	This is important for 'code' pages: these can only now assume that all
-	$ccms[] entries for the current page have been set up completely.
-	ATM no modules use this assumption (for example to modify/postprocess the $ccms[]
-	data) but this code flow enables the existence of such modules (plugins)
-	as they are loaded through the 'iscoding'-marked page.
-	*/
+	 * The CONTENT collection should be the very last thing happening. 
+	 * 
+	 * This is important for 'code' pages: these can only now assume that all
+	 * $ccms[] entries for the current page have been set up completely.
+	 * ATM no modules use this assumption (for example to modify/postprocess the $ccms[]
+	 * data) but this code flow enables the existence of such modules (plugins)
+	 * as they are loaded through the 'iscoding'-marked page.
+	 */
 	$ccms['content'] = ccmsContent($ccms['urlpage'], $ccms['published'], $preview);
 	if ($ccms['content'] === false)
 	{
@@ -683,7 +699,7 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 	 
 	 See also: http://hsivonen.iki.fi/producing-xml/
 	*/
-	header ("content-type: application/xml");
+	header("content-type: application/xml");
 
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	?>

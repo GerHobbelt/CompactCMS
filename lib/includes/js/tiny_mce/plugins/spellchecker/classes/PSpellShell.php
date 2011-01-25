@@ -61,7 +61,7 @@ class PSpellShell extends SpellChecker {
 		$cmd = $this->_getCMD($lang);
 
         if (function_exists("mb_convert_encoding"))
-            $word = mb_convert_encoding($word, "ISO-8859-1", mb_detect_encoding($word, "UTF-8"));
+            $word = mb_convert_encoding($word, "ISO-8859-1", mb_detect_encoding($word, 'UTF-8'));
         else
             $word = utf8_encode($word);
 

@@ -65,9 +65,12 @@ global $db,$cfg,$ccms;
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Print: {%title%}</title>
-	<meta name="description" content="[PRINT FRIENDLY] {%sitename%} | {%desc%}" />
-	<meta name="keywords" content="{%keywords%}" />
-	<link href="{%rootdir%}lib/templates/ccms/printing.css" rel="stylesheet" type="text/css" />
+	<meta name="description" content="[PRINT FRIENDLY] {%sitename!protect4attr%} | {%desc!protect4attr%}" />
+	<meta name="keywords" content="{%keywords!protect4attr%}" />
+	<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/base.css,layout.css,printing.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/ie.css" />
+	<![endif]-->
 	<link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
@@ -82,7 +85,7 @@ global $db,$cfg,$ccms;
 
 	<div id="content" class="span-25">
 		<div id="printable" style="text-align: right;">
-			<span id="pageref"><a href="{%rootdir%}{%urlpage%}.html">{%lang:system:tooriginal%}</a></span>
+			<span id="pageref"><a href="{%rootdir%}{%urlpage%}.html{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:system:tooriginal%}</a></span>
 		</div>
 		
 		{%content%}

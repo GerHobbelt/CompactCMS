@@ -224,15 +224,20 @@ function confirmation()
 
 var jsLogEl = document.getElementById('jslog');
 var js = [
+	'../../../../lib/includes/js/the_goto_guy.js'
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-?>
-	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
-<?php
+	echo ",\n";
+	$with_fancyuploader = false;
+	if ($with_fancyuploader)
+	{
+		// if you want to test with the fancy-uploader, you'll need mootools in here as well.
+		echo "'../../../../lib/includes/js/mootools-core.js,mootools-more.js',\n"; 
+	}
+	echo generateJS4TinyMCEinit(0, "elm1", $with_fancyuploader);
 }
 ?>
-	'../../../../lib/includes/js/the_goto_guy.js'
 	];
 
 
@@ -258,8 +263,16 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	tinyMCE.init({
 		mode : "exact",
 		elements : "elm1",
-		theme : "advanced",
-		theme : "simple"
+		//theme : "advanced",
+		theme : "simple",
+		skin: 'o2k7',
+		skin_variant: 'silver',
+		//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
+		//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
+		//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
+		//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
+		//theme_advanced_toolbar_location: 'top'
+		theme_simple_toolbar_location: 'top'
 	});
 	//});
 <?php
@@ -286,21 +299,10 @@ function ccms_lazyload_setup_GHO()
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-?>
-	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-<?php
+	echo generateJS4TinyMCEinit(1, "elm1", false); 
 }
 ?>
-	
+		
 	LazyLoad.js(js, jsComplete);
 }
 </script>

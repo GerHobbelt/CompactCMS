@@ -426,16 +426,16 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			?>
 			<form action="./lightbox.Process.php?<?php 
 				/* 
-				FancyUpload 3.0 uses a Flash object, which doesn't pass the session ID cookie, hence it BREAKS the session.
-				Given that we now finally DO check the session variables, FancyUpload suddenly b0rks with timeout errors as
-				lightbox.Process.php didn't produce ANY output in such circumstances.
-				
-				We need to make sure the Flash component forwards the session ID anyway. Use SID for that. See also:
-				
-					http://www.php.net/manual/en/function.session-id.php
-					http://devzone.zend.com/article/1312
-					http://www.php.net/manual/en/session.idpassing.php
-				*/
+				 * FancyUpload 3.0 uses a Flash object, which doesn't pass the session ID cookie, hence it BREAKS the session.
+				 * Given that we now finally DO check the session variables, FancyUpload suddenly b0rks with timeout errors as
+				 * lightbox.Process.php didn't produce ANY output in such circumstances.
+				 * 
+				 * We need to make sure the Flash component forwards the session ID anyway. Use SID for that. See also:
+				 * 
+				 * 	http://www.php.net/manual/en/function.session-id.php
+				 * 	http://devzone.zend.com/article/1312
+				 * 	http://www.php.net/manual/en/session.idpassing.php
+				 */
 				$sesid = null;
 				if (defined('SID'))
 				{
@@ -452,11 +452,11 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 				}
 				
 				/*
-				Because sessions are long-lived, we need to add an extra check as well, which will ensure that the current
-				form display will only produce a single permitted upload request; we can do this using a few random values
-				which may be stored in the session, but we MUST DESTROY those values once we've handled the corresponding
-				'save-files' action resulting from a form submit.
-				*/
+				 * Because sessions are long-lived, we need to add an extra check as well, which will ensure that the current
+				 * form display will only produce a single permitted upload request; we can do this using a few random values
+				 * which may be stored in the session, but we MUST DESTROY those values once we've handled the corresponding
+				 * 'save-files' action resulting from a form submit.
+				 */
 				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 				echo '&SIDCHK=' . $_SESSION['fup1'];
 

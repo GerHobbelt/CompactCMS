@@ -1011,7 +1011,7 @@ class MySQL
 						$html .= "\t<tr>\n";
 						foreach ($member as $key => $value) 
 						{
-							$html .= "\t\t<th $th><strong>" . htmlspecialchars($key) . "</strong></th>\n";
+							$html .= "\t\t<th $th><strong>" . htmlspecialchars($key, ENT_COMPAT, 'UTF-8') . "</strong></th>\n";
 						}
 						$html .= "\t</tr>\n";
 						$header = true;
@@ -1019,7 +1019,7 @@ class MySQL
 					$html .= "\t<tr>\n";
 					foreach ($member as $key => $value) 
 					{
-						$html .= "\t\t<td $td>" . htmlspecialchars($value) . "</td>\n";
+						$html .= "\t\t<td $td>" . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . "</td>\n";
 					}
 					$html .= "\t</tr>\n";
 				}
@@ -1188,8 +1188,8 @@ class MySQL
 					$child = $doc->createElement($fieldname);
 					$child = $element->appendChild($child);
 
-					// $fieldvalue = iconv("ISO-8859-1", "UTF-8", $fieldvalue);
-					$fieldvalue = htmlspecialchars($fieldvalue);
+					// $fieldvalue = iconv("ISO-8859-1", 'UTF-8', $fieldvalue);
+					$fieldvalue = htmlspecialchars($fieldvalue, ENT_COMPAT, 'UTF-8');
 					$value = $doc->createTextNode($fieldvalue);
 					$value = $child->appendChild($value);
 				} 
@@ -1327,21 +1327,49 @@ class MySQL
 				else if ($this->RowCount() > 0) 
 				{
 					$members = array();
-
-					while($row = $this->RowArray(null, MYSQL_ASSOC))
+					
+					for ($rows_dumped = 0; $row = $this->RowArray(null, MYSQL_ASSOC); $rows_dumped++)
 					{
 						$k = '';
 						$d = '';
 						foreach ($row as $key => $data)
 						{
 							$k .= '`' . $key . '`, ';
-							// TODO: how do we cope with NULL-valued columns???
-							$d .= '\'' . addslashes($data) . '\', ';
+							// we cope with NULL-valued columns:
+							if ($data === null)
+							{
+								$d .= 'NULL, ';
+							}
+							else
+							{
+								$d .= '\'' . addslashes($data) . '\', ';
+							}
 						}
 						$k = substr($k, 0, -2);
 						$d = substr($d, 0, -2);
-						$tv .= 'INSERT INTO ' . $table . ' (' . $k . ') VALUES (' . $d . ');' . "\r\n";
+						
+						// one INSERT INTO statement per 100 rows:
+						$marker = $rows_dumped % 100;
+						if ($marker == 0)
+						{
+							if ($rows_dumped > 0)
+							{
+								$tv .= ";\r\n\r\n";
+							}
+							$tv .= 'INSERT INTO ' . $table . ' (' . $k . ') VALUES' . "\r\n";
+						}
+						if ($rows_dumped > 0)
+						{
+							$tv .= ",\r\n";
+						}
+						$tv .= '(' . $d . ')';
 					}
+					
+					if ($rows_dumped > 0)
+					{
+						$tv .= ";\r\n\r\n";
+					}
+
 					if ($this->ErrorNumber()) 
 					{
 						mysql_query('UNLOCK TABLES', $this->mysql_link);
@@ -1479,7 +1507,7 @@ class MySQL
 				return $message;
 			}
 		} 
-		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT']) $message .= "<h1>Offending SQL query</h1><p>" . htmlspecialchars($this->last_sql) . "</p><h2>Error Message</h2><p> ";
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT']) $message .= "<h1>Offending SQL query</h1><p>" . htmlspecialchars($this->last_sql, ENT_COMPAT, 'UTF-8') . "</p><h2>Error Message</h2><p> ";
 		
 		return $message . $this->Error();
 	}

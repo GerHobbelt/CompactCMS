@@ -169,7 +169,7 @@ if ($do_update_or_livefilter && checkAuth())
 		
 		if (!empty($name) && !empty($_SESSION[$name]))
 		{
-			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name]) . '\'">&#160;</span>';
+			echo '<span class="sprite livefilter livefilter_active" rel="' . $name . '" title="' . ucfirst($ccms['lang']['forms']['edit_remove']) . ' ' . strtolower($title) . ' -- ' . $ccms['lang']['forms']['filter_showing'] . ': \'' . htmlspecialchars($_SESSION[$name], ENT_COMPAT, 'UTF-8') . '\'">&#160;</span>';
 		}
 		else
 		{
@@ -1010,7 +1010,7 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
  */
 if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	FbX::SetFeedbackLocation($cfg['rootdir'] . '/admin/includes/modules/template-editor/backend.php');
+	FbX::SetFeedbackLocation('./modules/template-editor/backend.php');
 	try
 	{
 		// Only if current user has the rights
@@ -1057,59 +1057,65 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
  */
 if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		//$i=count(array_filter($_POST));
-		//if($i <= 6) error
-		
-		if (empty($_POST['userPass']))
+		// Only if current user has the rights
+		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
-		}
-		$userName = strtolower(getPOSTparam4IdOrNumber('user'));
-		$userPass = md5($_POST['userPass'].$cfg['authcode']);
-		$userFirst = getPOSTparam4HumanName('userFirstname');
-		$userLast = getPOSTparam4HumanName('userLastname');
-		$userEmail = getPOSTparam4Email('userEmail');
-		$userActive = getPOSTparam4boolean('userActive');
-		$userLevel = getPOSTparam4Number('userLevel');
-		if (empty($userName) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
-		}
+			//$i=count(array_filter($_POST));
+			//if($i <= 6) error
 			
-		// Set variables
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values['userName']		= MySQL::SQLValue($userName,MySQL::SQLVALUE_TEXT);
-		$values['userPass']		= MySQL::SQLValue($userPass,MySQL::SQLVALUE_TEXT);
-		$values['userFirst']	= MySQL::SQLValue($userFirstname,MySQL::SQLVALUE_TEXT);
-		$values['userLast']		= MySQL::SQLValue($userLastname,MySQL::SQLVALUE_TEXT);
-		$values['userEmail']	= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
-		$values['userActive']	= MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
-		$values['userLevel']	= MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-		// TODO: userToken is currently UNUSED. -- should be used to augment the $cfg['authcode'] where applicable
-		$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
-		
-		// Execute the insert
-		$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
-		
-		// Check for errors
-		if($result) 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-			exit();
+			if (empty($_POST['userPass']))
+			{
+				throw new FbX($ccms['lang']['system']['error_tooshort']);
+			}
+			$userName = strtolower(getPOSTparam4IdOrNumber('user'));
+			$userPass = md5($_POST['userPass'].$cfg['authcode']);
+			$userFirst = getPOSTparam4HumanName('userFirstname');
+			$userLast = getPOSTparam4HumanName('userLastname');
+			$userEmail = getPOSTparam4Email('userEmail');
+			$userActive = getPOSTparam4boolean('userActive');
+			$userLevel = getPOSTparam4Number('userLevel');
+			if (empty($userName) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
+			{
+				throw new FbX($ccms['lang']['system']['error_tooshort']);
+			}
+				
+			// Set variables
+			$values = array(); // [i_a] make sure $values is an empty array to start with here
+			$values['userName']		= MySQL::SQLValue($userName,MySQL::SQLVALUE_TEXT);
+			$values['userPass']		= MySQL::SQLValue($userPass,MySQL::SQLVALUE_TEXT);
+			$values['userFirst']	= MySQL::SQLValue($userFirstname,MySQL::SQLVALUE_TEXT);
+			$values['userLast']		= MySQL::SQLValue($userLastname,MySQL::SQLVALUE_TEXT);
+			$values['userEmail']	= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
+			$values['userActive']	= MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
+			$values['userLevel']	= MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
+			// TODO: userToken is currently UNUSED. -- should be used to augment the $cfg['authcode'] where applicable
+			$values['userToken']	= MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
+			
+			// Execute the insert
+			$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
+			
+			// Check for errors
+			if($result) 
+			{
+				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+				exit();
+			} 
+			else 
+			{
+				throw new FbX($db->MyDyingMessage());
+			}
 		} 
 		else 
 		{
-			$db->Kill();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
 
@@ -1120,45 +1126,54 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
  */
 if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	$userID = getPOSTparam4Number('userID');
-	$userFirst = getPOSTparam4HumanName('first');
-	$userLast = getPOSTparam4HumanName('last');
-	$userEmail = getPOSTparam4Email('email');
-	
-	// Only if current user has the rights
-	if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID'] == $userID) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		// Check length of values
-		if(strlen($userFirst)>2&&strlen($userLast)>2&&strlen($userEmail)>6) 
+		$userID = getPOSTparam4Number('userID');
+		$userFirst = getPOSTparam4HumanName('first');
+		$userLast = getPOSTparam4HumanName('last');
+		$userEmail = getPOSTparam4Email('email');
+		
+		// Only if current user has the rights
+		if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID'] == $userID) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userFirst']= MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);
-			$values['userLast']	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
-			$values['userEmail']= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
-			
-			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			// Check length of values
+			if(strlen($userFirst)>2&&strlen($userLast)>2&&strlen($userEmail)>6) 
 			{
-				if($userID==$_SESSION['ccms_userID']) 
-				{
-					$_SESSION['ccms_userFirst']	= $userFirst; // getPOSTparam4HumanName already does the htmlentities() encoding, so we're safe to use & display these values as they are now.
-					$_SESSION['ccms_userLast']	= $userLast;
-				}
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userFirst']= MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);
+				$values['userLast']	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
+				$values['userEmail']= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
 				
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				{
+					if($userID==$_SESSION['ccms_userID']) 
+					{
+						$_SESSION['ccms_userFirst']	= $userFirst; // getPOSTparam4HumanName already does the htmlentities() encoding, so we're safe to use & display these values as they are now.
+						$_SESSION['ccms_userLast']	= $userLast;
+					}
+					
+					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					exit();
+				}
+				else
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
+			} 
+			else 
+			{
+				throw new FbX($ccms['lang']['system']['error_tooshort']);
 			}
-			else
-				$db->Kill();
 		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
  
@@ -1171,47 +1186,54 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
 	$userID = getPOSTparam4Number('userID');
-	
-	// Only if current user has the rights
-	if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID']==$userID) 
+		
+	FbX::SetFeedbackLocation('./modules/user-management/user.Edit.php', 'userID='.$userID);
+	try
 	{
-		if (empty($_POST['userPass']) || empty($_POST['cpass']))
+		// Only if current user has the rights
+		if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID']==$userID) 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passshort'])));
-			exit();
-		}
-		
-		$passphrase_len = strlen($_POST['userPass']);
-		
-		if($passphrase_len > 6 && md5($_POST['userPass']) === md5($_POST['cpass'])) 
-		{
-			$userPassHash = md5($_POST['userPass'].$cfg['authcode']);
-			
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
-			
-			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			if (empty($_POST['userPass']) || empty($_POST['cpass']))
 			{
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				throw new FbX($ccms['lang']['system']['error_passshort']);
 			}
-			else
-				$db->Kill();
+			
+			$passphrase_len = strlen($_POST['userPass']);
+			
+			if($passphrase_len > 6 && md5($_POST['userPass']) === md5($_POST['cpass'])) 
+			{
+				$userPassHash = md5($_POST['userPass'].$cfg['authcode']);
+				
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
+				
+				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				{
+					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					exit();
+				}
+				else
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
+			} 
+			elseif($passphrase_len <= 6) 
+			{
+				throw new FbX($ccms['lang']['system']['error_passshort']);
+			} 
+			else 
+			{
+				throw new FbX($ccms['lang']['system']['error_passnequal']);
+			}
 		} 
-		elseif($passphrase_len <= 6) 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passshort'])));
-			exit();
-		} 
-		else 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/user.Edit.php?userID='.$userID.'&status=error&msg='.rawurlencode($ccms['lang']['system']['error_passnequal'])));
-			exit();
+		else
+		{	
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else
-	{	
-		die($ccms['lang']['auth']['featnotallowed']);
+	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
 	}
 }
 
@@ -1223,41 +1245,49 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
  
 if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		$userID = getPOSTparam4Number('userID');
-		$userActive = getPOSTparam4boolean('userActive');
-		$userLevel = getPOSTparam4Number('userLevel');
-		if ($userLevel > 0)
+		// Only if current user has the rights
+		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 		{
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userLevel'] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-			$values['userActive'] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
-				
-			if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+			$userID = getPOSTparam4Number('userID');
+			$userActive = getPOSTparam4boolean('userActive');
+			$userLevel = getPOSTparam4Number('userLevel');
+			if ($userLevel > 0)
 			{
-				if($userID==$_SESSION['ccms_userID']) 
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userLevel'] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
+				$values['userActive'] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
+					
+				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 				{
-					$_SESSION['ccms_userLevel'] = $userLevel;
+					if($userID==$_SESSION['ccms_userID']) 
+					{
+						$_SESSION['ccms_userLevel'] = $userLevel;
+					}
+				
+					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					exit();
 				}
-			
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				else
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
 			}
-			else
+			else 
 			{
-				$db->Kill();
+				throw new FbX($ccms['lang']['system']['error_forged']);
 			}
-		}
+		} 
 		else 
 		{
-			die($ccms['lang']['system']['error_forged']);
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
 
@@ -1268,42 +1298,49 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
  */
 if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
+	try
 	{
-		$total = (isset($_POST['userID']) ? count($_POST['userID']) : 0);
-		
-		if($total==0) 
+		// Only if current user has the rights
+		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
 		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_selection'])));
-			exit();
-		}
-		
-		// Delete details from the database
-		$i=0;
-		foreach ($_POST['userID'] as $user_num) 
-		{
-			$user_num = filterParam4Number($user_num);
+			$total = (isset($_POST['userID']) ? count($_POST['userID']) : 0);
 			
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
-			$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
-			$i++;
-		}
-		// Check for errors
-		if($result && $i == $total) 
-		{
-			header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
-			exit();
+			if($total==0) 
+			{
+				throw new FbX($ccms['lang']['system']['error_selection']);
+			}
+			
+			// Delete details from the database
+			$i=0;
+			foreach ($_POST['userID'] as $user_num) 
+			{
+				$user_num = filterParam4Number($user_num);
+				
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
+				$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
+				$i++;
+			}
+			// Check for errors
+			if($result && $i == $total) 
+			{
+				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+				exit();
+			} 
+			else 
+			{
+				throw new FbX($db->MyDyingMessage());
+			}
 		} 
 		else 
 		{
-			$db->Kill();
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 }
 
@@ -1323,11 +1360,6 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 	// Check for editor.css in template directory
 	$template	= $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('variant'));
 	if (!$template) $db->Kill();
-	$css = "";
-	if (is_file($cfg['rootdir'] . '/lib/templates/'.$template.'/editor.css')) 
-	{
-		$css = $cfg['rootdir'] . '/lib/templates/'.$template.'/editor.css';
-	}
 	
 	// Check for filename	
 	if(!empty($filename)) 
@@ -1386,7 +1418,7 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
 		
 		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
-			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents)); ?></textarea>
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 			<!--<br/>-->
 			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
 			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
@@ -1426,129 +1458,85 @@ var jsLogEl = document.getElementById('jslog');
 
 
 	<?php 
-	// Load TinyMCE (compressed for faster loading) 
 	if($cfg['wysiwyg'] && $iscoding != 'Y')
 	{
+	// -------------------------------------------------
+	// Load TinyMCE (compressed for faster loading) 
 	?>
-var js = [
-	'../../lib/includes/js/the_goto_guy.js',
-	'../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
-	'../../lib/includes/js/mootools-core.js,mootools-more.js',
-	'../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
-	if ($cfg['fancyupload_language'] != 'en')
-	{
-		echo 'Language/Language.en.js,';
-	}
-	?>Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'
-	];
-		
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
-tinyMCE.init(
-	{
-		mode: 'exact',
-		elements: 'content',
-		theme: 'advanced',
-		<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
-		skin: 'o2k7',
-		skin_variant: 'silver',
-		plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		theme_advanced_toolbar_location: 'top',
-		theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
-		theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
-		theme_advanced_buttons3: '',
-		theme_advanced_toolbar_align: 'left',
-		theme_advanced_statusbar_location: 'bottom',
-		dialog_type: 'modal',
-		paste_auto_cleanup_on_paste:true,
-		theme_advanced_resizing:true,
-		relative_urls:true,
-		convert_urls:false,
-		remove_script_host:true,
-		document_base_url: '<?php echo $cfg['rootdir']; ?>',
-		<?php
-		if($cfg['iframe'])
-		{
-		?>
-		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',
-		<?php
-		}
-		?>
-		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
-		file_browser_callback:FileManager.TinyMCE(
-			function(type)
-			{
-				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-					baseURL: '<?php echo $cfg['rootdir']; ?>',
-					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
-					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
-					selectable: true,
-					uploadAuthData:
-					{
-						session:'ccms_userLevel',
-						sid:'<?php echo session_id(); ?>'
-					}
-				};
-			})
-	});
-
-	//});
-}
-	<?php 
-	} 
-	else 
-	{ 
-		// Alternative to tinyMCE: load Editarea for code editing
-		?>
 	
 var js = [
 	'../../lib/includes/js/the_goto_guy.js',
-	'../../lib/includes/js/edit_area/edit_area_full.js'
+	'../../lib/includes/js/mootools-core.js,mootools-more.js',
+	<?php echo generateJS4TinyMCEinit(0, 'content'); ?>
 	];
 		
-function jsComplete(user_obj, lazy_obj)
+function jsCompleteDone(user_obj)
 {
-    if (lazy_obj.todo_count)
+	// window.addEvent('domready',function()
+	//{
+		<?php echo generateJS4TinyMCEinit(2, 'content'); ?>
+	//});
+}
+		
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	<?php echo generateJS4TinyMCEinit(1, 'content'); ?>
+
+	LazyLoad.js(js, jsComplete);
+}
+	<?php 
+	// -------------------------------------------------
+	} 
+	else 
+	{ 
+	// -------------------------------------------------
+	// Alternative to tinyMCE: load Editarea for code editing
+	?>
+	
+var js = [
+	'../../lib/includes/js/the_goto_guy.js',
+<?php
+	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
+		echo "	'../../lib/includes/js/edit_area/edit_area_full.js'\n";
 	}
 	else
 	{
-		jslog('All JS has been loaded!');
+		echo "	'../../lib/includes/js/edit_area/edit_area_full.js'\n";
 	}
-
+?>
+	];
+		
+function jsCompleteDone(user_obj)
+{
 	// window.addEvent('domready',function()
 	//{
-editAreaLoader.init(
-	{
-		id:"content",
-		is_multi_files:false,
-		allow_toggle:false,
-		word_wrap:true,
-		start_highlight:true,
-		<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
-		syntax:"html"
-	});
-
+	editAreaLoader.init(
+		{
+			id:"content",
+			is_multi_files:false,
+			allow_toggle:false,
+			word_wrap:true,
+			start_highlight:true,
+			<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
+			syntax:"html"
+		});
 	//});
 }
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+	LazyLoad.js(js, jsComplete);
+}
 	<?php 
+	// -------------------------------------------------
 	} 
 	?>
 	
@@ -1567,28 +1555,22 @@ function jslog(message)
 	}
 }
 
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
+function jsComplete(user_obj, lazy_obj)
 {
-	jslog('loading JS (sequential calls)');
+    if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return;
+	}
+	else
+	{
+		jslog('All JS has been loaded!');
+	}
 
-
-
-
-	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-
-	LazyLoad.js(js, jsComplete);
+	jsCompleteDone(user_obj);
 }
+
 	</script>
 	<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 	</body>

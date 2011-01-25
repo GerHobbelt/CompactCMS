@@ -62,9 +62,9 @@ class ccmsParser
 		$chh = $cond[1];
 		$wert = $cond[2];
 		$wert = preg_replace("( ['|\"] )","",$wert);
-		if($chh == "gt") return ($value >   $wert);
+		if($chh == "gt") return ($value >  $wert);
 		if($chh == "ge") return ($value >= $wert);
-		if($chh == "lt") return ($value <   $wert);
+		if($chh == "lt") return ($value <  $wert);
 		if($chh == "le") return ($value <= $wert);
 		if($chh == "eq") return ($value == $wert);
 		if($chh == "ne") return ($value != $wert);
@@ -108,7 +108,7 @@ class ccmsParser
 		$template = array();
 		while ($str != '') 
 		{
-			$result = preg_match('/^([^{<]*)({%.*?%}|<!--.*?-->|{[^%][^{<]*|<[^{<]*|)/s', $str, $matches);
+			$result = preg_match('/^([^{]*)({%.*?%}|{[^%{]*|)/s', $str, $matches);
 			$str = substr($str, strlen($matches[0]));
 			if (strlen($matches[1])) $template[] = $matches[1];
 			if (preg_match('/{%INCLUDE (.*)%}/', $matches[2], $matches2)) 
@@ -161,6 +161,60 @@ class ccmsParser
 			if (is_array($v) && count($v) == 2 && array_key_exists($v[0], $vars))
 			{
 				return $this->getvar($vars[$v[0]], $v[1]);
+			}
+			/* else: postprocessing required --> '!'-bang postfixed variable reference? */
+			$v = explode('!', $var, 2);
+			if (is_array($v) && count($v) == 2 && array_key_exists($v[0], $vars))
+			{
+				$rv = $this->getvar($vars, $v[0]);
+				$pm = preg_match('/^(\w+)(\s*\(\s*([^,]*)(\s*,\s*([^,]*))*\s*\))?$/s', trim($v[1]), $fbits);
+				if (!$pm)
+					return 'regex match failure for "' . $v[1] . '"';
+					
+				switch ($fbits[0])
+				{
+				default:
+				case 'quoteprotect':
+					/* data must have its quotes transformed to HTML entities! */
+					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
+
+				case 'protect4attr':
+					/* make data suitable for an attribute value: strip tags and encode quotes! */
+					$rv = strip_tags($rv);
+					$rv = preg_replace('/\s+/', ' ', $rv);
+					if (count($fbits) > 2)
+					{
+						// reduce the data string to a maximum length; clip at the last whitespace when this is required.
+						$maxlen = intval($fbits[2]);
+						$clip_on_ws = $fbits[4];
+						if ($maxlen > 0)
+						{
+							if ($clip_on_ws == 'true' || $clip_on_ws == '1')
+							{
+								$rv = substr($rv, 0, $maxlen + 1);
+								/*
+								 * since all whitespace has been transformed to regular spaces, we can simply look for 
+								 * the last space in there.
+								 * 
+								 * NOTE: we previously clipped to MAXLEN PLUS ONE so this subsequent check for last 
+								 *       whitespace position can still produce the MAXLEN position when a space is
+								 * 	     positioned there! This prevent undue length reduction of the result.
+								 */
+								$lwspos = strrpos($rv, ' ');
+								if ($lwspos > 0)
+								{
+									$rv = substr($rv, 0, $lwspos);
+								}
+							}
+							else
+							{
+								$rv = substr($rv, 0, $maxlen);
+							}
+						}
+						// else: do not clip
+					}
+					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
+				}
 			}
 			return '';
 		}
@@ -301,7 +355,7 @@ class ccmsParser
 				# The point?
 				#
 				# Watch out for recursive {%tag%} self-references: they will make the 
-				# engine run until it hits the 
+				# engine run until it hits the edge.
 				#
 				# print variable value by replacing the tag with its value (split up in chunks), then rewinding the index by -1, so this template entry will be hit another time, now with altered content
 				$a = $this->splitTemplate(strval($this->getvar($vars, $matches[1])));

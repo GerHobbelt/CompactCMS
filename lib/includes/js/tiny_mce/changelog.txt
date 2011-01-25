@@ -1,6 +1,56 @@
-Version 3.3.9.3 (2010-xx-xx)
+Version 3.4b3 (2011-01-xx)
+	Fixed bug where anchors would wrap the text contents after it due to a bug in the DomParser logic.
+	Fixed bug where the selected state wouldn't be removed on ListBox controls when a menu item was selected.
+	Fixed bug where color wasn't correctly applied to anchor elements.
+Version 3.4b2 (2011-01-13)
+	Added new custom flash player, this player supports mp4 and flv and has skin support.
+	Fixed so mceInsertContent handles context correctly to enforce valid nesting of elements.
+	Fixed bug where scrolling would become jerky on IE on some contents.
+	Fixed bug where paste as plain text would throw exception of missing entities setting.
+	Fixed bug where anchor nodes where removed by the new serializer engine.
+	Fixed bug where IE would crash if when backspace where used on some specific contents.
+	Fixed bug where pasting of plain text in WebKit would result in merging of text lines.
+	Fixed bug where it wasn't possible to delete images or tables using backspace on IE9.
+	Fixed bug where urls in styles would generate a JS error due to incorrect scope.
+	Fixed bug where copy paste from Java applications would produce extra contents in FF on Mac.
+	Fixed bug where the verify_html option wouldn't allow all elements and attributes.
+Version 3.4b1 (2010-12-20)
+	Added new serialization engine that increases performance and enforces valid output according to the specified schema settings.
+	Added new HTML parser logic used by the serialization engine and can handle malformed html contents.
+	Added new valid_children config option, enables more fine grain control of elements can be inside other elements.
+	Added new entities encoding logic boost performance and will only encode entities based on context i.e. attributes/text nodes.
+	Added new protect setting that enables users to protect template items from being removed by the serializer logic.
+	Added new {$caret} marker for the mceInsertContent command. Makes it possible to move the caret to a specific position when inserting contents.
+	Added new validation of anchor names. Only valid W3C names will be accepted.
+	Replaced the internal _mce_ prefixed attributes to the more standard HTML5 data-mce- prefix. This will also resolve future browser santiaztion issues.
+	Fixed bug where the paste plugin wouldn't convert Word lists with more than 9 items to real ol lists. Patch contributed by Mike (yogaboy).
+	Fixed bug where clicking on a format title would produce errors if the current selection didn't have any formats.
+	Fixed bug where paste of simple texts wouldn't work correctly in Gecko using the paste plugin since it keeps block formatting.
+	Fixed bug where confirm dialogs didn't display correctly due to resent IE9 fixes.
+	Fixed bug where spaces in URLs wouldn't be properly encoded to %20 if the user entered them in the link dialogs. Patch contributed by Ephox.
+	Fixed bug where the image alignment buttons wouldn't reposition the resize handles on FF due to a browser issue. Patch contributed by Ephox.
+	Fixed bug where the compareBoundaryPoints method of the IE Range class didn't work correctly. Patch contributed by Ephox.
+	Fixed bug where selection of elements using double click wouldn't select the clicked element but rather the parent node on FF. Patch contributed by Ephox.
+	Fixed bug where IE would scroll the user to the current selection causing parent document to scroll as well. Patch contributed by Ephox.
+	Fixed bug where style compression would incorrectly compress items with different values. It now only compresses if the values are the same. Patch contributed by Ephox.
+	Fixed bug where FF would add non breaking spaces outside TD elements if formatting was applied to table cells. Patch contributed by Ephox.
+	Fixed bug where the caret position would be lost on WebKit browsers if you pasted images multiple times. Patch contributed by Ephox.
+	Fixed bug where non word contents like * would be counted as words in the wordcount pluging. Patch contributed by David Balatero.
+	Fixed bug where the toggle absolute button in the layer plugin wouldn't remove the existing internal style attribute first.
+	Fixed bug where the autosave plugin would generate an exception on IE if the user had disabled userdata persistence.
+	Fixed bug where the paste plugin would remove dashed classes on IE since the regexps didn't include that character.
+	Fixed bug where applying text color would not add spans inside link elements. This is needed due to CSS style inheritance.
+	Fixed bug where applying block formats to empty elements wouldn't render correctly on IE.
+	Fixed bug where the searchreplace plugin would add a f or r character when shortcuts where used on IE while using default dialogs.
+	Fixed bug where Opera wouldn't load scripts correctly since the onreadystate would fire even though the script wasn't loaded.
+	Fixed issue where &nbsp; wouldn't be handled correctly in the bbcode plugin if entity_encoding was set to raw.
+	Fixed issue where contents would flicker since the content css files where asynchronously loaded.
+	Fixed bug where WebKit wouldn't create links on images with a float style.
+Version 3.3.9.3 (2010-12-20)
 	Fixed issue where WebKit wouldn't correctly apply ins/del in xhtmlxtras plugin.
 	Fixed bug where paste as plaintext on WebKit wouldn't produce br and p elements correctly.
+	Fixed bug where the confirm dialog texts would be incorrectly placed due to recent IE 9 workarounds in the window.css.
+	Fixed bug where applying text color would not add spans inside link elements. This is needed due to CSS style inheritance.
 Version 3.3.9.2 (2010-09-29)
 	Fixed bug where placing the caret in IE 9 beta 1 would not work correctly if you clicked out side the document body element.
 	Fixed bug where IE 9 beta 1 wouldn't resize the editor correctly since the events didn't fire as previous versions did.

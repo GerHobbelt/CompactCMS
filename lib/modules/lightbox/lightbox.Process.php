@@ -89,42 +89,57 @@ $do_action	= getGETparam4IdOrNumber('action');
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album') 
 {
-	// Only if current user has the rights
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	try
 	{
-		if($album_name!=null) 
+		if(!empty($album_name)) 
 		{
-			$dest = BASE_PATH.'/media/albums/'.$album_name;
-			if(!is_dir($dest)) 
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
+					
+			// Only if current user has the rights
+			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 			{
-				if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w")) 
+				if($album_name!=null) 
 				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
-					exit();
+					$dest = BASE_PATH.'/media/albums/'.$album_name;
+					if(!is_dir($dest)) 
+					{
+						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w")) 
+						{
+							header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
+							exit();
+						} 
+						else 
+						{
+							throw new FbX($ccms['lang']['system']['error_dirwrite']);
+						}
+					} 
+					else 
+					{
+						throw new FbX($ccms['lang']['system']['error_exists']);
+					}
 				} 
 				else 
 				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_dirwrite'])));
-					exit();
+					throw new FbX($ccms['lang']['system']['error_tooshort']);
 				}
 			} 
 			else 
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_exists'])));
-				exit();
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
 			}
 		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
+			throw new FbX($ccms['lang']['auth']['error_forged']);
 		}
-	} 
-	else 
-	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
-		exit();
 	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 /**
@@ -134,73 +149,59 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album') 
 {
-	// Only if current user has the rights
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	try
 	{
-		if(empty($_POST['albumID'])) 
+		// Only if current user has the rights
+		if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 		{
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_selection'])));
-			exit();
-		} 
-		else 
-		{
-			function rrmdir($dir) 
+			if(empty($_POST['albumID'])) 
 			{
-				if (is_dir($dir)) 
+				throw new FbX($ccms['lang']['system']['error_selection']);
+			} 
+			else 
+			{
+				$total 	= count($_POST['albumID']);
+				$i		= 0;
+				foreach ($_POST['albumID'] as $key => $value) 
 				{
-					$objects = scandir($dir);
+					$key = filterParam4Number($key);
+					$value = filterParam4Filename($value);
 					
-					foreach ($objects as $object) 
+					if(!empty($key)&&!empty($value)) 
 					{
-						if ($object != "." && $object != "..") 
+						$dest = BASE_PATH.'/media/albums/'.$value;
+						if(is_dir($dest)) 
 						{
-							if (filetype($dir."/".$object) == "dir") 
+							if(recrmdir($dest)) 
 							{
-								rrmdir($dir."/".$object); 
+								$i++;
 							}
-							else 
-							{
-								unlink($dir."/".$object);
-							}
-						}
-					}
-					reset($objects);
-					rmdir($dir);
-				} 
-				return true;
-		 	}
-		
-			$total 	= count($_POST['albumID']);
-			$i		= 0;
-			foreach ($_POST['albumID'] as $key => $value) 
-			{
-				$key = filterParam4Number($key);
-				$value = filterParam4Filename($value);
-				
-				if(!empty($key)&&!empty($value)) 
-				{
-					$dest = BASE_PATH.'/media/albums/'.$value;
-					if(is_dir($dest)) 
-					{
-						if(rrmdir($dest)) 
-						{
-							$i++;
 						}
 					}
 				}
+				if($total==$i) 
+				{
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+					exit();
+				}
+				else
+				{
+					throw new FbX($ccms['lang']['system']['error_delete']);
+				} 
 			}
-			if($total==$i) 
-			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
-				exit();
-			}
+		} 
+		else 
+		{
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
-	} 
-	else 
-	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
-		exit();
 	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 /**
@@ -210,16 +211,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images') 
 {
-	FbX::SetFeedbackLocation($cfg['rootdir'] . 'lib/modules/lightbox/lightbox.Manage.php');
-	
+	FbX::SetFeedbackLocation('lightbox.Manage.php');
 	try
 	{
-		// Only if current user has the rights
-		if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+		$album = getGETparam4Filename('album');
+		
+		if(!empty($album)) 
 		{
-			$album = getGETparam4Filename('album');
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album);
 			
-			if(!empty($album)) 
+			// Only if current user has the rights
+			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 			{
 				// Number of selected items
 				$total = (!empty($_POST['imageName']) && is_array($_POST['imageName']) ? count($_POST['imageName']) : 0);
@@ -248,17 +250,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 							} 
 							else 
 							{
-								throw new FbX($ccms['lang']['system']['error_delete'] . ': ' . htmlentities($picname), 'album='.$album);
+								throw new FbX($ccms['lang']['system']['error_delete'] . ': ' . htmlentities($picname));
 							}
 						}
 						else 
 						{
-							throw new FbX($ccms['lang']['system']['error_delete'] . '= ' . htmlentities($picname), 'album='.$album);
+							throw new FbX($ccms['lang']['system']['error_delete'] . '= ' . htmlentities($picname));
 						}
 					}
 					else 
 					{
-						throw new FbX($ccms['lang']['system']['error_tooshort'], 'album='.$album);
+						throw new FbX($ccms['lang']['system']['error_tooshort']);
 					}
 					
 					$i++;
@@ -269,12 +271,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 			} 
 			else 
 			{
-				throw new FbX($ccms['lang']['auth']['featnotallowed'], 'album='.$album);
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
 			}
 		} 
 		else 
 		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed'], 'album='.$album);
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -292,45 +294,53 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album') 
 {
-	// Only if current user has the rights
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	try
 	{
-		if($album_name!=null) 
+		if(!empty($album_name)) 
 		{
-			// Posted variables
-			$topage = getPOSTparam4Filename('albumtopage');
-			$description = getPOSTparam4DisplayHTML('description');
-			$infofile = BASE_PATH.'/media/albums/'.$album_name.'/info.txt';
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
 			
-			if ($handle = fopen($infofile, 'w+')) 
+			// Only if current user has the rights
+			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 			{
-			    if (fwrite($handle, $topage."\r\n".$description)) 
+				// Posted variables
+				$topage = getPOSTparam4Filename('albumtopage');
+				$description = getPOSTparam4DisplayHTML('description');
+				$infofile = BASE_PATH.'/media/albums/'.$album_name.'/info.txt';
+				
+				if ($handle = fopen($infofile, 'w+')) 
 				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?album='.$album_name.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-					exit();
-			    }
+					if (fwrite($handle, $topage."\r\n".$description)) 
+					{
+						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?album='.$album_name.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+						exit();
+					}
+				} 
+				else 
+				{
+					throw new FbX($ccms['lang']['system']['error_write']);
+				}
 			} 
 			else 
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_write'])));
-				exit();
+				throw new FbX($ccms['lang']['system']['featnotallowed']);
 			}
 		} 
 		else 
 		{
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
+			throw new FbX($ccms['lang']['auth']['error_forged']);
 		}
-	} 
-	else 
-	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
-		exit();
 	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 /**
- *
  * Process and save image plus thumbnail
  *
  * See also the comment in lightbox.Manage.php: FancyUpload 3.0 doesn't pass the 
@@ -340,40 +350,46 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files') 
 {
+	$error 		= false;
+	$error_code = 0;
+
 	if (!checkAuth() || empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])
 	{
+if (0)
+{
 		echo "<p>" . (empty($_GET['SIDCHK']) ? '----' : $_GET['SIDCHK']) . ', ' . $_SESSION['fup1'] . "</p>\n";
 		var_dump($_GET);
 		var_dump($_COOKIES);
-	
+}	
 		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 		
-		die($ccms['lang']['auth']['featnotallowed']);
+		$error = $ccms['lang']['auth']['featnotallowed'];
+		$error_code = 403;
 	}
 	
-	/*
-	WARNING: we must NOT reset/alter the extra check session value in here as 
-	         FancyUpload will invoke this code multiple times from the same 
-		     web form when bulk uploads are performed (more then one(1) image file).
-	
-	         So we are a little less safe as the extra session var will only 
-		     be regenerated every time the upload form is rerendered.
-		 
-	         Alas.
-	*/
-	//$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-	
-	$dest = BASE_PATH.'/media/albums/'.$album_name;
-	if(!is_dir($dest)) 
+	if (empty($error))
 	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_write'])));
-		exit();
-	} 
-	// else ...    [i_a] dangling else removed
+		/*
+		 * WARNING: we must NOT reset/alter the extra check session value in here as 
+		 *          FancyUpload will invoke this code multiple times from the same 
+		 * 	        web form when bulk uploads are performed (more then one(1) image file).
+		 * 
+		 *          So we are a little less safe as the extra session var will only 
+		 * 	        be regenerated every time the upload form is rerendered.
+		 * 	 
+		 *          Alas.
+		 */
+		//$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+		
+		$dest = BASE_PATH.'/media/albums/'.$album_name;
+		if(!is_dir($dest)) 
+		{
+			$error = $ccms['lang']['system']['error_write'];
+			$error_code = $dest;
+		} 
+	}
 	
 	// Validation
-	$error 		= false;
-	$error_code = 0;
 	$size       = false; // init to prevent PHP errors about unknown vars further down
 
 	// get the local (temporary) filename:
@@ -383,7 +399,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files')
 	// Set file and get file extension
 	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
 
-	if (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)) 
+	if (empty($error) && (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile))) 
 	{
 		$error = 'Invalid Upload: ';
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
@@ -395,7 +411,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files')
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
-	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM) ) ) 
+	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM))) 
 	{
 		$error = 'Please upload only images of type JPEG, GIF or PNG.';
 		$error_code = $size[2];
@@ -577,6 +593,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files')
 	if ($response == 'xml') 
 	{
 		/* do nothing */
+		die($ccms['lang']['auth']['featnotallowed']);
 	} 
 	else 
 	{
@@ -590,163 +607,165 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files')
  */
 if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen") 
 {
-	// Only if current user has the rights
-	if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	try
 	{
 		$album = getGETparam4Filename('album');
 		
 		if(!empty($album)) 
 		{
-			$dest = BASE_PATH.'/media/albums/'.$album;
-			if(!is_dir($dest)) 
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album);
+			
+			// Only if current user has the rights
+			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_dirwrite'])));
+				$dest = BASE_PATH.'/media/albums/'.$album;
+				if(!is_dir($dest) && is_writable_ex($dest)) 
+				{
+					throw new FbX($ccms['lang']['system']['error_dirwrite']);
+				} 
+				if(!is_dir($dest.'/_thumbs')) 
+				{
+					if(!@mkdir($dest.'/_thumbs')) 
+					{
+						throw new FbX($ccms['lang']['system']['error_dirwrite']);
+					}
+				} 
+				
+				foreach(array_diff(scandir($dest),array('.','..','index.html','info.txt')) as $f) 
+				{
+					if(is_file($dest.'/'.$f)) 
+					{
+						$extension = pathinfo($f, PATHINFO_EXTENSION);
+
+						$uploadedfile = $dest . '/' . $f;
+						
+						// Do resize
+						switch ($extension)
+						{
+						case 'jpg':
+						case 'jpeg':
+							$src = imagecreatefromjpeg($uploadedfile);
+							break;
+							
+						case 'png':
+							$src = imagecreatefrompng($uploadedfile);
+							break;
+							
+						case 'gif':
+							$src = imagecreatefromgif($uploadedfile);
+							break;
+							
+						default:
+							// skip all other file formats
+							continue;
+						}
+						if (empty($src))
+						{
+							throw new FbX('invalid image format for file ' . $uploadedfile . ', type: ' . $extension);
+						}
+							 
+						list($width,$height)=getimagesize($uploadedfile);
+						
+						$aspect_ratio = (floatval($height)/floatval($width));
+						
+						// Resize thumbnail to approx 80 x 80
+						$newheight_t = $height;
+						$newwidth_t = $width;
+						if ($newwidth_t > 80)
+						{
+							$newwidth_t = 80;
+							$newheight_t = intval($aspect_ratio * $newwidth_t);
+						}
+						if ($newheight_t > 80)
+						{
+							$newheight_t = 80;
+							$newwidth_t = intval($newheight_t / $aspect_ratio);
+						}
+						
+						// sharpen intermediate image when shrinking size a lot.
+						//
+						// see also:
+						//   http://adamhopkinson.co.uk/blog/2010/08/26/sharpen-an-image-using-php-and-gd/
+						//   http://nl2.php.net/manual/nl/ref.image.php#56144
+						//   http://loriweb.pair.com/8udf-sharpen.html
+						if ($height >= 160 || $width >= 160)
+						{
+							$newheight = $newheight_t * 2;
+							$newwidth = intval($newheight / $aspect_ratio);
+							
+							$tmp = imagecreatetruecolor($newwidth,$newheight);
+							imagecopyresampled($tmp,$src,0,0,0,0,$newwidth,$newheight,$width,$height);
+
+							// define the sharpen matrix
+							$sharpen = array(
+								array(0.0, -1.0, 0.0),
+								array(-1.0, 5.0, -1.0),
+								array(0.0, -1.0, 0.0)
+							);
+
+							// calculate the sharpen divisor
+							$divisor = array_sum(array_map('array_sum', $sharpen));
+
+							// apply the matrix
+							imageconvolution($tmp, $sharpen, $divisor, 0);
+
+							imagedestroy($src);
+							$src = $tmp;
+							$width = $newwidth;
+							$height = $newheight;
+						}
+
+						$tmp_t = imagecreatetruecolor($newwidth_t,$newheight_t);
+						imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
+						
+						// Save newly generated versions
+						$thumbnail	= $dest.'/_thumbs/'.$f;
+						
+						@unlink($thumbnail);
+						
+						switch ($extension)
+						{
+						case 'jpg':
+						case 'jpeg':
+							imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
+							break;
+							
+						case 'png':
+							imagepng($tmp_t, $thumbnail, 9);
+							break;
+							
+						case 'gif':
+							imagegif($tmp_t, $thumbnail);
+							break;
+							
+						default:
+							break;
+						}
+						
+						imagedestroy($tmp_t);
+					}
+				}
+
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullregenerated']).'&album='.$album));
 				exit();
 			} 
-			if(!is_dir($dest.'/_thumbs')) 
+			else 
 			{
-				if(@mkdir($dest.'/_thumbs')) 
-				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
-					exit();
-				} 
-				else 
-				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_dirwrite'])));
-					exit();
-				}
-			} 
-			
-			foreach(array_diff(scandir($dest),array('.','..','index.html','info.txt')) as $f) 
-			{
-				if(is_file($dest.'/'.$f)) 
-				{
-					$extension = pathinfo($f, PATHINFO_EXTENSION);
-
-					$uploadedfile = $dest . '/' . $f;
-					
-					// Do resize
-					switch ($extension)
-					{
-					case 'jpg':
-					case 'jpeg':
-						$src = imagecreatefromjpeg($uploadedfile);
-						break;
-						
-					case 'png':
-						$src = imagecreatefrompng($uploadedfile);
-						break;
-						
-					case 'gif':
-						$src = imagecreatefromgif($uploadedfile);
-						break;
-						
-					default:
-						// skip all other file formats
-						continue;
-					}
-					if (empty($src))
-					{
-						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode('invalid image format for file ' . $uploadedfile . ', type: ' . $extension)));
-						exit();
-					}
-						 
-					list($width,$height)=getimagesize($uploadedfile);
-					
-					$aspect_ratio = (floatval($height)/floatval($width));
-					
-					// Resize thumbnail to approx 80 x 80
-					$newheight_t = $height;
-					$newwidth_t = $width;
-					if ($newwidth_t > 80)
-					{
-						$newwidth_t = 80;
-						$newheight_t = intval($aspect_ratio * $newwidth_t);
-					}
-					if ($newheight_t > 80)
-					{
-						$newheight_t = 80;
-						$newwidth_t = intval($newheight_t / $aspect_ratio);
-					}
-					
-					// sharpen intermediate image when shrinking size a lot.
-					//
-					// see also:
-					//   http://adamhopkinson.co.uk/blog/2010/08/26/sharpen-an-image-using-php-and-gd/
-					//   http://nl2.php.net/manual/nl/ref.image.php#56144
-					//   http://loriweb.pair.com/8udf-sharpen.html
-					if ($height >= 160 || $width >= 160)
-					{
-						$newheight = $newheight_t * 2;
-						$newwidth = intval($newheight / $aspect_ratio);
-						
-						$tmp = imagecreatetruecolor($newwidth,$newheight);
-						imagecopyresampled($tmp,$src,0,0,0,0,$newwidth,$newheight,$width,$height);
-
-						// define the sharpen matrix
-						$sharpen = array(
-							array(0.0, -1.0, 0.0),
-							array(-1.0, 5.0, -1.0),
-							array(0.0, -1.0, 0.0)
-						);
-
-						// calculate the sharpen divisor
-						$divisor = array_sum(array_map('array_sum', $sharpen));
-
-						// apply the matrix
-						imageconvolution($tmp, $sharpen, $divisor, 0);
-
-						imagedestroy($src);
-						$src = $tmp;
-						$width = $newwidth;
-						$height = $newheight;
-					}
-
-					$tmp_t = imagecreatetruecolor($newwidth_t,$newheight_t);
-					imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
-					
-					// Save newly generated versions
-					$thumbnail	= $dest.'/_thumbs/'.$f;
-					
-					@unlink($thumbnail);
-					
-					switch ($extension)
-					{
-					case 'jpg':
-					case 'jpeg':
-						imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
-						break;
-						
-					case 'png':
-						imagepng($tmp_t, $thumbnail, 9);
-						break;
-						
-					case 'gif':
-						imagegif($tmp_t, $thumbnail);
-						break;
-						
-					default:
-						break;
-					}
-					
-					imagedestroy($tmp_t);
-				}
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
 			}
-
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullregenerated']).'&album='.$album));
-			exit();
-		}
-		else
+		} 
+		else 
 		{
-			header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_tooshort'])));
-			exit();
+			throw new FbX($ccms['lang']['auth']['error_forged']);
 		}
-	} 
-	else 
-	{
-		header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($ccms['lang']['auth']['featnotallowed'])));
-		exit();
 	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak();
+	}
+	
+	exit();
 }
 
 ?>

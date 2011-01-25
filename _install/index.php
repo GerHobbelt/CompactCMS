@@ -101,20 +101,20 @@ if($rootdir != '/')
 
 
 /*
-To detect the possiblity of an upgrade action, there's two ways we support:
-
-1) someone extracted a backup archive and (when this is from a pre-1.4.2 backup) moved all the files
-   in the appropriate spots, which we ASSUME HAS HAPPENED when we find the 
-     compactcms-sqldump.sql
-   file in the site's media/files/ccms-restore/ directory. 
-   This implies the config.inc.php file has also been copied to that directory already.
-   
-2) someone actually ran the 'backup' command in the admin backup within the last
-   hour or so (timeout configurable through the UPGRADE_FROM_BACKUP_ACTION_TIMEOUT
-   constant) as the backup will have not only generated the expected .zip archive
-   but (since 1.4.2) also dumped the SQL dump and config file to the /media/files/ccms-restore/
-   directory.
-*/
+ * To detect the possiblity of an upgrade action, there's two ways we support:
+ * 
+ * 1) someone extracted a backup archive and (when this is from a pre-1.4.2 backup) moved all the files
+ *    in the appropriate spots, which we ASSUME HAS HAPPENED when we find the 
+ *      compactcms-sqldump.sql
+ *    file in the site's media/files/ccms-restore/ directory. 
+ *    This implies the config.inc.php file has also been copied to that directory already.
+ *    
+ * 2) someone actually ran the 'backup' command in the admin backup within the last
+ *    hour or so (timeout configurable through the UPGRADE_FROM_BACKUP_ACTION_TIMEOUT
+ *    constant) as the backup will have not only generated the expected .zip archive
+ *    but (since 1.4.2) also dumped the SQL dump and config file to the /media/files/ccms-restore/
+ *    directory.
+ */
 
 if (empty($_SESSION['variables']))
 {
@@ -204,32 +204,32 @@ if (empty($_SESSION['variables']['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION
 }
 
 /*
-now see whether the prerequisite files exist in ../media/files/ccms-restore/ 
-*AND* 
-whether at the SQL dump file has a 'last nodified' timestamp equal or beyond ANY
-of the content files stored in ../content/ or ../media/
-
-... because only if it has, can we be sure the backup producing those prerequisite
-files is of the 'most recent activity' kind.
-
-Naturally, there is a hitch: when we are performing a 'site restore' operation right
-now, then there MAY be some lingering content which has not been replaced by the 
-'restore' operation so far, i.e. the archive extract and /content/... + /media/... 
-directory overwrite. That is, assuming such an overwrite-on-restore was done in an
-unclean way. Which should be frowned upon most severely as it can cause all sorts
-of site editing ulcers later on, when the lingering content disrupts the creation
-of, say, fresh pages with the same name as the lingering (not cleaned up) files.
-
-Hence, we should put up a FATAL warning informing the user she's got some lingering
-files in there, which are not part of the backup. Plus a little hint for the truly
-stubborn and savvy ones: after all it only takes a UNIX' touch to fix the problem
-in a way of your liking. ;-)
-Nevertheless, when using the magick of UNIX' touch, you're on your own from that point
-on as using magick like that is only for grownups who should've learned their lesson
-already.
-(And maybe, just maybe, I shouldn't have read Neil Gaiman so very early in the 
-morning when the dawn is yet only a hint from yesterday's tale.)
-*/
+ * now see whether the prerequisite files exist in ../media/files/ccms-restore/ 
+ * *AND* 
+ * whether at the SQL dump file has a 'last nodified' timestamp equal or beyond ANY
+ * of the content files stored in ../content/ or ../media/
+ * 
+ * ... because only if it has, can we be sure the backup producing those prerequisite
+ * files is of the 'most recent activity' kind.
+ * 
+ * Naturally, there is a hitch: when we are performing a 'site restore' operation right
+ * now, then there MAY be some lingering content which has not been replaced by the 
+ * 'restore' operation so far, i.e. the archive extract and /content/... + /media/... 
+ * directory overwrite. That is, assuming such an overwrite-on-restore was done in an
+ * unclean way. Which should be frowned upon most severely as it can cause all sorts
+ * of site editing ulcers later on, when the lingering content disrupts the creation
+ * of, say, fresh pages with the same name as the lingering (not cleaned up) files.
+ * 
+ * Hence, we should put up a FATAL warning informing the user she's got some lingering
+ * files in there, which are not part of the backup. Plus a little hint for the truly
+ * stubborn and savvy ones: after all it only takes a UNIX' touch to fix the problem
+ * in a way of your liking. ;-)
+ * Nevertheless, when using the magick of UNIX' touch, you're on your own from that point
+ * on as using magick like that is only for grownups who should've learned their lesson
+ * already.
+ * (And maybe, just maybe, I shouldn't have read Neil Gaiman so very early in the 
+ * morning when the dawn is yet only a hint from yesterday's tale.)
+ */
 
 $has_prepped_restore = false;
 $has_uptodate_backup = false;
@@ -238,10 +238,10 @@ if (is_file($filepath . 'config.inc.php') && is_file($filepath . 'compactcms-sql
 {
 	$has_prepped_restore = true;
 	/*
-	NOTE that the sqldump file will be the LAST file WRITTEN by the backup procedure and will have, upon extraction from the archive,
-	     a create/modify timestamp equaling the time the backup was being performed. As such, it MUST be the latest file in the
-		 entire content region!
-	*/
+	 * NOTE that the sqldump file will be the LAST file WRITTEN by the backup procedure and will have, upon extraction from the archive,
+	 *      a create/modify timestamp equaling the time the backup was being performed. As such, it MUST be the latest file in the
+	 * 	    entire content region!
+	 */
 	$backup_time = filemtime($filepath . 'compactcms-sqldump.sql');
 
 	/*
@@ -262,26 +262,26 @@ if (is_file($filepath . 'config.inc.php') && is_file($filepath . 'compactcms-sql
 	}
 	
 	/*
-	If we have ANY more recent content than the files in .../ccms-restore/ , this signals two things:
-	
-	a) we have performed backups before OR extracted an older backup archive and prepared that restore directory,
-	   either way signalling that we MAY desire a restore/upgrade operation now, while
-	   
-	b) the fact that there's more recent content than our latest backup signal files means we haven't 
-	   created a backup very recently. THIS implies that going through on such a 'automated' restore
-	   operation would REWIND the site content to some prior UNIDENTIFIED state: UNIDENTIFIED because
-	   we have failed to either clean the content&media directory trees of recent content which MUST be
-	   removed as we apparently wish to rewind to the state as of an older date (restore/rewind), or we
-	   simply failed to run a recent backup (meaning 'we', as in ANY user with sufficient priveleges)
-	   changed or augmented the site content AFTER the last backup was made.
-	   
-	That, my friends, is a clear cut case of Nuking Your Site With Extreme Prejudice and we don't want
-	to be a party in such Murphian Madness. So you either do a proper backup, a proper restore OR you
-	tweak the SQL dump file last-modified timestamp to agree with our rule here, in which case, of course,
-	you just handed yourself a paddle to travel upcreek. Who am I, my dearies, to stand in the way of 
-	a Viking so visionary as to crave a UNIX' touch? Have it your way then, and may the gods look 
-	favorably upon your soul in the here-on-after. Ta ta.
-	*/
+	 * If we have ANY more recent content than the files in .../ccms-restore/ , this signals two things:
+	 * 
+	 * a) we have performed backups before OR extracted an older backup archive and prepared that restore directory,
+	 *    either way signalling that we MAY desire a restore/upgrade operation now, while
+	 *    
+	 * b) the fact that there's more recent content than our latest backup signal files means we haven't 
+	 *    created a backup very recently. THIS implies that going through on such a 'automated' restore
+	 *    operation would REWIND the site content to some prior UNIDENTIFIED state: UNIDENTIFIED because
+	 *    we have failed to either clean the content&media directory trees of recent content which MUST be
+	 *    removed as we apparently wish to rewind to the state as of an older date (restore/rewind), or we
+	 *    simply failed to run a recent backup (meaning 'we', as in ANY user with sufficient priveleges)
+	 *    changed or augmented the site content AFTER the last backup was made.
+	 *    
+	 * That, my friends, is a clear cut case of Nuking Your Site With Extreme Prejudice and we don't want
+	 * to be a party in such Murphian Madness. So you either do a proper backup, a proper restore OR you
+	 * tweak the SQL dump file last-modified timestamp to agree with our rule here, in which case, of course,
+	 * you just handed yourself a paddle to travel upcreek. Who am I, my dearies, to stand in the way of 
+	 * a Viking so visionary as to crave a UNIX' touch? Have it your way then, and may the gods look 
+	 * favorably upon your soul in the here-on-after. Ta ta.
+	 */
 	$has_uptodate_backup = ($lastmtime < $backup_time);
 }
 	
@@ -298,6 +298,14 @@ if (empty($_SESSION['variables']['do_upgrade']))
 }
 
 
+
+
+
+// B0RK when the server still has that old hack still active:
+if (get_magic_quotes_gpc())
+{
+	die("Your server still has the old PHP 'magic quotes' hack setting turned ON; it is obsoleted and poses and indirect security risk: any software on your machine still depending on that setting should be upgraded/overhauled! CompactCMS will NOT install as long as this setting is active.");
+}
 
 
 
@@ -507,7 +515,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 <div>
-  <textarea id="jslog" class="log span-25" readonly="readonly">
+  <textarea id="jslog" class="log span-25 clear" readonly="readonly">
   </textarea>
 </div>
 <?php
@@ -515,7 +523,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 ?>
 
 
-<p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
+<p class="quiet small clear" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
 
 <script type="text/javascript" charset="utf-8">
 var jsLogEl = document.getElementById('jslog');
@@ -564,11 +572,6 @@ function ccms_combiner_running()
 /* now show the correct DIV, as we do have JavaScript up & running */
 document.getElementById("noscript").style.display = "none";
 document.getElementById("install-wrapper").style.display = "block";
-
-if (typeof window.ccms_lazyload_setup_GHO == 'function')
-{
-	//alert('2');
-}
 
 </script>
 <script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

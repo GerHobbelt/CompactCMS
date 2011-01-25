@@ -33,45 +33,56 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>{%title%}</title>
-<meta name="description" content="{%sitename%} | {%desc%}" />
-<meta name="keywords" content="{%keywords%}" />
-<link href="{%rootdir%}lib/templates/ccms/base.css,layout.css" rel="stylesheet" type="text/css" />
+<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
+<meta name="keywords" content="{%keywords!protect4attr%}" />
+<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/base.css,layout.css,last_minute_fixes.css" />
+<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/ie.css" />
+<![endif]-->
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
 <body>
 <div class="container-25">
-	<div id="header" class="span-25">
+	<div id="header" class="span-25 last">
 		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
 		<div class="span-20 last" id="navigation">
-			<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
+			{%IF extramenu (eq ())%} 
+				<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
+			{%ELSE%} 
+				{%extramenu%}
+			{%/IF extramenu%} 
 		</div>
 	</div>
 
 	<h2>{%subheader%}</h2>
 
 	<div id="left" class="span-4 colborder">
-		<p style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
-			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="{%lang:backend:administration%}">{%lang:login:login%}</a>
-		</p>
-		
+		<div style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
+			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="{%lang:backend:administration!protect4attr%}">{%lang:login:login%}</a>
+		</div>
+		{%leftmenu%}
 	</div>
 
-	<div id="content" class="span-21 last">
+	<div id="content" class="span-20 last">
 		<div id="printable" class="span-21 last" style="text-align: right;">
 			{%breadcrumb%}
 			{%IF printable (eq Y)%}
-				<br/><a href="{%rootdir%}{%urlpage%}.print">{%lang:template:print%}</a>
+				<br/><a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:template:print%}</a>
 			{%/IF printable%}
 		</div>
 		
 		{%content%}
-		
-		{%leftmenu%}
+
+		<div id="rightmenu">
+		{%rightmenu%}
+		</div>
 	</div>
 </div>
 
 <div id="footer" class="quiet small">
+	{%footermenu%}
+	
 	<p>&copy; <?php echo date('Y'); ?> {%sitename%} | Maintained with <a href="http://www.compactcms.nl">CompactCMS</a></p>
 </div>
 

@@ -30,6 +30,8 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 /* === 0. MISC === */
 
 /*
+Installer:
+
 It turns out not only IE8 but also Chrome & Opera need this to make the overview in step #4 stay close together vertically.
 
 Harmless for FF3.
@@ -43,6 +45,20 @@ table th, table td
 	/* border: 1px solid red; */
 }
 
+
+/*
+the underline looks horrible as it also passes through the sprites in the <a> links: the sprites are within
+the <a> to ensure clicking ON the sprite is as valid as clicking on the text next to it.
+
+Since the links are already identifiable through their color change when you hover over them, all we need
+to do here is ENSURE the moise POINTER is shown when hovering over a link: several links in the admin screens,
+e.g. the headers of the create page, etc. sections, do not alter the mouse piinter unless we enforce it here.
+*/
+a
+{
+    cursor: pointer;
+	text-decoration: none;
+}
 
 a.external 
 {
@@ -118,9 +134,22 @@ blueprint CSS calls this 'last':
 	margin-right: 0;
 }
 */
-#createnew, #menudepth 
+#createnew, #menudepth, #load_notice 
 {
-	margin-top: 10px;
+	/* margin-top: 10px; */
+}
+
+#load_notice #notice_wrapper
+{
+	padding-top: 10px;
+}
+/*
+override the green colors of the (#desktop fieldset)
+*/
+#desktop #load_notice fieldset
+{
+	border-color: #f00;
+	background-color: #fdd;
 }
 
 .ff{display:inline-block;width:80px;height:15px;background-position: 0 0;}

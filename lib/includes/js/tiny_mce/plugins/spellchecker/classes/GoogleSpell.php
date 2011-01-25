@@ -21,7 +21,7 @@ class GoogleSpell extends SpellChecker {
 		$words = array();
 
 		for ($i=0; $i<count($matches); $i++)
-			$words[] = $this->_unhtmlentities(mb_substr($wordstr, $matches[$i][1], $matches[$i][2], "UTF-8"));
+			$words[] = $this->_unhtmlentities(mb_substr($wordstr, $matches[$i][1], $matches[$i][2], 'UTF-8'));
 
 		return $words;
 	}

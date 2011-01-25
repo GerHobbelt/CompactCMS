@@ -111,7 +111,7 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	$height = null;
 	$width = null;
 	$aspect_ratio = null;
-	if(!empty($thumb_path) && file_exists($thumb_path))
+	if(!empty($thumb_path) && file_exists($thumb_path) && is_readable($thumb_path))
 	{
 		$imginfo = @getimagesize($thumb_path);
 		if (!empty($imginfo[0]))
@@ -126,7 +126,7 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	if ($show_thumb != 1)
 	{
 		$thumb_path = $img_path;
-		if(file_exists($thumb_path)) 
+		if(file_exists($thumb_path) && is_readable($thumb_path)) 
 		{
 			$imginfo = @getimagesize($thumb_path);
 			if (!empty($imginfo[0]))
@@ -245,7 +245,9 @@ if(count($albums)>1 && $singleShow==false)
 		} 
 	} 
 	else 
+	{
 		echo $ccms['lang']['album']['noalbums'];
+	}
 } 
 elseif($singleShow==true) 
 {
@@ -270,7 +272,8 @@ elseif($singleShow==true)
 		}
 		
 		// and augment the breadcrumb trail and other template variables:
-		$preview_checkcode = ($ccms['preview'] ? GenerateNewPreviewCode(null, $pageID) : false);
+		$preview_checkcode = ($ccms['preview'] == 'Y' ? GenerateNewPreviewCode(null, $pageID) : false);
+		$ccms['previewcode'] = $preview_checkcode;
 		
 		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
 		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a></span>';
