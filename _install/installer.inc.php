@@ -58,7 +58,7 @@ $nextstep = getPOSTparam4IdOrNumber('do');
 $may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] != false); 
 $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] != false); 
 
-$dump_queries_n_stuff_in_devmode = false;
+$dump_queries_n_stuff_in_devmode = true;
 
 
 /**

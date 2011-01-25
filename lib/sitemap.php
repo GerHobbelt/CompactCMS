@@ -369,6 +369,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 		// Content variables
 		$ccms['cfg']        = $cfg;
+		$ccms['page_id']    = $row->page_id;
+		$ccms['page_name']  = $row->urlpage;
 		$ccms['language']   = $cfg['language'];
 		$ccms['tinymce_language']   = $cfg['language'];
 		$ccms['editarea_language']   = $cfg['language'];
@@ -465,6 +467,8 @@ if (0)
 		// ERROR 403/404; if not 403, then we default to 404
 		// Or if DB query returns zero, show error 404: file does not exist
 		
+		$ccms['page_id'] = false;
+		$ccms['page_name'] = false;
 		setup_ccms_for_40x_error((get_response_code_string($pagereq, false) !== false ? intval($pagereq) : 404), $pagereq);
 	}
 
