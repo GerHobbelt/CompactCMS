@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgnews` (
 DROP TABLE IF EXISTS `ccms_cfgpermissions`;
 CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
   `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'The identifying name of the permission',
-  `value` smallint(1) NOT NULL DEFAULT '0' COMMENT 'The value of the permission: 0 (don''t care) .. 5 (admin only)',
+  `value` smallint(1) NOT NULL DEFAULT '0' COMMENT 'The value of the permission: 0 (undefined), 1 (any authenticated user) .. 4 (admin only)',
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
