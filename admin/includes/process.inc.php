@@ -467,6 +467,7 @@ if ($do_update_or_livefilter && checkAuth())
 	{
 		echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_bullet_red">&#160;</span>'.$ccms['lang']['system']['noresults'].'</p>'; 
 	}
+	exit();
 }
 	
 
@@ -615,6 +616,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 	{
 		echo '<p class="center-text ss_has_sprite" style="padding-top:5px;"><span class="ss_sprite_16 ss_delete">&#160;</span>'.$ccms['lang']['auth']['featnotallowed'].'</p>';
 	} 
+	exit();
 }
 
 
@@ -837,6 +839,7 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	{
 		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$ccms['lang']['system']['error_selection'].'</p>';
 	}
+	exit();
 }
 
 /**
@@ -848,31 +851,35 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 {
 	$error = null;
 	
-	foreach ($_POST['pageid'] as $page_id) 
+	if(!empty($_POST['page_id'])) 
 	{
-		$page_id = filterParam4Number($page_id);
-		$toplevel = filterParam4Number($_POST['toplevel'][$page_id]);
-		$sublevel = filterParam4Number($_POST['sublevel'][$page_id]);
-		$templatename = filterParam4Filename($_POST['template'][$page_id]);
-		$menu_id = filterParam4Number($_POST['menuid'][$page_id]);
-		if (!$page_id || !$toplevel || empty($templatename) || !$menu_id)
+		foreach ($_POST['pageid'] as $page_id) 
 		{
-			$error = $ccms['lang']['system']['error_forged'];
-			break;
-		}
-		
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values['toplevel']	= MySQL::SQLValue($toplevel, MySQL::SQLVALUE_NUMBER);
-		$values['sublevel']	= MySQL::SQLValue($sublevel, MySQL::SQLVALUE_NUMBER);
-		$values['variant']	= MySQL::SQLValue($templatename, MySQL::SQLVALUE_TEXT);
-		$values['menu_id']	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
-		
-		// Execute the update
-		if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
-		{
-			$error = $db->Error();
+			$page_id = filterParam4Number($page_id);
+			$toplevel = filterParam4Number($_POST['toplevel'][$page_id]);
+			$sublevel = filterParam4Number($_POST['sublevel'][$page_id]);
+			$templatename = filterParam4Filename($_POST['template'][$page_id]);
+			$menu_id = filterParam4Number($_POST['menuid'][$page_id]);
+			if (!$page_id || !$toplevel || empty($templatename) || !$menu_id)
+			{
+				$error = $ccms['lang']['system']['error_forged'];
+				break;
+			}
+			
+			$values = array(); // [i_a] make sure $values is an empty array to start with here
+			$values['toplevel']	= MySQL::SQLValue($toplevel, MySQL::SQLVALUE_NUMBER);
+			$values['sublevel']	= MySQL::SQLValue($sublevel, MySQL::SQLVALUE_NUMBER);
+			$values['variant']	= MySQL::SQLValue($templatename, MySQL::SQLVALUE_TEXT);
+			$values['menu_id']	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
+			
+			// Execute the update
+			if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+			{
+				$error = $db->Error();
+			}
 		}
 	}
+	// else: no pages specified; which is okay with us here...
 	
 	if(empty($error)) 
 	{
@@ -956,6 +963,7 @@ if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == "GET" && checkAu
 	{
 		$db->Kill($ccms['lang']['system']['error_general']);
 	}
+	exit();
 }
 
 /**
@@ -1001,6 +1009,7 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	{
 		echo $content;
 	}
+	exit();
 }
 
 /**
@@ -1048,6 +1057,7 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
 	{
 		$e->croak();
 	}
+	exit();
 }
 
 /**
@@ -1117,6 +1127,7 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	{
 		$e->croak();
 	}
+	exit();
 }
 
 /**
@@ -1175,6 +1186,7 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 	{
 		$e->croak();
 	}
+	exit();
 }
  
 /**
@@ -1235,6 +1247,7 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
 	{
 		$e->croak();
 	}
+	exit();
 }
 
 /**
@@ -1289,6 +1302,7 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
 	{
 		$e->croak();
 	}
+	exit();
 }
 
 /**
@@ -1342,6 +1356,7 @@ if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	{
 		$e->croak();
 	}
+	exit();
 }
 
 /**
@@ -1701,5 +1716,7 @@ function confirmation()
 	{
 		$db->Kill();
 	}
+
+	exit();
 } 
 ?>
