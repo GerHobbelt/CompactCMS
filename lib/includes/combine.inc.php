@@ -712,14 +712,14 @@ function filter4browser($contents, $client_browser)
 			die("Illegal filter condition string: " . $this_line);
 		}
 
-		$pass = true;
+		$pass = false;
 
 		$src = $matches[1];
 		$match_count = count($matches);
 		$comment = trim($matches[$match_count - 1]);
 		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
 		$extra_first_step = 1;
-		for ($i = 2; $i < $match_count - 1 /* discount the last one: the trailing comment */; $i++)
+		for ($i = 2; $i + 4 <= $match_count - 1 /* discount the last one: the trailing comment */; $i++)
 		{
 			$op = $matches[$i++];
 			$brand = trim($matches[$i++]);
@@ -728,11 +728,6 @@ function filter4browser($contents, $client_browser)
 			$i++; // skip the minor version match
 			$i += $extra_first_step; // move to the next of a combined set (if there are any more conditions in there)
 			$extra_first_step = 0;
-			if ($i > 6 && empty($op) && empty($brand) && !$b_v_set)
-			{
-				// an empty match of the '| op brand version' set: happens when there's a comment at the end -- skip this entry
-				continue;
-			}
 
 			// perform check, set $pass=false when there's a match
 			//echo "<pre>check: ($op) ($brand) ($b_version) ($this_line) ($comment)\n";
@@ -768,27 +763,27 @@ function filter4browser($contents, $client_browser)
 				die("Illegal filter comparison operator: " . $this_line);
 
 			case '!=':
-				$pass = !($gotcha && (!$b_v_set || $vchk == 0));
+				$pass |= !($gotcha && (!$b_v_set || $vchk == 0));
 				break;
 
 			case '==':
-				$pass = ($gotcha && (!$b_v_set || $vchk == 0));
+				$pass |= ($gotcha && (!$b_v_set || $vchk == 0));
 				break;
 
 			case '>=':
-				$pass = ($gotcha && (!$b_v_set || $vchk >= 0));
+				$pass |= ($gotcha && (!$b_v_set || $vchk >= 0));
 				break;
 
 			case '>':
-				$pass = ($gotcha && (!$b_v_set || $vchk > 0));
+				$pass |= ($gotcha && (!$b_v_set || $vchk > 0));
 				break;
 
 			case '<':
-				$pass = ($gotcha && (!$b_v_set || $vchk < 0));
+				$pass |= ($gotcha && (!$b_v_set || $vchk < 0));
 				break;
 
 			case '<=':
-				$pass = ($gotcha && (!$b_v_set || $vchk <= 0));
+				$pass |= ($gotcha && (!$b_v_set || $vchk <= 0));
 				break;
 			}
 			//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
@@ -797,7 +792,168 @@ function filter4browser($contents, $client_browser)
 		if (!$pass)
 		{
 			// filter line... or CSS/JS block? When the next non-whitespace item is a '{' we'll need to ditch the entire block
-			if (preg_match('/^\s*(\{[^}]*\})(.*)$/s', $contents, $matches))
+			if (preg_match('/^\s*\{[^}{]*\{/s', $contents))
+			{
+				// bingo! JS block with NESTED scope blocks!
+				$c = $contents;
+				$depth[0] = 1; // curly braces
+				$depth[1] = 0; // single quotes
+				$depth[2] = 0; // double quotes
+				$depth[3] = 0; // regexes
+				$depth[4] = 0; // [...] set in regex
+				$endset = '{}/"\'';
+				
+				for (;;)
+				{
+					$i = strcspn($c, $endset);
+					$s = substr($c, 0, $i + 1);
+					if (strlen($s) == 0)
+					{
+						// reached end of source/content before we hit end of scope: error!
+						send_response_status_header(500);
+						die("Unexpected end of scope for condition block following: " . $src);
+					}
+					$brace = substr($s, $i, 1);
+					$c = substr($c, $i + 1);
+					
+					switch ($brace)
+					{
+					default:
+						send_response_status_header(500);
+						die("INTERNAL ERROR: Illegal element in string, regex or scope for condition block following: " . $src);
+						
+					case '{':
+						// when not inside string or regex:
+						if (!$depth[1] && !$depth[2] && !$depth[3])
+						{
+							$depth[0]++;
+						}
+						continue;
+					
+					case '}':
+						// when not inside string or regex:
+						if (!$depth[1] && !$depth[2] && !$depth[3])
+						{
+							$depth[0]--;
+							
+							// when we've reached the end of the outer scope block, we terminate the scan and keep what's left:
+							if ($depth[0] == 0)
+							{
+								break;
+							}
+						}
+						continue;
+						
+					case '\\':
+						// escape character: applies inside strings, regexes (and implicitly: regex sets):
+						if ($depth[1] || $depth[2] || $depth[3])
+						{
+							// skip next character in content:
+							$c = substr($c, 1);
+						}
+						continue;
+						
+					case '/':
+						// when not inside string or regex [...] SET:
+						if (!$depth[1] && !$depth[2] && !$depth[4])
+						{
+							if ($depth[3])
+							{
+								$depth[3]--;
+								$endset = '{}/"\'';
+							}
+							else
+							{
+								// comment starter or regex marker:
+								$b2 = substr($c, 0, 1);
+								switch ($b2)
+								{
+								case '/':
+									// C++ style comment: ignore until EOL:
+									$i = strcspn($c, "\n");
+									$c = substr($c, $i + 1);
+									continue;
+									
+								case '*':
+									// C style comment: ignore until you've found a matching '*/' combo:
+									if (!preg_match('/^\*.*?\*\/(.*)$/s', $c, $cmtm))
+									{
+										// illegal format: report this and fail dramatically
+										send_response_status_header(500);
+										die("Unterminated comment in scope following conditionalized element: " . $src);
+									}
+									$c = $cmtm[1];
+									continue;
+									
+								default:
+									// regex marker...
+									$depth[3]++;
+									$endset = '[]/\\';
+									continue;
+								}
+							}
+						}
+						continue;
+					
+					case '[':
+						// when inside regex but not inside regex SET:
+						if ($depth[3] && !$depth[4])
+						{
+							$depth[4]++;
+							$endset = ']\\';
+						}
+						continue;
+					
+					case ']':
+						// when inside regex SET:
+						if ($depth[3] && $depth[4])
+						{
+							$depth[4]--;
+							$endset = '[]/\\';
+						}
+						continue;
+						
+					case '"':
+						// when not inside sq string or regex:
+						if (!$depth[1] && !$depth[3])
+						{
+							if ($depth[2])
+							{
+								$depth[2]--;
+								$endset = '{}/"\'';
+							}
+							else
+							{
+								$depth[2]++;
+								$endset = '"\\';
+							}
+						}
+						continue;
+						
+					case "'":
+						// when not inside dq string or regex:
+						if (!$depth[2] && !$depth[3])
+						{
+							if ($depth[1])
+							{
+								$depth[1]--;
+								$endset = '{}/"\'';
+							}
+							else
+							{
+								$depth[1]++;
+								$endset = "'\\";
+							}
+						}
+						continue;
+					}
+					break;
+				}
+				
+				$contents = $c;
+				// removed!  <snip> Just like that! :-)
+			}
+			else if (preg_match('/^\s*(\{[^}{]*\})(.*)$/s', $contents, $matches))
 			{
 				// bingo! CSS/JS block!
 				$contents = $matches[2];
@@ -811,7 +967,7 @@ function filter4browser($contents, $client_browser)
 		else
 		{
 			// we must keep the current line/block:
-			$prev_content .= $this_line;
+			$prev_content .= $this_line;   // or: $prev_content .= $src;  iff you don't want to keep the conditional comment in the output, ever. 
 		}
 	}
 
