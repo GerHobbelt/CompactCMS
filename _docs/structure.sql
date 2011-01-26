@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 17, 2011 at 02:13 AM
+-- Generation Time: Jan 26, 2011 at 08:49 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -104,26 +104,28 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgnews` (
 
 DROP TABLE IF EXISTS `ccms_cfgpermissions`;
 CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
-  `manageUsers` smallint(1) NOT NULL DEFAULT '3' COMMENT 'From what user level on can users manage user accounts (add, modify, delete)',
-  `manageOwners` smallint(1) NOT NULL DEFAULT '3' COMMENT 'To allow to appoint certain users to a specific page',
-  `managePages` smallint(1) NOT NULL DEFAULT '1' COMMENT 'From what user level on can users manage pages (add, delete)',
-  `manageMenu` smallint(1) NOT NULL DEFAULT '2' COMMENT 'From what user level on can users manage menu preferences',
-  `manageTemplate` smallint(1) NOT NULL DEFAULT '3' COMMENT 'From what user level on can users manage all of the available templates',
-  `manageModules` smallint(1) NOT NULL DEFAULT '5' COMMENT 'From what user level on can users manage modules',
-  `manageActivity` smallint(1) NOT NULL DEFAULT '2' COMMENT 'From what user level on can users manage the activeness of pages',
-  `manageVarCoding` smallint(1) NOT NULL DEFAULT '3' COMMENT 'From what user level on can users set whether a page contains coding (wysiwyg vs code editor)',
-  `manageModBackup` smallint(1) NOT NULL DEFAULT '3' COMMENT 'From what user level on can users delete current back-up files',
-  `manageModNews` smallint(1) NOT NULL DEFAULT '2' COMMENT 'From what user level on can users manage news items through the news module (add, modify, delete)',
-  `manageModLightbox` smallint(1) NOT NULL DEFAULT '2' COMMENT 'From what user level on can users manage albums throught the lightbox module (add, modify, delete)',
-  `manageModComment` smallint(1) NOT NULL DEFAULT '2' COMMENT 'The level of a user that is allowed to manage comments'
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'The identifying name of the permission',
+  `value` smallint(1) NOT NULL DEFAULT '0' COMMENT 'The value of the permission: 0 (don''t care) .. 5 (admin only)',
+  PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `ccms_cfgpermissions`
 --
 
-INSERT INTO `ccms_cfgpermissions` (`manageUsers`, `manageOwners`, `managePages`, `manageMenu`, `manageTemplate`, `manageModules`, `manageActivity`, `manageVarCoding`, `manageModBackup`, `manageModNews`, `manageModLightbox`, `manageModComment`) VALUES
-(3, 0, 2, 2, 4, 4, 2, 4, 3, 2, 2, 2);
+INSERT INTO `ccms_cfgpermissions` (`name`, `value`) VALUES
+('manageUsers', 3),
+('manageOwners', 0),
+('managePages', 2),
+('manageMenu', 2),
+('manageTemplate', 4),
+('manageModules', 4),
+('manageActivity', 2),
+('manageVarCoding', 4),
+('manageModBackup', 3),
+('manageModNews', 2),
+('manageModLightbox', 2),
+('manageModComment', 2);
 
 -- --------------------------------------------------------
 
@@ -268,20 +270,27 @@ CREATE TABLE IF NOT EXISTS `ccms_modules` (
   `modLocation` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'where you''ld find the plugin sources for management & display (use % as a marker where the mode (''Manage'', ''Show'') should be inserted into the specified path)',
   `modVersion` decimal(5,2) NOT NULL,
   `modPermissionName` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'the permission name used in the admin permissions management screen to configure which users have what permissions',
+  `hasPageMaker` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'If module may act as a page content generator',
+  `hasAdminSection` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'if module requires a link to access it from the admin screen',
   `modActive` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`modID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the installed modules, their version and activation state' AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the installed modules, their version and activation state' AUTO_INCREMENT=11 ;
 
 --
 -- Dumping data for table `ccms_modules`
 --
 
-INSERT INTO `ccms_modules` (`modID`, `modName`, `modTitle`, `modLocation`, `modVersion`, `modPermissionName`, `modActive`) VALUES
-(1, 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', 1),
-(2, 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', 1),
-(4, 'mixer', 'Layout Mixer', './lib/modules/mixer/mixer.%.php', '1.00', 'manageModMixer', 1),
-(3, 'comment', 'Comments', './lib/modules/comment/comment.%.php', '1.20', 'manageModComment', 1),
-(5, 'acl', 'Access Control', './lib/modules/acl/acl.%.php', '1.00', 'manageModACL', 1);
+INSERT INTO `ccms_modules` (`modID`, `modName`, `modTitle`, `modLocation`, `modVersion`, `modPermissionName`, `hasPageMaker`, `hasAdminSection`, `modActive`) VALUES
+(1, 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', 1, 0, 1),
+(2, 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', 1, 0, 1),
+(4, 'mixer', 'Layout Mixer', './lib/modules/mixer/mixer.%.php', '1.00', 'manageModMixer', 1, 0, 1),
+(3, 'comment', 'Comments', './lib/modules/comment/comment.%.php', '1.20', 'manageModComment', 1, 0, 1),
+(5, 'acl', 'Access Control', './lib/modules/acl/acl.%.php', '1.00', 'manageModACL', 0, 1, 1),
+(6, 'template-editor', 'Template Editor', './admin/modules/template-editor/tpedt.%.php', '1.00', 'manageTemplateEditor', 0, 1, 1),
+(7, 'user-management', 'User Management', './admin/modules/user-management/usrmgr.%.php', '1.00', 'manageUsers', 0, 1, 1),
+(8, 'backup-restore', 'Backup / Restore', './admin/modules/backup-restore/backup.%.php', '1.00', 'manageBackups', 0, 1, 1),
+(9, 'content-owners', 'Content Ownership', './admin/modules/content-owners/owners.%.php', '1.00', 'manageContentOwners', 0, 1, 1),
+(10, 'translation', 'Translation Assistant', './admin/modules/translation/translation.%.php', '0.10', 'manageTranslations', 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -311,7 +320,7 @@ CREATE TABLE IF NOT EXISTS `ccms_pages` (
   `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Keeps track of the changes to the page content (through ''touching'' the record) and page attributes - used for web cache hinting and previewCode validation.',
   PRIMARY KEY (`page_id`),
   UNIQUE KEY `urlpage` (`urlpage`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='Table with details for included pages' AUTO_INCREMENT=31 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='Table with details for included pages' AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `ccms_pages`
@@ -349,8 +358,8 @@ CREATE TABLE IF NOT EXISTS `ccms_users` (
 -- Dumping data for table `ccms_users`
 --
 
-INSERT INTO `ccms_users` (`userID`, `userName`, `userPass`, `userFirst`, `userLast`, `userEmail`, `userActive`, `userLevel`, `userToken`, `userLastlog`, `userTimestamp`) VALUES
-(00001, 'admin', '52dcb810931e20f7aa2f49b3510d3805', 'Xander', 'G.', 'xander@compactcms.nl', 1, 4, '5168774687486', '2010-08-30 06:44:57', '2010-08-30 08:44:57');
+INSERT INTO `ccms_users` (`userID`, `userName`, `userPass`, `userFirst`, `userLast`, `userEmail`, `userActive`, `userLevel`, `userToken`, `userLastlog`, `userCreationDate`, `userTimestamp`) VALUES
+(00001, 'admin', '52dcb810931e20f7aa2f49b3510d3805', 'Xander', 'G.', 'xander@compactcms.nl', 1, 4, '5168774687486', '2010-08-30 06:44:57', '2010-08-30 06:44:57', '2010-08-30 08:44:57');
 
 
 
