@@ -91,7 +91,7 @@ if(!empty($get_temp))
 } 
 
 
-if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel'])) 
+if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel'])) 
 {
 	$chstatus = false; // templates are viewable but NOT WRITABLE when user doesn't have permission to manage these.
 }
