@@ -296,7 +296,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				?>
 				
 				<div id="editor-options">
-					<div class="clearfix span-8">
+					<div class="clearfix span-8 last">
 						<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
 						<label for="f_pr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
 							<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
@@ -304,7 +304,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 							<input type="radio" id="f_pr2" name="printable" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
 					</div>
-					<div class="clearfix span-8">
+					<div class="clearfix span-8 last">
 						<label><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
 						<label for="f_pu1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
 							<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
@@ -312,7 +312,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 							<input type="radio" id="f_pu2" name="published" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
 					</div>
-					<div class="clearfix span-8">
+					<div class="clearfix span-8 last">
 						<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
 						<label for="f_cod" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
 							<input type="radio" id="f_cod" name="iscoding" value="Y" />  

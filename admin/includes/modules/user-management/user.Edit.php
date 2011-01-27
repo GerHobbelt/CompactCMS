@@ -195,12 +195,12 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 						?>
 					</select>
 					<hr class="space"/>
-					<div>
+					<div class="yesno">
 						<label><?php echo $ccms['lang']['users']['active']; ?></label>
-							<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-							<input type="radio" name="userActive" <?php echo ($row->userActive?'checked="checked"':null); ?> value="1" id="userActive1" />	
-							<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
-							<input type="radio" name="userActive" class="validate-one-required" <?php echo (!$row->userActive?'checked="checked"':null); ?> value="0" id="userActive0" />
+							<label for="userActive1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?></label>
+							<input type="radio" name="userActive" <?php echo ($row->userActive ? 'checked="checked"' : null); ?> value="1" id="userActive1" />	
+							<label for="userActive0" class="prepend-1 yesno"><?php echo $ccms['lang']['backend']['no']; ?></label>
+							<input type="radio" name="userActive" class="validate-one-required" <?php echo (!$row->userActive ? 'checked="checked"' : null); ?> value="0" id="userActive0" />
 					</div>
 					<hr class="space"/>		
 				

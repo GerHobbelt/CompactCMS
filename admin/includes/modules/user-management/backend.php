@@ -221,12 +221,12 @@ $status_message = getGETparam4DisplayHTML('msg');
 						} 
 						?>
 					</select>
-					<div>
+					<div class="yesno">
 						<label><?php echo $ccms['lang']['users']['active']; /* [i_a] and make sure either yes or no are selected to begin with; pick 'no' as the default here */ ?></label>
-							<label for="userActive1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['yes']; ?></label>
-								<input type="radio" class="validate-one-required" name="userActive" value="1" id="userActive1" />
-							<label for="userActive0" class="prepend-1" style="display:inline;font-weight:normal;"><?php echo $ccms['lang']['backend']['no']; ?></label>
-								<input type="radio" name="userActive" value="0" id="userActive0" checked="checked" />
+						<label for="userActive1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?></label>
+						<input type="radio" class="validate-one-required" name="userActive" value="1" id="userActive1" />
+						<label for="userActive0" class="prepend-1 yesno"><?php echo $ccms['lang']['backend']['no']; ?></label>
+						<input type="radio" name="userActive" value="0" id="userActive0" checked="checked" />
 					</div>
 					<hr class="space"/>
 					<div class="right">

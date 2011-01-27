@@ -503,21 +503,34 @@ We 'solve' this in a more generic way as we need to style all the input/textarea
 #editor-options span.ss_sprite_16
 {
 	float: right;
-	margin-right: 0;
-	margin-top: 5px;
+	margin-right: -5px;  /* we need this correction because the other sections are not exactly span-8 wide themselves */
+	padding-right: 0;
+	/* margin-top: 5px; */
 }
 #editor-options label
 {
 	/* clear: both;   -- done by the <br> in the HTML */
 	/* margin-top: -2px; */ /* pull up the baseline so it aligns with the rest (yes/no radios) */
-	vertical-align: baseline;
+	/* vertical-align: baseline; */
+	/*
+	display: inline;
+	float: none;
+	width: 85px;
+	*/
+}
+#editor-options input
+{
+	/* clear: both;   -- done by the <br> in the HTML */
+	/* margin-top: -2px; */ /* pull up the baseline so it aligns with the rest (yes/no radios) */
+	/* vertical-align: baseline; */
+	/*
+	display: inline;
+	*/
 }
 #editor-options label.yesno
 {
-	/* force these to display inline in the second 'column' of the form (the float:left labels  being the 1st 'column') */
 	float: none;
 	margin: 5px 3px 0px 0px;
-	font-weight: normal;
 }
 
 
@@ -1120,9 +1133,11 @@ remember that 'create-user' is a <div> in a 'liquid' layout!
 
 same goes for #edit-user-details, which sits in a subpage of the user management.
 */
-#create-user input.text, #edit-user-details input.text
+#create-user input, #edit-user-details input
 {
-	width: 98%;
+	width: 97%;
+	padding-left: 1%; /* fix for liquid design: ~ 3px, but depends on screen size */
+	padding-right: 1%; /* fix for liquid design: ~ 3px, but depends on screen size */
 }
 #create-user select, #edit-user-details select
 {
@@ -1172,6 +1187,15 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 
 
 
+#create-user label.yesno, #edit-user-details label.yesno
+{
+	display: inline;
+	font-weight: normal;
+}
+#create-user div.yesno input, #edit-user-details div.yesno input
+{
+	width: auto;
+}
 
 
 
