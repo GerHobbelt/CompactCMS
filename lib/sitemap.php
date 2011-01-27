@@ -205,8 +205,8 @@ else
 
 
 // Fill active module array and load the plugin code
-$modules = $db->SelectArray($cfg['db_prefix'].'modules', array('modActive' => "'1'"));
-if (!$modules)
+$modules = $db->SelectArray($cfg['db_prefix'].'modules' /* , array('modActive' => MySQL::SQLValue(1, MySQL::SQLVALUE_NUMBER)) */ );
+if ($db->ErrorNumber())
 	$db->Kill();
 
 

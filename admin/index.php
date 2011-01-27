@@ -272,19 +272,28 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['description']; ?>">&#160;</span><br/>
 				
 				<?php 
-				// Modules
-				if(count($modules)>0) 
+				// Modules which can create a page:
+				$page_creators = array();
+				for ($i = 0; $i < count($modules); $i++) 
+				{ 
+					if (!$modules[$i]['modActive'] || !$modules[$i]['hasPageMaker'])
+						continue;
+						
+					$page_creators[] = $modules[$i];
+				}
+				
+				if(count($page_creators) > 0) 
 				{ 
 				?>
 				<label for="f_mod"><?php echo $ccms['lang']['forms']['module']; ?></label>
 				<select class="text" name="module" id="f_mod" size="1">
 					<option value="editor"><?php echo $ccms['lang']['forms']['contentitem']; ?></option>
 					<optgroup label="<?php echo $ccms['lang']['forms']['additions']; ?>">
-						<?php //
-						for ($i=0; $i<count($modules); $i++) 
+						<?php 
+						for ($i = 0; $i < count($page_creators); $i++) 
 						{ 
 						?>
-							<option value="<?php echo $modules[$i]['modName'];?>"><?php echo $modules[$i]['modTitle']; ?></option>
+							<option value="<?php echo $page_creators[$i]['modName']; ?>"><?php echo $page_creators[$i]['modTitle']; ?></option>
 						<?php 
 						} 
 						?>
