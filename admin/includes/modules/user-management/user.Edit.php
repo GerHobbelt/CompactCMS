@@ -147,7 +147,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 					</label>
 					<input type="text" onkeyup="passwordStrength(this.value);" class="required minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">
-						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
+						<div id="pws1">&#160;</div>
 					</div>
 					<br class="clear"/>
 					<label for="cpass"><?php echo $ccms['lang']['users']['cpassword']; ?></label>

@@ -186,7 +186,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 					</label>
 					<input type="text" onkeyup="passwordStrength(this.value);" class="minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">
-						<div id="pws1">&#160;</div><div id="pws2">&#160;</div>
+						<div id="pws1">&#160;</div>
 					</div>
 					</br class="clear"/>
 					<label for="userFirstname"><?php echo $ccms['lang']['users']['firstname']; ?></label>

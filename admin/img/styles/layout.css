@@ -729,13 +729,58 @@ div.module
 
 
 /* === USER MANAGEMENT === */
-#passwordStrength{height:10px;display:block;float:left;}
-.strength0{width:212px;background:#cccccc;}
-.strength1{width:40px;background:#ff0000;}
-.strength2{width:80px;background:#ff5f5f;}
-.strength3{width:123px;background:#56e500;}
-.strength4{background:#4dcd00;width:166px;}
-.strength5{background:#399800;width:212px;}
+#passwordStrength
+{
+	height: 10px;
+	line-height: 10px; /* <-- needed for IE6 to ensure the bar is /thin/ instead of some thick block! */
+	display: block;
+	float: left;
+	/* width:212px; */
+	width: 100%; 
+	margin: 0;
+}
+.strength0 div
+{
+	width: 99.9%;
+	background-color: #cccccc;
+	padding: 0;
+	margin: 0;
+}
+.strength1 div
+{
+	width: 20%;
+	background-color: #ff0000;
+	padding: 0;
+	margin: 0;
+}
+.strength2 div
+{
+	width: 40%;
+	background-color: #ff5f5f;
+	padding: 0;
+	margin: 0;
+}
+.strength3 div
+{
+	width: 60%;
+	background-color: #56e500;
+	padding: 0;
+	margin: 0;
+}
+.strength4 div
+{
+	width: 80%;
+	background-color: #4dcd00;
+	padding: 0;
+	margin: 0;
+}
+.strength5 div
+{
+	width: 99.9%;
+	background-color: #399800;
+	padding: 0;
+	margin: 0;
+}
 
 
 
@@ -1100,70 +1145,14 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 	width: 100%; 
 	height: 10px;
 	line-height: 10px; /* <-- needed for IE6 to ensure the bar is /thin/ instead of some thick block! */
-}
-#create-user #passwordStrength #pws1, #edit-user-details #passwordStrength #pws1
-{
-	height: 100%;
 	float: left;
 	margin: 0;
 	/* border: 1px solid red; */
 }
-#create-user #passwordStrength #pws2, #edit-user-details #passwordStrength #pws2
-{
-	background-color: #fff;
-	height: 100%;
-	float: right;
-	margin: 0;	
-	/* border: 1px solid blue; */
-}
-#create-user .strength0 #pws1, #edit-user-details .strength0 #pws1
-{
-	width: 99%;
-}
-#create-user .strength1 #pws1, #edit-user-details .strength1 #pws1
-{
-	width: 20%;
-}
-#create-user .strength2 #pws1, #edit-user-details .strength2 #pws1
-{
-	width: 40%;
-}
-#create-user .strength3 #pws1, #edit-user-details .strength3 #pws1
-{
-	width: 60%;
-}
-#create-user .strength4 #pws1, #edit-user-details .strength4 #pws1
-{
-	width: 80%;
-}
-#create-user .strength5 #pws1, #edit-user-details .strength5 #pws1
-{
-	width: 99%;
-}
-#create-user .strength0 #pws2, #edit-user-details .strength0 #pws2
-{
-	width: 40.1%;
-}
-#create-user .strength1 #pws2, #edit-user-details .strength1 #pws2
-{
-	width: 79.1%;
-}
-#create-user .strength2 #pws2, #edit-user-details .strength2 #pws2
-{
-	width: 59.1%;
-}
-#create-user .strength3 #pws2, #edit-user-details .strength3 #pws2
-{
-	width: 39.1%;
-}
-#create-user .strength4 #pws2, #edit-user-details .strength4 #pws2
-{
-	width: 19.1%;
-}
-#create-user .strength5 #pws2, #edit-user-details .strength5 #pws2
-{
-	width: .1%;
-}
+
+
+
+
 
 
 
@@ -1263,6 +1252,10 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
+
+
+
+
 
 
 

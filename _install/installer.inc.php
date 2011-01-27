@@ -89,7 +89,9 @@ if($nextstep == md5('2') && CheckAuth())
 			<a class="ss_has_sprite small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_arrow_refresh">&#160;</span>Auto generate a safe password</a>
 		</label>
 		<input type="text" class="alt title" name="userPass" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
-		<div id="passwordStrength" class="strength0"></div>
+		<div class="clear strength0" id="passwordStrength">
+			<div id="pws1">&#160;</div>
+		</div>
 		<p class="ss_has_sprite small quiet clear"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Remember your admin password as it cannot be retrieved</p>
 		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN
 			<br/>
