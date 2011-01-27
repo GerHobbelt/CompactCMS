@@ -1192,7 +1192,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		// It's because a few mochaUI styles specify a 'opacity: 0;' to make them invisible.
 		$contents = preg_replace('/\s(-ms-)?filter:\s*[\'"]?[^(};]*[Aa]lpha\([^)]+\)[\'"]?\s*;?/', ' ', $contents);
 		$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
-		$contents = preg_replace('/\sopacity:\s*[0-9.]+;?/', ' ', $contents);
+		$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
 		break;
 
 	default:
