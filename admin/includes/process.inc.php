@@ -920,6 +920,7 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
 	{
 		$db->Kill();
 	}
+	exit();
 }
 
 /**
@@ -927,7 +928,7 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
  * Edit print, publish or iscoding preference
  *
  */
-if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == "GET" && checkAuth()) 
+if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth()) 
 {
 	// Explode variable with all necessary information
 	$page_id = explode('-', getGETparam4IdOrNumber('id'), 2); // [i_a] fix for page_id's which have dashes in their own name...

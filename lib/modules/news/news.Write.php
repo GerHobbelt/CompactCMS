@@ -74,7 +74,7 @@ if (empty($pageID))
 	die($ccms['lang']['system']['error_forged']);
 }
 
-if($newsID != null)
+if(!empty($newsID) && !empty($pageID))
 {
 	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID=u.userID WHERE newsID = " . MySQL::SQLValue($newsID, MySQL::SQLVALUE_NUMBER) . " AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
 	if (!$news) $db->Kill();
@@ -126,7 +126,7 @@ if($newsID != null)
 					</tr>
 					<tr>
 						<td>
-							<input type="text" class="minLength:3 text span-25" name="newsTitle" value="<?php echo (isset($news)?$news->newsTitle:null);?>" id="newsTitle"/>
+							<input type="text" class="minLength:3 text span-25" name="newsTitle" value="<?php echo (isset($news) ? $news->newsTitle : null); ?>" id="newsTitle"/>
 						</td>
 						<td>
 							<select name="newsAuthor" class="required text span-25" id="newsAuthor">
@@ -136,14 +136,14 @@ if($newsID != null)
 								foreach($userlist as $user)
 								{
 								?>
-									<option value="<?php echo rm0lead($user->userID); ?>" <?php echo (isset($news) && $user->userID==$news->userID ? 'selected="selected"' : null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
+									<option value="<?php echo rm0lead($user->userID); ?>" <?php echo (isset($news) && $user->userID == $news->userID ? 'selected="selected"' : null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
 								<?php
 								}
 								?>
 							</select>
 						</td>
 						<td class="nowrap">
-							<input type="text" class="required text" name="newsModified" value="<?php echo (isset($news) ? date('Y-m-d G:i',strtotime($news->newsModified)) : date('Y-m-d G:i')); ?>" id="newsModified">
+							<input type="text" class="required text" name="newsModified" value="<?php echo (isset($news) ? date('Y-m-d G:i', strtotime($news->newsModified)) : date('Y-m-d G:i')); ?>" id="newsModified">
 						</td>
 						<td>
 							<input type="checkbox" name="newsPublished" <?php echo (isset($news) && $news->newsPublished ? 'checked="checked"' : null); ?>  value="1" id="newsPublished" />

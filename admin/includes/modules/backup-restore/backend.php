@@ -327,6 +327,7 @@ foreach($modules_in_use as $row)
 	default:
 		// when you use the lightbox or some plugin we don't know all about, the backup will be incomplete.
 		$show_warn_about_partial_backup = true;
+		break;
 	}
 }
 
@@ -337,9 +338,9 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 ?>
 		<div class="span-8 colborder">
 			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
-			<p><?php echo $ccms['lang']['backup']['explain'];?></p>
-			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8" class="clearfix" >
-				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton'];?></button>
+			<p><?php echo $ccms['lang']['backup']['explain']; ?></p>
+			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF']; ?>?do=backup" method="post" accept-charset="utf-8" class="clearfix" >
+				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 			</form>
 			<?php
 			if ($show_warn_about_partial_backup)

@@ -172,24 +172,24 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 				<form action="../../process.inc.php?action=edit-user-level" id="userLevelForm" method="post" accept-charset="utf-8">
 					<label for="userLevel"><?php echo $ccms['lang']['users']['userlevel']; ?></label>
 					<select name="userLevel" class="required" id="userLevel" size="1">
-						<option value="1" <?php echo ($row->userLevel==1?"selected='SELECTED'":null); ?>><?php echo $ccms['lang']['permission']['level1']; ?></option>
+						<option value="1" <?php echo ($row->userLevel==1 ? "selected='selected'" : null); ?>><?php echo $ccms['lang']['permission']['level1']; ?></option>
 						<?php 
 						if($_SESSION['ccms_userLevel'] > 1) 
 						{ 
 						?>
-							<option value="2" <?php echo ($row->userLevel==2?"selected='SELECTED'":null); ?>><?php echo $ccms['lang']['permission']['level2']; ?></option>
+							<option value="2" <?php echo ($row->userLevel==2 ? "selected='selected'" : null); ?>><?php echo $ccms['lang']['permission']['level2']; ?></option>
 						<?php 
 						} 
 						if($_SESSION['ccms_userLevel'] > 2) 
 						{ 
 						?>
-							<option value="3" <?php echo ($row->userLevel==3?"selected='SELECTED'":null); ?>><?php echo $ccms['lang']['permission']['level3']; ?></option>
+							<option value="3" <?php echo ($row->userLevel==3 ? "selected='selected'" : null); ?>><?php echo $ccms['lang']['permission']['level3']; ?></option>
 						<?php 
 						} 
 						if($_SESSION['ccms_userLevel'] > 3) 
 						{ 
 						?>
-							<option value="4" <?php echo ($row->userLevel==4?"selected='SELECTED'":null); ?>><?php echo $ccms['lang']['permission']['level4']; ?></option>
+							<option value="4" <?php echo ($row->userLevel==4 ? "selected='selected'" : null); ?>><?php echo $ccms['lang']['permission']['level4']; ?></option>
 						<?php 
 						} 
 						?>
