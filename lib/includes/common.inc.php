@@ -156,8 +156,8 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	// leading underscore should be okay. And so would a trailing underscore...
 	//$dst = trim($dst, '_');
 
-	// We NEVER tolerate a leading dot:
-	$dst = preg_replace('/^\.+/', '', $dst);
+	// We NEVER tolerate a leading dot or a leading ~:
+	$dst = preg_replace('/^[.~]+/', '', $dst);
 	if (!$accept_leading_minus)
 	{
 		$dst = preg_replace('/^-+/', '', $dst);
