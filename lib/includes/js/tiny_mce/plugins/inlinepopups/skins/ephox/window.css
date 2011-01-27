@@ -98,3 +98,13 @@
 .ephox .mceConfirm .mceOk {left:50%; top:auto; margin-left: -90px}
 .ephox .mceConfirm .mceCancel {left:50%; top:auto}
 .ephox .mceConfirm .mceIcon {background:url(img/confirm.gif)} 
+
+/* IE9 fixes */
+.ephox.ie9 .mceTop .mceCenter {clip:auto;}
+.ephox.ie9 .mceMiddle {clip:auto;}
+.ephox.ie9 .mceMiddle .mceLeft, .clearlooks2.ie9 .mceMiddle .mceRight {top: 23px;}
+.ephox.ie9 .mceAlert .mceMiddle span, .clearlooks2.ie9 .mceConfirm .mceMiddle span {top:13px;}
+.ephox.ie9 .mceModal .mceMiddle {top:23px}
+.ephox.ie9 .mceModal .mceMiddle .mceLeft, .clearlooks2.ie9 .mceModal .mceMiddle .mceRight {top: 0}
+.ephox.ie9 .mceMiddle .mceIcon {top:13px}
+.ephox.ie9 .mceTop .mceCenter {top:0; right:auto; left:6px; width:calc(100%-12px)}
