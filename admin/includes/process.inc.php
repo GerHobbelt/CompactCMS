@@ -1468,124 +1468,52 @@ function confirmation()
 
 
 
-	
-var jsLogEl = document.getElementById('jslog');
 
-
-	<?php 
-	if($cfg['wysiwyg'] && $iscoding != 'Y')
-	{
+<?php
+$js_files = array();
+$js_files[] = '../../lib/includes/js/the_goto_guy.js';
+$js_files[] = '../../lib/includes/js/mootools-core.js,mootools-more.js';
+if($cfg['wysiwyg'] && $iscoding != 'Y')
+{
 	// -------------------------------------------------
 	// Load TinyMCE (compressed for faster loading) 
-	?>
-	
-var js = [
-	'../../lib/includes/js/the_goto_guy.js',
-	'../../lib/includes/js/mootools-core.js,mootools-more.js',
-	<?php echo generateJS4TinyMCEinit(0, 'content'); ?>
-	];
-		
-function jsCompleteDone(user_obj)
-{
-	// window.addEvent('domready',function()
-	//{
-		<?php echo generateJS4TinyMCEinit(2, 'content'); ?>
-	//});
-}
-		
+	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
 
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
+	$driver_code = generateJS4TinyMCEinit(2, 'content');
 
-	<?php echo generateJS4TinyMCEinit(1, 'content'); ?>
-
-	LazyLoad.js(js, jsComplete);
-}
-	<?php 
-	// -------------------------------------------------
-	} 
-	else 
-	{ 
+	$starter_code = generateJS4TinyMCEinit(1, 'content');
+} 
+else 
+{ 
 	// -------------------------------------------------
 	// Alternative to tinyMCE: load Editarea for code editing
-	?>
-	
-var js = [
-	'../../lib/includes/js/the_goto_guy.js',
-<?php
 	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 	{
-		echo "	'../../lib/includes/js/edit_area/edit_area_full.js'\n";
+		$js_files[] = '../../lib/includes/js/edit_area/edit_area_full.js';
 	}
 	else
 	{
-		echo "	'../../lib/includes/js/edit_area/edit_area_full.js'\n";
+		$js_files[] = '../../lib/includes/js/edit_area/edit_area_full.js';
 	}
+	
+	$eaLanguage = $cfg['editarea_language'];
+	$driver_code = <<<EOT
+		editAreaLoader.init(
+			{
+				id: "content",
+				is_multi_files: false,
+				allow_toggle: false,
+				word_wrap: true,
+				start_highlight: true,
+				language: "$eaLanguage",
+				syntax: "html"
+			});
+EOT;
+	$starter_code = null;
+}
+
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 ?>
-	];
-		
-function jsCompleteDone(user_obj)
-{
-	// window.addEvent('domready',function()
-	//{
-	editAreaLoader.init(
-		{
-			id:"content",
-			is_multi_files:false,
-			allow_toggle:false,
-			word_wrap:true,
-			start_highlight:true,
-			<?php echo 'language:"'.$cfg['editarea_language'].'",'; ?>
-			syntax:"html"
-		});
-	//});
-}
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
-	<?php 
-	// -------------------------------------------------
-	} 
-	?>
-	
-	
-	
-	
-	
-	
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	jsCompleteDone(user_obj);
-}
-
 	</script>
 	<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 	</body>

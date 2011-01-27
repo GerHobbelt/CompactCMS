@@ -526,43 +526,18 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 <p class="quiet small clear" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
 
 <script type="text/javascript" charset="utf-8">
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../lib/includes/js/mootools-core.js',
-	'../lib/includes/js/mootools-more.js',
-	'../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running',
-	'install.js'
-	];
+<?php
+$js_files = array();
+$js_files[] = '../lib/includes/js/mootools-core.js';
+$js_files[] = '../lib/includes/js/mootools-more.js';
+$js_files[] = '../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running';
+$js_files[] = 'install.js';
 
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-}
+$driver_code = <<<EOT
+EOT;
 
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 
 function ccms_combiner_running()
 {

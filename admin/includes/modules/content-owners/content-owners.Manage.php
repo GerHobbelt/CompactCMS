@@ -221,90 +221,46 @@ function confirmation()
 }
 
 
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../../../lib/includes/js/the_goto_guy.js'
 <?php
+$js_files = array();
+$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	echo ",\n";
 	$with_fancyuploader = false;
-	if ($with_fancyuploader)
-	{
-		// if you want to test with the fancy-uploader, you'll need mootools in here as well.
-		echo "'../../../../lib/includes/js/mootools-core.js,mootools-more.js',\n"; 
-	}
-	echo generateJS4TinyMCEinit(0, "elm1", $with_fancyuploader);
+	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, "elm1", $with_fancyuploader));
 }
-?>
-	];
+$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
 
-
-function jsComplete(user_obj, lazy_obj) 
-{
-    if (lazy_obj.todo_count) 
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-	
-<?php
+$driver_code = null;
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-?>
-	// window.addEvent('domready',function()
-	//{
-	tinyMCE.init({
-		mode : "exact",
-		elements : "elm1",
-		//theme : "advanced",
-		theme : "simple",
-		skin: 'o2k7',
-		skin_variant: 'silver',
-		//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
-		//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
-		//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
-		//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
-		//theme_advanced_toolbar_location: 'top'
-		theme_simple_toolbar_location: 'top'
-	});
-	//});
-<?php
-}
-?>
+	$driver_code = <<<EOT
+		tinyMCE.init({
+			mode : "exact",
+			elements : "elm1",
+			//theme : "advanced",
+			theme : "simple",
+			skin: 'o2k7',
+			skin_variant: 'silver',
+			//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
+			//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
+			//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
+			//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
+			//theme_advanced_toolbar_location: 'top'
+			theme_simple_toolbar_location: 'top'
+		});
+EOT;
 }
 
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-
-<?php
+$starter_code = null;
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	echo generateJS4TinyMCEinit(1, "elm1", false); 
+	$starter_code = generateJS4TinyMCEinit(1, "elm1", false);
 }
+
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 ?>
-		
-	LazyLoad.js(js, jsComplete);
-}
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

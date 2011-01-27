@@ -516,72 +516,26 @@ function get_total_page_count()
 }
 
 
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../lib/includes/js/excanvas.js?only-when=%3d%3d+IE',
-	'../lib/includes/js/mootools-core.js,mootools-more.js',
-	/*--MOCHAUI--*/
 <?php
+$js_files = array();
+$js_files[] = '../lib/includes/js/excanvas.js?only-when=%3d%3d+IE';
+$js_files[] = '../lib/includes/js/mootools-core.js,mootools-more.js';
+/*--MOCHAUI--*/
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-?>
-	'../lib/includes/js/mochaui/Source/dummy.js,Core/Core.js,Core/Canvas.js,Core/Content.js,Core/Desktop.js,Controls/column/Column.js,Controls/panel/Panel.js,Controls/taskbar/Taskbar.js,Controls/window/Window.js,Controls/window/Modal.js,Core/Themes.js',
-<?php
+	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,Core/Core.js,Core/Canvas.js,Core/Content.js,Core/Desktop.js,Controls/column/Column.js,Controls/panel/Panel.js,Controls/taskbar/Taskbar.js,Controls/window/Window.js,Controls/window/Modal.js,Core/Themes.js';
 }
 else
 {
+	$js_files[] = '../lib/includes/js/mochaUI.js';
+}
+/* $js_files[] = '../lib/includes/js/mochaui/Source/Utility/window-from-html.js'; */
+$js_files[] = '../lib/includes/js/common.js';
+
+$driver_code = 'lazyloading_commonJS_done("' . $cfg['rootdir'] . '");';
+
+echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>
-	'../lib/includes/js/mochaUI.js',
-<?php
-}
-?>
-	/* '../lib/includes/js/mochaui/Source/Utility/window-from-html.js', */
-	'../lib/includes/js/common.js'
-	];
-
-function jsComplete(user_obj, lazy_obj)
-{
-	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');
-	
-	//alert('done count: ' + lazy_obj.done_count + ', todo count: ' + lazy_obj.todo_count);
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return false;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
-		lazyloading_commonJS_done("<?php echo $cfg['rootdir']; ?>");
-	//});
-	
-	return stop_loading;
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
-
-
 </script>
 <script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

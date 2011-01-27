@@ -89,46 +89,15 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 }
 ?>
 <script type="text/javascript">
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'{%rootdir%}lib/includes/js/mootools-core.js,mootools-more.js'
-	];
+<?php
+$js_files = array();
+$js_files[] = '{%rootdir%}lib/includes/js/mootools-core.js,mootools-more.js';
 
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
+$driver_code = <<<EOT
+EOT;
 
-	// window.addEvent('domready',function()
-	//{
-	//});
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 </script>
 <script type="text/javascript" src="{%rootdir%}lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

@@ -523,58 +523,19 @@ function googleTranslateElementInit()
 }
 
 
+<?php
+$js_files = array();
+$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = 'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+$js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
+$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
 
+$driver_code = generateJS4TinyMCEinit(2, 'content');
 
+$starter_code = generateJS4TinyMCEinit(1, 'content');
 
-
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../../../lib/includes/js/the_goto_guy.js',
-	'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
-	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
-	<?php echo generateJS4TinyMCEinit(0, 'content'); ?>
-	];
-
-	
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
-		<?php echo generateJS4TinyMCEinit(2, 'content'); ?>
-	//});
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	<?php echo generateJS4TinyMCEinit(1, 'content'); ?>
-	
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

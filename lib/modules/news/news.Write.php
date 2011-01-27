@@ -211,63 +211,30 @@ function confirmation()
 }
 
 
+<?php
+$js_files = array();
+$js_files[] = '../../includes/js/the_goto_guy.js';
+$js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
+$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent'));
 
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../includes/js/the_goto_guy.js',
-	'../../includes/js/mootools-core.js,mootools-more.js',
-	<?php echo generateJS4TinyMCEinit(0, "newsContent"); ?>
-	];
-
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
-		<?php echo generateJS4TinyMCEinit(2, 'newsContent'); ?>
+$driver_code = generateJS4TinyMCEinit(2, 'newsContent') . <<<EOT
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
 			{
-				onFormValidate:function(passed,form,event)
+				onFormValidate: function(passed, form, event)
 				{
 					event.stop();
 					if(passed)
 						form.submit();
 				}
 			});
-	//});
-}
+EOT;
 
+$starter_code = generateJS4TinyMCEinit(1, 'newsContent');
 
-function jslog(message)
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	<?php echo generateJS4TinyMCEinit(1, "newsContent"); ?>
-	
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+?>
 </script>
 <script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

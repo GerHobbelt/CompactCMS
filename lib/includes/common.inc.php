@@ -2709,25 +2709,28 @@ function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true,
 		return false;
 		
 	case 0:
+		$rv = array();
+		
 		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
 		if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 		{
-			$rv = "'" . $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js'";
+			$rv[] = $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js";
 		}
 		else
 		{
-			$rv = "'" . $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js'";
+			$rv[] = $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js";
 		}
 		if ($with_fancyupload)
 		{
 			/* File uploader JS */
-			$rv .= ",\n";
-			$rv .= "'" . $cfg['rootdir'] . "lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,";
+			$ls = $cfg['rootdir'] . "lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,";
 			if ($cfg['fancyupload_language'] != 'en')
 			{
-				$rv .= "Language/Language.en.js,";
+				$ls .= "Language/Language.en.js,";
 			}
-			$rv .= "Language/Language." . $cfg['fancyupload_language'] . ".js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'";
+			$ls .= "Language/Language." . $cfg['fancyupload_language'] . ".js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js";
+			
+			$rv[] = $ls;
 		}
 		return $rv;
 	
@@ -2889,6 +2892,69 @@ function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true,
 	}
 }
 
+
+
+
+
+/**
+Generate the common JS lazyload driver block which should be included in each HTML output where
+multiple JS files need to be loaded.
+*/
+function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code = null)
+{
+	global $cfg;
+
+	$rv = "var jsLogEl = document.getElementById('jslog');\n";
+	$rv .= "var js = [\n";
+	$rv .= "	'" . implode("',\n        '", $js_files) . "'\n";
+	$rv .= "	];\n";
+	$rv .= "\n";
+	$rv .= "function jsComplete(user_obj, lazy_obj)\n";
+	$rv .= "{\n";
+	$rv .= "	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
+	$rv .= "	\n";
+	$rv .= "    if (lazy_obj.todo_count)\n";
+	$rv .= "	{\n";
+	$rv .= "		/* nested invocation of LazyLoad added one or more sets to the load queue */\n";
+	$rv .= "		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
+	$rv .= "		return false;\n";
+	$rv .= "	}\n";
+	$rv .= "	else\n";
+	$rv .= "	{\n";
+	$rv .= "		jslog('All JS has been loaded!');\n";
+	$rv .= "	}\n";
+	$rv .= "\n";
+	$rv .= "	// window.addEvent('domready',function()\n";
+	$rv .= "	//{\n";
+	$rv .= $driver_code . "\n";
+	$rv .= "	//});\n";
+	$rv .= "\n";
+	$rv .= "	//alert('stop_loading = ' + (1 * stop_loading));\n";
+	$rv .= "	return stop_loading;\n";
+	$rv .= "}\n";
+	$rv .= "\n";
+	$rv .= "\n";
+	$rv .= "function jslog(message) \n";
+	$rv .= "{\n";
+	$rv .= "	if (jsLogEl)\n";
+	$rv .= "	{\n";
+	$rv .= "		jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
+	$rv .= "	}\n";
+	$rv .= "}\n";
+	$rv .= "\n";
+	$rv .= "\n";
+	$rv .= "/* the magic function which will start it all, thanks to the augmented lazyload.js: */\n";
+	$rv .= "function ccms_lazyload_setup_GHO()\n";
+	$rv .= "{\n";
+	$rv .= "	jslog('loading JS (sequential calls)');\n";
+	$rv .= "\n";
+	$rv .= $starter_code . "\n";
+	$rv .= "\n";
+	$rv .= "	LazyLoad.js(js, jsComplete);\n";
+	$rv .= "}\n";
+	
+	return $rv;
+}
 
 
 ?>

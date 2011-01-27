@@ -201,50 +201,7 @@ function confirmation()
 	}
 	return false;
 }
-
-
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../../../lib/includes/js/the_goto_guy.js'
-	];
-
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
-	//});
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
 </script>
-<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
+<script type="text/javascript" src="../../../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
 </body>
 </html>

@@ -536,12 +536,7 @@ if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageMod
 {
 ?>
 	<script type="text/javascript" charset="utf-8">
-var js = [
-	'../../includes/js/mootools-core.js,mootools-more.js',
-	'../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js',
-	'../../../lib/includes/js/the_goto_guy.js'
-	];
-	
+
 function confirmation_delete()
 {
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
@@ -583,47 +578,17 @@ function delete_these_files()
 }
 
 
+<?php
+$js_files = array();
+var js = [
+$js_files[] = '../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
+$js_files[] = '../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js';
 
+$driver_code = "lazyload_done_now_init('" . $cfg['rootdir'] . "');   // defined in modLightbox.js\n";
 
-
-var jsLogEl = document.getElementById('jslog');
-
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
-	lazyload_done_now_init('<?php echo $cfg['rootdir']; ?>');   // defined in modLightbox.js
-	//});
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 </script>
 <script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 <?php

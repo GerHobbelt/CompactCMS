@@ -248,54 +248,35 @@ function confirmation()
 }
 
 
-
-
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../../../lib/includes/js/the_goto_guy.js',
 <?php
-	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
-	{
-		echo "	'../../../../lib/includes/js/edit_area/edit_area_full.js'\n";
-	}
-	else
-	{
-		echo "	'../../../../lib/includes/js/edit_area/edit_area_full.js'\n";
-	}
-?>
-	];
-
-function jsComplete(user_obj, lazy_obj)
+$js_files = array();
+$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 {
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
+	$js_files[] = '../../../../lib/includes/js/edit_area/edit_area_full.js';
+}
+else
+{
+	$js_files[] = '../../../../lib/includes/js/edit_area/edit_area_full.js';
+}
 
-	// window.addEvent('domready',function()
-	//{
+$eaLanguage = $cfg['editarea_language'];
+$driver_code = <<<EOT
 		// initialisation
 				
 		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!		
-		var supported_syntaxes = ','+editAreaLoader.default_settings.syntax_selection_allow+',';
-		var desired_syntax = '<?php echo $temp_extension; ?>';
-		desired_syntax = (supported_syntaxes.indexOf(','+desired_syntax+',') >= 0 ? desired_syntax : "");
+		var supported_syntaxes = ',' + editAreaLoader.default_settings.syntax_selection_allow + ',';
+		var desired_syntax = '$temp_extension';
+		desired_syntax = (supported_syntaxes.indexOf(',' + desired_syntax + ',') >= 0 ? desired_syntax : "");
 
 		editAreaLoader.init(
 			{
-				id:"content",
-				start_highlight:true,
-				allow_resize:'both',
-				allow_toggle:true,
-				word_wrap:true,
-				<?php echo 'language: "'.$cfg['editarea_language'].'",'; ?>
+				id: "content",
+				start_highlight: true,
+				allow_resize: 'both',
+				allow_toggle: true,
+				word_wrap: true,
+				language: "$eaLanguage",
 				syntax: desired_syntax
 			});
 		/*
@@ -304,27 +285,10 @@ function jsComplete(user_obj, lazy_obj)
 			alert("syntax: " + syn);
 		}
 		*/
+EOT;
 
-	//});
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

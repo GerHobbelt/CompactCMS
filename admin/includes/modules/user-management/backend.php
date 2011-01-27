@@ -275,35 +275,13 @@ function confirmation()
 }
 
 
+<?php
+$js_files = array();
+$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
+$js_files[] = 'passwordcheck.js';
 
-
-	
-	
-	
-
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
-	'passwordcheck.js',
-	'../../../../lib/includes/js/the_goto_guy.js'
-	];
-
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-
-	// window.addEvent('domready',function()
-	//{
+$driver_code = <<<EOT
 		new FormValidator($('addUser'),
 		{
 			onFormValidate: function(passed, form, event)
@@ -313,26 +291,10 @@ function jsComplete(user_obj, lazy_obj)
 					form.submit();
 			}
 		});
-	//});
-}
+EOT;
 
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
