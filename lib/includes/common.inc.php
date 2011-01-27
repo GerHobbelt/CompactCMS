@@ -29,6 +29,8 @@ if (!defined('BASE_PATH'))
 
 /*MARKER*/require_once(BASE_PATH . '/lib/class/exception_ajax.php');
 
+/*MARKER*/require_once(BASE_PATH . '/lib/class/global_permissions.php');
+
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/email-validator/EmailAddressValidator.php');
 
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/htmLawed/htmLawed.php');

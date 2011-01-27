@@ -90,11 +90,8 @@ if(!empty($get_temp))
 	} 
 } 
 
-// Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
-if($_SESSION['ccms_userLevel']<$perm['manageTemplate']) 
+if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel'])) 
 {
 	$chstatus = false; // templates are viewable but NOT WRITABLE when user doesn't have permission to manage these.
 }
@@ -115,7 +112,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 <body>
 	<div class="module" id="template-editor">
 		<?php 
-		if($chstatus==false) 
+		if(!$chstatus) 
 		{ 
 		?>
 		<div class="span-25 last center-text error">
@@ -207,7 +204,7 @@ if($_SESSION['ccms_userLevel']<$perm['manageTemplate'])
 			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
 			<div class="right">
 				<?php 
-				if($chstatus > 0) 
+				if($chstatus) 
 				{ 
 				?>
 					<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>

@@ -71,14 +71,11 @@ if (!checkAuth())
 // set jpeg quality for the thumbnails; turns out they are quite reasonable @ 70% quality (and still way smaller than @ 100%)
 define('THUMBNAIL_JPEG_QUALITY', 70);
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 // Set default variables
-$album_name	= getPOSTparam4Filename('album');
-$do_action	= getGETparam4IdOrNumber('action');
+$album_name = getPOSTparam4Filename('album');
+$do_action  = getGETparam4IdOrNumber('action');
 
 
 
@@ -97,7 +94,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
 					
 			// Only if current user has the rights
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 				if($album_name!=null) 
 				{
@@ -153,7 +150,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
 	try
 	{
 		// Only if current user has the rights
-		if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+		if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 		{
 			if(empty($_POST['albumID'])) 
 			{
@@ -221,7 +218,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album);
 			
 			// Only if current user has the rights
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 				// Number of selected items
 				$total = (!empty($_POST['imageName']) && is_array($_POST['imageName']) ? count($_POST['imageName']) : 0);
@@ -302,7 +299,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
 			
 			// Only if current user has the rights
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 				// Posted variables
 				$topage = getPOSTparam4Filename('albumtopage');
@@ -617,7 +614,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album);
 			
 			// Only if current user has the rights
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 				$dest = BASE_PATH.'/media/albums/'.$album;
 				if(!is_dir($dest) && is_writable_ex($dest)) 

@@ -62,9 +62,6 @@ $do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Get all pages
 $pages = $db->SelectArray($cfg['db_prefix'].'pages', null, array('page_id', 'urlpage', 'user_ids'));
@@ -102,7 +99,7 @@ if (!is_array($users)) $db->Kill();
 
 	<h2><span class="ss_sprite_16 ss_group_gear">&#160;</span><?php echo $ccms['lang']['owners']['header']; ?></h2>
 	<?php
-	if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
+	if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
 	{ 
 	?>
 	<p class="left-text"><?php echo $ccms['lang']['owners']['explain']; ?></p>

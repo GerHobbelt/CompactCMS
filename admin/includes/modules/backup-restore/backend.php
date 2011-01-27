@@ -53,11 +53,10 @@ if (!defined('BASE_PATH'))
 
 $do = getGETparam4IdOrNumber('do');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
-if ($perm['manageModBackup'] <= 0 || !checkAuth()) 
+
+
+if ($perm->get('manageModBackup') <= 0 || !checkAuth()) 
 {
 	die("No external access to file");
 }
@@ -275,7 +274,7 @@ if($do=="delete" && !empty($btn_delete))
 	if (!empty($_POST['file']))
 	{
 		// Only if current user has the rights
-		if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+		if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel'])) 
 		{
 			echo '<div class="notice center-text">';
 			foreach ($_POST['file'] as $value) 
@@ -367,7 +366,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 				<table cellspacing="0" cellpadding="0">
 					<tr>
 						<?php 
-						if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+						if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel'])) 
 						{ 
 						?>
 							<th class="span-1">&#160;</th>
@@ -395,7 +394,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 									echo '<tr>';
 								} 
 								echo "\n";
-								if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+								if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel'])) 
 								{
 									echo '<td><input type="checkbox" name="file[]" value="'.$file.'" id="'.$i.'"></td>';
 								}
@@ -413,7 +412,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 				</table>
 				</div>
 			<?php 
-			if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) 
+			if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel'])) 
 			{
 				if($i>0) 
 				{ 

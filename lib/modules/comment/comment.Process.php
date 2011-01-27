@@ -63,9 +63,6 @@ class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -
 // Security functions
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 // Set default variables
@@ -213,7 +210,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && check
 			FbX::SetFeedbackLocation('comment.Manage.php', 'file=' . $pageID);
 			
 			// Only if current user has the rights
-			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
 			{
 				// Number of selected items
 				$total = (!empty($_POST['commentID']) && is_array($_POST['commentID']) ? count($_POST['commentID']) : 0);
@@ -337,7 +334,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-cfg' && checkAuth
 			FbX::SetFeedbackLocation('comment.Manage.php', 'file=' . $pageID);
 			
 			// Only if current user has the rights
-			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
 			{
 				$showMessage = getPOSTparam4Number('messages');
 				$showLocale = getPOSTparam4IdOrNumber('locale');

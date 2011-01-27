@@ -59,19 +59,15 @@ if (!defined('BASE_PATH'))
 
 class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
 
-// Security functions
 
-
-
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Set default variables
 $newsID 	= getPOSTparam4Number('newsID');
 $pageID		= getPOSTparam4IdOrNumber('pageID');
 $cfgID		= getPOSTparam4Number('cfgID');
 $do_action 	= getGETparam4IdOrNumber('action');
+
+
 
 /**
  *
@@ -88,7 +84,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-edit-news' && chec
 			FbX::SetFeedbackLocation('news.Manage.php', 'file=' . $pageID);
 		
 			// Only if current user has the rights
-			if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 			{
 				// Published
 				$newsAuthor = getPOSTparam4Number('newsAuthor');
@@ -160,7 +156,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-news' && checkAuth
 			FbX::SetFeedbackLocation('news.Manage.php', 'file=' . $pageID);
 		
 			// Only if current user has the rights
-			if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 			{
 				// Number of selected items
 				$total = (!empty($_POST['newsID']) && is_array($_POST['newsID']) ? count($_POST['newsID']) : 0);
@@ -226,7 +222,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 			FbX::SetFeedbackLocation('news.Manage.php', 'file=' . $pageID);
 		
 			// Only if current user has the rights
-			if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 			{
 				$showLocale = getPOSTparam4IdOrNumber('locale');
 				$showMessage = getPOSTparam4Number('messages');

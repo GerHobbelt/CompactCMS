@@ -62,9 +62,6 @@ $do	= getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 ?>
@@ -125,7 +122,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 						?>
 							<td>
 							<?php 
-							if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers'] && $_SESSION['ccms_userLevel']>=$row['userLevel'] && $_SESSION['ccms_userID']!=rm0lead($row['userID'])) 
+							if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel'] && $_SESSION['ccms_userID'] != rm0lead($row['userID'])) 
 							{ 
 							?>	
 								<input type="checkbox" name="userID[]" value="<?php echo rm0lead($row['userID']); ?>" id="userID" />
@@ -139,7 +136,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							</td>
 							<td>
 							<?php 
-							if($_SESSION['ccms_userID']==rm0lead($row['userID']) || ($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers'] && $_SESSION['ccms_userLevel']>=$row['userLevel'])) 
+							if($_SESSION['ccms_userID'] == rm0lead($row['userID']) || ($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel'])) 
 							{ 
 							?>
 								<a href="user.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><span class="ss_sprite_16 ss_user_edit">&#160;</span><?php echo $row['userName']; ?></a>
@@ -153,7 +150,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							</td>
 							<td><?php echo substr($row['userFirst'],0,1); ?>. <?php echo $row['userLast']; ?></td>
 							<td><a href="mailto:<?php echo $row['userEmail']; ?>"><span class="ss_sprite_16 ss_email">&#160;</span><?php echo $row['userEmail']; ?></a></td>
-							<td><?php echo ($row['userActive']==1 ? $ccms['lang']['backend']['yes'] : $ccms['lang']['backend']['no']); ?></td>
+							<td><?php echo ($row['userActive'] ? $ccms['lang']['backend']['yes'] : $ccms['lang']['backend']['no']); ?></td>
 							<td><?php echo $row['userLevel']; ?></td>
 							<td class="nowrap"><?php echo date('d-m-\'y',strtotime($row['userLastlog'])); ?></td>
 						</tr>
@@ -165,7 +162,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 				</div>
 				<hr class="space"/>
 				<?php 
-				if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+				if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
 				{ 
 				?>
 					<button type="submit" onclick="return confirmation_delete();" name="deleteUser"><span class="ss_sprite_16 ss_user_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
@@ -178,7 +175,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 		<div class="span-6 last" id="create-user">
 			<h2><?php echo $ccms['lang']['users']['createuser']; ?></h2>
 			<?php 
-			if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+			if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
 			{ 
 			?>
 				<form action="../../process.inc.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">

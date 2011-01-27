@@ -72,9 +72,6 @@ if (empty($to_lang)) $to_lang = 'xx';
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 

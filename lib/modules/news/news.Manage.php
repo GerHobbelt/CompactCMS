@@ -67,9 +67,6 @@ if (empty($pageID))
 }
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
@@ -136,7 +133,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 								echo '<tr><td>';
 							} 
 					
-								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+								if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 								{ 
 								?>
 									<label>
@@ -160,7 +157,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 								</td>
 								<td>
 								<?php 
-								if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+								if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 								{ 
 								?>
 									<a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><span class="ss_sprite_16 ss_pencil">&#160;</span><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20 ? '...' : null); ?></a>
@@ -184,7 +181,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 					</table>
 				</div>
 					<?php 
-					if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+					if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
@@ -206,7 +203,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 		<div class="span-6 last">
 			<h2><?php echo $ccms['lang']['news']['addnews']; ?></h2>
 			<?php 
-			if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 			{ 
 			?>
 				<p class="ss_has_sprite"><a href="news.Write.php?pageID=<?php echo $pageID; ?>"><span class="ss_sprite_16 ss_newspaper_add">&#160;</span><?php echo $ccms['lang']['news']['addnewslink']; ?></a></p>

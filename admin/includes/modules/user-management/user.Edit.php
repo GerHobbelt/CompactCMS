@@ -68,9 +68,6 @@ else
 	die($ccms['lang']['system']['error_general']);
 }
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
@@ -92,9 +89,9 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 
 		<?php 
 		// Check authority 
-		if($perm['manageUsers']==0 || $_SESSION['ccms_userLevel']<$perm['manageUsers'] || $row->userLevel>$_SESSION['ccms_userLevel']) 
+		if(!$perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) || $row->userLevel > $_SESSION['ccms_userLevel']) 
 		{
-			if($_SESSION['ccms_userID']!=$userID) 
+			if($_SESSION['ccms_userID'] != $userID) 
 			{
 				die("[ERR802] ".$ccms['lang']['auth']['featnotallowed']);
 			}
@@ -138,7 +135,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		
 		<div class="span-9 last">
 			<?php 
-			if($_SESSION['ccms_userID']==$row->userID||($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']&&$_SESSION['ccms_userLevel']>=$row->userLevel)) 
+			if($_SESSION['ccms_userID'] == $row->userID || ($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row->userLevel)) 
 			{ 
 			?>
 			<h2><?php echo $ccms['lang']['users']['editpassword']; ?></h2>
@@ -168,7 +165,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			<h2><?php echo $ccms['lang']['users']['accountcfg']; ?></h2>
 			<?php 
 			} 
-			if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']&&$_SESSION['ccms_userLevel']>=$row->userLevel) 
+			if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row->userLevel) 
 			{ 
 			?>
 			<div class="prepend-1">

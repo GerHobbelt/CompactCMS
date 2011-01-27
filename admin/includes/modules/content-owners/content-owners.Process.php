@@ -56,13 +56,9 @@ if (!defined('BASE_PATH'))
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
-// Security functions
 
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
  /**
  *
@@ -72,7 +68,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
 	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
+	if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
 	{
 		/*
 		 * Since the number of items to process is PAGES x USERS, this number can become rather large, even for moderately small sites.

@@ -63,12 +63,9 @@ $do	= getGETparam4IdOrNumber('do');
 $newsID = getGETparam4Number('newsID');
 $pageID = getGETparam4IdOrNumber('pageID');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
-if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModNews']))
+if (!(checkAuth() && $perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])))
 {
 	die("No external access to file");
 }

@@ -79,12 +79,12 @@ if(!isset($_SESSION['rc1']) || !isset($_SESSION['rc2']))
 $do_action = getGETparam4IdOrNumber('action');
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+// load the global permissions so we can ask what a given user may and may not do later on:
+$perm = new CcmsGlobalPermissions($db, $cfg['db_prefix']);
 
-// Fill active module array
-// $modules = $db->SelectArray($cfg['db_prefix'].'modules', array('modActive' => "'1'"));    // [i_a] already collected in sitemap.php 
+
+
+
 
 
 $do_update_or_livefilter = (($do_action == 'update' && $_SERVER['REQUEST_METHOD'] != 'POST') || ($do_action == 'livefilter' && $_SERVER['REQUEST_METHOD'] == 'POST'));
@@ -195,7 +195,7 @@ if ($do_update_or_livefilter && checkAuth())
 				<th class="span-2a nowrap center-text"><?php echo $ccms['lang']['forms']['printable']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
 				<th class="span-2a nowrap center-text">
 					<?php 
-					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
+					if($perm->is_level_okay('manageActivity', $_SESSION['ccms_userLevel'])) 
 					{ 
 						echo $ccms['lang']['forms']['published']; 
 						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
@@ -205,7 +205,7 @@ if ($do_update_or_livefilter && checkAuth())
 				</th>
 				<th class="span-2a nowrap center-text">
 					<?php
-					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
+					if($perm->is_level_okay('manageVarCoding', $_SESSION['ccms_userLevel'])) 
 					{ 
 						echo $ccms['lang']['forms']['iscoding']; 
 						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
@@ -224,8 +224,8 @@ if ($do_update_or_livefilter && checkAuth())
 		foreach($rows as $row)
 		{
 			// Check whether current user is owner, or no owners at all
-			$owner = @explode('||', $row->user_ids);
-			if(empty($row->user_ids) || $perm['manageOwners']==0 || $_SESSION['ccms_userLevel']>=4 || in_array($_SESSION['ccms_userID'], $owner)) 
+			$owner = explode('||', strval($row->user_ids));
+			if((empty($row->user_ids) && $perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) || in_array($_SESSION['ccms_userID'], $owner))
 			{
 				// Determine file specific variables
 				if($row->module == 'editor') 
@@ -263,7 +263,7 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				<td class="leftpad-2">
 				<?php 
-				if($_SESSION['ccms_userLevel']<$perm['managePages'] || $row->urlpage == 'home' || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner))) 
+				if($row->urlpage == 'home' || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])))
 				{ 
 				?>
 					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
@@ -300,7 +300,7 @@ if ($do_update_or_livefilter && checkAuth())
 				</td>
 				<td class="center-text">
 					<?php 
-					if($_SESSION['ccms_userLevel']>=$perm['manageActivity']) 
+					if($perm->is_level_okay('manageActivity', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 						<a id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
@@ -319,7 +319,7 @@ if ($do_update_or_livefilter && checkAuth())
 				</td>
 				<td class="center-text">
 					<?php 
-					if($_SESSION['ccms_userLevel']>=$perm['manageVarCoding']) 
+					if($perm->is_level_okay('manageVarCoding', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 						<?php 
@@ -481,7 +481,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 {
 	$menu_sortorder = getGETparam4IdOrNumber('m_order', 'I12LH0');
 	
-	if(isset($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $perm['manageMenu']) 
+	if(isset($_SESSION['ccms_userLevel']) && $perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
 	{
 		// Open recordset for sites' pages
 		$rows = $db->SelectObjects($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
@@ -1023,7 +1023,7 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
 	try
 	{
 		// Only if current user has the rights
-		if($_SESSION['ccms_userLevel']>=$perm['manageTemplate']) 
+		if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel'])) 
 		{
 			$filenoext	= getGETparam4FullFilePath('template');
 			$filename	= BASE_PATH . '/lib/templates/' . $filenoext;
@@ -1071,7 +1071,7 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	try
 	{
 		// Only if current user has the rights
-		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
 		{
 			//$i=count(array_filter($_POST));
 			//if($i <= 6) error
@@ -1146,7 +1146,7 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 		$userEmail = getPOSTparam4Email('email');
 		
 		// Only if current user has the rights
-		if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID'] == $userID) 
+		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) || $_SESSION['ccms_userID'] == $userID) 
 		{
 			// Check length of values
 			if(strlen($userFirst)>2&&strlen($userLast)>2&&strlen($userEmail)>6) 
@@ -1203,7 +1203,7 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
 	try
 	{
 		// Only if current user has the rights
-		if(($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) || $_SESSION['ccms_userID']==$userID) 
+		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) || $_SESSION['ccms_userID'] == $userID) 
 		{
 			if (empty($_POST['userPass']) || empty($_POST['cpass']))
 			{
@@ -1262,7 +1262,7 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
 	try
 	{
 		// Only if current user has the rights
-		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
 		{
 			$userID = getPOSTparam4Number('userID');
 			$userActive = getPOSTparam4boolean('userActive');
@@ -1316,7 +1316,7 @@ if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	try
 	{
 		// Only if current user has the rights
-		if($perm['manageUsers']>0 && $_SESSION['ccms_userLevel']>=$perm['manageUsers']) 
+		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
 		{
 			$total = (isset($_POST['userID']) ? count($_POST['userID']) : 0);
 			

@@ -128,7 +128,8 @@ $language = SetUpLanguageAndLocale($language);
 // SECURITY ==
 // Include security file only for administration directory
 $location = explode("/", $_SERVER['PHP_SELF']);
-if(in_array("admin",$location)) 
+$php_src_is_admin_code = in_array("admin", $location);
+if($php_src_is_admin_code) 
 {
 	/*MARKER*/require_once(BASE_PATH . '/admin/includes/security.inc.php');
 }
@@ -209,8 +210,27 @@ if (!$modules)
 	$db->Kill();
 
 
+	
+// load the global permissions so we can ask what a given user may and may not do later on:
+if ($php_src_is_admin_code || !empty($_SESSION['ccms_userID']))
+{
+	// only do this extra work when we can expect to actually /use/ it:
+	$perm = new CcmsGlobalPermissions($db, $cfg['db_prefix']);
+}
+else
+{
+	$perm = new CcmsGlobalPermissions(); // NIL permissions
+}
 
-// only execute the remainder of this file's code if we aren't running a 'minimal' run...
+
+
+	
+
+/*======================================================================================
+ *
+ * Only execute the remainder of this file's code if we aren't running a 'minimal' run...
+ *
+ *======================================================================================*/
 if (!defined('CCMS_PERFORM_MINIMAL_INIT'))
 {
 

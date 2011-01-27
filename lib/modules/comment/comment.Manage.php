@@ -68,9 +68,6 @@ if (empty($pageID))
 }
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
@@ -145,7 +142,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							echo '<tr class="row0"><td rowspan="2" class="rowspan2 hover">';
 						} 
 						
-							if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
+							if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 							{ 
 							?>
 								<label>
@@ -219,7 +216,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 				</table>
 			</div>
 			<?php 
-			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
 			{ 
 			?>
 				<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
@@ -242,7 +239,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 		<div class="span-6 last">
 			<h2><?php echo $ccms['lang']['guestbook']['configuration']; ?></h2>
 			<?php 
-			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
+			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
 			{ 
 				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
 				if ($db->ErrorNumber() != 0) $db->Kill();

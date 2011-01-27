@@ -170,37 +170,37 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			<div id="advanced_res">
 				<ul>
 					<?php 
-					if($_SESSION['ccms_userLevel']>=4) 
+					if($_SESSION['ccms_userLevel'] >= 4) 
 					{ 
 					?>
 						<li><a id="sys-perm" href="./includes/modules/permissions/permissions.Manage.php" rel="<?php echo $ccms['lang']['backend']['permissions']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['permissions']; ?></a></li>
 					<?php 
 					} 
-					if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
+					if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 						<li><a id="sys-pow" href="./includes/modules/content-owners/content-owners.Manage.php" rel="<?php echo $ccms['lang']['backend']['contentowners']; ?>" class="tabs"><span class="ss_sprite_16 ss_folder_user">&#160;</span><?php echo $ccms['lang']['backend']['contentowners']; ?></a></li>
 					<?php 
 					} 
-					if($perm['manageTemplate']>0 && $_SESSION['ccms_userLevel']>=$perm['manageTemplate'])  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
+					if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
 					{ 
 					?>
 						<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
 					<?php 
 					} 
-					// if($perm['manageUsers']>0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
+					// if($perm->get('manageUsers') > 0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
 					{ 
 					?>
 						<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
 					<?php 
 					} 
-					if($perm['manageModBackup']>0 /* && $_SESSION['ccms_userLevel']>=$perm['manageModBackup'] */ ) 
+					if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 						<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
 					<?php 
 					} 
-					if($_SESSION['ccms_userLevel']>=4 && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
+					if($perm->is_level_okay('manageModTranslate', $_SESSION['ccms_userLevel']) && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
 					{ 
 					?>
 						<li><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['translation']; ?></a></li>
@@ -231,7 +231,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	// Start main management section 
 	
 	// Create new page 
-	if($_SESSION['ccms_userLevel']>=$perm['managePages']) 
+	if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
 	{ 
 	?>
 	<fieldset>
@@ -331,7 +331,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 
 	// Manage menu depths & languages 
 	
-	if($_SESSION['ccms_userLevel']>=$perm['manageMenu']) 
+	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
 	{ 
 	?>
 	<fieldset>
@@ -388,7 +388,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		<table width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<?php 
-				if($_SESSION['ccms_userLevel']>=$perm['managePages']) 
+				if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
 				{ 
 				?>
 					<th class="span-17 text-left">

@@ -58,13 +58,10 @@ if (!defined('BASE_PATH'))
 
 class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
 
-// Security functions
 
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+
 
 /**
  *
@@ -77,7 +74,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 	try
 	{
 		// (!) Only administrators can change these values
-		if($_SESSION['ccms_userLevel']>=4) 
+		if($_SESSION['ccms_userLevel'] >= 4) 
 		{
 			// Execute UPDATE
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
@@ -87,9 +84,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 				$setting = filterParam4Number($value);
 				if (empty($key) || (empty($setting) && $value !== "0"))
 					throw new FbX($ccms['lang']['system']['error_forged']); 
-				$values[$key] = MySQL::SQLValue($setting, MySQL::SQLVALUE_NUMBER);
+				$perm->set($key, $value);
 			}
-			if($db->UpdateRows($cfg['db_prefix'].'cfgpermissions', $values)) 
+			if($perm->SavePermissions($db, $cfg['db_prefix'], false)) 
 			{
 				header('Location: ' . makeAbsoluteURI('permissions.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();

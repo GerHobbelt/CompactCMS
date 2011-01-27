@@ -82,11 +82,7 @@ if(!empty($get_temp))
 	} 
 } 
 
-// Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
-
-if($_SESSION['ccms_userLevel']<$perm['manageTemplate']) 
+if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel'])) 
 {
 	$chstatus = false; // templates are viewable but NOT WRITABLE when user doesn't have permission to manage these.
 }

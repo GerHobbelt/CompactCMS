@@ -59,9 +59,6 @@ $do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
@@ -226,7 +223,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 					?>
 					<tr>
 						<?php 
-						if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+						if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 						{ 
 						?>
 							<th class="span-1">&#160;</th>
@@ -250,7 +247,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 								echo '<tr>';
 							} 
 							
-							if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+							if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 							{ 
 							?>
 								<td><input type="checkbox" name="albumID[<?php echo $key+1; ?>]" value="<?php echo $value; ?>" id="newsID"></td>
@@ -273,7 +270,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			</div>
 			<hr />
 			<?php 
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']&&count($albums)>0) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']) && count($albums) > 0) 
 			{ 
 			?>
 				<button type="submit" onclick="return confirmation_delete();" name="deleteAlbum"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
@@ -304,7 +301,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			<form action="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=del-images" accept-charset="utf-8" method="post" id="album-pics">
 			<div class="right">
 				<?php
-				if (count($images) > 0 && $perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModLightbox']) 
+				if (count($images) > 0 && $perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 				{
 				?>
 					<a class="button" onclick="delete_these_files(); return false;">
@@ -326,7 +323,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			{ 
 				echo '<label class="thumbimgwdel"><span style="background-image: url(' . path2urlencode($imagethumbs[$key]) . ');" class="thumbview" title="Thumbnail of ' . $value . '" ' . /* $imginfo[$key]['style'] . */ ' >&#160;</span>';
 
-				if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+				if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 				{
 					echo '<input type="checkbox" name="imageName['. ($key+1) .']" value="' . $value . '">';
 				} 
@@ -348,7 +345,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 		?>
 			<h2><?php echo $ccms['lang']['album']['newalbum']; ?></h2>
 			<?php 
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 			?>
 				<form action="lightbox.Process.php?action=create-album" method="post" accept-charset="utf-8">
@@ -372,7 +369,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			?>
 			<h2><?php echo $ccms['lang']['album']['settings']; ?></h2>
 			<?php 
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 			?>
 				<form action="lightbox.Process.php?action=apply-album" method="post" accept-charset="utf-8">
@@ -421,7 +418,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 		?>
 			<h2><?php echo $ccms['lang']['album']['uploadcontent']; ?></h2>
 			<?php 
-			if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 			{
 			?>
 			<form action="./lightbox.Process.php?<?php 
@@ -532,7 +529,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</div>
 <?php 
 // prevent JS errors when permissions don't allow uploading (and all the rest)
-if($perm['manageModLightbox']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) 
+if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel'])) 
 {
 ?>
 	<script type="text/javascript" charset="utf-8">
