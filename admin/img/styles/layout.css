@@ -396,17 +396,34 @@ IE6 fix:
 	font-variant: normal;
 	text-align: left;
 	/* border-bottom: 0; */
+	margin: .1em 0 .1em 20px;
 }
+
+/* override the basic 'p + p' CSS rule: */
+#notify_res p + p {
+    margin-top: .1em;
+    text-indent: 0;
+}
+
 #notify_res p.versionstatus
 {
 	font-weight: bold;
 	text-align: center;
 	padding: 20px 0 0 0;
 }
+#notify_res ul
+{
+	margin: 0 0 0 20px;
+}
+#notify_res ul p
+{
+	margin: .1em 0 .1em 0;
+}
+
 #advanced ul
 {
 	margin: 5px;
-	list-style-type:none;
+	list-style-type: none;
 }
 #advanced li
 {
@@ -423,6 +440,7 @@ IE6 fix:
 	border: 0;
 	text-align: left;
 	font-weight: bold;
+	margin-left: 0;
 }
 
 /* === 1. CORE === */
