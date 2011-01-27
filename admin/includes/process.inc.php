@@ -966,20 +966,7 @@ if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == "GET" && checkAu
 	exit();
 }
 
-/**
- *
- * Check latest version
- *
- */
-$version_recent = @file_get_contents('http://www.compactcms.nl/version/'.$v.'.txt');
-if(version_compare($version_recent, $v) != '1') 
-{ 
-	$version = $ccms['lang']['backend']['uptodate']; 
-} 
-else 
-{
-	$version = $ccms['lang']['backend']['outofdate']." <a href=\"http://www.compactcms.nl/changes.html\" class=\"external\" rel=\"external\">".$ccms['lang']['backend']['considerupdate']."</a>.";
-}
+
 
 /**
  *

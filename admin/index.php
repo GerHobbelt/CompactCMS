@@ -151,6 +151,19 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			<div id="notify_icon">&#160;</div>
 			<div id="notify_res">
 				<?php 
+				/*
+				 * Check latest version
+				 */
+				$version_recent = @file_get_contents('http://www.compactcms.nl/version/'.$v.'.txt');
+				if(version_compare($version_recent, $v) != 1) 
+				{ 
+					$version = $ccms['lang']['backend']['uptodate']; 
+				} 
+				else 
+				{
+					$version = $ccms['lang']['backend']['outofdate']." <a href=\"http://www.compactcms.nl/changes.html\" class=\"external\" rel=\"external\">".$ccms['lang']['backend']['considerupdate']."</a>.";
+				}
+
 				if(!empty($version_recent) && !empty($v) && $cfg['version']) 
 				{ 
 				?>
@@ -159,7 +172,9 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				<?php 
 				} 
 				else 
+				{
 					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>'; 
+				}
 				?>
 			</div>
 		</div>
