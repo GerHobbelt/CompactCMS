@@ -116,42 +116,31 @@ $status_message = getGETparam4DisplayHTML('msg');
 					<th class="span-4 center-text"><?php echo $ccms['lang']['permission']['level4']; ?></th>
 				</tr>
 				<?php
-				$i = 0;
-				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgpermissions');
-				if (!$rsCfg) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+				$rsCfg = $db->SelectArray($cfg['db_prefix'].'cfgpermissions', null, null, array('name'));
+				if (empty($rsCfg)) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
-				// Get column names and their comments from database
-				$columns = $db->GetColumnComments($cfg['db_prefix'].'cfgpermissions');
-				foreach ($columns as $columnName => $comments) 
+				$i = 0;
+				foreach ($rsCfg as $rec) 
 				{
+					$columnName = $rec['name'];
+					$comments = (array_key_exists($rec['name'], $ccms['lang']['permitem']) ? $ccms['lang']['permitem'][$rec['name']] : null); 
+					$state = $rec['value'];
+				
 					?>
 					<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
 						<th class="permission-name"><?php echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); ?></th>
-						<td class="hover center-text">
-							<label>
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==0?'checked="checked"':null); ?> value="0">
-							</label>
-						</td>
-						<td class="hover center-text">
-							<label>
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==1?'checked="checked"':null); ?> value="1">
-							</label>
-						</td>
-						<td class="hover center-text">
-							<label>
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==2?'checked="checked"':null); ?> value="2">
-							</label>
-						</td>
-						<td class="hover center-text">
-							<label>
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==3?'checked="checked"':null); ?> value="3">
-							</label>
-						</td>
-						<td class="hover center-text">
-							<label>
-							<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($rsCfg->$columnName==4?'checked="checked"':null); ?> value="4">
-							</label>
-						</td>
+						<?php
+						for ($j = 0; $j < 5; $j++)
+						{
+							?>
+							<td class="hover center-text">
+								<label>
+								<input type="radio" name="<?php echo $columnName; ?>" <?php echo ($state == $j ? 'checked="checked"' : null); ?> value="<?php echo $j; ?>">
+								</label>
+							</td>
+							<?php
+						}
+						?>
 					</tr>
 					<?php 
 					$i++;
