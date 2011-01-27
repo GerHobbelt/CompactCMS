@@ -647,33 +647,90 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	$iscoding_pref	= getPOSTparam4boolYN('iscoding', 'N');
 	
 	// Start with a clean sheet
-	$errors=array();
+	$errors = array();
 	
 	if(strstr($post_urlpage, '.') !== FALSE) 
-		{ $errors[] = '- '.$ccms['lang']['system']['error_filedots']; }
-	if ($post_urlpage=='' || strlen($post_urlpage)<3)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_filesize']; }
-	if ($pagetitle=='' || strlen($pagetitle)<3)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_pagetitle']; }
-	if ($subheader=='' || strlen($subheader)<3)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_subtitle']; }
-	if ($description=='' || strlen($description)<3)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_description']; }
+		{ $errors[] = $ccms['lang']['system']['error_filedots']; }
+	if (strlen($post_urlpage) < 3)
+		{ $errors[] = $ccms['lang']['system']['error_filesize']; }
+	if (strlen($pagetitle) < 3)
+		{ $errors[] = $ccms['lang']['system']['error_pagetitle']; }
+	if (strlen($subheader) < 3)
+		{ $errors[] = $ccms['lang']['system']['error_subtitle']; }
+	if (strlen($description) < 3)
+		{ $errors[] = $ccms['lang']['system']['error_description']; }
 	if (strlen($post_urlpage) > 50)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_filesize_2']; }
+		{ $errors[] = $ccms['lang']['system']['error_filesize_2']; }
 	if (strlen($pagetitle) > 100)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_pagetitle_2']; }
+		{ $errors[] = $ccms['lang']['system']['error_pagetitle_2']; }
 	if (strlen($subheader) > 200)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_subtitle_2']; }
+		{ $errors[] = $ccms['lang']['system']['error_subtitle_2']; }
 	if (strlen($description) > 250)
-		{ $errors[] = '- '.$ccms['lang']['system']['error_description_2']; }
+		{ $errors[] = $ccms['lang']['system']['error_description_2']; }
 	if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
-		{ $errors[] = '- '.$ccms['lang']['system']['error_reserved']; }
+		{ $errors[] = $ccms['lang']['system']['error_reserved']; }
 	
+	$file_freshly_created = false;
+		
+	if(count($errors) == 0)
+	{
+		$filepath = BASE_PATH . '/content/' . $post_urlpage . '.php';
+		
+		/*
+		WARNING:
+		
+		Tolerate it when the file already exists: do not overwrite the contents then.
+		
+		This 'feature' exists to help recover broken upgrades / updates: you can thus
+		manually add the page records in the database again without lossing the original
+		content of the page.
+		*/
+		if (!file_exists($filepath))
+		{
+			// Create the actual file
+			$filehandle = fopen($filepath, 'w');
+			if(!$filehandle) 
+			{
+				$errors[] = $ccms['lang']['system']['error_write'];
+			} 
+			else 
+			{
+				// Write default contents to newly created file
+				if($post_module === 'editor') 
+				{
+					if (!fwrite($filehandle, '<p>'.$ccms['lang']['backend']['newfiledone'].'</p>'))
+					{
+						$errors[] = $ccms['lang']['system']['error_write'];
+					}
+				} 
+				else 
+				{
+					// Write require_once tag to file (modname.Show.php)
+					$iscoding_pref = true;
+					if (!fwrite($filehandle, "<?php require_once(BASE_PATH . '/lib/modules/$post_module/$post_module.Show.php'); ?>"))
+					{
+						$errors[] = $ccms['lang']['system']['error_write'];
+					}
+				}
+			}
+			// Report success in notify area
+			if(!fclose($filehandle)) 
+			{
+				$errors[] = $ccms['lang']['system']['error_create'];
+			}
+			
+			if(count($errors) == 0)
+			{
+				$file_freshly_created = true;
+			}
+		}
+	}
+
 	if(count($errors) == 0)
 	{
 		// Insert new page into database
 		$values = array(); // [i_a] make sure $values is an empty array to start with here
+		
 		// $arrayVariable["column name"] = formatted SQL value
 		$values['urlpage']		= MySQL::SQLValue($post_urlpage,MySQL::SQLVALUE_TEXT);
 		$values['module']		= MySQL::SQLValue($post_module,MySQL::SQLVALUE_TEXT);
@@ -690,82 +747,35 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		// the default 'owner' is the one who creates the page:
 		$values['user_ids']		= MySQL::SQLValue(intval($_SESSION['ccms_userID']),MySQL::SQLVALUE_TEXT);
 		
-		// Execute the insert
-		$result = $db->TransactionBegin();
-		if ($result)
+		$result = $db->InsertRow($cfg['db_prefix'].'pages', $values);
+		// Check for errors
+		if($result) 
 		{
-			$result = $db->InsertRow($cfg['db_prefix'].'pages', $values);
-
-			// Check for errors
-			if($result) 
-			{
-				// Create the actual file
-				$filehandle = fopen('../../content/'.$post_urlpage.'.php', 'w');
-				if(!$filehandle) 
-				{
-					$errors[] = $ccms['lang']['system']['error_write'];
-				} 
-				else 
-				{
-					// Write default contents to newly created file
-					if($post_module === 'editor') 
-					{
-						if (!fwrite($filehandle, '<p>'.$ccms['lang']['backend']['newfiledone'].'</p>'))
-						{
-							$errors[] = $ccms['lang']['system']['error_write'];
-						}
-					} 
-					// Write require_once tag to file (modname.Show.php)
-					else 
-					{
-						if (!fwrite($filehandle, "<?php require_once(BASE_PATH . '/lib/modules/$post_module/$post_module.Show.php'); ?>"))
-						{
-							$errors[] = $ccms['lang']['system']['error_write'];
-						}
-					}
-				}
-				// Report success in notify area
-				if(!fclose($filehandle)) 
-				{
-					$errors[] = $ccms['lang']['system']['error_create'];
-				}
-			} 
-			elseif($db->ErrorNumber() == 1062) 
-			{
-				$errors[] = $ccms['lang']['system']['error_exists'];
-			} 
-			else
-			{
-				$errors[] = $db->Error(); // Some error which has not been antipicated.
-			}
-			
-			// commit or abort TXN:
-			if(count($errors) != 0)
-			{
-				$result = $db->TransactionRollback();
-			}
-			else
-			{
-				$result = $db->TransactionEnd();
-			}
-			if (!$result)
-			{
-				$errors[] = $db->Error(); // Transaction commit/rollback error.
-			}
-		}
+		} 
+		elseif($db->ErrorNumber() == 1062)
+		{
+			$errors[] = $ccms['lang']['system']['error_rec_exists'];
+		} 
 		else
 		{
-			$errors[] = $db->Error(); // Transaction init failure.
+			$errors[] = $db->Error(); // Some error which has not been antipicated.
+
+			// Rollback the entire 'transaction': delete the content carrying file when the DB action went bad:
+			if ($file_freshly_created)
+			{
+				@unlink($filepath);
+			}
 		}
 	}
 
 	if(count($errors) != 0)
 	{
-		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p>';
-		while (list($key,$value) = each($errors))
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><ul>';
+		foreach($errors as $value)
 		{
-			echo '<p class="fault">'.$value.'</p>';
+			echo '<li><p class="fault">' . $value . '</p></li>';
 		}
+		echo '</ul>';
 		exit(); // Prevent AJAX from continuing
 	}
 
