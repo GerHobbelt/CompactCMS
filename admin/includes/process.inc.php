@@ -630,8 +630,8 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
 	// Remove all none system friendly characters
-	$post_urlpage = getPOSTparam4Filename('urlpage'); 
-	$post_urlpage = strtolower(str_replace(' ','-',$post_urlpage));
+	$post_urlpage = getPOSTparam4Filename('urlpage');
+	// $post_urlpage = strtolower(str_replace(' ','-',$post_urlpage));   -- superfluous, is already done as part of the filtering inside getPOSTparam4Filename()
 	
 	// Check for non-empty module variable
 	$post_module = strtolower(getPOSTparam4Filename('module', 'editor'));
