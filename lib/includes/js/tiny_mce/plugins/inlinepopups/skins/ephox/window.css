@@ -82,14 +82,14 @@
 .ephox .mceMiddle .mceIcon {left:15px; top:35px; width:32px; height:32px}
 .ephox .mceAlert .mceMiddle span, .ephox .mceConfirm .mceMiddle span 
 {
-	background:transparent;
-	left:60px; 
-	top:35px; 
-	width:320px; 
-	height:150px;  /* [i_a] was: 50 px but advimage alert doesn't fit, for example */
-	font-weight:bold; 
-	overflow:auto; 
-	white-space:normal;
+	background: transparent;
+	left: 60px; 
+	top: 35px; 
+	width: 320px; 
+	height: auto;  /* [i_a] was: 50 px but advimage alert doesn't fit, for example */
+	font-weight: bold; 
+	overflow: auto; 
+	white-space: normal;
 }
 .ephox a:hover {font-weight:bold;}
 .ephox .mceAlert .mceMiddle, .ephox .mceConfirm .mceMiddle {background:#D6D7D5}
