@@ -52,9 +52,9 @@ $ccms['lang']['system']['error_description_2'] = "Enter a description of less th
 $ccms['lang']['system']['error_reserved'] 	= "You've specified a file name reserved for internal use.";
 $ccms['lang']['system']['error_general']	= "Error occurred";
 $ccms['lang']['system']['error_correct'] 	= "Please correct the following:";
-$ccms['lang']['system']['error_create'] 	= "Error while completing creation of the new file";
+$ccms['lang']['system']['error_create'] 	= "Error while completing creation of the new file.";
 $ccms['lang']['system']['error_exists'] 	= "The file name you specified already exists.";
-$ccms['lang']['system']['error_delete']		= "Error while completing deletion of the selected file";
+$ccms['lang']['system']['error_delete']		= "Error while completing deletion of the selected file.";
 $ccms['lang']['system']['error_selection'] 	= "There were no items selected.";
 $ccms['lang']['system']['error_versioninfo'] = "No version information is available.";
 $ccms['lang']['system']['error_misconfig']	= "<strong>There seems to be a misconfiguration.</strong><br/>Please make sure the .htaccess file is correctly configured to reflect your file structure. If you have<br/>installed CompactCMS in a subdirectory, then adjust the .htaccess file accordingly.";
@@ -69,6 +69,7 @@ $ccms['lang']['system']['error_sitemap'] 	= "An overview of all pages";
 $ccms['lang']['system']['error_tooshort']	= "One or multiple submitted values were either too short or incorrect";
 $ccms['lang']['system']['error_passshort']	= "A password should contain more than 6 characters";
 $ccms['lang']['system']['error_passnequal']	= "The entered passwords did not match";
+$ccms['lang']['system']['error_rec_exists'] = "Entry already exists in the database.";
 $ccms['lang']['system']['noresults']		= "No results";
 $ccms['lang']['system']['tooriginal']		= "Back to original";
 $ccms['lang']['system']['message_rights'] 	= "All rights reserved";
@@ -131,11 +132,11 @@ $ccms['lang']['backend']['none']			= "None";
 $ccms['lang']['backend']['yes']				= "Yes";
 $ccms['lang']['backend']['no']				= "No";
 $ccms['lang']['backend']['translation']     = "Translations";
-$ccms['lang']['backend']['hello'] = "Hi";
-$ccms['lang']['backend']['logout'] = "Log-out";
-$ccms['lang']['backend']['see_forum'] = "See forum";
-$ccms['lang']['backend']['warning'] = "Warning";
-$ccms['lang']['backend']['js_loading'] = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
+$ccms['lang']['backend']['hello']           = "Hi";
+$ccms['lang']['backend']['logout']          = "Log-out";
+$ccms['lang']['backend']['see_forum']       = "See forum";
+$ccms['lang']['backend']['warning']         = "Warning";
+$ccms['lang']['backend']['js_loading']      = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']			= "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
@@ -252,6 +253,21 @@ $ccms['lang']['permission']['level1']	= "Level 1 - User";
 $ccms['lang']['permission']['level2']	= "Level 2 - Editor";
 $ccms['lang']['permission']['level3']	= "Level 3 - Manager";
 $ccms['lang']['permission']['level4']	= "Level 4 - Admin";
+
+// Help texts for each of the global permissions:
+$ccms['lang']['permitem']['manageUsers']       = "From what user level on can users manage user accounts (add, modify, delete)";
+$ccms['lang']['permitem']['manageOwners']      = "To allow to appoint certain users to a specific page";
+$ccms['lang']['permitem']['managePages']       = "From what user level on can users manage pages (add, delete)";
+$ccms['lang']['permitem']['manageMenu']        = "From what user level on can users manage menu preferences";
+$ccms['lang']['permitem']['manageTemplate']    = "From what user level on can users manage all of the available templates";
+$ccms['lang']['permitem']['manageModules']     = "From what user level on can users manage modules";
+$ccms['lang']['permitem']['manageActivity']    = "From what user level on can users manage the activeness of pages";
+$ccms['lang']['permitem']['manageVarCoding']   = "From what user level on can users set whether a page contains coding (wysiwyg vs code editor)";
+$ccms['lang']['permitem']['manageModBackup']   = "From what user level on can users delete current back-up files";
+$ccms['lang']['permitem']['manageModNews']     = "From what user level on can users manage news items through the news module (add, modify, delete)";
+$ccms['lang']['permitem']['manageModLightbox'] = "From what user level on can users manage albums throught the lightbox module (add, modify, delete)";
+$ccms['lang']['permitem']['manageModComment']  = "The level of a user that is allowed to manage comment";
+
 
 // Content owners
 $ccms['lang']['owners']['header']		= "Content owners";
