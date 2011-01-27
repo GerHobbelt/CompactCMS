@@ -153,7 +153,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 				// If all checks are okay
 				//
 				// Update latest login date
-				if($db->UpdateRows($cfg['db_prefix'].'users', array('userLastlog' => MySQL::SQLValue(date('Y-m-d G:i:s'), MySQL::SQLVALUE_DATETIME)), array('userID' => MySQL::BuildSQLValue($row['userID'])))) 
+				if($db->UpdateRow($cfg['db_prefix'].'users', array('userLastlog' => MySQL::SQLValue(date('Y-m-d G:i:s'), MySQL::SQLVALUE_DATETIME)), array('userID' => MySQL::BuildSQLValue($row['userID'])))) 
 				{
 					// Set system wide session variables
 					$_SESSION['ccms_userID']	= $row['userID'];

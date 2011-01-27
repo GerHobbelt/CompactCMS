@@ -873,7 +873,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 			$values['menu_id']	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
 			
 			// Execute the update
-			if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+			if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				$error = $db->Error();
 			}
@@ -905,7 +905,7 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values['islink'] = MySQL::SQLValue($islink_in_menu, MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 	{
 		if($values['islink'] == 'Y') 
 		{ 
@@ -948,7 +948,7 @@ if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == "GET" && checkAu
 	// TOGGLE the flag (printable/published/iscoding) state:
 	$values[$action] = MySQL::SQLValue(!getGETparam4boolean('s'),MySQL::SQLVALUE_Y_N);
 	
-	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
+	if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
 	{
 		if($values[$action] == 'Y')
 		{ 
@@ -988,7 +988,7 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
 	
-	if (!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+	if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
 	{
 		$db->Kill();
 	}
@@ -1143,7 +1143,7 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 				$values['userLast']	= MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
 				$values['userEmail']= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
 				
-				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				if ($db->UpdateRow($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 				{
 					if($userID==$_SESSION['ccms_userID']) 
 					{
@@ -1206,7 +1206,7 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
 				$values = array(); // [i_a] make sure $values is an empty array to start with here
 				$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
 				
-				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				if ($db->UpdateRow($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 				{
 					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 					exit();
@@ -1260,7 +1260,7 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
 				$values['userLevel'] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
 				$values['userActive'] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
 					
-				if ($db->UpdateRows($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
+				if ($db->UpdateRow($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER)))) 
 				{
 					if($userID==$_SESSION['ccms_userID']) 
 					{
@@ -1562,7 +1562,7 @@ if($do_action == 'save-changes' && checkAuth())
 	$values = array(); // [i_a] make sure $values is an empty array to start with here
 	$values['keywords'] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 	
-	if ($db->UpdateRows($cfg['db_prefix'].'pages', $values, array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)))) 
+	if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)))) 
 	{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

@@ -122,7 +122,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 			$values = array();
 			$values['user_ids'] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
 		
-			if(!$db->UpdateRows($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+			if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
 			{
 				$db->Kill();
 			}
