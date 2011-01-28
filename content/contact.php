@@ -82,12 +82,12 @@ if($action_type == 'send'
 	if (empty($emailaddress) || strcspn($emailaddress, '<"\'') != strlen($emailaddress))
 	{
 		// email filter allows quoted prefix before the '<' ; we DO NOT as we have both parts separated here...
-		die("<p class=\"error center\">You specified an invalid email address</p>");
+		die('<p class="error center">You specified an invalid email address</p>');
 	}
 	if (empty($sender) || strpos($sender, '"') !== false )
 	{
 		// ... nor do we allow a double-quote inside the 'human name' preceeding part of the address.
-		die("<p class=\"error center\">You specified an invalid email sender name</p>");
+		die('<p class="error center">You specified an invalid email sender name</p>');
 	}
 	/*
 	We REQUIRE a FILLED subject line and message body as well:
@@ -114,13 +114,13 @@ if($action_type == 'send'
 		} 
 		else 
 		{
-			echo '<div class="error center"><p>Error while processing your e-mail:</p><p style="font-size:0.825em; 	line-height: 1.2em;">'.$content.'</p></div>';
+			echo '<div class="error center"><p>Error while processing your e-mail:</p><p style="font-size:0.825em;  line-height: 1.2em;">'.$content.'</p></div>';
 		}
 		exit();
 	}
 	else
 	{
-		die("<p class=\"error center\">You haven't specified either a valid email sender or a subject line or message body</p>");
+		die('<p class="error center">You haven\'t specified either a valid email sender or a subject line or message body</p>');
 	}
 }
 else 
@@ -134,9 +134,9 @@ else
 	$_SESSION['ccms_captcha'] = mt_rand('123456','987654'); 
 }
 
-if($_SERVER['REQUEST_METHOD'] != "GET") 
+if($_SERVER['REQUEST_METHOD'] != 'GET') 
 {
-	die("<p class=\"error center\">Invalid data. Nothing sent!</p>");
+	die('<p class="error center">Invalid data. Nothing sent!</p>');
 }
 
 ?>
