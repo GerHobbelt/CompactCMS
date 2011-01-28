@@ -259,14 +259,15 @@ $ccms['lang']['permitem']['manageUsers']        = "From what user level on can u
 $ccms['lang']['permitem']['manageOwners']       = "To allow to appoint certain users to a specific page";
 $ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
 $ccms['lang']['permitem']['manageMenu']         = "From what user level on can users manage menu preferences";
-$ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage all of the available templates";
+$ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
 $ccms['lang']['permitem']['manageModules']      = "From what user level on can users manage modules";
-$ccms['lang']['permitem']['manageActivity']     = "From what user level on can users manage the activeness of pages";
-$ccms['lang']['permitem']['manageVarCoding']    = "From what user level on can users set whether a page contains coding (wysiwyg vs code editor)";
+$ccms['lang']['permitem']['managePageActivation']     = "From what user level on can users manage the activeness of pages (published vs. unpublished)";
+$ccms['lang']['permitem']['managePageCoding']    = "From what user level on can users set whether a page contains coding (wysiwyg vs. code editor)";
 $ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
 $ccms['lang']['permitem']['manageModNews']      = "From what user level on can users manage news items through the news module (add, modify, delete)";
 $ccms['lang']['permitem']['manageModLightbox']  = "From what user level on can users manage albums throught the lightbox module (add, modify, delete)";
-$ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comment";
+$ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
+$ccms['lang']['permitem']['managePageEditing']  = "From what user level on can users edit pages (content, title, subheader, keywords, etc.)";
 
 
 // Content owners

@@ -192,10 +192,19 @@ if ($do_update_or_livefilter && checkAuth())
 				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
 				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
 				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-2a nowrap center-text"><?php echo $ccms['lang']['forms']['printable']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span></th>
 				<th class="span-2a nowrap center-text">
 					<?php 
-					if($perm->is_level_okay('manageActivity', $_SESSION['ccms_userLevel'])) 
+					if($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel'])) 
+					{ 
+						echo $ccms['lang']['forms']['printable'];
+						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
+					<?php 
+					} 
+					?>
+				</th>
+				<th class="span-2a nowrap center-text">
+					<?php 
+					if($perm->is_level_okay('managePageActivation', $_SESSION['ccms_userLevel'])) 
 					{ 
 						echo $ccms['lang']['forms']['published']; 
 						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
@@ -205,7 +214,7 @@ if ($do_update_or_livefilter && checkAuth())
 				</th>
 				<th class="span-2a nowrap center-text">
 					<?php
-					if($perm->is_level_okay('manageVarCoding', $_SESSION['ccms_userLevel'])) 
+					if($perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) 
 					{ 
 						echo $ccms['lang']['forms']['iscoding']; 
 						?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
@@ -225,7 +234,7 @@ if ($do_update_or_livefilter && checkAuth())
 		{
 			// Check whether current user is owner, or no owners at all
 			$owner = explode('||', strval($row->user_ids));
-			if((empty($row->user_ids) && $perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) || in_array($_SESSION['ccms_userID'], $owner))
+			if((empty($row->user_ids) && $perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) || in_array($_SESSION['ccms_userID'], $owner) || $perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 			{
 				// Determine file specific variables
 				if($row->module == 'editor') 
@@ -236,6 +245,8 @@ if ($do_update_or_livefilter && checkAuth())
 				{
 					$module = '../lib/modules/'.$row->module.'/'.$row->module.'.Manage.php';
 				}
+
+				$editing_mode = $perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']);
 				
 				// Define $isEven for alternate table coloring
 				if($i % 2 != 1) 
@@ -272,7 +283,7 @@ if ($do_update_or_livefilter && checkAuth())
 				else 
 				{ 
 				?>
-					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].rm0lead($row->page_id); ?>" />
+					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].'-'.rm0lead($row->page_id); ?>" />
 				<?php 
 				} 
 				?>
@@ -281,26 +292,33 @@ if ($do_update_or_livefilter && checkAuth())
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
 				</td>
 				<td>
-					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
+					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
 				<td>
-					<span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="subheader"><?php echo $row->subheader; ?></span>
-				</td>
-				<td class="center-text">
-					<a id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
-						if($row->printable == 'Y')
-						{ 
-							echo $ccms['lang']['backend']['yes']; 
-						} 
-						else 
-						{
-							echo $ccms['lang']['backend']['no']; 
-						}
-						?></a>
+					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
 				<td class="center-text">
 					<?php 
-					if($perm->is_level_okay('manageActivity', $_SESSION['ccms_userLevel'])) 
+					if($editing_mode) 
+					{ 
+					?>
+						<a id="printable-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->printable; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
+							if($row->printable == 'Y')
+							{ 
+								echo $ccms['lang']['backend']['yes']; 
+							} 
+							else 
+							{
+								echo $ccms['lang']['backend']['no']; 
+							}
+							?></a>
+					<?php 
+					} 
+					?>
+				</td>
+				<td class="center-text">
+					<?php 
+					if($perm->is_level_okay('managePageActivation', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 						<a id="published-<?php echo rm0lead($row->page_id); ?>" rel="<?php echo $row->published; ?>" class="sprite editinplace" title="<?php echo $ccms['lang']['backend']['changevalue']; ?>"><?php 
@@ -319,7 +337,7 @@ if ($do_update_or_livefilter && checkAuth())
 				</td>
 				<td class="center-text">
 					<?php 
-					if($perm->is_level_okay('manageVarCoding', $_SESSION['ccms_userLevel'])) 
+					if($perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
 						<?php 
@@ -349,15 +367,17 @@ if ($do_update_or_livefilter && checkAuth())
 				</td>
 				<?php 
 				// Check for restrictions
-				if(!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner)) // only the OWNER is allowed editing access for a restricted page!
+				if ($editing_mode && 
+					($row->iscoding != 'Y' || $perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) && // deny editing of code pages unless the user has PageCoding permissions
+					 (!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner))) // only the OWNER is ALWAYS allowed editing access for a restricted page! (unless the owner doesn't have code edit perms and it's a code page)
 				{ 
 					$preview_checkcode = GenerateNewPreviewCode($row->page_id);
 					
 				?>
 					<td class="last right-text nowrap">
-						<a id="<?php echo $row->urlpage;?>" 
-							href="<?php echo $module; ?>?file=<?php echo $row->urlpage; ?>&amp;action=edit&amp;restrict=<?php echo $row->iscoding; ?>&amp;active=<?php echo $row->published;?>" 
-							rel="Edit <?php echo $row->urlpage.'.html';?>" 
+						<a id="<?php echo $row->urlpage; ?>" 
+							href="<?php echo $module; ?>?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=edit" 
+							rel="Edit <?php echo $row->urlpage.'.html'; ?>" 
 							class="tabs sprite edit"
 						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
 						| 
@@ -379,7 +399,7 @@ if ($do_update_or_livefilter && checkAuth())
 				</tr>
 				
 				<?php 
-				if($i%2 != 1) 
+				if($i % 2 != 1) 
 				{
 					if($row->published === 'N') 
 					{
@@ -411,7 +431,7 @@ if ($do_update_or_livefilter && checkAuth())
 					$description = ucfirst($description);
 				}
 				?>
-				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="sprite-hover liveedit" rel="description"><?php echo $description; ?></span></td>
+				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php 
 					if($row->module == 'editor' && !empty($row->toplevel)) 
@@ -430,8 +450,9 @@ if ($do_update_or_livefilter && checkAuth())
 						switch ($row->module)
 						{
 						default:
+							$modID = '<span class="ss_sprite_16 ss_brick">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
-						
+							
 						case 'lightbox':
 							$modID = '<span class="ss_sprite_16 ss_images">&#160;</span><strong>'.ucfirst($row->module).'</strong>';
 							break;
@@ -479,9 +500,10 @@ if ($do_update_or_livefilter && checkAuth())
  */
 if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth()) 
 {
+	// TODO : add interface bits to allow changing this sort order (e.g. click on headers?)
 	$menu_sortorder = getGETparam4IdOrNumber('m_order', 'I12LH0');
 	
-	if(isset($_SESSION['ccms_userLevel']) && $perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
+	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
 	{
 		// Open recordset for sites' pages
 		$rows = $db->SelectObjects($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
@@ -522,10 +544,10 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 							<optgroup label="Menu">
 								<?php 
 								$y = 1; 
-								while($y<=MENU_TARGET_COUNT) 
+								while($y <= MENU_TARGET_COUNT) 
 								{ 
 								?>
-									<option <?php echo ($row->menu_id==$y) ? "selected=\"selected\"" : ""; ?> value="<?php echo $y; ?>"><?php echo $ccms['lang']['menu'][$y]; ?></option>
+									<option <?php echo ($row->menu_id == $y) ? 'selected="selected"' : ''; ?> value="<?php echo $y; ?>"><?php echo $ccms['lang']['menu'][$y]; ?></option>
 									<?php 
 									$y++; 
 								} 
@@ -535,7 +557,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 					</td>
 					<td>
 						<select class="span-3 last" name="template[<?php echo $pageIdAsStr; ?>]">
-							<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
+							<optgroup label="<?php echo $ccms['lang']['backend']['template']; ?>">
 								<?php 
 								for ($x = 0; $x < count($template); $x++) 
 								{ 
@@ -555,7 +577,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 								while($z <= count($rows)) 
 								{ 
 								?>
-									<option <?php echo ($row->toplevel==$z) ? "selected=\"selected\"" : ""; ?> value="<?php echo $z; ?>"><?php echo $z; ?></option>
+									<option <?php echo ($row->toplevel==$z) ? 'selected="selected"' : ""; ?> value="<?php echo $z; ?>"><?php echo $z; ?></option>
 									<?php 
 									$z++; 
 								} 
@@ -571,7 +593,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 								while($y+1 < count($rows)) 
 								{ 
 								?>
-									<option <?php echo ($row->sublevel==$y) ? "selected=\"selected\"" : ""; ?> value="<?php echo $y; ?>"><?php echo $y; ?></option>
+									<option <?php echo ($row->sublevel==$y) ? 'selected="selected"' : ""; ?> value="<?php echo $y; ?>"><?php echo $y; ?></option>
 									<?php 
 									$y++; 
 								} 
@@ -590,7 +612,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 						else 
 						{ 
 						?>
-							<input type="checkbox" name="islink" id="<?php echo $pageIdAsStr; ?>" class="islink" <?php echo($row->islink==="Y")?'checked="checked"':null;?> />
+							<input type="checkbox" name="islink" id="<?php echo $pageIdAsStr; ?>" class="islink" <?php echo($row->islink === 'Y') ? 'checked="checked"' : null; ?> />
 						<?php 
 						} 
 						?>
@@ -629,7 +651,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
  */
 if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Remove all none system friendly characters
+	// Remove all system friendly characters
 	$post_urlpage = getPOSTparam4Filename('urlpage');
 	// $post_urlpage = strtolower(str_replace(' ','-',$post_urlpage));   -- superfluous, is already done as part of the filtering inside getPOSTparam4Filename()
 	
@@ -648,6 +670,12 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	
 	// Start with a clean sheet
 	$errors = array();
+
+	// are you allowed to run this action?
+	if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
+	{ 
+		$errors[] = $ccms['lang']['system']['error_forged'];
+	}
 	
 	if(strstr($post_urlpage, '.') !== FALSE) 
 		{ $errors[] = $ccms['lang']['system']['error_filedots']; }
@@ -798,9 +826,9 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		// Loop through all submitted page ids
 		foreach ($_POST['page_id'] as $index) 
 		{
-			$value = explode($_SESSION['rc2'], $index);
+			$value = explode('-', $index);
 			$page_id = filterParam4Number($value[1]);
-			if($page_id != 0 && $value[0] == $_SESSION['rc1']) 	// [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
+			if($page_id != 0 && $value[0] == $_SESSION['rc1'] . $_SESSION['rc2']) 	// [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
 			{
 				// Select file name and module with given page_id
 				$pagerow = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)), array('urlpage', 'module'));
@@ -861,35 +889,43 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 {
 	$error = null;
 	
-	if(!empty($_POST['page_id'])) 
-	{
-		foreach ($_POST['pageid'] as $page_id) 
+	// are you allowed to run this action?
+	if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
+	{ 
+		if(!empty($_POST['page_id'])) 
 		{
-			$page_id = filterParam4Number($page_id);
-			$toplevel = filterParam4Number($_POST['toplevel'][$page_id]);
-			$sublevel = filterParam4Number($_POST['sublevel'][$page_id]);
-			$templatename = filterParam4Filename($_POST['template'][$page_id]);
-			$menu_id = filterParam4Number($_POST['menuid'][$page_id]);
-			if (!$page_id || !$toplevel || empty($templatename) || !$menu_id)
+			foreach ($_POST['pageid'] as $page_id) 
 			{
-				$error = $ccms['lang']['system']['error_forged'];
-				break;
-			}
-			
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['toplevel']	= MySQL::SQLValue($toplevel, MySQL::SQLVALUE_NUMBER);
-			$values['sublevel']	= MySQL::SQLValue($sublevel, MySQL::SQLVALUE_NUMBER);
-			$values['variant']	= MySQL::SQLValue($templatename, MySQL::SQLVALUE_TEXT);
-			$values['menu_id']	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
-			
-			// Execute the update
-			if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
-			{
-				$error = $db->Error();
+				$page_id = filterParam4Number($page_id);
+				$toplevel = filterParam4Number($_POST['toplevel'][$page_id]);
+				$sublevel = filterParam4Number($_POST['sublevel'][$page_id]);
+				$templatename = filterParam4Filename($_POST['template'][$page_id]);
+				$menu_id = filterParam4Number($_POST['menuid'][$page_id]);
+				if (!$page_id || !$toplevel || empty($templatename) || !$menu_id)
+				{
+					$error = $ccms['lang']['system']['error_forged'];
+					break;
+				}
+				
+				$values = array(); // [i_a] make sure $values is an empty array to start with here
+				$values['toplevel']	= MySQL::SQLValue($toplevel, MySQL::SQLVALUE_NUMBER);
+				$values['sublevel']	= MySQL::SQLValue($sublevel, MySQL::SQLVALUE_NUMBER);
+				$values['variant']	= MySQL::SQLValue($templatename, MySQL::SQLVALUE_TEXT);
+				$values['menu_id']	= MySQL::SQLValue($menu_id, MySQL::SQLVALUE_NUMBER);
+				
+				// Execute the update
+				if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+				{
+					$error = $db->Error();
+				}
 			}
 		}
+		// else: no pages specified; which is okay with us here...
 	}
-	// else: no pages specified; which is okay with us here...
+	else
+	{
+		$error = $ccms['lang']['system']['error_forged'];
+	}
 	
 	if(empty($error)) 
 	{
@@ -909,26 +945,33 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
  */
 if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	$page_id = getPOSTparam4Number('id');
-	$islink_in_menu = getPOSTparam4boolYN('cvalue', 'N');
-	
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
-	$values['islink'] = MySQL::SQLValue($islink_in_menu, MySQL::SQLVALUE_Y_N);
-	
-	if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
 	{
-		if($values['islink'] == 'Y') 
-		{ 
-			echo $ccms['lang']['backend']['yes']; 
+		$page_id = getPOSTparam4Number('id');
+		$islink_in_menu = getPOSTparam4boolYN('cvalue', 'N');
+		
+		$values = array(); // [i_a] make sure $values is an empty array to start with here
+		$values['islink'] = MySQL::SQLValue($islink_in_menu, MySQL::SQLVALUE_Y_N);
+		
+		if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+		{
+			if($values['islink'] == 'Y') 
+			{ 
+				echo $ccms['lang']['backend']['yes']; 
+			} 
+			else 
+			{
+				echo $ccms['lang']['backend']['no'];
+			}
 		} 
 		else 
 		{
-			echo $ccms['lang']['backend']['no'];
+			$db->Kill();
 		}
-	} 
-	else 
+	}
+	else
 	{
-		$db->Kill();
+		die($ccms['lang']['system']['error_forged']);
 	}
 	exit();
 }
@@ -940,39 +983,54 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
  */
 if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth()) 
 {
-	// Explode variable with all necessary information
-	$page_id = explode('-', getGETparam4IdOrNumber('id'), 2); // [i_a] fix for page_id's which have dashes in their own name...
-	
-	$page_num = filterParam4Number($page_id[1]);
-	
-	// Set the action for this call
-	if($page_num && ($page_id[0] == 'printable' || $page_id[0] == 'published' || $page_id[0] == 'iscoding')) 
+	/*
+	 Only allow if it one of the editinplace entries we know and the user has sufficient rights.
+	 
+	 Minor remark here: we don't care when user has ANY of these permissions; that's a little less
+	 strict than the user iterface code which may legally trigger this action. Alas.
+	*/
+	if ($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']) ||
+		$perm->is_level_okay('managePageActivation', $_SESSION['ccms_userLevel']) ||
+		$perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel']))
 	{
-		$action	 = $page_id[0];
-	} 
-	else 
-	{
-		die($ccms['lang']['system']['error_forged']);
-	}
-	
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
-	// TOGGLE the flag (printable/published/iscoding) state:
-	$values[$action] = MySQL::SQLValue(!getGETparam4boolean('s'),MySQL::SQLVALUE_Y_N);
-	
-	if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
-	{
-		if($values[$action] == 'Y')
-		{ 
-			echo $ccms['lang']['backend']['yes']; 
+		// Explode variable with all necessary information
+		$page_id = explode('-', getGETparam4IdOrNumber('id'), 2);
+		
+		$page_num = filterParam4Number($page_id[1]);
+		
+		// Set the action for this call
+		if($page_num && ($page_id[0] == 'printable' || $page_id[0] == 'published' || $page_id[0] == 'iscoding')) 
+		{
+			$action	 = $page_id[0];
 		} 
 		else 
 		{
-			echo $ccms['lang']['backend']['no'];
+			die($ccms['lang']['system']['error_forged']);
 		}
-	} 
-	else 
+		
+		$values = array(); // [i_a] make sure $values is an empty array to start with here
+		// TOGGLE the flag (printable/published/iscoding) state:
+		$values[$action] = MySQL::SQLValue(!getGETparam4boolean('s'),MySQL::SQLVALUE_Y_N);
+		
+		if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_num,MySQL::SQLVALUE_NUMBER)))) 
+		{
+			if($values[$action] == 'Y')
+			{ 
+				echo $ccms['lang']['backend']['yes']; 
+			} 
+			else 
+			{
+				echo $ccms['lang']['backend']['no'];
+			}
+		} 
+		else 
+		{
+			$db->Kill($ccms['lang']['system']['error_general']);
+		}
+	}
+	else
 	{
-		$db->Kill($ccms['lang']['system']['error_general']);
+		die($ccms['lang']['system']['error_forged']);
 	}
 	exit();
 }
@@ -986,26 +1044,33 @@ if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
  */
 if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	$content = getPOSTparam4DisplayHTML('content');
-	if(empty($content) || strlen($content) < 3 || strlen($content) > 240) 
+	if ($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']))
 	{
-		die($ccms['lang']['system']['error_value']);
-	}
-	
-	// Continue with content update
-	$page_id		= getPOSTparam4Number('id');
-	$dest			= getGETparam4IdOrNumber('part');
-	
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
-	$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
-	
-	if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
-	{
-		$db->Kill();
+		$content = getPOSTparam4DisplayHTML('content');
+		if(empty($content) || strlen($content) < 3 || strlen($content) > 240) 
+		{
+			die($ccms['lang']['system']['error_value']);
+		}
+		
+		// Continue with content update
+		$page_id = getPOSTparam4Number('id');
+		$dest    = getGETparam4IdOrNumber('part');
+		
+		$values = array(); // [i_a] make sure $values is an empty array to start with here
+		$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
+		
+		if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+		{
+			$db->Kill();
+		}
+		else
+		{
+			echo $content;
+		}
 	}
 	else
 	{
-		echo $content;
+		die($ccms['lang']['system']['error_forged']);
 	}
 	exit();
 }
@@ -1362,47 +1427,58 @@ if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
  * Generate the WYSIWYG or code editor for editing purposes (prev. editor.php)
  *
  */
-if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth()) 
+if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())   // action=edit
 {
 	// Set the necessary variables
-	$name 		= getGETparam4Filename('file');
-	$iscoding	= getGETparam4boolYN('restrict', 'N');
-	$active		= getGETparam4boolYN('active', 'N');
-	$filename	= BASE_PATH . '/content/'.$name.'.php';
-	
-	// Check for editor.css in template directory
-	$template	= $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('variant'));
-	if (!$template) $db->Kill();
-	
-	// Check for filename	
-	if(!empty($filename)) 
+	$page_id = getGETparam4Filename('page_id');
+	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
+	if (!$row) $db->Kill();
+
+	$owner = explode('||', strval($row->user_ids));
+
+	if ($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']) && 
+		($row->iscoding != 'Y' || $perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) && // deny editing of code pages unless the user has PageCoding permissions
+		 (!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner))) // only the OWNER is ALWAYS allowed editing access for a restricted page! (unless the owner doesn't have code edit perms and it's a code page)
 	{
-		$handle = @fopen($filename, 'r');
-		if ($handle) 
+		$iscoding = $row->iscoding;
+		$active = $row->published;
+		$name = $row->urlpage;
+		$filename = BASE_PATH . '/content/'.$name.'.php';
+	
+if (0) // TODO?
+{
+		// Check for editor.css in template directory
+		$template = $row->variant;
+}
+	
+		// Check for filename	
+		if(!empty($filename)) 
 		{
-			// PHP5+ Feature
-			$contents = stream_get_contents($handle);
-			if (0)
+			$handle = @fopen($filename, 'r');
+			if ($handle) 
 			{
-				// PHP4 Compatibility
-				$flen = filesize($filename);
-				if ($flen > 0)
+				// PHP5+ Feature
+				$contents = stream_get_contents($handle);
+				if (0)
 				{
-					$contents = fread($handle, $flen);
+					// PHP4 Compatibility
+					$flen = filesize($filename);
+					if ($flen > 0)
+					{
+						$contents = fread($handle, $flen);
+					}
 				}
+				fclose($handle);
+				$contents = str_replace('<br />', '<br>', $contents);
+			} 
+			else 
+			{ 
+				die($ccms['lang']['system']['error_deleted']);
 			}
-			fclose($handle);
-			$contents = str_replace('<br />', '<br>', $contents);
 		} 
-		else 
-		{ 
-			die($ccms['lang']['system']['error_deleted']);
-		}
-	} 
-	
-	// Get keywords for current file
-	$keywords = $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)), array('keywords'));
-	
+		
+		// Get keywords for current file
+		$keywords = $row->keywords;
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
@@ -1430,12 +1506,11 @@ if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())
 		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
 		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
 		
-		<form action="./process.inc.php?page=<?php echo $name; ?>&amp;restrict=<?php echo $iscoding; ?>&amp;active=<?php echo $active; ?>&amp;action=save-changes" method="post" name="save">
+		<form action="./process.inc.php?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=save-changes" method="post" name="save">
 			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 			<!--<br/>-->
 			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
 			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
-			<input type="hidden" name="code" value="<?php echo getGETparam4boolYN('restrict', 'N'); ?>" id="code" />
 			<div class="right">
 				<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
@@ -1517,7 +1592,11 @@ echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 	</body>
 	</html>
 <?php 
-
+	}
+	else
+	{
+		die($ccms['lang']['system']['error_forged']);
+	}
 	exit();
 }
 
@@ -1528,53 +1607,56 @@ echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
  */
 if($do_action == 'save-changes' && checkAuth()) 
 {
-	// Strip slashes for certain servers (DEPRECIATED for PHP6)
-	if (get_magic_quotes_gpc()) 
+	$page_id = getGETparam4Filename('page_id');
+	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
+	if (!$row) $db->Kill();
+	
+	$owner = explode('||', strval($row->user_ids));
+
+	if ($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']) && 
+		($row->iscoding != 'Y' || $perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) && // deny editing of code pages unless the user has PageCoding permissions
+		 (!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner))) // only the OWNER is ALWAYS allowed editing access for a restricted page! (unless the owner doesn't have code edit perms and it's a code page)
 	{
-		function stripslashes_deep($value) 
+		$active = $row->published;
+		$name = $row->urlpage;
+		if ($row->iscoding == 'Y')
 		{
-			if(is_array($value)) {
-				$value = array_map('stripslashes_deep',$value);
-			} else {
-				$value = stripslashes($value);
+			// code pages: only for users with elevated rights, so we're okay with less filtering (none at all, in this case!)
+			$type = 'code';
+			$content = getPOSTparam4RAWCONTENT('content'); // accept ANYTHING: it's code, so can carry anything, including javascript and PHP code chunks!
+		}
+		else
+		{
+			$type = 'text';
+			$content = getPOSTparam4RAWHTML('content'); // [i_a] must be RAW HTML, no htmlspecialchars(). Filtering required if malicious input risk expected.
+		}
+		$filename = BASE_PATH . '/content/'.$name.'.php';
+		$keywords = getPOSTparam4DisplayHTML('keywords');
+
+
+		if (is_writable_ex($filename)) 
+		{
+			if (!$handle = fopen($filename, 'w')) 
+			{
+				die('[ERR105] '.$ccms['lang']['system']['error_openfile'].' ('.$filename.').');
 			}
-			return $value;
-		}
-	
-		$_POST = array_map('stripslashes_deep', $_POST);
-		$_GET = array_map('stripslashes_deep', $_GET);
-	}
-
-	$name 		= getGETparam4Filename('page');
-	$active		= getGETparam4boolYN('active', 'N');
-	$type		= (getPOSTparam4boolean('code') ? "code" : "text");
-	$content	= getPOSTparam4RAWHTML('content'); // [i_a] must be RAW HTML, no htmlspecialchars(). Filtering required if malicious input risk expected.
-	$filename	= BASE_PATH . '/content/' . $name . '.php';
-	$keywords	= getPOSTparam4DisplayHTML('keywords');
-
-	if (is_writable_ex($filename)) 
-	{
-		if (!$handle = fopen($filename, 'w')) 
+			if (fwrite($handle, $content) === FALSE) 
+			{
+				die('[ERR106] '.$ccms['lang']['system']['error_write'].' ('.$filename.').');
+			}
+			fclose($handle);
+		} 
+		else 
 		{
-			die('[ERR105] '.$ccms['lang']['system']['error_openfile'].' ('.$filename.').');
+			die($ccms['lang']['system']['error_chmod']);
 		}
-		if (fwrite($handle, $content) === FALSE) 
-		{
-			die('[ERR106] '.$ccms['lang']['system']['error_write'].' ('.$filename.').');
-		}
-		fclose($handle);
-	} 
-	else 
-	{
-		die($ccms['lang']['system']['error_chmod']);
-	}
+			
+		// Save keywords to database
+		$values = array(); // [i_a] make sure $values is an empty array to start with here
+		$values['keywords'] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 		
-	// Save keywords to database
-	$values = array(); // [i_a] make sure $values is an empty array to start with here
-	$values['keywords'] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
-	
-	if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('urlpage' => MySQL::SQLValue($name, MySQL::SQLVALUE_TEXT)))) 
-	{
+		if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)))) 
+		{
 ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
@@ -1610,14 +1692,14 @@ if($do_action == 'save-changes' && checkAuth())
 			<?php 
 			} 
 			
-			$preview_checkcode = GenerateNewPreviewCode(null, $name);
+			$preview_checkcode = GenerateNewPreviewCode($page_id, null);
 			?>
 			<hr/>
 			<p>
-				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $preview_checkcode;?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>
+				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $preview_checkcode; ?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>
 			</p>
 			<div class="right">
-				<a class="button" href="process.inc.php?file=<?php echo $name; ?>&amp;action=edit&amp;restrict=<?php echo getGETparam4boolYN('restrict', 'N'); ?>&amp;active=<?php echo $active; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
+				<a class="button" href="process.inc.php?page_id=<?php echo $page_id; ?>&amp;action=edit"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
 				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['closewindow']; ?></a>
 			</div>
 		</div>
@@ -1637,10 +1719,15 @@ function confirmation()
 	</body>
 	</html>
 	<?php 	
-	} 
-	else 
+		} 
+		else 
+		{
+			$db->Kill();
+		}
+	}
+	else
 	{
-		$db->Kill();
+		die($ccms['lang']['system']['error_forged']);
 	}
 
 	exit();

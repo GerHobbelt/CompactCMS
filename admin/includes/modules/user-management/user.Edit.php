@@ -243,6 +243,8 @@ $js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
 $js_files[] = 'passwordcheck.js';
 
 $driver_code = <<<EOT
+	if ($('userDetailForm')) 
+	{
 		new FormValidator($('userDetailForm'), 
 			{
 				onFormValidate: function(passed, form, event)
@@ -252,6 +254,9 @@ $driver_code = <<<EOT
 						form.submit();
 				}
 			});
+	}
+	if ($('userPassForm')) 
+	{
 		new FormValidator($('userPassForm'), 
 			{
 				onFormValidate: function(passed, form, event)
@@ -261,6 +266,9 @@ $driver_code = <<<EOT
 						form.submit();
 				}
 			});
+	}
+	if ($('userLevelForm')) /* form may not be available when global permissions restrict access */
+	{
 		new FormValidator($('userLevelForm'), 
 			{
 				onFormValidate: function(passed, form, event)
@@ -270,6 +278,7 @@ $driver_code = <<<EOT
 						form.submit();
 				}
 			});
+	}
 EOT;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);

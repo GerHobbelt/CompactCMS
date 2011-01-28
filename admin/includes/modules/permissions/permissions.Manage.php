@@ -116,7 +116,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 					<th class="span-4 center-text"><?php echo $ccms['lang']['permission']['level4']; ?></th>
 				</tr>
 				<?php
-				$rsCfg = $db->SelectArray($cfg['db_prefix'].'cfgpermissions', null, null, array('name'));
+				$rsCfg = $db->SelectArray($cfg['db_prefix'].'cfgpermissions', null, null, array('display_order', 'name'));
 				if (empty($rsCfg)) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 				$i = 0;
@@ -125,10 +125,19 @@ $status_message = getGETparam4DisplayHTML('msg');
 					$columnName = $rec['name'];
 					$comments = (array_key_exists($rec['name'], $ccms['lang']['permitem']) ? $ccms['lang']['permitem'][$rec['name']] : null); 
 					$state = $rec['value'];
+					$dlevel = explode('.', $rec['display_order']);
 				
 					?>
 					<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
-						<th class="permission-name"><?php echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); ?></th>
+						<th class="permission-name">
+						<?php 
+							if ($dlevel[1] > 0)
+							{
+								echo '<span class="ss_sprite_16 ss_bullet_white">&#160;</span>'; 
+							}
+							echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); 
+						?>
+						</th>
 						<?php
 						for ($j = 0; $j < 5; $j++)
 						{

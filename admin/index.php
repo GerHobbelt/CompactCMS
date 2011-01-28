@@ -343,9 +343,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	} 
 	else
 	{
-	?>
-		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
-	<?php 
+		// echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span>' . $ccms['lang']['backend']['createpage'] . ': ' . $ccms['lang']['auth']['featnotallowed'] . "</p>\n";
 	} 
 	?>
 	</div>
@@ -379,9 +377,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	} 
 	else
 	{
-	?>
-		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
-	<?php 
+		// echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span>' . $ccms['lang']['backend']['managemenu'] . ': ' . $ccms['lang']['auth']['featnotallowed'] . "</p>\n";
 	} 
 	?>
 	</div>
@@ -399,7 +395,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		<?php
 		/*
 		 * With lining the header texts with the data and everything, it's simply way too much hassle to keep them in separate tables:
-		 * you never get the laignment right.
+		 * you never get the alignment right.
 		 * 
 		 * So starting with this edition, the header is regenerated with each reload. This has an impact on the filters, but we can fix them
 		 * easily there by re-registering those nodes in the JS code.
@@ -519,11 +515,11 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 </div>
 
 <?php // Dock block ?>
-<div id="dockWrapper">
-	<div id="dock">
-		<div id="dockPlacement"></div>
-		<div id="dockAutoHide"></div>
-		<div id="dockSort"><div id="dockClear" class="clear"></div></div>
+<div id="taskbarWrapper">
+	<div id="taskbar">
+		<div id="taskbarPlacement"></div>
+		<div id="taskbarAutoHide"></div>
+		<div id="taskbarSort"><div id="taskbarClear" class="clear"></div></div>
 	</div>
 </div>
 

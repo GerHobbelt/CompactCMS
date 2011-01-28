@@ -279,6 +279,8 @@ $js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
 $js_files[] = 'passwordcheck.js';
 
 $driver_code = <<<EOT
+	if ($('addUser')) /* form may not be available when global permissions restrict access */
+	{
 		new FormValidator($('addUser'),
 		{
 			onFormValidate: function(passed, form, event)
@@ -288,6 +290,7 @@ $driver_code = <<<EOT
 					form.submit();
 			}
 		});
+	}
 EOT;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);

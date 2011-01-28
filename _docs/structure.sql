@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 26, 2011 at 08:49 AM
+-- Generation Time: Jan 28, 2011 at 04:53 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -105,7 +105,8 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgnews` (
 DROP TABLE IF EXISTS `ccms_cfgpermissions`;
 CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
   `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'The identifying name of the permission',
-  `value` smallint(1) NOT NULL DEFAULT '0' COMMENT 'The value of the permission: 0 (undefined), 1 (any authenticated user) .. 4 (admin only)',
+  `value` smallint(1) NOT NULL DEFAULT '0' COMMENT 'The value of the permission: 0 (disabled), 1 (any authenticated user) .. 4 (admin only)',
+  `display_order` decimal(5,2) NOT NULL DEFAULT '999.99' COMMENT 'the order in which these items will be listed in the management edit window: useful when you want to group settings',
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -113,19 +114,21 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
 -- Dumping data for table `ccms_cfgpermissions`
 --
 
-INSERT INTO `ccms_cfgpermissions` (`name`, `value`) VALUES
-('manageUsers', 3),
-('manageOwners', 0),
-('managePages', 2),
-('manageMenu', 2),
-('manageTemplate', 4),
-('manageModules', 4),
-('manageActivity', 2),
-('manageVarCoding', 4),
-('manageModBackup', 3),
-('manageModNews', 2),
-('manageModLightbox', 2),
-('manageModComment', 2);
+INSERT INTO `ccms_cfgpermissions` (`name`, `value`, `display_order`) VALUES
+('manageModTranslate', 0, '100.10'),
+('manageOwners', 0, '10.10'),
+('managePages', 0, '10.00'),
+('manageMenu', 0, '3.00'),
+('manageTemplate', 0, '2.00'),
+('manageModules', 0, '100.00'),
+('managePageActivation', 2, '10.60'),
+('managePageCoding', 2, '10.70'),
+('manageModBackup', 0, '100.10'),
+('manageModNews', 0, '100.40'),
+('manageModLightbox', 0, '100.30'),
+('manageModComment', 0, '100.20'),
+('manageUsers', 0, '1.00'),
+('managePageEditing', 2, '10.50');
 
 -- --------------------------------------------------------
 
