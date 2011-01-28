@@ -121,17 +121,17 @@ class CcmsGlobalPermissions
 	/**
 	 * Return TRUE when the given user level is cleared for this operation, FALSE otherwise.
 	 * 
-	 * Assumes a permission level setting range of 1=any authenticated user ... 4=admin only
+	 * Assumes a permission level setting range of 0=disabled, 1=any authenticated user ... 4=admin only
 	 * 
 	 * Rules which are checked:
 	 * 	
-	 * - (when TRUE) admins are allowed full access (default: N.A. ~ FALSE)
+	 * - (when TRUE) admins are allowed full access, UNLESS the permission state is 'DISABLED' (default: N.A. ~ FALSE)
 	 * 	
 	 * - (when TRUE) allow when this is the owner we're talking about (default: N.A. ~ FALSE)
 	 * 	
 	 * - allow when the user level is equal or above the required user level
   	 */
-    public function is_level_okay($perm_name, $user_level = 1, $is_owner = false, $always_allow_admins = true) 
+    public function is_level_okay($perm_name, $user_level = 1, $is_owner = false, $always_allow_admins = false) 
 	{
 		$user_level = intval($user_level);
 		if ($is_owner || ($always_allow_admins && $user_level >= 4))
