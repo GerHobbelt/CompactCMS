@@ -171,12 +171,12 @@ $ccms['HTML']['JS.done'][] = <<<EOT42
 			update: 'response',
 			data: $('contactForm'),
 			onRequest: function() {
-				myFx.start('opacity', 0,1);
+				myFx.start('opacity', 0, 1);
 				$('status').set('text','Form is being processed');
 				$('status').set('class','notice');
 			},
 			onComplete: function(response) {
-				myFx.start('opacity', 1,0.8);
+				myFx.start('opacity', 1, 0.8);
 				$('status').set('text','Form submitted');
 				$('status').set('class','success');
 				scroll.toElement('response');
