@@ -85,7 +85,7 @@ $do_action = getGETparam4IdOrNumber('action');
 
 
 
-$do_update_or_livefilter = (($do_action == 'update' && $_SERVER['REQUEST_METHOD'] != 'POST') || ($do_action == 'livefilter' && $_SERVER['REQUEST_METHOD'] == 'POST'));
+$do_update_or_livefilter = (($do_action == 'update' && $_SERVER['REQUEST_METHOD'] == 'GET') || ($do_action == 'livefilter' && $_SERVER['REQUEST_METHOD'] == 'POST'));
 
 
 
@@ -496,7 +496,7 @@ if ($do_update_or_livefilter && checkAuth())
  * Render the entire menu list
  *
  */
-if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth()) 
+if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth()) 
 {
 	// TODO : add interface bits to allow changing this sort order (e.g. click on headers?)
 	$menu_sortorder = getGETparam4IdOrNumber('m_order', 'I12LH0');
@@ -610,14 +610,14 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAu
 						else 
 						{ 
 						?>
-							<input type="checkbox" name="islink" id="<?php echo $pageIdAsStr; ?>" class="islink" <?php echo($row->islink === 'Y') ? 'checked="checked"' : null; ?> />
+							<input type="checkbox" name="islink[<?php echo $pageIdAsStr; ?>]" id="islink-<?php echo $pageIdAsStr; ?>" class="islink" <?php echo($row->islink === 'Y') ? 'checked="checked"' : null; ?> />
 						<?php 
 						} 
 						?>
 					</td>
 					<td class="last">
 						<?php echo $row->urlpage; ?><em>(.html)</em>
-						<input type="hidden" name="pageid[]" value="<?php echo $pageIdAsStr; ?>" id="pageid"/>
+						<input type="hidden" name="page_id[<?php echo $pageIdAsStr; ?>]" value="<?php echo $pageIdAsStr; ?>" id="page_id"/>
 					</td>
 				</tr>
 				<?php 
@@ -892,7 +892,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	{ 
 		if(!empty($_POST['page_id'])) 
 		{
-			foreach ($_POST['pageid'] as $page_id) 
+			foreach ($_POST['page_id'] as $page_id) 
 			{
 				$page_id = filterParam4Number($page_id);
 				$toplevel = filterParam4Number($_POST['toplevel'][$page_id]);
@@ -1118,7 +1118,6 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
 	{
 		$e->croak();
 	}
-	exit();
 }
 
 /**
@@ -1188,7 +1187,6 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	{
 		$e->croak();
 	}
-	exit();
 }
 
 /**
@@ -1247,7 +1245,6 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 	{
 		$e->croak();
 	}
-	exit();
 }
  
 /**
@@ -1308,7 +1305,6 @@ if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' &&
 	{
 		$e->croak();
 	}
-	exit();
 }
 
 /**
@@ -1363,7 +1359,6 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
 	{
 		$e->croak();
 	}
-	exit();
 }
 
 /**
@@ -1417,7 +1412,6 @@ if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	{
 		$e->croak();
 	}
-	exit();
 }
 
 /**
@@ -1425,7 +1419,7 @@ if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
  * Generate the WYSIWYG or code editor for editing purposes (prev. editor.php)
  *
  */
-if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] != 'POST' && checkAuth())   // action=edit
+if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth())   // action=edit
 {
 	// Set the necessary variables
 	$page_id = getGETparam4Filename('page_id');
@@ -1730,4 +1724,12 @@ function confirmation()
 
 	exit();
 } 
+
+
+
+// when we get here, an illegal command was fed to us!
+header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' )));
+//die('status=error&action-was=' . $do_action . '&check=' . (1 * checkAuth()) . '&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ));
+die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+
 ?>

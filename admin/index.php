@@ -54,8 +54,10 @@ if (!defined('BASE_PATH'))
 }
 
 // Include general configuration
-// /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');   [i_a] loaded by process.inc.php anyway
-/*MARKER*/require_once(BASE_PATH . '/admin/includes/process.inc.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+///*MARKER*/require_once(BASE_PATH . '/admin/includes/process.inc.php');
+
+
 
 
 /* make darn sure only authenticated users can get past this point in the code */
