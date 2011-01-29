@@ -55,11 +55,11 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 	<div id="header" class="span-25 last">
 		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
 		<div class="span-20 last" id="navigation">
-			{%IF extramenu (eq ())%} 
+			{%IF extramenu eq ()%} 
 				<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
 			{%ELSE%} 
 				{%extramenu%}
-			{%/IF extramenu%} 
+			{%/IF%} 
 		</div>
 	</div>
 
@@ -75,9 +75,9 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 	<div id="content" class="span-20 last">
 		<div id="printable" class="span-21 last" style="text-align: right;">
 			{%breadcrumb%}
-			{%IF printable (eq Y)%}
+			{%IF printable eq (Y)%}
 				<br/><a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:template:print%}</a>
-			{%/IF printable%}
+			{%/IF%}
 		</div>
 		
 		{%content%}
