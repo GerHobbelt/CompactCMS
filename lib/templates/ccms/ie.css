@@ -24,6 +24,8 @@
 	text-align: left;
 }
 
+
+
 * html .span-25 { display:inline; overflow-x: hidden; }
 
 
@@ -59,13 +61,17 @@ table th, td
 
 
 
+legend     /* IE8 */
+{ 
+	margin-left: .7em;
+} 
 *:first-child+html legend  /* IE7 */
 { 
-	margin-top:-0.4em; 
+	margin-top: -0.4em; 
 }
 * html legend     /* IE6 */
 { 
-	margin-top:0; 
+	margin-top: 0; 
 	/* also fix padding which is completely destroyed on IE6 */
 	padding: .2em 1em; 
 } 

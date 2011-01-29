@@ -44,25 +44,18 @@ if (!defined('BASE_PATH'))
 // This file parses the template and coding
 /*MARKER*/require_once(BASE_PATH . '/lib/class/engine.class.php');
 
-// Initialize ccmsParser class
-$STP = new ccmsParser;
 
 // Set friendly menu names
-$ccms['mainmenu']	= (isset($ccms['structure1'])?$ccms['structure1']:null);
-$ccms['leftmenu']	= (isset($ccms['structure2'])?$ccms['structure2']:null);
-$ccms['rightmenu']	= (isset($ccms['structure3'])?$ccms['structure3']:null);
-$ccms['footermenu']	= (isset($ccms['structure4'])?$ccms['structure4']:null);
-$ccms['extramenu']	= (isset($ccms['structure5'])?$ccms['structure5']:null);
+$ccms['mainmenu']	= (isset($ccms['structure1']) ? $ccms['structure1'] : null);
+$ccms['leftmenu']	= (isset($ccms['structure2']) ? $ccms['structure2'] : null);
+$ccms['rightmenu']	= (isset($ccms['structure3']) ? $ccms['structure3'] : null);
+$ccms['footermenu']	= (isset($ccms['structure4']) ? $ccms['structure4'] : null);
+$ccms['extramenu']	= (isset($ccms['structure5']) ? $ccms['structure5'] : null);
 
-// Set the appropriate template
-$STP->setTemplate('./lib/templates/'.$ccms['template'].'.tpl.html', '<?php global $db, $cfg, $ccms; ?>');
 
-// Execute code
-$STP->setParams($ccms);
-$STP->parseAndEchoPHP();
+// Initialize ccmsParser class
+ccmsParser::setTemplateAndEchoPHP(BASE_PATH . '/lib/templates/'.$ccms['template'].'.tpl.html', $ccms, '<?php global $ccms, $cfg, $db, $modules, $v; ?>');
 
-?>
-<?php
 
 if (0)
 {

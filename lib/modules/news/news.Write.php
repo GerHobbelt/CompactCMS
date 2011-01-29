@@ -209,6 +209,10 @@ function confirmation()
 
 
 <?php
+$ccms['JS.required_files']['{%rootdir%}lib/includes/js/the_goto_guy.js'] = count($ccms['JS.required_files']); // make sure the value is a nicely unique sequence number: count() is good for that.
+$ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-core.js'] = count($ccms['JS.required_files']);
+$ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-more.js'] = count($ccms['JS.required_files']);
+
 $js_files = array();
 $js_files[] = '../../includes/js/the_goto_guy.js';
 $js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';

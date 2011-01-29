@@ -52,9 +52,21 @@ if (empty($page_id) || empty($pagename))
 
 
 
-<link rel="stylesheet" href="./lib/modules/comment/resources/style.css" type="text/css" media="screen" title="comments" charset="utf-8" />
-<script type="text/javascript" src="./lib/modules/comment/resources/script.js" charset="utf-8"></script>
-<script type="text/javascript" charset="utf-8">
+
+// code requires mootools: make sure we load it!
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/includes/js/mootools-core.js');
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/includes/js/mootools-more.js');
+// now register our own JS and make sure it ends up AFTER the mootools stuff has been loaded:
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/modules/comment/resources/script.js');
+
+
+tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/modules/comment/resources/style.css > media="screen" title="comments"');
+
+
+// window.addEvent("domready", function() {
+$cmtdir = $cfg['rootdir'] . 'lib/modules/comment';
+
+$ccms['JS.done'][] = <<<EOT42
 window.addEvent(
 	'domready',
 	function()
@@ -63,7 +75,7 @@ window.addEvent(
 			{
 				useSpinner:true,
 				method:'get',
-				url:<?php echo "'./lib/modules/comment/comment.Process.php?action=show-comments&page=" . $pageID . "'"; ?>,
+				url:'$cmtdir/comment.Process.php?action=show-comments&page_id=$page_id',
 				update:$('comments'),
 				onRequest:function(){},
 				onFailure:function(){},
@@ -81,7 +93,7 @@ window.addEvent(
 							e=new Event(e).stop();
 							var alink=ele.getProperty('href');
 							var qrypos = alink.indexOf('?');
-							var url='./lib/modules/comment/comment.Process.php'+alink.substr(qrypos);
+							var url='$cmtdir/comment.Process.php'+alink.substr(qrypos);
 							var ajaxLink=new Request.HTML(
 								{
 									useSpinner:true,
@@ -100,7 +112,14 @@ window.addEvent(
 				});
 		}
 	});
-</script>
+EOT42;
+
+
+
+
+
+
+?>
 
 <div id="comments">
 	<!--spinner-->

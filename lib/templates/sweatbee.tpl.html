@@ -90,11 +90,30 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 ?>
 <script type="text/javascript">
 <?php
+
+// Mark the JS sourcefiles needed by this template itself:
+//$ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-core.js'] = true;
+//$ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-more.js'] = true;
+
 $js_files = array();
-$js_files[] = '{%rootdir%}lib/includes/js/mootools-core.js,mootools-more.js';
+if (array_key_exists('JS.required_files', $ccms))
+{
+	foreach($ccms['JS.required_files'] as $jsfkey => $dummy)
+	{
+		if (!empty($jsfkey))
+		{
+			$js_files[] = $jsfkey;
+		}
+	}
+}
 
 $driver_code = <<<EOT
 EOT;
+
+if (array_key_exists('JS.done', $ccms))
+{
+	$driver_code .= implode("\n\n", $ccms['JS.done']);
+}
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

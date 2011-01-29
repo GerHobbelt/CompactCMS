@@ -166,6 +166,21 @@ $ccms['preview'] = ($preview ? 'Y' : 'N');
 // This files' current version
 $ccms['ccms_version'] = $v = "1.4.2";
 
+
+
+
+
+
+// preparation for plugins, et.c which want to load JavaScript files through the template:
+$ccms['CSS.required_files'] = array();
+$ccms['JS.required_files'] = array();
+$ccms['JS.done'] = array();
+
+
+
+
+
+
 // TEMPLATES ==
 // Read and list the available templates
 if ($handle = @opendir(BASE_PATH . '/lib/templates/')) 
@@ -334,6 +349,13 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				{
 					if (is_readable($filepath))
 					{
+						// load template init code BEFORE we load the page content itself:
+						$tpl_init_path = BASE_PATH . '/lib/templates/'.$ccms['template'].'/init.inc.php';
+						if (is_file($tpl_init_path))
+						{
+							/*MARKER*/require_once($tpl_init_path);
+						}
+
 						/*MARKER*/include($filepath);
 					}
 					else

@@ -2728,10 +2728,12 @@ state == 1: the PREinit code section
 
 state == 2: the init() code section
 */
-function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true, $js_load_callback = 'jsComplete')
+function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true, $js_load_callback = 'jsComplete')
 {
 	global $cfg;
 
+	$editarea_tags = explode(',', $editarea_tags);
+	
 	switch ($state)
 	{
 	default:
@@ -2782,74 +2784,86 @@ function generateJS4tinyMCEinit($state, $editarea_tag, $with_fancyupload = true,
 		// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
 		$rv .= "var dimensions;\n";
 		$rv .= "var editwinwidth;\n";
-		$rv .= "dimensions = window.getSize();\n";
-		$rv .= "editwinwidth = dimensions.x - 20;\n";
-		$rv .= "dimensions = \$('" . $editarea_tag . "').getSize();\n";
-		$rv .= "editwinwidth = dimensions.x;\n";
-		//$rv .= "alert('width: ' + editwinwidth + 'px');\n";
-		$rv .= "\n";
-		$rv .= "tinyMCE.init(\n";
-		$rv .= "	{\n";
-		$rv .= "		mode: 'exact',\n";
-		$rv .= "		elements: '" . $editarea_tag . "',\n";
-		$rv .= "		theme: 'advanced',\n";
-		$rv .= "		language: '" . $cfg['tinymce_language'] ."',\n";
-		$rv .= "		skin: 'o2k7',\n";
-		$rv .= "		skin_variant: 'silver',\n";
 		
-		$pluginarr = get_tinyMCE_plugin_list();
-		$pstr = implode(',', $pluginarr);
-		
-		$rv .= "		plugins: '" . $pstr . "',\n";
-		$rv .= "		theme_advanced_toolbar_location: 'top',\n";
-		
-		$rv .= "		theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
-		$rv .= "		theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
-		$rv .= "		theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
-		$rv .= "		theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
-		
-		$rv .= "		theme_advanced_toolbar_align: 'left',\n";
-		$rv .= "		theme_advanced_statusbar_location: 'bottom',\n";
-		$rv .= "		dialog_type: 'modal',\n";
-		$rv .= "		paste_auto_cleanup_on_paste: true,\n";
-		$rv .= "		theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-		$rv .= "		theme_advanced_resize_horizontal : 1,\n";
-		$rv .= "		theme_advanced_resizing_use_cookie : 1,\n";
-		$rv .= "		theme_advanced_resize_horizontal: false,\n";
-		$rv .= "		theme_advanced_resizing_min_width: 400,\n";
-		$rv .= "		theme_advanced_resizing_min_height: 100,\n";
-		$rv .= "		theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-		$rv .= "		theme_advanced_resizing_max_height: 0xFFFF,\n";
-		$rv .= "		relative_urls: true,\n";
-		$rv .= "		convert_urls: false,\n";
-		$rv .= "		remove_script_host: true,\n";
-		$rv .= "		document_base_url: '" . $cfg['rootdir'] . "',\n";
-		if($cfg['iframe'])
+		foreach($editarea_tags as $tag)
 		{
-			$rv .= "		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
+			$rv .= "dimensions = window.getSize();\n";
+			$rv .= "editwinwidth = dimensions.x - 20;\n";
+			$rv .= "dimensions = \$('" . $tag . "').getSize();\n";
+			$rv .= "editwinwidth = dimensions.x;\n";
+			//$rv .= "alert('width: ' + editwinwidth + 'px');\n";
+			$rv .= "\n";
+			$rv .= "tinyMCE.init(\n";
+			$rv .= "	{\n";
+			$rv .= "		mode: 'exact',\n";
+			$rv .= "		elements: '" . $tag . "',\n";
+			$rv .= "		theme: 'advanced',\n";
+			$rv .= "		language: '" . $cfg['tinymce_language'] ."',\n";
+			$rv .= "		skin: 'o2k7',\n";
+			$rv .= "		skin_variant: 'silver',\n";
+			
+			$pluginarr = get_tinyMCE_plugin_list();
+			$pstr = implode(',', $pluginarr);
+			
+			$rv .= "		plugins: '" . $pstr . "',\n";
+			$rv .= "		theme_advanced_toolbar_location: 'top',\n";
+			
+			$rv .= "		theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
+			$rv .= "		theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
+			$rv .= "		theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
+			$rv .= "		theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
+			
+			$rv .= "		theme_advanced_toolbar_align: 'left',\n";
+			$rv .= "		theme_advanced_statusbar_location: 'bottom',\n";
+			$rv .= "		dialog_type: 'modal',\n";
+			$rv .= "		paste_auto_cleanup_on_paste: true,\n";
+			$rv .= "		theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+			$rv .= "		theme_advanced_resize_horizontal : 1,\n";
+			$rv .= "		theme_advanced_resizing_use_cookie : 1,\n";
+			$rv .= "		theme_advanced_resize_horizontal: false,\n";
+			$rv .= "		theme_advanced_resizing_min_width: 400,\n";
+			$rv .= "		theme_advanced_resizing_min_height: 100,\n";
+			$rv .= "		theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+			$rv .= "		theme_advanced_resizing_max_height: 0xFFFF,\n";
+			$rv .= "		relative_urls: true,\n";
+			$rv .= "		convert_urls: false,\n";
+			$rv .= "		remove_script_host: true,\n";
+			$rv .= "		document_base_url: '" . $cfg['rootdir'] . "',\n";
+			
+			// TODO: determine the template of the given page: fetch those CSS files.
+			
+			// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
+			$rv .= "		content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,admin/img/styles/liquid.css,admin/img/styles/layout.css,admin/img/styles/sprite.css,admin/img/styles/last_minute_fixes.css' .
+					                     ",admin/img/styles/ie.css?only-when=%3d%3d+IE',\n";
+
+			if($cfg['iframe'])
+			{
+				$rv .= "		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
+			}
+			$rv .= "		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
+			if ($with_fancyupload)
+			{
+				$rv .= "		file_browser_callback: FileManager.TinyMCE(\n";
+				$rv .= "			function(type)\n";
+				$rv .= "			{\n";
+				$rv .= "				return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+				$rv .= "					url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
+				$rv .= "					baseURL: '" . $cfg['rootdir'] . "',\n";
+				$rv .= "					assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
+				$rv .= "					language: '" . $cfg['fancyupload_language'] . "',\n";
+				$rv .= "					selectable: true,\n";
+				$rv .= "					uploadAuthData: {\n";
+				$rv .= "						session: 'ccms_userLevel',\n";
+				$rv .= "						sid: '" . session_id() . "'\n";
+				$rv .= "					}\n";
+				$rv .= "				};\n";
+				$rv .= "			}),\n";
+			}
+			//$rv .= "		height: '300px',\n";
+			$rv .= "		width: editwinwidth\n"; // default: width in pixels
+			$rv .= "	});\n";
 		}
- 		$rv .= "		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
-		if ($with_fancyupload)
-		{
-			$rv .= "		file_browser_callback: FileManager.TinyMCE(\n";
-			$rv .= "			function(type)\n";
-			$rv .= "			{\n";
-			$rv .= "				return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-			$rv .= "					url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
-			$rv .= "					baseURL: '" . $cfg['rootdir'] . "',\n";
-			$rv .= "					assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
-			$rv .= "					language: '" . $cfg['fancyupload_language'] . "',\n";
-			$rv .= "					selectable: true,\n";
-			$rv .= "					uploadAuthData: {\n";
-			$rv .= "						session: 'ccms_userLevel',\n";
-			$rv .= "						sid: '" . session_id() . "'\n";
-			$rv .= "					}\n";
-			$rv .= "				};\n";
-			$rv .= "			}),\n";
-		}
-		//$rv .= "		height: '300px',\n";
-		$rv .= "		width: editwinwidth\n"; // default: width in pixels
-		$rv .= "	});\n";
+		
 		return $rv;
 
 		/*
@@ -2933,57 +2947,124 @@ function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code
 {
 	global $cfg;
 
-	$rv = "var jsLogEl = document.getElementById('jslog');\n";
-	$rv .= "var js = [\n";
-	$rv .= "	'" . implode("',\n        '", $js_files) . "'\n";
-	$rv .= "	];\n";
-	$rv .= "\n";
-	$rv .= "function jsComplete(user_obj, lazy_obj)\n";
-	$rv .= "{\n";
-	$rv .= "	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
-	$rv .= "	\n";
-	$rv .= "    if (lazy_obj.todo_count)\n";
-	$rv .= "	{\n";
-	$rv .= "		/* nested invocation of LazyLoad added one or more sets to the load queue */\n";
-	$rv .= "		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
-	$rv .= "		return false;\n";
-	$rv .= "	}\n";
-	$rv .= "	else\n";
-	$rv .= "	{\n";
-	$rv .= "		jslog('All JS has been loaded!');\n";
-	$rv .= "	}\n";
-	$rv .= "\n";
-	$rv .= "	// window.addEvent('domready',function()\n";
-	$rv .= "	//{\n";
-	$rv .= $driver_code . "\n";
-	$rv .= "	//});\n";
-	$rv .= "\n";
-	$rv .= "	//alert('stop_loading = ' + (1 * stop_loading));\n";
-	$rv .= "	return stop_loading;\n";
-	$rv .= "}\n";
-	$rv .= "\n";
-	$rv .= "\n";
-	$rv .= "function jslog(message) \n";
-	$rv .= "{\n";
-	$rv .= "	if (jsLogEl)\n";
-	$rv .= "	{\n";
-	$rv .= "		jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
-	$rv .= "	}\n";
-	$rv .= "}\n";
-	$rv .= "\n";
-	$rv .= "\n";
-	$rv .= "/* the magic function which will start it all, thanks to the augmented lazyload.js: */\n";
-	$rv .= "function ccms_lazyload_setup_GHO()\n";
-	$rv .= "{\n";
-	$rv .= "	jslog('loading JS (sequential calls)');\n";
-	$rv .= "\n";
-	$rv .= $starter_code . "\n";
-	$rv .= "\n";
-	$rv .= "	LazyLoad.js(js, jsComplete);\n";
-	$rv .= "}\n";
-	
+	$fs = null;
+	if (is_array($js_files) && count($js_files) > 0)
+	{
+		$fs = "'" . implode("',\n'", $js_files) . "'";
+	}
+	else 
+	{
+		$js_files = trim($js_files);
+		if (!empty($js_files))
+		{
+			$fs = strval($js_files);
+		}
+	}
+	if (!empty($fs))
+	{
+		$rv = "var jsLogEl = document.getElementById('jslog');\n";
+		$rv .= "var js = [\n";
+		$rv .= $fs . "\n";
+		$rv .= "	];\n";
+		$rv .= "\n";
+		$rv .= "function jsComplete(user_obj, lazy_obj)\n";
+		$rv .= "{\n";
+		$rv .= "	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
+		$rv .= "	\n";
+		$rv .= "    if (lazy_obj.todo_count)\n";
+		$rv .= "	{\n";
+		$rv .= "		/* nested invocation of LazyLoad added one or more sets to the load queue */\n";
+		$rv .= "		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
+		$rv .= "		return false;\n";
+		$rv .= "	}\n";
+		$rv .= "	else\n";
+		$rv .= "	{\n";
+		$rv .= "		jslog('All JS has been loaded!');\n";
+		$rv .= "	}\n";
+		$rv .= "\n";
+		$rv .= "	// window.addEvent('domready',function()\n";
+		$rv .= "	//{\n";
+		$rv .= $driver_code . "\n";
+		$rv .= "	//});\n";
+		$rv .= "\n";
+		$rv .= "	//alert('stop_loading = ' + (1 * stop_loading));\n";
+		$rv .= "	return stop_loading;\n";
+		$rv .= "}\n";
+		$rv .= "\n";
+		$rv .= "\n";
+		$rv .= "function jslog(message) \n";
+		$rv .= "{\n";
+		$rv .= "	if (jsLogEl)\n";
+		$rv .= "	{\n";
+		$rv .= "		jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
+		$rv .= "	}\n";
+		$rv .= "}\n";
+		$rv .= "\n";
+		$rv .= "\n";
+		$rv .= "/* the magic function which will start it all, thanks to the augmented lazyload.js: */\n";
+		$rv .= "function ccms_lazyload_setup_GHO()\n";
+		$rv .= "{\n";
+		$rv .= "	jslog('loading JS (sequential calls)');\n";
+		$rv .= "\n";
+		$rv .= $starter_code . "\n";
+		$rv .= "\n";
+		$rv .= "	LazyLoad.js(js, jsComplete);\n";
+		$rv .= "}\n";
+	}
+	else
+	{
+		$rv = "\n";
+		$rv .= $starter_code . "\n";
+		$rv .= "\n";
+		$rv .= "// window.addEvent('domready',function()\n"; // TODO !
+		$rv .= "//{\n";
+		$rv .= $driver_code . "\n";
+		$rv .= "//});\n";
+	}
 	return $rv;
 }
+
+
+
+
+
+
+
+
+/**
+For the template engine related code: set the value of the $arr[$key] element,
+IFF it doesn't exist yet.
+
+Return the resulting $arr[$key] value.
+*/
+function tmpl_set_no_over(&$arr, $key, $value)
+{
+	if (!array_key_exists($key, $arr))
+	{
+		$arr[$key] = $value;
+	}
+	return $arr[$key];
+}
+
+/**
+For the template engine related code: set the value of the $arr[$key] element to
+the next lower priority value (== higher number), IFF the entry doesn't exist yet.
+
+Note that when the $prio has been specified, it can be used to set the priority, but
+once again, this will only happen IFF the entry doesn't exist yet.
+
+Return the resulting $arr[$key] priority.
+*/
+function tmpl_set_autoprio(&$arr, $key, $prio = null)
+{
+	if (!array_key_exists($key, $arr))
+	{
+		$arr[$key] = (empty($prio) ? count($arr) : $prio); // append at the end by default
+	}
+	return $arr[$key];
+}
+
+
 
 
 ?>

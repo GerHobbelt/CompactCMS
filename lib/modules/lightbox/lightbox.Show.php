@@ -35,7 +35,7 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 // Default albums location
 $album_path	= BASE_PATH.'/media/albums';
-$album_url	= $cfg['rootdir'].'media/albums';
+$album_url	= $cfg['rootdir'] . 'media/albums';
 
 $pageID	= getGETparam4Filename('page');
 $imgID	= getGETparam4Filename('id');
@@ -78,7 +78,7 @@ if($handle = opendir($album_path))
 // Get specified album for current page
 $singleShow = false;
 $spec_album = array();
-if(count($albums)>0) 
+if(count($albums) > 0) 
 {
 	foreach ($albums as $file) 
 	{
@@ -91,19 +91,22 @@ if(count($albums)>0)
 	// Define single show
 	$singleShow = (count($spec_album) == 1 || count($albums) == 1 || !empty($imgID));
 }
-?>
 
-<!-- additional style and code -->
-<link rel="stylesheet" href="<?php echo $cfg['rootdir']; ?>lib/modules/lightbox/resources/style.css" type="text/css" media="screen" title="lightbox" charset="utf-8" />
-<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/modules/lightbox/resources/script.js" charset="utf-8"></script>
-<script type="text/javascript" charset="utf-8">
-window.addEvent("domready", function() {
-		initImageZoom({loadImage: '<?php echo $cfg['rootdir']; ?>lib/modules/lightbox/resources/loading.gif'});
-	});
-</script>
 
-<!-- lay-out -->
-<?php 
+// code requires mootools: make sure we load it!
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/includes/js/mootools-core.js');
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/includes/js/mootools-more.js');
+// now register our own JS and make sure it ends up AFTER the mootools stuff has been loaded:
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/modules/lightbox/resources/script.js');
+
+
+tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/modules/lightbox/resources/style.css > media="screen" title="lightbox"');
+
+// window.addEvent("domready", function() {
+$ccms['JS.done'][] = 'initImageZoom({loadImage: "' . $cfg['rootdir'] . 'lib/modules/lightbox/resources/loading.gif"});';
+
+
+
 
 function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $max_width = 80)
 {
@@ -179,7 +182,11 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	return $rv;
 }
 
-if(count($albums)>1 && $singleShow==false) 
+
+
+//echo '<pre>count = ' . count($albums) . ', single = ' . (1 * $singleShow) . '</pre> ';
+
+if(count($albums) > 1 && $singleShow == false) 
 {
 	if(!empty($albums)) 
 	{
@@ -249,7 +256,7 @@ if(count($albums)>1 && $singleShow==false)
 		echo $ccms['lang']['album']['noalbums'];
 	}
 } 
-elseif($singleShow==true) 
+elseif($singleShow) 
 {
 	$album = (!empty($imgID) ? $imgID : (count($spec_album) > 0 ? $spec_album[0] : $albums[0])); // [i_a] PHP evaluates nested ?: from RIGHT-TO-LEFT! Without the braces, you'ld get the wrong result.
 	
@@ -293,7 +300,7 @@ elseif($singleShow==true)
 	$images = fileList($album_path.'/'.$album);
 	
 	// If album is not empty and thumbnail is found
-	if (count($images)>0)
+	if (count($images) > 0)
 	{
 		foreach($images as $content) 
 		{
@@ -340,7 +347,7 @@ elseif($singleShow==true)
 	} 
 	else 
 	{
-		echo "<p>&#160;</p><p>".$ccms['lang']['system']['error_value']."</p>";
+		echo '<p>&#160;</p><p>' . $ccms['lang']['system']['error_value'] . '</p>';
 	}
 	
 	echo str_replace("album-back-to-ov-top", "album-back-to-ov-bottom", $back_to_overview_html);

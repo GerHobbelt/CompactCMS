@@ -221,25 +221,26 @@ class ccmsParser
 				if (!$pm)
 					return 'regex match failure for "' . $v[1] . '"';
 					
-				switch ($fbits[0])
+				switch ($fbits[1])
 				{
 				default:
 				case 'quoteprotect':
 					/* data must have its quotes transformed to HTML entities! */
+					//echo "<p>var = $var</p>\n";
 					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
 
 				case 'protect4attr':
 					/* make data suitable for an attribute value: strip tags and encode quotes! */
 					$rv = strip_tags($rv);
 					$rv = preg_replace('/\s+/', ' ', $rv);
-					if (count($fbits) > 2)
+					if (count($fbits) > 3)
 					{
 						// reduce the data string to a maximum length; clip at the last whitespace when this is required.
-						$maxlen = intval($fbits[2]);
-						$clip_on_ws = $fbits[4];
+						$maxlen = intval($fbits[3]);
+						$clip_on_ws = (count($fbits) > 5 ? $fbits[5] : false);
 						if ($maxlen > 0)
 						{
-							if ($clip_on_ws == 'true' || $clip_on_ws == '1')
+							if ($clip_on_ws == 'true' || $clip_on_ws == 1)
 							{
 								$rv = substr($rv, 0, $maxlen + 1);
 								/*
@@ -264,6 +265,118 @@ class ccmsParser
 						// else: do not clip
 					}
 					return htmlspecialchars($rv, ENT_QUOTES, 'UTF-8');
+					
+				case 'css_files':
+					/* 
+					  produce a series of (possibly merged!) CSS file loading <link ...> statements: extract optional 
+					  media type, etc. from the entries themselves.
+					 */
+					$merge = false;
+					if (count($fbits) > 3)
+					{
+						$merge = (strcasecmp(trim($fbits[3]), 'combine') == 0);
+					}
+					
+					asort($rv); // sort on /value/: lowest number has priority
+					
+					$combined_basepath = null;
+					$combined_path = null;
+					$css_files = array();
+					
+					foreach($rv as $cssfkey => $prio)
+					{
+						// to merge, all URLs must have the same start AND no URL should have a query section!
+						if ($merge && !empty($combined_basepath) && 0 === strpos($cssfkey, $combined_basepath) && false === strpos($cssfkey, '?') && false === strpos($cssfkey, '>'))
+						{
+							$combined_path .= ',' . substr($cssfkey, strlen($combined_basepath));
+							continue;
+						}
+						// when we get here, the previous combo is done: dump it:
+						if (!empty($combined_path))
+						{
+							$f = explode('>', $combined_path);
+							if (!isset($f[1])) $f[1] = '';
+							$css_files[] = '<link rel="stylesheet" type="text/css" href="' . rtrim($f[0]) . '" charset="utf-8" ' . $f[1] . '/>';
+						}
+
+						// now determine new basepath, etc.:
+						$combined_basepath = null;
+						
+						$pos = strrpos($cssfkey, '/');
+						if ($pos !== false && false === strpos($cssfkey, '?'))
+						{
+							$combined_basepath = substr($cssfkey, 0, $pos + 1);
+						}
+						$combined_path = $cssfkey;
+					}
+				
+					if (!empty($combined_path))
+					{
+						$f = explode('>', $combined_path);
+						if (!isset($f[1])) $f[1] = '';
+						$css_files[] = '<link rel="stylesheet" type="text/css" href="' . rtrim($f[0]) . '" charset="utf-8" ' . $f[1] . '/>';
+					}
+					
+					return implode("\n", $css_files);
+					
+				case 'js_files':
+					/* 
+					  produce a series of (possibly merged!) JS file lazy-loading JS array entries.
+					 */
+					$merge = false;
+					if (count($fbits) > 3)
+					{
+						$merge = (strcasecmp(trim($fbits[3]), 'combine') == 0);
+					}
+					
+					asort($rv); // sort on /value/: lowest number has priority
+					
+					$combined_basepath = null;
+					$combined_path = null;
+					$js_files = array();
+					
+					foreach($rv as $cssfkey => $prio)
+					{
+						if ($merge && !empty($combined_basepath) && 0 === strpos($cssfkey, $combined_basepath))
+						{
+							$combined_path .= ',' . substr($cssfkey, strlen($combined_basepath));
+							continue;
+						}
+						// when we get here, the previous combo is done: dump it:
+						if (!empty($combined_path))
+						{
+							$js_files[] = '"' . $combined_path . '"';
+						}
+
+						// now determine new basepath, etc.:
+						$combined_basepath = null;
+						
+						$pos = strrpos($cssfkey, '/');
+						if ($pos !== false)
+						{
+							$combined_basepath = substr($cssfkey, 0, $pos + 1);
+						}
+						$combined_path = $cssfkey;
+					}
+				
+					if (!empty($combined_path))
+					{
+						$js_files[] = '"' . $combined_path . '"';
+					}
+					
+					return implode(",\n", $js_files);
+					
+				case 'implode':
+					/* 
+					  implode an array of text chunks, using the specified interjection string, just like PHP implode() itself:
+					 */
+					$merge = "\n\n";
+					if (count($fbits) > 3)
+					{
+						$merge = $fbits[3];
+					}
+					
+					return implode($merge, $rv);
 				}
 			}
 			return '';
@@ -503,13 +616,15 @@ class ccmsParser
 		// see also: 
 		//     http://nl3.php.net/manual/en/function.eval.php (comments)
 		$short_tag_mode = (ini_get('short_open_tag') > 0);
+		
+		$template_engine = $this; // may be accessed within the eval() code
 		if ($short_tag_mode)
 		{
-			$rv = eval('?>'.$text.'<? '); 
+			$rv = eval(' ?>'.$text.'<? '); 
 		}
 		else
 		{
-			$rv = eval('?>'.$text.'<?php '); 
+			$rv = eval(' ?>'.$text.'<?php '); 
 		}
 		return $rv;
 	}
@@ -566,11 +681,19 @@ class ccmsParser
 	 *
 	 * accepts an array or an object that supports the method getVar($name)
 	 */
-	public function setParams(&$params) 
+	public function setParams(&$params, $no_overwrite = false) 
 	{
 		if (is_array($params))
 		{
-			$this->params = array_merge($params, $this->params);
+			if ($no_overwrite)
+			{
+				$this->params = array_merge($params, $this->params);
+			}
+			else
+			{
+				// when entries already exist, the new will overwrite those:
+				$this->params = array_merge($this->params, $params);
+			}
 			return true;
 		}
 		elseif (is_object($params) && method_exists($params, 'getVar'))
@@ -758,7 +881,7 @@ class ccmsParser
 	/**
 	 * Does everything at once: assemble, setParams and parseAndEcho
 	 */
-	public static function assembleAndEcho($frame, $frags, $params, $leadin = '', $leadout = '') 
+	public static function assembleAndEcho($frame, $frags, &$params, $leadin = '', $leadout = '') 
 	{
 		$parser = new ccmsParser;
 		$parser->setParams($params);
@@ -769,7 +892,7 @@ class ccmsParser
 	/**
 	 * Does everything at once: setTemplate, setParams and parseAndEcho
 	 */
-	public static function setTemplateAndEcho($tmpl, $params, $leadin = '', $leadout = '') 
+	public static function setTemplateAndEcho($tmpl, &$params, $leadin = '', $leadout = '') 
 	{
 		$parser = new ccmsParser;
 		$parser->setParams($params);
@@ -780,7 +903,7 @@ class ccmsParser
 	/**
 	 * Does everything at once: assemble, setParams and parseAndEchoPHP
 	 */
-	public static function assembleAndEchoPHP($frame, $frags, $params, $leadin = '', $leadout = '') 
+	public static function assembleAndEchoPHP($frame, $frags, &$params, $leadin = '', $leadout = '') 
 	{
 		$parser = new ccmsParser;
 		$parser->setParams($params);
@@ -791,7 +914,7 @@ class ccmsParser
 	/**
 	 * Does everything at once: setTemplate, setParams and parseAndEcho
 	 */
-	public static function setTemplateAndEchoPHP($tmpl, $params, $leadin = '', $leadout = '') 
+	public static function setTemplateAndEchoPHP($tmpl, &$params, $leadin = '', $leadout = '') 
 	{
 		$parser = new ccmsParser;
 		$parser->setParams($params);

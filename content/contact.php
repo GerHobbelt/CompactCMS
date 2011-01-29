@@ -147,13 +147,20 @@ if($_SERVER['REQUEST_METHOD'] != 'GET')
 	die('<p class="error center">Invalid data. Nothing sent!</p>');
 }
 
-?>
-<script type="text/javascript" charset="utf-8">
-window.addEvent('domready', function(){
+// TODO: JS and regular header and footer handling for pages (template engine)
+
+//<script type="text/javascript" charset="utf-8">
+$ccms['HTML']['JS.required_files'][$cfg['rootdir'] . 'lib/includes/js/mootools-core.js'] = count($ccms['JS.required_files']); // make sure the value is a nicely unique sequence number: count() is good for that.
+$ccms['HTML']['JS.required_files'][$cfg['rootdir'] . 'lib/includes/js/mootools-more.js'] = count($ccms['JS.required_files']);
+
+
+//TODO
+//window.addEvent('domready', function(){
+$ccms['HTML']['JS.done'][] = <<<EOT42
 	// Do: set-up form send functionality
 	function sendForm() {
-		var myFx 	= 	new Fx.Tween($('status'), { duration:500 });
-		var scroll	= 	new Fx.Scroll(window, { 
+		var myFx 	= new Fx.Tween($('status'), { duration:500 });
+		var scroll	= new Fx.Scroll(window, { 
 							wait: false, 
 							duration: 500, 
 							transition: Fx.Transitions.Quad.easeInOut 
@@ -187,8 +194,10 @@ window.addEvent('domready', function(){
 				sendForm();
 		}
 	});
-});
-</script>
+EOT42;
+//});
+
+?>
 <p>This is a simple contact form to show how you are able to code e.g. PHP code directly within the CCMS back-end. Feel free to modify the styling of this basic form to suit your websites' look &amp; feel. Don't forget to adjust the &lt;YOUR_ADDRESS_HERE&gt; line to your own e-mail address.</p>
 
 <div id="status"><!-- spinner --></div>
