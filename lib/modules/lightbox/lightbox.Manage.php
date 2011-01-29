@@ -577,7 +577,6 @@ function delete_these_files()
 
 <?php
 $js_files = array();
-var js = [
 $js_files[] = '../../../lib/includes/js/the_goto_guy.js';
 $js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
 $js_files[] = '../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js';
