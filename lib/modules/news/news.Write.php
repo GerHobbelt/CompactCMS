@@ -216,9 +216,9 @@ $ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-more.js'] = coun
 $js_files = array();
 $js_files[] = '../../includes/js/the_goto_guy.js';
 $js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
-$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent'));
+$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent,newsTeaser'));
 
-$driver_code = generateJS4TinyMCEinit(2, 'newsContent') . <<<EOT
+$driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
@@ -232,7 +232,7 @@ $driver_code = generateJS4TinyMCEinit(2, 'newsContent') . <<<EOT
 			});
 EOT;
 
-$starter_code = generateJS4TinyMCEinit(1, 'newsContent');
+$starter_code = generateJS4TinyMCEinit(1, 'newsContent,newsTeaser');
 
 echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 ?>
