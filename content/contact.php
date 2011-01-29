@@ -105,7 +105,7 @@ if($action_type == 'send'
 		$message = str_replace("\n.", "\n..", $message);
 		
 		ob_start();
-			$result = mail("<YOUR_ADDRESS_HERE>",$subject,$message,$headers);
+			$result = @mail("<YOUR_ADDRESS_HERE>",$subject,$message,$headers);
 			$content = ob_get_contents();
 		ob_end_clean();
 		if($result) 
@@ -114,6 +114,11 @@ if($action_type == 'send'
 		} 
 		else 
 		{
+			$content = trim($content);
+			if (empty($content))
+			{
+				$content = 'The SMTP data may be misconfigured. Anyhow, the email could not be sent.';
+			}
 			echo '<div class="error center"><p>Error while processing your e-mail:</p><p style="font-size:0.825em;  line-height: 1.2em;">'.$content.'</p></div>';
 		}
 		exit();
@@ -194,10 +199,10 @@ window.addEvent('domready', function(){
 		<label class="clear" for="email">Your e-mail</label><input type="text" name="email" value="" id="email" class="text required validate-email" /><br/><br/>
 		<label class="clear" for="subject">Subject</label><input type="text" name="subject" value="" id="subject" class="text required" /><br/><br/>
 		<label class="clear" for="message">Message content</label><textarea name="message" id="message" class="minLength:10" rows="8" cols="40"></textarea>
-		<p>And to check that this message isn't automated... Please re-enter <span style="font-weight:bold;color: #f00;"><?php echo $_SESSION['ccms_captcha']; ?></span>.</p>
+		<p>And to check that this message isn't automated... Please re-enter <span style="font-weight:bold; color:#f00;"><?php echo $_SESSION['ccms_captcha']; ?></span>.</p>
 		<label for="verification">Verification</label><input type="text" name="verification" maxlength="6" value="" id="verification" class="required validate-match matchInput:'captcha_check' matchName:'captcha' text"/><br/><br/>
 		<input type="hidden" name="captcha_check" value="<?php echo $_SESSION['ccms_captcha']; ?>" id="captcha_check" />
 		
 		<p class="prepend-7"><button type="submit">Send e-mail &rarr;</button></p>
 	</fieldset>
-</form>																		
+</form>
