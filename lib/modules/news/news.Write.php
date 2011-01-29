@@ -61,7 +61,7 @@ $do	= getGETparam4IdOrNumber('do');
 
 // Open recordset for specified user
 $newsID = getGETparam4Number('newsID');
-$pageID = getGETparam4IdOrNumber('pageID');
+$page_id = getGETparam4IdOrNumber('page_id');
 
 
 
@@ -69,14 +69,14 @@ if (!(checkAuth() && $perm->is_level_okay('manageModNews', $_SESSION['ccms_userL
 {
 	die("No external access to file");
 }
-if (empty($pageID))
+if (!$page_id)
 {
 	die($ccms['lang']['system']['error_forged']);
 }
 
-if(!empty($newsID) && !empty($pageID))
+if($newsID && $page_id)
 {
-	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID=u.userID WHERE newsID = " . MySQL::SQLValue($newsID, MySQL::SQLVALUE_NUMBER) . " AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID = u.userID WHERE newsID = " . MySQL::SQLValue($newsID, MySQL::SQLVALUE_NUMBER) . " AND page_id = " . MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER));
 	if (!$news) $db->Kill();
 }
 
@@ -162,7 +162,7 @@ if(!empty($newsID) && !empty($pageID))
 				?></textarea>
 				<hr class="space"/>
 				<input type="hidden" name="newsID" value="<?php echo $newsID; ?>" id="newsID" />
-				<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+				<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 				<div class="right">
 					<button type="submit" name="submitNews" value="<?php echo $newsID; ?>">
 						<?php
@@ -179,7 +179,7 @@ if(!empty($newsID) && !empty($pageID))
 						<?php
 						}
 						?>
-					<a class="button" href="./news.Manage.php?pageID=<?php echo $pageID; ?>" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					<a class="button" href="./news.Manage.php?page_id=<?php echo $page_id; ?>" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 				</div>
 			</form>
 		</div>

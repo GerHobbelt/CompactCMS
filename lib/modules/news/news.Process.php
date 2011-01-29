@@ -63,7 +63,7 @@ class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -
 
 // Set default variables
 $newsID 	= getPOSTparam4Number('newsID');
-$pageID		= getPOSTparam4IdOrNumber('pageID');
+$page_id	= getPOSTparam4IdOrNumber('page_id');
 $cfgID		= getPOSTparam4Number('cfgID');
 $do_action 	= getGETparam4IdOrNumber('action');
 
@@ -79,16 +79,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-edit-news' && chec
 	FbX::SetFeedbackLocation('news.Manage.php');
 	try
 	{
-		if (!empty($pageID))
+		if (!empty($page_id))
 		{
-			FbX::SetFeedbackLocation('news.Manage.php', 'file=' . $pageID);
+			FbX::SetFeedbackLocation('news.Manage.php', 'page_id=' . $page_id);
 		
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 			{
 				// Published
 				$newsAuthor = getPOSTparam4Number('newsAuthor');
-				//$pageID = getPOSTparam4IdOrNumber('pageID');
 				$newsTitle = getPOSTparam4DisplayHTML('newsTitle');
 				$newsTeaser = getPOSTparam4DisplayHTML('newsTeaser');
 				$newsContent = getPOSTparam4DisplayHTML('newsContent');
@@ -96,12 +95,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-edit-news' && chec
 				$newsPublished = getPOSTparam4boolean('newsPublished');
 
 				/* make sure empty news posts don't get through! front-end checking alone is NOT enough! */
-				if (!empty($pageID) && !empty($newsAuthor) && !empty($newsAuthor) && !empty($newsTitle) && strlen($newsTitle) >= 3 && !empty($newsTeaser) && !empty($newsContent))
+				if (!empty($page_id) && !empty($newsAuthor) && !empty($newsAuthor) && !empty($newsTitle) && strlen($newsTitle) >= 3 && !empty($newsTeaser) && !empty($newsContent))
 				{
 					// Set all the submitted variables
 					$values = array(); // [i_a] make sure $values is an empty array to start with here
 					$values["userID"] = MySQL::SQLValue($newsAuthor, MySQL::SQLVALUE_NUMBER);
-					$values["pageID"] = MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+					$values["page_id"] = MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
 					$values["newsTitle"] = MySQL::SQLValue($newsTitle, MySQL::SQLVALUE_TEXT);
 					$values["newsTeaser"] = MySQL::SQLValue($newsTeaser, MySQL::SQLVALUE_TEXT);
 					$values["newsContent"] = MySQL::SQLValue($newsContent, MySQL::SQLVALUE_TEXT);
@@ -111,7 +110,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-edit-news' && chec
 					// Execute either INSERT or UPDATE based on $newsID
 					if($db->AutoInsertUpdate($cfg['db_prefix'].'modnews', $values, array('newsID' => MySQL::BuildSQLValue($newsID)))) 
 					{
-						header('Location: ' . makeAbsoluteURI('news.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
+						header('Location: ' . makeAbsoluteURI('news.Manage.php?page_id='.$page_id.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
 						exit();
 					} 
 					else 
@@ -151,9 +150,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-news' && checkAuth
 	
 	try
 	{
-		if (!empty($pageID))
+		if ($page_id)
 		{
-			FbX::SetFeedbackLocation('news.Manage.php', 'file=' . $pageID);
+			FbX::SetFeedbackLocation('news.Manage.php', 'page_id=' . $page_id);
 		
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
@@ -183,7 +182,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-news' && checkAuth
 				// Check for errors
 				if($result && $i==$total) 
 				{
-					header('Location: ' . makeAbsoluteURI('news.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+					header('Location: ' . makeAbsoluteURI('news.Manage.php?page_id='.$page_id.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
 					exit();
 				} 
 				else 
@@ -217,9 +216,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 	FbX::SetFeedbackLocation('news.Manage.php');
 	try
 	{
-		if (!empty($pageID))
+		if ($page_id)
 		{
-			FbX::SetFeedbackLocation('news.Manage.php', 'file=' . $pageID);
+			FbX::SetFeedbackLocation('news.Manage.php', 'page_id=' . $page_id);
 		
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
@@ -231,7 +230,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 				$showTeaser = getPOSTparam4boolean('show_teaser');
 
 				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values["pageID"]		= MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+				$values["page_id"]		= MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
 				$values["showLocale"]	= MySQL::SQLValue($showLocale, MySQL::SQLVALUE_TEXT);
 				$values["showMessage"]	= MySQL::SQLValue($showMessage, MySQL::SQLVALUE_NUMBER);
 				$values["showAuthor"]	= MySQL::SQLValue($showAuthor, MySQL::SQLVALUE_BOOLEAN);
@@ -241,7 +240,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 				// Execute the insert or update for current page
 				if($db->AutoInsertUpdate($cfg['db_prefix'].'cfgnews', $values, array('cfgID' => MySQL::BuildSQLValue($cfgID)))) 
 				{
-					header('Location: ' . makeAbsoluteURI('news.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+					header('Location: ' . makeAbsoluteURI('news.Manage.php?page_id='.$page_id.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 					exit();
 				} 
 				else 

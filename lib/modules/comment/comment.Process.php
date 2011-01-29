@@ -66,7 +66,7 @@ class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -
 
 
 // Set default variables
-$pageID		= getPOSTparam4Filename('pageID');
+$page_id    = getPOSTparam4Filename('page_id');
 $cfgID		= getPOSTparam4Number('cfgID');
 $do_action 	= getGETparam4IdOrNumber('action');
 
@@ -79,8 +79,8 @@ $do_action 	= getGETparam4IdOrNumber('action');
 if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action=='show-comments' && !empty($_SESSION['ccms_captcha']) /* && checkAuth() */ ) // there's not necessarily an *authenticated* SESSION going on here... 
 {
 	// Pagination variables
-	$pageID	= getGETparam4Filename('page');
-	$rs = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), array('showMessage', 'showLocale'));
+	$page_id = getGETparam4IdOrNumber('page_id');
+	$rs = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)), array('showMessage', 'showLocale'));
 	if (!$rs)
 		$db->Kill();
 	$rsCfg	= $rs->showMessage;
@@ -100,7 +100,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action=='show-comments' && !empty(
 	 * have been taken. (Well, /hardcoding/ it like this is the safest possible
 	 * thing right there, so no worries, mate! ;-) )
 	 */
-	$total = $db->SelectSingleValue($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), 'COUNT(commentID)');
+	$total = $db->SelectSingleValue($cfg['db_prefix'].'modcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)), 'COUNT(commentID)');
 	if ($db->ErrorNumber()) 
 		$db->Kill();
 	$limit = getGETparam4Number('offset') * $max;
@@ -122,10 +122,10 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action=='show-comments' && !empty(
 	SetUpLanguageAndLocale($rsLoc);
 
 	// Load recordset
-	$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID'), $limit4sql);
+	$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)), null, array('-commentTimestamp', '-commentID'), $limit4sql);
 	if ($commentlist === false)
 		$db->Kill();
-	//echo "<pre>" . $db->GetLastSQL() . " -- $limit, $pageID, ".getGETparam4Number('offset')."\n";
+	//echo "<pre>" . $db->GetLastSQL() . " -- $limit, $page_id, ".getGETparam4Number('offset')."\n";
 	//var_dump($_GET);
 	//echo "</pre>";
 	
@@ -177,7 +177,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action=='show-comments' && !empty(
 				} 
 				else 
 				{
-					echo '<a href="?offset='.$i.'&action='.$do_action.'&page='.$pageID.'&">'.$linktext.'</a>';
+					echo '<a href="?offset='.$i.'&action='.$do_action.'&page_id='.$page_id.'&">'.$linktext.'</a>';
 				}
 			} 
 			?>
@@ -200,14 +200,14 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action=='show-comments' && !empty(
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && checkAuth()) 
 {
-	$pageID	= getPOSTparam4Filename('pageID');
+	$page_id = getPOSTparam4IdOrNumber('page_id');
 	
 	FbX::SetFeedbackLocation('comment.Manage.php');
 	try
 	{
-		if (!empty($pageID))
+		if (!empty($page_id))
 		{
-			FbX::SetFeedbackLocation('comment.Manage.php', 'file=' . $pageID);
+			FbX::SetFeedbackLocation('comment.Manage.php', 'page_id=' . $page_id);
 			
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
@@ -230,7 +230,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && check
 					$values = array(); // [i_a] make sure $values is an empty array to start with here
 					$values['commentID'] = MySQL::SQLValue($idnum, MySQL::SQLVALUE_NUMBER);
 					/* only do this when a good pageID value was specified! */
-					$values["pageID"] = MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+					$values["page_id"] = MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
 					
 					$result = $db->DeleteRows($cfg['db_prefix'].'modcomment', $values);
 					if (!$result) break;
@@ -240,7 +240,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-comments' && check
 				// Check for errors
 				if($result && $i==$total) 
 				{
-					header('Location: ' . makeAbsoluteURI('comment.Manage.php?status=notice&file='.$pageID.'&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+					header('Location: ' . makeAbsoluteURI('comment.Manage.php?status=notice&page_id='.$page_id.'&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
 					exit();
 				} 
 				else 
@@ -285,7 +285,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-comment' && $_POST
 	if (!empty($commentName) && !empty($commentEmail) && !empty($commentRating) && !empty($commentContent) && !empty($commentHost))
 	{
 		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values['pageID']		= MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+		$values['page_id']      = MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
 		$values['commentName']	= MySQL::SQLValue($commentName, MySQL::SQLVALUE_TEXT);
 		$values['commentEmail']	= MySQL::SQLValue($commentEmail, MySQL::SQLVALUE_TEXT);
 		$values['commentUrl']	= MySQL::SQLValue($commentUrl, MySQL::SQLVALUE_TEXT);
@@ -324,14 +324,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-comment' && $_POST
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-cfg' && checkAuth()) 
 {
-	$pageID	= getPOSTparam4Filename('pageID');
+	$page_id = getPOSTparam4IdOrNumber('page_id');
 	
 	FbX::SetFeedbackLocation('comment.Manage.php');
 	try
 	{
-		if (!empty($pageID))
+		if (!empty($page_id))
 		{
-			FbX::SetFeedbackLocation('comment.Manage.php', 'file=' . $pageID);
+			FbX::SetFeedbackLocation('comment.Manage.php', 'page_id=' . $page_id);
 			
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
@@ -342,14 +342,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-cfg' && checkAuth
 				if (!empty($showMessage) && !empty($showLocale))
 				{
 					$values = array(); // [i_a] make sure $values is an empty array to start with here
-					$values['pageID'] = MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT);
+					$values['page_id'] = MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER);
 					$values['showMessage'] = MySQL::SQLValue($showMessage, MySQL::SQLVALUE_NUMBER);
 					$values['showLocale'] = MySQL::SQLValue($showLocale, MySQL::SQLVALUE_TEXT);
 
 					// Insert or update configuration
 					if($db->AutoInsertUpdate($cfg['db_prefix'].'cfgcomment', $values, array('cfgID' => MySQL::BuildSQLValue($cfgID)))) 
 					{
-						header('Location: ' . makeAbsoluteURI('comment.Manage.php?file='.$pageID.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+						header('Location: ' . makeAbsoluteURI('comment.Manage.php?page_id='.$page_id.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 						exit();
 					} 
 					else 

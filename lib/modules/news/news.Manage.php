@@ -59,9 +59,11 @@ if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 $do	= getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
-$pageID	= getGETparam4Filename('file');
-
-if (empty($pageID))
+$page_id = getGETparam4IdOrNumber('page_id');
+$pagerow = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
+if (!$pagerow) $db->Kill();
+$pageName = $pagerow->urlpage;
+if (empty($pageName) || empty($page_id))
 {
 	die($ccms['lang']['system']['error_forged']);
 }
@@ -99,14 +101,14 @@ if (empty($pageID))
 			<?php
 			// Load recordset
 			$i=0;
-			$newsitems = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE pageID=".MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+			$newsitems = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE page_id=".MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER));
 			if ($newsitems === false)
 				$db->Kill();
 
 			// Start switch for news, select all the right details
 			if(count($newsitems) > 0) 
 			{ 
-				$preview_checkcode = GenerateNewPreviewCode(null, $pageID);
+				$preview_checkcode = GenerateNewPreviewCode($page_id);
 				
 			?>
 				<form action="news.Process.php?action=del-news" method="post" accept-charset="utf-8">
@@ -151,7 +153,7 @@ if (empty($pageID))
 								// Filter spaces, non-file characters and account for UTF-8
 								$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
 								
-								echo '<a href="' . $cfg['rootdir'].$rsNews->pageID.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle . '.html?preview=' . $preview_checkcode . '" ' .
+								echo '<a href="' . $cfg['rootdir'].$pageName.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle . '.html?preview=' . $preview_checkcode . '" ' .
 											'title="' . $ccms['lang']['backend']['previewpage'] . '"><span class="ss_sprite_16 ss_eye">&#160;</span></a>'; 
 								?>
 								</td>
@@ -160,7 +162,7 @@ if (empty($pageID))
 								if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 								{ 
 								?>
-									<a href="news.Write.php?pageID=<?php echo $pageID; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><span class="ss_sprite_16 ss_pencil">&#160;</span><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20 ? '...' : null); ?></a>
+									<a href="news.Write.php?page_id=<?php echo $page_id; ?>&amp;newsID=<?php echo rm0lead($rsNews->newsID); ?>"><span class="ss_sprite_16 ss_pencil">&#160;</span><?php echo substr($rsNews->newsTitle,0,20); echo (strlen($rsNews->newsTitle)>20 ? '...' : null); ?></a>
 								<?php 
 								} 
 								else 
@@ -184,7 +186,7 @@ if (empty($pageID))
 					if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 					{ 
 					?>
-					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
+					<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id">
 					<div class="right">
 						<button type="submit" onclick="return confirmation_delete();" name="deleteNews"><span class="ss_sprite_16 ss_newspaper_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
 					</div>
@@ -206,11 +208,11 @@ if (empty($pageID))
 			if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])) 
 			{ 
 			?>
-				<p class="ss_has_sprite"><a href="news.Write.php?pageID=<?php echo $pageID; ?>"><span class="ss_sprite_16 ss_newspaper_add">&#160;</span><?php echo $ccms['lang']['news']['addnewslink']; ?></a></p>
+				<p class="ss_has_sprite"><a href="news.Write.php?page_id=<?php echo $page_id; ?>"><span class="ss_sprite_16 ss_newspaper_add">&#160;</span><?php echo $ccms['lang']['news']['addnewslink']; ?></a></p>
 			
 				<h2><?php echo $ccms['lang']['news']['settings']; ?></h2>
 				<?php 
-				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('pageID' => MySQL::SQLValue($pageID,MySQL::SQLVALUE_TEXT)));
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)));
 				if ($db->ErrorNumber() != 0) $db->Kill();
 					
 				if ($rsCfg !== false)
@@ -284,7 +286,7 @@ if (empty($pageID))
 						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />';
 					}
 					?>
-					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+					<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
 						<a class="button" href="../../../admin/index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
@@ -313,7 +315,7 @@ function confirmation()
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pageID; ?>_ccms');
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pageName; ?>_ccms');
 	}
 	return false;
 }

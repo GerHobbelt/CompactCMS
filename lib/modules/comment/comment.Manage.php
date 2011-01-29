@@ -60,13 +60,15 @@ if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 $do	= getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
-$pageID	= getGETparam4Filename('file');
+$page_id = getGETparam4Filename('page_id');
 
-if (empty($pageID))
+if (empty($page_id))
 {
 	die($ccms['lang']['system']['error_forged']);
 }
 
+$pagerow = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)));
+if (!$pagerow) $db->Kill();
 
 
 
@@ -98,7 +100,7 @@ if (empty($pageID))
 		<?php 
 		// Load recordset; most recent comments on top; the extra order by commentID bit is there to ensure the sort/order is repeatable.
 		$i = 0;
-		$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID'));
+		$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)), null, array('-commentTimestamp', '-commentID'));
 		if ($commentlist === false)
 			$db->Kill();
 	
@@ -153,7 +155,7 @@ if (empty($pageID))
 							?>
 							</td>
 							<td class="rating-col">
-								<img src="./resources/<?php echo $rsComment->commentRate;?>-star.gif" alt="<?php echo $ccms['lang']['guestbook']['rating']." ".$rsComment->commentRate;?>"/>
+								<img src="./resources/<?php echo $rsComment->commentRate; ?>-star.gif" alt="<?php echo $ccms['lang']['guestbook']['rating']." ".$rsComment->commentRate;?>"/>
 							</td>
 							<td class="name-col nowrap">
 							<?php 
@@ -219,7 +221,7 @@ if (empty($pageID))
 			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
 			{ 
 			?>
-				<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
+				<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id">
 				<div class="right">
 					<button type="submit" onclick="return confirmation_delete();" name="deleteComments"><span class="ss_sprite_16 ss_newspaper_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
 				</div>
@@ -241,7 +243,7 @@ if (empty($pageID))
 			<?php 
 			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel'])) 
 			{ 
-				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
 				if ($db->ErrorNumber() != 0) $db->Kill();
 				if ($rsCfg !== false)
 				{
@@ -282,7 +284,7 @@ if (empty($pageID))
 						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />'; 
 					}
 					?>
-					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+					<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
 						<a class="button" href="../../../admin/index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
@@ -311,7 +313,7 @@ function confirmation()
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pageID; ?>_ccms');
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pagerow->urlpage; ?>_ccms');
 	}
 	return false;
 }

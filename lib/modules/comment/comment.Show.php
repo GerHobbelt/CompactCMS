@@ -37,12 +37,21 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 $_SESSION['ccms_captcha'] = mt_rand('123456','987654'); 
 
 // Load comment preferences
-$pageID	= getGETparam4Filename('page');
+$pagename = getGETparam4Filename('page');
 $is_printing = ($ccms['printing'] == 'Y');
 
-?>
+$pagerow = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($pagename,MySQL::SQLVALUE_TEXT)));
+if ($db->ErrorNumber() != 0) $db->Kill();
 
-<!-- additional style and code -->
+$page_id = $pagerow->page_id;
+
+if (empty($page_id) || empty($pagename))
+{
+	die($ccms['lang']['system']['error_forged']);
+}
+
+
+
 <link rel="stylesheet" href="./lib/modules/comment/resources/style.css" type="text/css" media="screen" title="comments" charset="utf-8" />
 <script type="text/javascript" src="./lib/modules/comment/resources/script.js" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
@@ -137,7 +146,7 @@ if (!$is_printing)
 			<label for="verification"><?php echo $ccms['lang']['guestbook']['verify']; ?></label><input type="input" name="verification" style="width:50px;" maxlength="6" value="" id="verification" class="required validate-match matchInput:'captcha_check' matchName:'captcha' text"/>
 			
 			<input type="hidden" name="captcha_check" value="<?php echo $_SESSION['ccms_captcha']; ?>" id="captcha_check" />
-			<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+			<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 			<p style="margin-bottom:20px;text-align:center;">
 				<button name="submit_gb" type="submit"><?php echo $ccms['lang']['guestbook']['add']; ?></button>
 			</p>
