@@ -349,7 +349,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			{
 			?>
 				<form action="lightbox.Process.php?action=create-album" method="post" accept-charset="utf-8">
-					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" name="album" value="" id="album" />
+					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" name="album" value="" id="album-create" />
 					<button type="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 				</form>
 			<?php 
@@ -396,7 +396,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 					?>
 					<label for="description"><?php echo $ccms['lang']['album']['description']; ?></label>
 					<textarea name="description" rows="3" cols="40" id="description"><?php echo $desc; ?></textarea>
-					<input type="hidden" name="album" value="<?php echo $album; ?>" id="album" />
+					<input type="hidden" name="album" value="<?php echo $album; ?>" id="album-cfg" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
 					</div>
@@ -413,7 +413,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 		<?php
 		} 
 		
-		if(count($albums)>0) 
+		if(count($albums) > 0) 
 		{ 
 		?>
 			<h2><?php echo $ccms['lang']['album']['uploadcontent']; ?></h2>
@@ -459,29 +459,19 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 
 				/* whitespace is important here... */ ?>&action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
 		
-				<label for="album"><?php echo $ccms['lang']['album']['toexisting']; ?></label>
-				<select name="album" id="album" class="text" size="1">
-					<?php 
-					foreach ($albums as $value) 
-					{ 
-					?>
-						<option <?php echo ($album===$value?"selected":null); ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
-					<?php 
-					} 
-					?>
-				</select>
-				<hr class="space"/>
-				<div id="lightbox-fallback">
-					<form action="lightbox.Process.php?action=save-files" method="post" accept-charset="utf-8">
-						<?php echo $ccms['lang']['album']['singlefile']; ?>
-						<input id="lightbox-photoupload" type="file" name="Filedata" />
-						<div class="right">
-							<button type="submit"><span class="ss_sprite_16 ss_add"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></button>
-						</div>
-					</form>
-				</div>
-			
-				<div id="lightbox-status" >
+				<label><?php echo $ccms['lang']['album']['toexisting']; ?>
+					<select name="album" id="album-upl-target" class="text" size="1">
+						<?php 
+						foreach ($albums as $value) 
+						{ 
+						?>
+							<option <?php echo ($album === $value ? "selected" : null); ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
+						<?php 
+						} 
+						?>
+					</select>
+				</label>
+				<div id="lightbox-status">
 					<p>
 						<a id="lightbox-browse"><span class="ss_sprite_16 ss_folder_image">&#160;</span><?php echo $ccms['lang']['album']['browse']; ?></a> |
 						<a id="lightbox-clear"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['album']['clear']; ?></a> |
@@ -502,6 +492,29 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 			
 				<ul id="lightbox-list"></ul>
 			</form>	
+			
+			<div id="lightbox-fallback" class="clear" >
+				<form action="lightbox.Process.php?action=save-files1" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+					<?php echo $ccms['lang']['album']['singlefile']; ?>
+					
+					<label><?php echo $ccms['lang']['album']['toexisting']; ?>
+						<select name="album" id="album_upload1" class="text" size="1">
+							<?php 
+							foreach ($albums as $value) 
+							{ 
+							?>
+								<option <?php echo ($album === $value ? "selected" : null); ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
+							<?php 
+							} 
+							?>
+						</select>
+					</label>
+					<input id="lightbox-photoupload" type="file" name="Filedata" />
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_add"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></button>
+					</div>
+				</form>
+			</div>
 			<?php 
 			} 
 			else 

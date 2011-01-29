@@ -341,12 +341,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
  * As we like to play it safe when uploading files, we'll add another check right 
  * here to ensure this action is only allowed once per form rendering.
  */
-if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-files') 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && ($do_action == 'save-files' || $do_action == 'save-files1')) 
 {
 	$error 		= false;
 	$error_code = 0;
 
-	if (!checkAuth() || empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])
+	if (!checkAuth() || ($do_action == 'save-files' && (empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])))
 	{
 if (0)
 {
@@ -394,7 +394,7 @@ if (0)
 
 	if (empty($error) && (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile))) 
 	{
-		$error = 'Invalid Upload: ';
+		$error = 'Invalid file or no file at all uploaded';
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
@@ -407,13 +407,13 @@ if (0)
 	if (empty($error) && !in_array($size[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM))) 
 	{
 		$error = 'Please upload only images of type JPEG, GIF or PNG.';
-		$error_code = $size[2];
+		$error_code = $size[2] . ' :: ' . $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
 	if (empty($error) && (($size[0] < 50) || ($size[1] < 50)))  // braces for proper evaluation precedence!!
 	{
 		$error = 'Please upload an image bigger than 50px.';
-		$error_code = $size[0] . ':' . $size[1];
+		$error_code = $size[0] . ':' . $size[1] . ' :: ' . $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
 	$src = false;
@@ -444,7 +444,7 @@ if (0)
 	
 	if (empty($error) && $src == false)
 	{
-		$error = 'Internal error.';
+		$error = 'Corrupted file cannot be processed as image type ' . strtoupper($extension);
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 	
@@ -521,12 +521,47 @@ if (0)
 			$newheight_t = 80;
 			$newwidth_t = intval($newheight_t / $aspect_ratio);
 		}
-		$tmp_t = imagecreatetruecolor($newwidth_t,$newheight_t);
-		imagecopyresampled($tmp_t,$tmp,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
 		
+		// sharpen intermediate image when shrinking a lot.
+		//
+		// see also:
+		//   http://adamhopkinson.co.uk/blog/2010/08/26/sharpen-an-image-using-php-and-gd/
+		//   http://nl2.php.net/manual/nl/ref.image.php#56144
+		//   http://loriweb.pair.com/8udf-sharpen.html
+		if ($height >= 160 || $width >= 160)
+		{
+			$newheight = $newheight_t * 2;
+			$newwidth = intval($newheight / $aspect_ratio);
+			
+			$tmp2 = imagecreatetruecolor($newwidth,$newheight);
+			imagecopyresampled($tmp2,$src,0,0,0,0,$newwidth,$newheight,$width,$height);
+
+			// define the sharpen matrix
+			$sharpen = array(
+				array(0.0, -1.0, 0.0),
+				array(-1.0, 5.0, -1.0),
+				array(0.0, -1.0, 0.0)
+			);
+
+			// calculate the sharpen divisor
+			$divisor = array_sum(array_map('array_sum', $sharpen));
+
+			// apply the matrix
+			imageconvolution($tmp2, $sharpen, $divisor, 0);
+
+			imagedestroy($src);
+			$src = $tmp2;
+			$width = $newwidth;
+			$height = $newheight;
+		}
+
+		$tmp_t = imagecreatetruecolor($newwidth_t,$newheight_t);
+		imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
+		
+
 		// Save newly generated versions
-		$thumbnail	= $dest.'/_thumbs/'. $target_filename;
-		$original	= $dest.'/'.$target_filename;
+		$thumbnail = $dest.'/_thumbs/'. $target_filename;
+		$original  = $dest.'/'.$target_filename;
 		
 		switch ($extension)
 		{
@@ -557,6 +592,10 @@ if (0)
 	// Check for errors
 	if (!empty($error)) 
 	{
+		// see if the error code string carries any /useful/ info:
+		$code = trim(str_replace(':', '', $error_code));
+		if (empty($code)) $error_code = 403;
+		
 		$return = array(
 			'status' => '0',
 			'error' => $error,
@@ -582,17 +621,31 @@ if (0)
 		}
 	}
 
-	$response = getREQUESTparam4IdOrNumber('response');
-	if ($response == 'xml') 
-	{
-		/* do nothing */
-		die($ccms['lang']['auth']['featnotallowed']);
-	} 
-	else 
-	{
-		// header('Content-type: application/json');
-		echo json_encode($return);
-	}
+//	$response = getREQUESTparam4IdOrNumber('response');
+//	if ($response == 'xml') 
+//	{
+//		/* do nothing */
+//		die($ccms['lang']['auth']['featnotallowed']);
+//	} 
+//	else 
+//	{
+		if ($do_action == 'save-files')
+		{
+			// header('Content-type: application/json');
+			echo json_encode($return);
+		}
+		else
+		{
+			if (empty($error))
+			{
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
+			}
+			else
+			{
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($return['error'] . (!empty($return['code']) ? ' (' . $return['code'] . ')' : '')).'&album='.$album_name));
+			}
+		}
+//	}
 	
 	exit();
 }
@@ -678,7 +731,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 							$newwidth_t = intval($newheight_t / $aspect_ratio);
 						}
 						
-						// sharpen intermediate image when shrinking size a lot.
+						// sharpen intermediate image when shrinking a lot.
 						//
 						// see also:
 						//   http://adamhopkinson.co.uk/blog/2010/08/26/sharpen-an-image-using-php-and-gd/
@@ -689,8 +742,8 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 							$newheight = $newheight_t * 2;
 							$newwidth = intval($newheight / $aspect_ratio);
 							
-							$tmp = imagecreatetruecolor($newwidth,$newheight);
-							imagecopyresampled($tmp,$src,0,0,0,0,$newwidth,$newheight,$width,$height);
+							$tmp2 = imagecreatetruecolor($newwidth,$newheight);
+							imagecopyresampled($tmp2,$src,0,0,0,0,$newwidth,$newheight,$width,$height);
 
 							// define the sharpen matrix
 							$sharpen = array(
@@ -703,10 +756,10 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 							$divisor = array_sum(array_map('array_sum', $sharpen));
 
 							// apply the matrix
-							imageconvolution($tmp, $sharpen, $divisor, 0);
+							imageconvolution($tmp2, $sharpen, $divisor, 0);
 
 							imagedestroy($src);
-							$src = $tmp;
+							$src = $tmp2;
 							$width = $newwidth;
 							$height = $newheight;
 						}
@@ -739,6 +792,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 						}
 						
 						imagedestroy($tmp_t);
+						imagedestroy($src);
 					}
 				}
 
