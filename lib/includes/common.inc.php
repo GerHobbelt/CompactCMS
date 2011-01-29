@@ -20,6 +20,9 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 
 define('MENU_TARGET_COUNT', 5); // CCMS supports 5 menu 'destinations'
 
+define('MAX_REASONABLE_FILENAME_LENGTH', 64); // maximum allowed length of any file or directory name (when we have contol over their creation)
+
+
 if (!defined('BASE_PATH'))
 {
 	$base = str_replace('\\','/',dirname(dirname(dirname(__FILE__))));
@@ -124,11 +127,11 @@ ubiquitous underscore character. Any runs of multiple occurrences of that one ar
 one each.
 
 When the transformation would produce an identifier longer than a specified number of characters
-(default: 32), it is forcibly shortened to that length and the last 8 characters are replaced by the
-characters produced by the hash of the input text in order to deliver an identifier with quite
-tolerable uniqueness guarantees.
+(default: MAX_REASONABLE_FILENAME_LENGTH), it is forcibly shortened to that length and the last 8 
+characters are replaced by the characters produced by the hash of the input text in order to deliver 
+an identifier with quite tolerable uniqueness guarantees.
 */
-function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false, $max_outlen = 32)
+function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false, $max_outlen = MAX_REASONABLE_FILENAME_LENGTH)
 {
 	static $regex4var;
 
@@ -163,14 +166,38 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		$dst = preg_replace('/^-+/', '', $dst);
 	}
 	
+	$dst = str_replace('\\', '/', $dst);
+	$pos = strrpos($dst, '/');
+	$path = '';
+	if ($pos !== false)
+	{
+		$path = substr($dst, 0, $pos + 1);
+		$dst = substr($dst, $pos + 1);
+	}
+	$pos = strrpos($dst, '.');
+	$ext = '';
+	if ($pos !== false)
+	{
+		$ext = substr($dst, $pos);
+		$dst = substr($dst, 0, $pos);
+	
+		// special circumstances for: .tar.gz, .tar.Z, etc.:
+		if (strcasecmp(substr($dst, -4), '.tar') == 0)
+		{
+			$ext = substr($dst, -4) . $ext;
+			$dst = substr($dst, 0, -4);
+		}
+	}
+	
+	$max_outlen -= strlen($ext); // discount the extension: it should ALWAYS remain!
 	if ($max_outlen < strlen($dst))
 	{
 		$h = md5($src);
-		$tl = min(32, intval(($max_outlen + 3) / 4)); // round up tail len (the hash-replaced bit), so for very small sizes it's still > 0
+		$tl = min(32, $max_outlen, 4 + intval($max_outlen / 8)); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
 		$dst = substr($dst, 0, $max_outlen - $tl) . substr($h, -$tl);
 	}
 	
-	return $dst;
+	return $path . $dst . $ext;
 }
 
 /*
