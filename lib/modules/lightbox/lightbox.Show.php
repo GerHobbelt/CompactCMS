@@ -45,18 +45,21 @@ $is_printing = ($ccms['printing'] == 'Y');
 function fileList($d)
 {
 	$l = array();
-	foreach(array_diff(scandir($d),array('.','..','index.html','info.txt','_thumbs')) as $f) 
+	if (is_dir($d))
 	{
-		if(is_file($d.'/'.$f)) 
+		foreach(array_diff(scandir($d),array('.','..','index.html','info.txt','_thumbs')) as $f) 
 		{
-			$ext = strtolower(substr($f, strrpos($f, '.') + 1));
-			if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif") 
+			if(is_file($d.'/'.$f)) 
 			{
-				$l[] = $f;
+				$ext = strtolower(substr($f, strrpos($f, '.') + 1));
+				if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif") 
+				{
+					$l[] = $f;
+				}
 			}
-   		}
-   	} 
-	sort($l, SORT_STRING);
+		} 
+		sort($l, SORT_STRING);
+	}
 	return $l;
 } 
 
