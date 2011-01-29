@@ -113,6 +113,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 			if (empty($ownership[$pageID])) $ownership[$pageID] = '';
 			$ownership[$pageID] .= '||' . $userID; // add user; we'll trim leading '||' in phase 2
 		}
+
+		// blow away the old ownership set for ALL PAGES: we need to do this as the form will only send us those owners who are ASSIGNED (not the ones we REMOVED)
+		$values = array();
+		$values['user_ids'] = MySQL::SQLValue('',MySQL::SQLVALUE_TEXT);
+	
+		if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values)) 
+		{
+			$db->Kill();
+		}
 		
 		// now update page ownership in the database (phase #2); order doesn't matter
 		foreach($ownership as $page_id => $users)
@@ -132,8 +141,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 		exit();
 	} 
 	else 
+	{
 		die($ccms['lang']['auth']['featnotallowed']);
+	}
 } 
 else 
+{
 	die("No external access to file");
+}
+
 ?>
