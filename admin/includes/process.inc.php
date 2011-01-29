@@ -1012,7 +1012,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	}
 	else
 	{
-		$error = $ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ;
+		$error = $ccms['lang']['auth']['featnotallowed'];
 	}
 	
 	if(empty($error)) 
