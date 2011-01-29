@@ -227,7 +227,7 @@ if ($db->ErrorNumber())
 
 	
 // load the global permissions so we can ask what a given user may and may not do later on:
-if ($php_src_is_admin_code || !empty($_SESSION['ccms_userID']))
+if (checkAuth() && ($php_src_is_admin_code || !empty($_SESSION['ccms_userID'])))
 {
 	// only do this extra work when we can expect to actually /use/ it:
 	$perm = new CcmsGlobalPermissions($db, $cfg['db_prefix']);

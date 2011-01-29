@@ -79,8 +79,6 @@ if(!isset($_SESSION['rc1']) || !isset($_SESSION['rc2']))
 $do_action = getGETparam4IdOrNumber('action');
 
 
-// load the global permissions so we can ask what a given user may and may not do later on:
-$perm = new CcmsGlobalPermissions($db, $cfg['db_prefix']);
 
 
 
