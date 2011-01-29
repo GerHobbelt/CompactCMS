@@ -255,7 +255,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 		}
 		else 
 		{
-			throw new FbX($ccms['lang']['system']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -265,6 +265,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 }
 
 // when we get here, an illegal command was fed to us!
-die($ccms['lang']['system']['error_forged']);
+die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 
 ?>

@@ -69,7 +69,7 @@ class CcmsGlobalPermissions
 		{
 			foreach($this->changed as $key => $value)
 			{
-				if (!$value || empty($key)) throw new Exception(__CLASS__ . ": INTERNAL ERROR: " . $ccms['lang']['system']['error_forged']); 
+				if (!$value || empty($key)) throw new Exception(__CLASS__ . ": INTERNAL ERROR: " . $ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ); 
 
 				$values = array(); 
 				$values['value'] = MySQL::SQLValue($this->get($key), MySQL::SQLVALUE_NUMBER);

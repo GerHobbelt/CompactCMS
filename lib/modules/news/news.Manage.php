@@ -65,7 +65,7 @@ if (!$pagerow) $db->Kill();
 $pageName = $pagerow->urlpage;
 if (empty($pageName) || empty($page_id))
 {
-	die($ccms['lang']['system']['error_forged']);
+	die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 }
 
 

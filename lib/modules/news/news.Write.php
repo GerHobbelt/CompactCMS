@@ -71,7 +71,7 @@ if (!(checkAuth() && $perm->is_level_okay('manageModNews', $_SESSION['ccms_userL
 }
 if (!$page_id)
 {
-	die($ccms['lang']['system']['error_forged']);
+	die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 }
 
 if($newsID && $page_id)

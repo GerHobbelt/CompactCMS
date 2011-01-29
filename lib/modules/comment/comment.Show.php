@@ -47,7 +47,7 @@ $page_id = $pagerow->page_id;
 
 if (empty($page_id) || empty($pagename))
 {
-	die($ccms['lang']['system']['error_forged']);
+	die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 }
 
 

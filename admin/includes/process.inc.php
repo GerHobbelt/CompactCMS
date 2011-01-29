@@ -674,7 +674,7 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	// are you allowed to run this action?
 	if(!$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
 	{ 
-		$errors[] = $ccms['lang']['auth']['featnotallowed']; // $ccms['lang']['system']['error_forged'];
+		$errors[] = $ccms['lang']['auth']['featnotallowed']; // $ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ;
 	}
 	
 	if(strstr($post_urlpage, '.') !== FALSE) 
@@ -869,7 +869,7 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 			} 
 			else 
 			{
-				die($ccms['lang']['system']['error_forged']);
+				die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 			}
 		}
 	} 
@@ -903,7 +903,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 				$menu_id = filterParam4Number($_POST['menuid'][$page_id]);
 				if (!$page_id || !$toplevel || empty($templatename) || !$menu_id)
 				{
-					$error = $ccms['lang']['system']['error_forged'];
+					$error = $ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ;
 					break;
 				}
 				
@@ -924,7 +924,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	}
 	else
 	{
-		$error = $ccms['lang']['system']['error_forged'];
+		$error = $ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ;
 	}
 	
 	if(empty($error)) 
@@ -971,7 +971,7 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
 	}
 	else
 	{
-		die($ccms['lang']['system']['error_forged']);
+		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 	}
 	exit();
 }
@@ -1005,7 +1005,7 @@ if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
 		} 
 		else 
 		{
-			die($ccms['lang']['system']['error_forged']);
+			die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 		}
 		
 		$values = array(); // [i_a] make sure $values is an empty array to start with here
@@ -1030,7 +1030,7 @@ if($do_action == 'editinplace' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
 	}
 	else
 	{
-		die($ccms['lang']['system']['error_forged']);
+		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 	}
 	exit();
 }
@@ -1070,7 +1070,7 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	}
 	else
 	{
-		die($ccms['lang']['system']['error_forged']);
+		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 	}
 	exit();
 }
@@ -1353,7 +1353,7 @@ if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && ch
 			}
 			else 
 			{
-				throw new FbX($ccms['lang']['system']['error_forged']);
+				throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 			}
 		} 
 		else 
@@ -1595,7 +1595,7 @@ echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 	}
 	else
 	{
-		die($ccms['lang']['system']['error_forged']);
+		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 	}
 	exit();
 }
@@ -1727,7 +1727,7 @@ function confirmation()
 	}
 	else
 	{
-		die($ccms['lang']['system']['error_forged']);
+		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 	}
 
 	exit();

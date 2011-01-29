@@ -117,7 +117,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 				$pageID = filterParam4Number($explode[1]);
 				if (empty($userID) || empty($pageID))
 				{
-					throw new FbX($ccms['lang']['system']['error_forged']);
+					throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 				}
 				if (empty($ownership[$pageID])) $ownership[$pageID] = '';
 				$ownership[$pageID] .= '||' . $userID; // add user; we'll trim leading '||' in phase 2
@@ -163,6 +163,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 
 
 // when we get here, an illegal command was fed to us!
-die($ccms['lang']['system']['error_forged']);
+die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 
 ?>

@@ -764,6 +764,6 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 
 
 // when we get here, an illegal command was fed to us!
-die($ccms['lang']['system']['error_forged']);
+die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 
 ?>
