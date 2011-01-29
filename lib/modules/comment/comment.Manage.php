@@ -108,7 +108,7 @@ if (!$pagerow) $db->Kill();
 		if(count($commentlist) > 0) 
 		{
 		?>
-			<form action="comment.Process.php?action=del-comment" method="post" accept-charset="utf-8">
+			<form action="comment.Process.php?action=del-comments" method="post" accept-charset="utf-8">
 			<div class="table_inside">
 				<table cellspacing="0" cellpadding="0" cols="7">
 					<tr class="head0">
