@@ -369,6 +369,9 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			<hr class="space"/>
 
 			<div class="right">
+				<a class="button" id="reorder_menu" title="<?php echo $ccms['lang']['hints']['reordercmdhelp']; ?>">
+					<span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['reorderbutton']; ?>
+				</a>
 				<button type="submit" name="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 			</div>
 			<input type="hidden" name="form" value="menuorder" />

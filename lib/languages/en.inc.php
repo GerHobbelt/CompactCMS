@@ -129,6 +129,7 @@ $ccms['lang']['backend']['menutitle']           = "Menu";
 $ccms['lang']['backend']['linktitle']           = "Link";
 $ccms['lang']['backend']['item']                = "Item";
 $ccms['lang']['backend']['none']                = "None";
+$ccms['lang']['backend']['floatingtitle']       = "Floating";
 $ccms['lang']['backend']['yes']                 = "Yes";
 $ccms['lang']['backend']['no']                  = "No";
 $ccms['lang']['backend']['translation']         = "Translations";
@@ -137,6 +138,7 @@ $ccms['lang']['backend']['logout']              = "Log-out";
 $ccms['lang']['backend']['see_forum']           = "See forum";
 $ccms['lang']['backend']['warning']             = "Warning";
 $ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
+$ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned new (renumbered) menu positions";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']               = "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
@@ -172,6 +174,7 @@ $ccms['lang']['forms']['iscoding']              = "Coding";
 $ccms['lang']['forms']['createbutton']          = "Create!";
 $ccms['lang']['forms']['modifybutton']          = "Modify";
 $ccms['lang']['forms']['savebutton']            = "Save";
+$ccms['lang']['forms']['reorderbutton']         = "Re-order";
 $ccms['lang']['forms']['setlocale']             = "Front-end language";
 $ccms['lang']['forms']['filter_showing']        = "right now we're only showing pages which have at least this text in here";
 $ccms['lang']['forms']['edit_remove']           = "Edit or remove filter for";
@@ -192,6 +195,7 @@ $ccms['lang']['hints']['activelink']            = "Active link in menu? :: Not a
 $ccms['lang']['hints']['menuid']                = "Menu :: Choose in which menu this item should be listed in. The default is the main menu (1), where also the home page link should be shown.";
 $ccms['lang']['hints']['iscoding']              = "Contains coding :: Does this file contain manual added code such as PHP or Javascript? Selecting 'Yes' will restrict access to the file from the back-end's WYSIWYG editor and enables the code editor.";
 $ccms['lang']['hints']['filter']                = "<br><br>You can click on the <span class='sprite livefilter livefilter_active'>&#160;filter icon</span> at left of the title to add, edit or remove a text to filter the page list on, e.g. when you type 'home' in the edit field which appears when you click the icon, then press the Enter/Return key, only pages which have the text 'home' in this column will be shown. <br>Clicking the icon again and deleting the text in the edit field, then pressing the Enter/Return key, will remove the filter.<br>Hover over the filter icon to see whether the column is currently being filtered, and if so, using which filter text.";
+$ccms['lang']['hints']['reordercmdhelp']        = "Renumber all menu entries to ensure both each menu entry has a unique top+sublevel position and the positions are sequential";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor']          = "Close the editor";

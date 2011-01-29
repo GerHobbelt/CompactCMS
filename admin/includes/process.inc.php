@@ -432,7 +432,7 @@ if ($do_update_or_livefilter && checkAuth())
 				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php 
-					if($row->module == 'editor' && !empty($row->toplevel)) 
+					if($row->module == 'editor' && !empty($row->toplevel) && !empty($row->menu_id)) 
 					{ 
 					?>
 						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em> 
@@ -539,7 +539,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 				?>
 					<td>
 						<select class="span-2 last" name="menuid[<?php echo $pageIdAsStr; ?>]">
-							<optgroup label="Menu">
+							<optgroup label="<?php echo $ccms['lang']['backend']['menutitle']; ?>">
 								<?php 
 								$y = 1; 
 								while($y <= MENU_TARGET_COUNT) 
@@ -550,6 +550,9 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 									$y++; 
 								} 
 								?>
+							</optgroup>
+							<optgroup label="<?php echo $ccms['lang']['backend']['floatingtitle']; ?>">
+								<option <?php echo ($row->menu_id == 0) ? 'selected="selected"' : ''; ?> value="0"><?php echo $ccms['lang']['backend']['none']; ?></option>
 							</optgroup>
 						</select>
 					</td>
@@ -638,6 +641,93 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 	} 
 	exit();
 }
+
+
+
+
+
+	
+
+	
+/**
+ *
+ * Auto-renum ('reorder') the entire menu list
+ *
+ */
+if($do_action == 'reordermenu' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth()) 
+{
+	$error = null;
+	
+	// TODO : add interface bits to allow changing this sort order (e.g. click on headers?)
+	$menu_sortorder = getGETparam4IdOrNumber('m_order', 'I12LH0');
+	
+	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
+	{
+		// Open recordset for sites' pages
+		$rows = $db->SelectObjects($cfg['db_prefix'].'pages', null, null, cvt_ordercode2list($menu_sortorder));
+		if ($rows === false) $db->Kill();
+
+		// Check whether the recordset is not empty
+		if(count($rows) > 0) 
+		{
+			$major_level = 0;
+			$minor_level = 0;
+			
+			$old_major_level = -1;
+			
+			foreach($rows as $row)
+			{
+				if ($row->toplevel != $old_major_level)
+				{
+					$old_major_level = $row->toplevel;
+					
+					$major_level++;
+					$minor_level = 0;
+					$row->toplevel = $major_level;
+				}
+				else if ($row->sublevel == 0)
+				{
+					$major_level++;
+					$minor_level = 0;
+					$row->toplevel = $major_level;
+				}
+					
+				if ($row->sublevel != 0)
+				{
+					$row->toplevel = $major_level;
+				
+					$minor_level++;
+					$row->sublevel = $minor_level;
+				}
+							
+				$values = array();
+				$values['toplevel'] = MySQL::SQLValue($row->toplevel,MySQL::SQLVALUE_NUMBER);
+				$values['sublevel'] = MySQL::SQLValue($row->sublevel,MySQL::SQLVALUE_NUMBER);
+				
+				if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($row->page_id,MySQL::SQLVALUE_NUMBER))))
+				{
+					$error = $db->MyDyingMessage();
+				}
+			}
+		}
+	}
+	else
+	{
+		$error = $ccms['lang']['auth']['featnotallowed']; 
+	}
+	
+	if(empty($error)) 
+	{
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['success'].'</p><p>'.$ccms['lang']['backend']['reordermenu_done'].'</p>';
+	} 
+	else 
+	{
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$error.'</p>';
+	}
+	exit();
+}
+
+
 
 
 
@@ -899,7 +989,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 				$sublevel = filterParam4Number($_POST['sublevel'][$page_id]);
 				$templatename = filterParam4Filename($_POST['template'][$page_id]);
 				$menu_id = filterParam4Number($_POST['menuid'][$page_id]);
-				if (!$page_id || !$toplevel || empty($templatename) || !$menu_id)
+				if (!$page_id || !$toplevel || empty($templatename))
 				{
 					$error = $ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ;
 					break;
