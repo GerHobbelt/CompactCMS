@@ -130,11 +130,14 @@ if($action_type == 'send'
 }
 else 
 {
+if (0)
+{
 	// destroy the session if it existed before: start a new session
 	session_unset();
 	session_destroy();
 	session_regenerate_id();
 	session_start();
+}
 
 	$_SESSION['ccms_captcha'] = mt_rand('123456','987654'); 
 }
