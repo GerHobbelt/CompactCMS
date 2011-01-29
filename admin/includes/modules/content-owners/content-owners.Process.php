@@ -57,6 +57,12 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
 
+class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
+
+
+
+
+
 
 
 
@@ -67,87 +73,96 @@ if (!defined('BASE_PATH'))
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()) 
 {
-	// Only if current user has the rights
-	if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
+	FbX::SetFeedbackLocation('content-owners.Manage.php');
+	try
 	{
-		/*
-		 * Since the number of items to process is PAGES x USERS, this number can become rather large, even for moderately small sites.
-		 * 
-		 * Hence we do this in two phases: 
-		 * 
-		 * 1) first we collect the user=owner set per page in an associative array.
-		 * 
-		 * 2) next, we update the database for each page collected in phase 1.
-		 * 
-		 * This is different from the original approach in that:
-		 * 
-		 * a) it cuts down the number of queries by a factor of USERS
-		 * 
-		 * b) it does NOT reset the ownership of ALL pages at the start with another query --> unmentioned pages don't change.
-		 * 
-		 * Particularly (b) plays well into our hands when we expand the notion of 'filtered page sets' in the admin section, i.e.
-		 * an admin section which currently only shows a SUBSET of all the pages available on the site.
-		 */
-		
-		// If all empty, we're done here
-		if(empty($_POST['owner'])) 
+		// Only if current user has the rights
+		if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
 		{
-			header('Location: ' . makeAbsoluteURI('./content-owners.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-			exit();
-		}
-	
-		// Otherwise, set the page owners (phase #1)
-		$ownership = array();
-		foreach ($_POST['owner'] as $value) 
-		{
-			// Split posted variable
-			$explode = explode('||',$value);
-		
-			// Set variables
-			$userID = filterParam4Number($explode[0]);
-			$pageID = filterParam4Number($explode[1]);
-			if (empty($userID) || empty($pageID))
-			{
-				die($ccms['lang']['system']['error_forged']);
-			}
-			if (empty($ownership[$pageID])) $ownership[$pageID] = '';
-			$ownership[$pageID] .= '||' . $userID; // add user; we'll trim leading '||' in phase 2
-		}
-
-		// blow away the old ownership set for ALL PAGES: we need to do this as the form will only send us those owners who are ASSIGNED (not the ones we REMOVED)
-		$values = array();
-		$values['user_ids'] = MySQL::SQLValue('',MySQL::SQLVALUE_TEXT);
-	
-		if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values)) 
-		{
-			$db->Kill();
-		}
-		
-		// now update page ownership in the database (phase #2); order doesn't matter
-		foreach($ownership as $page_id => $users)
-		{
-			$users = ltrim($users, '|');
+			/*
+			 * Since the number of items to process is PAGES x USERS, this number can become rather large, even for moderately small sites.
+			 * 
+			 * Hence we do this in two phases: 
+			 * 
+			 * 1) first we collect the user=owner set per page in an associative array.
+			 * 
+			 * 2) next, we update the database for each page collected in phase 1.
+			 * 
+			 * This is different from the original approach in that:
+			 * 
+			 * a) it cuts down the number of queries by a factor of USERS
+			 * 
+			 * b) it does NOT reset the ownership of ALL pages at the start with another query --> unmentioned pages don't change.
+			 * 
+			 * Particularly (b) plays well into our hands when we expand the notion of 'filtered page sets' in the admin section, i.e.
+			 * an admin section which currently only shows a SUBSET of all the pages available on the site.
+			 */
 			
-			$values = array();
-			$values['user_ids'] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
-		
-			if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+			// If all empty, we're done here
+			if(empty($_POST['owner'])) 
 			{
-				$db->Kill();
+				header('Location: ' . makeAbsoluteURI('./content-owners.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+				exit();
 			}
-		}	
 		
-		header('Location: ' . makeAbsoluteURI('./content-owners.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['success'])));
-		exit();
-	} 
-	else 
+			// Otherwise, set the page owners (phase #1)
+			$ownership = array();
+			foreach ($_POST['owner'] as $value) 
+			{
+				// Split posted variable
+				$explode = explode('||',$value);
+			
+				// Set variables
+				$userID = filterParam4Number($explode[0]);
+				$pageID = filterParam4Number($explode[1]);
+				if (empty($userID) || empty($pageID))
+				{
+					throw new FbX($ccms['lang']['system']['error_forged']);
+				}
+				if (empty($ownership[$pageID])) $ownership[$pageID] = '';
+				$ownership[$pageID] .= '||' . $userID; // add user; we'll trim leading '||' in phase 2
+			}
+
+			// blow away the old ownership set for ALL PAGES: we need to do this as the form will only send us those owners who are ASSIGNED (not the ones we REMOVED)
+			$values = array();
+			$values['user_ids'] = MySQL::SQLValue('',MySQL::SQLVALUE_TEXT);
+		
+			if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values)) 
+			{
+				throw new FbX($db->MyDyingMessage());
+			}
+			
+			// now update page ownership in the database (phase #2); order doesn't matter
+			foreach($ownership as $page_id => $users)
+			{
+				$users = ltrim($users, '|');
+				
+				$values = array();
+				$values['user_ids'] = MySQL::SQLValue($users,MySQL::SQLVALUE_TEXT);
+			
+				if(!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)))) 
+				{
+					throw new FbX($db->MyDyingMessage());
+				}
+			}	
+			
+			header('Location: ' . makeAbsoluteURI('./content-owners.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['success'])));
+			exit();
+		} 
+		else 
+		{
+			throw new FbX($ccms['lang']['auth']['featnotallowed']);
+		}
+	}
+	catch (CcmsAjaxFbException $e)
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		$e->croak();
 	}
 } 
-else 
-{
-	die("No external access to file");
-}
+
+
+
+// when we get here, an illegal command was fed to us!
+die($ccms['lang']['system']['error_forged']);
 
 ?>

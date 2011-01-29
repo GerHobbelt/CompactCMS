@@ -376,7 +376,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'save-cfg' && checkAuth
 	{
 		$e->croak();
 	}
-	
-	exit();
 }
+
+
+// when we get here, an illegal command was fed to us!
+die($ccms['lang']['system']['error_forged']);
+
 ?>

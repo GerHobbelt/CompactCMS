@@ -135,8 +135,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 	{
 		$e->croak();
 	}
-	
-	exit();
 }
 
 /**
@@ -197,8 +195,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
 	{
 		$e->croak();
 	}
-	
-	exit();
 }
 
 /**
@@ -280,8 +276,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 	{
 		$e->croak();
 	}
-	
-	exit();
 }
 
 /**
@@ -313,6 +307,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?album='.$album_name.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 						exit();
 					}
+					else 
+					{
+						throw new FbX($ccms['lang']['system']['error_write']);
+					}
 				} 
 				else 
 				{
@@ -333,8 +331,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 	{
 		$e->croak();
 	}
-	
-	exit();
 }
 
 /**
@@ -597,6 +593,8 @@ if (0)
 		// header('Content-type: application/json');
 		echo json_encode($return);
 	}
+	
+	exit();
 }
 
 /**
@@ -761,8 +759,11 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 	{
 		$e->croak();
 	}
-	
-	exit();
 }
+
+
+
+// when we get here, an illegal command was fed to us!
+die($ccms['lang']['system']['error_forged']);
 
 ?>

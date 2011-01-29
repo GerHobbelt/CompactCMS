@@ -674,7 +674,7 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	// are you allowed to run this action?
 	if(!$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
 	{ 
-		$errors[] = $ccms['lang']['system']['error_forged'];
+		$errors[] = $ccms['lang']['auth']['featnotallowed']; // $ccms['lang']['system']['error_forged'];
 	}
 	
 	if(strstr($post_urlpage, '.') !== FALSE) 

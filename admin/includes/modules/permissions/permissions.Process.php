@@ -83,9 +83,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 				$key = filterParam4IdOrNumber($key);
 				$setting = filterParam4Number($value);
 				if (empty($key) || (empty($setting) && $value !== "0"))
+				{
 					throw new FbX($ccms['lang']['system']['error_forged']); 
+				}
 				$perm->set($key, $value);
 			}
+
 			if($perm->SavePermissions($db, $cfg['db_prefix'], false)) 
 			{
 				header('Location: ' . makeAbsoluteURI('permissions.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
@@ -105,8 +108,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 	{
 		$e->croak();
 	}
-	exit();
 } 
 
-die("No external access to file");
+
+// when we get here, an illegal command was fed to us!
+die($ccms['lang']['system']['error_forged']);
+
 ?>
