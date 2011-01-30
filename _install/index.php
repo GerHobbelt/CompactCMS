@@ -301,14 +301,6 @@ if (empty($_SESSION['variables']['do_upgrade']))
 
 
 
-// B0RK when the server still has that old hack still active:
-if (get_magic_quotes_gpc())
-{
-	die("Your server still has the old PHP 'magic quotes' hack setting turned ON; it is obsoleted and poses an indirect security risk: any software on your machine still depending on that setting should be upgraded/overhauled! CompactCMS will NOT install as long as this setting is active.");
-}
-
-
-
 
 ?>
 
@@ -336,6 +328,25 @@ if (get_magic_quotes_gpc())
 	
 	<hr class="space" />
 </noscript>
+
+<?php
+// B0RK when the server still has that old hack active:
+if (get_magic_quotes_gpc())
+{
+?>
+	<div class="error">
+	<h1>Warning</h1>
+	<p>Your server still has the old PHP 'magic quotes' hack setting turned ON; 
+	<a href="http://www.php.net/manual/en/security.magicquotes.php">it is obsoleted</a> and 
+	poses an indirect security risk: any software on your machine still depending on that 
+	setting should be upgraded/overhauled!
+	</p>
+	<p><strong>CompactCMS will NOT install as long as this setting is active.</strong></p>
+	</div>
+<?php
+	die();
+}
+?>
 
 <div id="install-wrapper" class="container-18" style="display:none;" >
 	<div id="help" class="span-8 colborder">
