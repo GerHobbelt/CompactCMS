@@ -1,8 +1,8 @@
-<?php 
+<?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-	
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
