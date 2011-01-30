@@ -165,7 +165,7 @@ if (empty($_SESSION['variables']['db_user']) && !empty($cfg['db_user']))
 {
 	$_SESSION['variables']['db_user'] = $cfg['db_user'];
 }
-if (empty($_SESSION['variables']['db_pass']) && !empty($cfg['db_pass']))
+if (empty($_SESSION['variables']['db_pass']) && isset($cfg['db_pass']))
 {
 	$_SESSION['variables']['db_pass'] = $cfg['db_pass'];
 }
@@ -173,7 +173,7 @@ if (empty($_SESSION['variables']['db_name']) && !empty($cfg['db_name']))
 {
 	$_SESSION['variables']['db_name'] = $cfg['db_name'];
 }
-if (empty($_SESSION['variables']['db_prefix']) && !empty($cfg['db_prefix']))
+if (empty($_SESSION['variables']['db_prefix']) && isset($cfg['db_prefix']))
 {
 	$_SESSION['variables']['db_prefix'] = $cfg['db_prefix'];
 }
@@ -304,7 +304,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 // B0RK when the server still has that old hack still active:
 if (get_magic_quotes_gpc())
 {
-	die("Your server still has the old PHP 'magic quotes' hack setting turned ON; it is obsoleted and poses and indirect security risk: any software on your machine still depending on that setting should be upgraded/overhauled! CompactCMS will NOT install as long as this setting is active.");
+	die("Your server still has the old PHP 'magic quotes' hack setting turned ON; it is obsoleted and poses an indirect security risk: any software on your machine still depending on that setting should be upgraded/overhauled! CompactCMS will NOT install as long as this setting is active.");
 }
 
 
