@@ -443,17 +443,55 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	// Try database connection
 	//
-	if (!$db->Open($_SESSION['variables']['db_name'], $_SESSION['variables']['db_host'], $_SESSION['variables']['db_user'], $_SESSION['variables']['db_pass']))
+	if (!$db->Open(null, $_SESSION['variables']['db_host'], $_SESSION['variables']['db_user'], $_SESSION['variables']['db_pass'], 'utf8', 'utf8_unicode_ci'))
 	{
-		$errors[] = 'Error: could not connect to the database';
+		$errors[] = 'Error: could not connect to the database engine';
 		$errors[] = $db->Error();
+		$errors[] = $db->MyDyingMessage();
 		$err++;
 	}
 	else
 	{
-		$log[] = "Database connection successful";
+		$log[] = "Database engine connection successful";
 	}
 
+	//
+	// Either Select the database or create it when it does not exist yet
+	//
+	if (!$db->SelectDatabase($_SESSION['variables']['db_name']))
+	{
+		if (!$db->CreateDatabase($_SESSION['variables']['db_name']))
+		{
+			$errors[] = 'Error: could not create the database "' . $_SESSION['variables']['db_name'] . '"';
+			$errors[] = $db->Error();
+			$errors[] = $db->MyDyingMessage();
+			$err++;
+		}
+		else
+		{
+			$log[] = "Database creation successful";
+		}
+
+		// and once created, try to select it, again:
+		if (!$db->SelectDatabase($_SESSION['variables']['db_name']))
+		{
+			$errors[] = 'Error: could not switch to the newly created database "' . $_SESSION['variables']['db_name'] . '"';
+			$errors[] = $db->Error();
+			$errors[] = $db->MyDyingMessage();
+			$err++;
+		}
+		else
+		{
+			$log[] = "Database selection successful";
+		}
+	}
+	else
+	{
+		$log[] = "Database selection successful";
+	}
+
+
+	
 	//
 	// Insert database structure and sample data
 	//
@@ -915,7 +953,7 @@ if($nextstep == md5('final') && CheckAuth())
 	{
 	?>
 		<div class="right">
-			<p class="ss_has_sprite"><a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a></p>
+			<a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a>
 		</div>
 	<?php
 	}
