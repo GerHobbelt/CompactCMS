@@ -1015,6 +1015,10 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		 * we know the path to the current CSS file; this one is relative to that one, or an absolute path.
 		 *
 		 * Only 'flatten' imported CSS which has a RELATIVE path: those are /ours/ :-)
+		 *
+		 * TODO: And to ensure the installer /does/ get the correct CSS files, even when the config.inc.php settings
+		 * are plain wrong (which is legal at that time!), we check whether the imported file exists from
+		 * our perspective and only 'expand' the import when indeed it does!
 		 */
 		if ($url[0] != '/' && strpos($url, '://') === false)
 		{
