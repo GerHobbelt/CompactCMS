@@ -9,9 +9,11 @@
 
 
 SET CHARACTER SET 'utf8';
+-- ALTER DATABASE `compactcms` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
 
 
 --
