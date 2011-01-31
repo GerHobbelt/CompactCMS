@@ -556,7 +556,7 @@ if ($die_on_old_hacks)
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-<div>
+<div class="container-25">
   <textarea id="jslog" class="log span-25 clear" readonly="readonly">
   </textarea>
 </div>

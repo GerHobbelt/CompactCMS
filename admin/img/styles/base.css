@@ -1,5 +1,5 @@
 /* *****************************************************
-Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
+Copyright (C) 2008 - 2011 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
 
 This file is part of CompactCMS.
@@ -21,7 +21,82 @@ author, communicating the product to be your own.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
+> Contact me for any inquiries.
+> E: Xander@CompactCMS.nl
+> W: http://community.CompactCMS.nl/forum
+****************************************************** */
+
+/* --------------------------------------------------------------
+
+   FF3, for some unfathomable reason, doesn't import the CSS files
+   @import-ed in the middle of the file. This issue is highly dependent
+   on unidentified context, but one thing's for sure: the current state
+   of the installer code triggers the issue for me (while it has been
+   resported by others a few times before, but never was reproducible 
+   for me.
+   
+   The current move, shifting the @import statements to the top of this
+   CSS file, circumvents the issue, but since I cannot the cause, 
+   this certainly is no fix, just a hack. Start your prayer wheels...
+   
+   (What seems to 'help' produce this issue is having a completely
+    shot config.inc.php or at least a non-working Combiner)
+
+-------------------------------------------------------------- */
+
+@import url(src/reset.css);
+
+@import url(src/typography.css);
+
+@import url(src/grid.css);
+
+@import url(src/forms.css);
+
+@import url(plugins/buttons/screen.css);
+
+@import url(plugins/fancy-type/screen.css);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* *****************************************************
+Copyright (C) 2008 - 2011 by Xander Groesbeek (CompactCMS.nl)
+Revision:   CompactCMS - v 1.4.2
+
+This file is part of CompactCMS.
+
+CompactCMS is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CompactCMS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A reference to the original author of CompactCMS and its copyright
+should be clearly visible at all times for the user of the back-
+end. You are not allowed to remove all references to the original
+author, communicating the product to be your own.
+
+You should have received a copy of the GNU General Public License
+along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -34,8 +109,9 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 
 -------------------------------------------------------------- */
 
+/*
 @import url(src/reset.css);
-
+*/
 
 
 
@@ -47,9 +123,11 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 
 -------------------------------------------------------------- */
 
+/*
 @import url(src/typography.css);
+*/
 
-body 
+body
 {
   /* font-size: 75%; */
   font-size:0.825em;
@@ -64,17 +142,15 @@ a:hover     { color: #09f; } /* was: #000 for CCMS */
 a           { color: #06c; text-decoration: underline; } /* color was: #009 for CCMS */
 
 abbr,
-acronym     
-{ 
+acronym
+{
 	cursor: help;
 }
 
-table       
-{ 
-	margin-bottom: 0.1em; 
+table
+{
+	margin-bottom: 0.1em;
 }
-
-
 
 
 
@@ -92,7 +168,10 @@ table
 
 -------------------------------------------------------------- */
 
+
+/*
 @import url(src/grid.css);
+*/
 
 /*
 EXTRA:
@@ -104,7 +183,7 @@ EXTRA:
 */
 
 /* A container should group all your columns. */
-.container-1, .container-2, .container-3, .container-4, .container-5, .container-6, 
+.container-1, .container-2, .container-3, .container-4, .container-5, .container-6,
 .container-7, .container-8, .container-9, .container-10, .container-11, .container-12,
 .container-13, .container-14, .container-15, .container-16, .container-17, .container-18,
 .container-19, .container-20, .container-21, .container-22, .container-23, .container-24,
@@ -141,7 +220,7 @@ EXTRA:
 /* Columns
 -------------------------------------------------------------- */
 
-.span-25 
+.span-25
 {
   float: left;
   margin-right: 10px;
@@ -153,7 +232,7 @@ EXTRA:
 .span-25 {width: 990px; } /* was: margin: 0 for CCMS */
 
 /* Use these classes to set the width of an input. */
-input.span-25, textarea.span-25 
+input.span-25, textarea.span-25
 {
   border-left-width: 1px;
   border-right-width: 1px;
@@ -178,9 +257,9 @@ next column, or to pull it into the previous column.  */
 
 .pull-25 { margin-left: -1000px; }
 
-.pull-25 
+.pull-25
 {
-	float: left; 
+	float: left;
 	position:relative;
 }
 
@@ -189,7 +268,7 @@ next column, or to pull it into the previous column.  */
 
 .push-25
 {
-	float: left; 
+	float: left;
 	position:relative;
 }
 
@@ -202,10 +281,10 @@ next column, or to pull it into the previous column.  */
    Based on How To Clear Floats Without Structural Markup by PiE
    [http://www.positioniseverything.net/easyclearing.html] */
 
-.container-1:after, .container-2:after, .container-3:after, .container-4:after, .container-5:after, 
-.container-6:after, .container-7:after, .container-8:after, .container-9:after, .container-10:after, 
-.container-11:after, .container-12:after, .container-13:after, .container-14:after, .container-15:after, 
-.container-16:after, .container-17:after, .container-18:after, .container-19:after, .container-20:after, 
+.container-1:after, .container-2:after, .container-3:after, .container-4:after, .container-5:after,
+.container-6:after, .container-7:after, .container-8:after, .container-9:after, .container-10:after,
+.container-11:after, .container-12:after, .container-13:after, .container-14:after, .container-15:after,
+.container-16:after, .container-17:after, .container-18:after, .container-19:after, .container-20:after,
 .container-21:after, .container-22:after, .container-23:after, .container-24:after, .container-25:after
 {
   content: "\0020";
@@ -215,9 +294,9 @@ next column, or to pull it into the previous column.  */
   visibility: hidden;
   overflow:hidden;
 }
-.container-1, .container-2, .container-3, .container-4, .container-5, .container-6, .container-7, 
-.container-8, .container-9, .container-10, .container-11, .container-12, .container-13, .container-14, 
-.container-15, .container-16, .container-17, .container-18, .container-19, .container-20, .container-21, 
+.container-1, .container-2, .container-3, .container-4, .container-5, .container-6, .container-7,
+.container-8, .container-9, .container-10, .container-11, .container-12, .container-13, .container-14,
+.container-15, .container-16, .container-17, .container-18, .container-19, .container-20, .container-21,
 .container-22, .container-23, .container-24, .container-25
 {
 	display: block;
@@ -232,13 +311,13 @@ next column, or to pull it into the previous column.  */
 /* --------------------------------------------------------- */
 
 
-.block 
+.block
 {
-	border:3px solid #B3E813; 
+	border:3px solid #B3E813;
 	padding: 10px;
 }
 
-.page-break 
+.page-break
 {
 	page-break-before:always;
 }
@@ -263,7 +342,9 @@ next column, or to pull it into the previous column.  */
 
 -------------------------------------------------------------- */
 
+/*
 @import url(src/forms.css);
+*/
 
 #contact label
 {
@@ -278,24 +359,24 @@ next column, or to pull it into the previous column.  */
 /* Form fields
 -------------------------------------------------------------- */
 
-/* 
-  Attribute selectors are used to differentiate the different types 
-  of input elements, but to support old browsers, you will have to 
-  add classes for each one. ".title" simply creates a large text  
+/*
+  Attribute selectors are used to differentiate the different types
+  of input elements, but to support old browsers, you will have to
+  add classes for each one. ".title" simply creates a large text
   field, this is purely for looks.
  */
 input[type="text"], input[type="password"]
 {
 	margin:0.2em 0;
 }
-input.text, input.title, textarea 
+input.text, input.title, textarea
 {
 	margin:0.2em 0;
 }
 /*
 The new default from blueprint CSS is more sensible
 
-textarea 
+textarea
 {
 	height: 150px;
 }
@@ -304,15 +385,15 @@ input.text,
 input.title   { padding: 3px; }
 textarea      { padding: 3px; }
 
-select.text 
+select.text
 {
 	/* width: 210px;   -- use the span-x classes! */
 	padding: 3px;
 }
-select.title   
-{ 
+select.title
+{
 	/* width: 300px;   -- use the span-x classes! */
-	padding: 3px; 
+	padding: 3px;
 }
 select.text, select.title
 {
@@ -320,9 +401,9 @@ select.text, select.title
   border:1px solid #bbb;
 }
 
-/* 
-  This is to be used on forms where a variety of elements are 
-  placed side-by-side. Use the p tag to denote a line. 
+/*
+  This is to be used on forms where a variety of elements are
+  placed side-by-side. Use the p tag to denote a line.
  */
 form.inline { line-height:3; }
 form.inline p { margin-bottom:0; }
@@ -331,7 +412,7 @@ form.inline p { margin-bottom:0; }
 /* Success, info, notice and error/alert boxes
 -------------------------------------------------------------- */
 
-.fault 
+.fault
 {
 	color:#8a1f11;
 }
@@ -344,11 +425,11 @@ form.inline p { margin-bottom:0; }
 
 
 
-/* -------------------------------------------------------------- 
-  
+/* --------------------------------------------------------------
+
    buttons.css
    * Gives you some great CSS-only buttons.
-   
+
    Created by Kevin Hale [particletree.com]
    * particletree.com/features/rediscovering-the-button-element
 
@@ -356,9 +437,11 @@ form.inline p { margin-bottom:0; }
 
 -------------------------------------------------------------- */
 
+/*
 @import url(plugins/buttons/screen.css);
+*/
 
-label,select,.pointer 
+label,select,.pointer
 {
 	cursor:pointer;
 }
@@ -382,8 +465,9 @@ label,select,.pointer
 
 -------------------------------------------------------------- */
 
+/*
 @import url(plugins/fancy-type/screen.css);
-
+*/
 
 
 
