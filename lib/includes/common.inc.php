@@ -43,6 +43,32 @@ if (!defined('BASE_PATH'))
 
 
 /**
+ * Remove the effects of the old dreaded magic_quotes setting.
+ *
+ * WARNING: we have not placed this in a function but run it immediately, right here,
+ *          because we know this sourcefile will be loaded once with every request 
+ *          we receive. Hence tis is the 'perfect place' to put this ****.
+ *
+ * The JSON encoding/decoding way is due to Alix Axel ( http://nl2.php.net/manual/en/function.get-magic-quotes-gpc.php )
+ *
+ * Also note 
+ *     http://nl2.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc
+ *     (we check if the function exists at all in preparation of PHP6, where it will be gone, finally)
+ */
+if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) 
+{
+    $_GET = json_decode(stripslashes(json_encode($_GET, JSON_HEX_APOS)), true);
+    $_POST = json_decode(stripslashes(json_encode($_POST, JSON_HEX_APOS)), true);
+    $_COOKIE = json_decode(stripslashes(json_encode($_COOKIE, JSON_HEX_APOS)), true);
+    $_REQUEST = json_decode(stripslashes(json_encode($_REQUEST, JSON_HEX_APOS)), true);
+}
+
+
+
+ 
+
+
+/**
  * Return TRUE when one string matches the 'tail' of the other string
  */
 function strmatch_tail($a, $b)

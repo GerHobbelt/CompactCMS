@@ -65,10 +65,12 @@ session_start();
 if (!isset($cfg))
 {
 	?>
+	<div class="error">
 	<h1>Fatal Error</h1>
 	<p>The installer has apparently rewritten the config.inc.php file but failed to rewrite its content. 
 	This is a severe failure and you must restore a backup or re-install the CompactCMS source code, in
 	particular the <file>lib/config.inc.php</file> and <file>.htaccess</file> files!</p>
+	</div>
 	<?php
 	die();
 }
@@ -331,19 +333,48 @@ if (empty($_SESSION['variables']['do_upgrade']))
 
 <?php
 // B0RK when the server still has that old hack active:
-if (get_magic_quotes_gpc())
+$old_hacks = array(
+	'magic_quotes_gpc' => 0,    // warn
+	'magic_quotes_sybase' => 1, // fatal
+	'magic_quotes_runtime' => 1 // fatal
+	);
+	
+$die_on_old_hacks = false;	
+foreach ($old_hacks as $key => $value)
+{	
+	if (ini_get($key))
+	{
+	?>
+		<div class="error">
+			<h1><?php echo ($value == 0 ? 'Warning' : 'Fatal error'); ?></h1>
+			<p>Your server still has the old PHP '<?php echo $key; ?>' hack setting turned ON; 
+			<a href="http://www.php.net/manual/en/security.magicquotes.php">it is obsoleted</a> and 
+			poses an indirect security risk: any software on your machine still depending on that 
+			setting should be upgraded/overhauled!
+			</p>
+			<?php
+			if ($value == 0)
+			{
+			?>
+				<p><strong>CompactCMS will plod on, but be very much aware that you are doing so at 
+				your own peril. <em>Any</em> statements regarding quality of service, robustness 
+				or operation are,	from this point onwards, <em>void</em>.</strong></p>
+			<?php
+			}
+			else
+			{
+				$die_on_old_hacks = true;
+			?>
+				<p><strong>CompactCMS will NOT install as long as this setting is active.</strong></p>
+			<?php
+			}
+			?>
+		</div>
+	<?php
+	}
+}
+if ($die_on_old_hacks)
 {
-?>
-	<div class="error">
-	<h1>Warning</h1>
-	<p>Your server still has the old PHP 'magic quotes' hack setting turned ON; 
-	<a href="http://www.php.net/manual/en/security.magicquotes.php">it is obsoleted</a> and 
-	poses an indirect security risk: any software on your machine still depending on that 
-	setting should be upgraded/overhauled!
-	</p>
-	<p><strong>CompactCMS will NOT install as long as this setting is active.</strong></p>
-	</div>
-<?php
 	die();
 }
 ?>
