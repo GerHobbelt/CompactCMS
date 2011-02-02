@@ -157,6 +157,7 @@ $client_browser = $client_browser->getBrowser();
 
 if (0)
 {
+	echo "/*\r\n";
 	echo '<h1>$client_browser</h1>';
 	echo "<pre>";
 	var_dump($client_browser);
@@ -169,6 +170,7 @@ if (0)
 	echo "<pre>";
 	var_dump($optimize);
 	echo "</pre>";
+	echo "*/\r\n";
 }
 
 /*
@@ -321,16 +323,9 @@ else
 	// Check for buggy versions of Internet Explorer
 	if (!empty($_SERVER['HTTP_USER_AGENT']))
 	{
-		if (!strstr($_SERVER['HTTP_USER_AGENT'], 'Opera') &&
-			preg_match('/^Mozilla\/4\.0 \(compatible; MSIE ([0-9]\.[0-9])/i', $_SERVER['HTTP_USER_AGENT'], $matches))
+		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || $client_browser->AOL)
 		{
-			$version = floatval($matches[1]);
-
-			if ($version < 6)
-				$encoding = 'none';
-
-			if ($version == 6 && !strstr($_SERVER['HTTP_USER_AGENT'], 'EV1'))
-				$encoding = 'none';
+			$encoding = 'none';
 		}
 	}
 	else
@@ -375,7 +370,8 @@ else
 	}
 
 	// Get contents of the files
-	$contents = '';
+	$contents = '/* Browser: ' . $client_browser->Browser . ' ' . $client_browser->Version . " */\n\n";
+	
 	foreach($elements as $element)
 	{
 		$my_content = load_one($type, $http_base, $base, $root, $element);
@@ -1182,8 +1178,6 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
 		}
-
-		$contents = '/* Browser: ' . $client_browser->Browser . ' ' . $client_browser->Version . " */\n" . $contents;
 		break;
 
 	case 'remove':
