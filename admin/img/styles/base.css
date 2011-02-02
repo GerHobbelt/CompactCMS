@@ -189,7 +189,7 @@ EXTRA:
 .container-19, .container-20, .container-21, .container-22, .container-23, .container-24,
 .container-25
 {
-  margin: 0 auto;
+  margin: 0 auto;      /* center the container: left & right margin: auto */
 }
 .container-1 {width: 30px;}
 .container-2 {width: 70px;}
