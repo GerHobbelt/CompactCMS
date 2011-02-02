@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -33,7 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -68,13 +68,13 @@ if(empty($_SESSION['ccms_userID']) && $cfg['protect']==true)
 }
 
 // Do log-out (kill sessions) and redirect
-if($do == "logout") 
+if($do == "logout")
 {
 	// Unset all of the session variables.
 	$_SESSION = array();
-	
+
 	// Destroy session
-	if (ini_get("session.use_cookies")) 
+	if (ini_get("session.use_cookies"))
 	{
 		$params = session_get_cookie_params();
 		if (!empty($params["ccms_userID"]))
@@ -85,18 +85,18 @@ if($do == "logout")
 			);
 		}
 	}
-	
+
 	// Generate a new session_id
 	session_regenerate_id();
-	
+
 	// Finally, destroy the session.
-	if(session_destroy()) 
+	if(session_destroy())
 	{
 		header('Location: ' . makeAbsoluteURI($loc));
 		exit();
 	}
-	
-	if(empty($_SESSION['ccms_userID'])) 
+
+	if(empty($_SESSION['ccms_userID']))
 	{
 		header('Location: ' . makeAbsoluteURI($loc));
 		exit();
@@ -112,5 +112,5 @@ Further setup/init work for the entire admin section of the site:
 -----------------------------------------------------------------
 */
 
-	
+
 ?>

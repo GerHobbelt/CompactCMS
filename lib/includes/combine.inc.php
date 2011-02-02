@@ -610,7 +610,7 @@ function css_mk_abs_path($relpath, $basedir)
 
 		Anyway, prepend the path with the absolute path to the given file and then discard the ./ and ../ entries in the path.
 		*/
-		$abspath = merg_path_elems($basedir, $relpath);
+		$abspath = merge_path_elems($basedir, $relpath);
 		$abspath = path_remove_dot_segments($abspath);
 	}
 	else
@@ -802,7 +802,7 @@ function filter4browser($contents, $client_browser)
 				$depth[3] = 0; // regexes
 				$depth[4] = 0; // [...] set in regex
 				$endset = '{}/"\'';
-				
+
 				for (;;)
 				{
 					$i = strcspn($c, $endset);
@@ -815,13 +815,13 @@ function filter4browser($contents, $client_browser)
 					}
 					$brace = substr($s, $i, 1);
 					$c = substr($c, $i + 1);
-					
+
 					switch ($brace)
 					{
 					default:
 						send_response_status_header(500);
 						die("INTERNAL ERROR: Illegal element in string, regex or scope for condition block following: " . $src);
-						
+
 					case '{':
 						// when not inside string or regex:
 						if (!$depth[1] && !$depth[2] && !$depth[3])
@@ -829,13 +829,13 @@ function filter4browser($contents, $client_browser)
 							$depth[0]++;
 						}
 						continue;
-					
+
 					case '}':
 						// when not inside string or regex:
 						if (!$depth[1] && !$depth[2] && !$depth[3])
 						{
 							$depth[0]--;
-							
+
 							// when we've reached the end of the outer scope block, we terminate the scan and keep what's left:
 							if ($depth[0] == 0)
 							{
@@ -843,7 +843,7 @@ function filter4browser($contents, $client_browser)
 							}
 						}
 						continue;
-						
+
 					case '\\':
 						// escape character: applies inside strings, regexes (and implicitly: regex sets):
 						if ($depth[1] || $depth[2] || $depth[3])
@@ -852,7 +852,7 @@ function filter4browser($contents, $client_browser)
 							$c = substr($c, 1);
 						}
 						continue;
-						
+
 					case '/':
 						// when not inside string or regex [...] SET:
 						if (!$depth[1] && !$depth[2] && !$depth[4])
@@ -873,7 +873,7 @@ function filter4browser($contents, $client_browser)
 									$i = strcspn($c, "\n");
 									$c = substr($c, $i + 1);
 									continue;
-									
+
 								case '*':
 									// C style comment: ignore until you've found a matching '*/' combo:
 									if (!preg_match('/^\*.*?\*\/(.*)$/s', $c, $cmtm))
@@ -884,7 +884,7 @@ function filter4browser($contents, $client_browser)
 									}
 									$c = $cmtm[1];
 									continue;
-									
+
 								default:
 									// regex marker...
 									$depth[3]++;
@@ -894,7 +894,7 @@ function filter4browser($contents, $client_browser)
 							}
 						}
 						continue;
-					
+
 					case '[':
 						// when inside regex but not inside regex SET:
 						if ($depth[3] && !$depth[4])
@@ -903,7 +903,7 @@ function filter4browser($contents, $client_browser)
 							$endset = ']\\';
 						}
 						continue;
-					
+
 					case ']':
 						// when inside regex SET:
 						if ($depth[3] && $depth[4])
@@ -912,7 +912,7 @@ function filter4browser($contents, $client_browser)
 							$endset = '[]/\\';
 						}
 						continue;
-						
+
 					case '"':
 						// when not inside sq string or regex:
 						if (!$depth[1] && !$depth[3])
@@ -929,7 +929,7 @@ function filter4browser($contents, $client_browser)
 							}
 						}
 						continue;
-						
+
 					case "'":
 						// when not inside dq string or regex:
 						if (!$depth[2] && !$depth[3])
@@ -949,7 +949,7 @@ function filter4browser($contents, $client_browser)
 					}
 					break;
 				}
-				
+
 				$contents = $c;
 				// removed!  <snip> Just like that! :-)
 			}
@@ -967,7 +967,7 @@ function filter4browser($contents, $client_browser)
 		else
 		{
 			// we must keep the current line/block:
-			$prev_content .= $this_line;   // or: $prev_content .= $src;  iff you don't want to keep the conditional comment in the output, ever. 
+			$prev_content .= $this_line;   // or: $prev_content .= $src;  iff you don't want to keep the conditional comment in the output, ever.
 		}
 	}
 
@@ -1036,7 +1036,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			if (0)
 			{
 				echo "<pre>@import: $type, $http_base, \n$base, \n$root, $url, $element";
-				$rfn = merg_path_elems($base, $element, '../', $url);
+				$rfn = merge_path_elems($base, $element, '../', $url);
 				echo "<pre>makes: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
 				$rfn = path_remove_dot_segments($rfn);
 				echo "<pre>makes 2: $type, $http_base, \n$base, \n$root, $url, $rfn, $element";
@@ -1068,8 +1068,8 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		$is_IE = (0 == strcasecmp('IE', $client_browser->Browser));
 		$is_FF = (0 == strcasecmp('Firefox', $client_browser->Browser));
 		$is_Chrome = (0 == strcasecmp('Chrome', $client_browser->Browser));
-		$is_Opera = (0 == strncasecmp('Opera', $client_browser->Browser, 5)); 
-		$is_Safari = (0 == strcasecmp('Safari', $client_browser->Browser)); 
+		$is_Opera = (0 == strncasecmp('Opera', $client_browser->Browser, 5));
+		$is_Safari = (0 == strcasecmp('Safari', $client_browser->Browser));
 		$is_mobile = !!$client_browser->isMobileDevice;
 		/*
 		 * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
@@ -1090,7 +1090,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 		/*
 		 fix CSS3 border-radius for IE:
-		 
+
 		 we DON'T. It's a mess and frankly, I can do without the hassle right now. So MSIE6/7/8 do NOT support rounded corners
 		 like that in the admin screens.
 		*/
@@ -1138,7 +1138,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			//-moz-border-radius: 5px [5px 5px 5px];
 			//border-radius: 5px [5px 5px 5px];
 			//-moz-opacity: 0.8;                  ??
-			
+
 			$contents = preg_replace('/\sborder-radius:/', "-moz-border-radius:", $contents);
 			$contents = preg_replace('/\sborder-shadow:/', "-moz-border-shadow:", $contents);
 		}
@@ -1165,7 +1165,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
 
 			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
-			
+
 			/*
 			Opera (11.0 build 1156) does not render border-radius correctly for <fieldset> borders (the background fill is correctly rendered, amazingly).
 			*/
@@ -1213,7 +1213,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 	 *   <path+filename of CSS>/../
 	 * and let the '..' directory remover do its regular job.
 	*/
-	$abspath = merg_path_elems($http_base, $element, '../');
+	$abspath = merge_path_elems($http_base, $element, '../');
 	$abspath = path_remove_dot_segments($abspath);
 
 	$contents = preg_replace('/\surl\(([^)]+)\)/e', "' url(\"'.css_mk_abs_path('\\1', '".$abspath."').'\")'", $contents);
@@ -1253,13 +1253,13 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	 */
 	SetUpLanguageAndLocale($cfg['language'], true);
 
-	$mce_basepath = merg_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
+	$mce_basepath = merge_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
 
 	$mce_files = array();
 	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
 
 	// Add core
-	$mce_files[] = merg_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
+	$mce_files[] = merge_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
 	// Add core language(s)
 	$languages = array($cfg['tinymce_language']);
 	if ($cfg['tinymce_language'] != 'en')
@@ -1268,32 +1268,32 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	}
 	foreach ($languages as $lang)
 	{
-		$mce_files[] = merg_path_elems($mce_basepath, "langs/" . $lang . ".js");
+		$mce_files[] = merge_path_elems($mce_basepath, "langs/" . $lang . ".js");
 	}
 	// Add themes
 	$themes = array('advanced');
 	foreach ($themes as $theme)
 	{
-		$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
+		$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
 
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
-			$mce_files[] = merg_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
+			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
+			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
 		}
 	}
 	// Add plugins
-	
+
 	$pluginarr = get_tinyMCE_plugin_list();
 
 	foreach ($pluginarr as $plugin)
 	{
-		$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
+		$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
 
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
-			$mce_files[] = merg_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
+			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
+			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
 		}
 	}
 

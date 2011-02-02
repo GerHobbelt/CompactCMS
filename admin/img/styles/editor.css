@@ -22,33 +22,33 @@
 
 @import url("../../../lib/includes/js/mochaui/Source/Themes/default/css/Window.css");
 
-.mochaTitlebar h3 
+.mochaTitlebar h3
 {
 	font: 0.825em "Verdana", arial, sans-serif;
-	line-height: 15px;	
+	line-height: 15px;
 	font-weight: bold;
 }
 
 .mocha .handle {
-	background: blue; 
+	background: blue;
 }
 
 .mocha .corner { /* Corner resize handles */
-	background: yellow;	
+	background: yellow;
 }
 
 /*
 	To use images for these buttons:
 	1. Set the useCanvasControls window option to false.
 	2. If you use a different button size you may need to reposition the controls.
-	   Modify the controlsOffset window option.		
+	   Modify the controlsOffset window option.
 	2. Replace the background-color with a background-image for each button.
 
 */
 .mochaSpinner{
 	background: url(../saving.gif) no-repeat;
 }
-		
+
 .pad {padding:20px;}
 
 
@@ -79,7 +79,7 @@
 #taskbar {
 	background: #E3E3E3;
 }
-.taskbarTab 
+.taskbarTab
 {
 	font: 0.825em "Verdana", arial, sans-serif;
 	/*
@@ -89,10 +89,10 @@
 	background-image: url(../mochaui/dock-tabs.png); /* good for IE6 too; don't need transparancy for this one! */
 	background-position: left top;
 	background-repeat: no-repeat;
-	width: 190px; 
+	width: 190px;
 }
-.taskbarText 
-{ 
+.taskbarText
+{
 	font-weight: bold;
 	padding-left: 22px; /* make sure the text does not obliterate the 'icon' embedded in our dock-tabs.png/dock-tabs.gif */
 	padding-right: 5px;
@@ -110,15 +110,15 @@
 
 
 /* Toolbar Tabs */
-.taskbarTabs {	
+.taskbarTabs {
 	padding: 0 5px 2px 2px;
 	background: url(../mochaui/tabs.png) repeat-x;
 	background-position: left -70px;
 	overflow: visible;
 }
-.tab-menu {	
+.tab-menu {
 	padding-top: 1px;
-	list-style:	none;
+	list-style: none;
 	margin: 0;
 	padding: 0;
 	line-height: 16px;
@@ -128,8 +128,8 @@
 	display: block;
 	float: left;
 	font: 0.825em "Verdana", arial, sans-serif;
-	margin:	0 0 5px 0;
-	cursor: pointer;	
+	margin: 0 0 5px 0;
+	cursor: pointer;
 	background: url(../mochaui/tabs.png) repeat-x;
 	background-position: left -35px;
 }
@@ -145,11 +145,11 @@
 	font-weight: normal;
 	color: #181818;
 	background: url(../mochaui/tabs.png) repeat-x;
-	background-position: right -35px;	
+	background-position: right -35px;
 }
 .tab-menu li.selected a {
 	color: #181818;
-	font-weight: bold;	
+	font-weight: bold;
 	background: url(../mochaui/tabs.png) repeat-x;
 	background-position: right 0;
 }
@@ -170,21 +170,21 @@
 }
 * html .iconWrapper {padding: 1px;border: 0;}
 .iconWrapper img {cursor: pointer;margin: 0;padding: 3px;}
-.iconWrapper:hover 
+.iconWrapper:hover
 {
 	border: 1px solid #a0a0a0;
 	border-radius: 3px;
 }
 
 #spinnerWrapper {
-    width: 16px;
-    height: 16px;
-    background: url(../spacer.gif) no-repeat;
-    margin: 4px 5px 0 5px;
+	width: 16px;
+	height: 16px;
+	background: url(../spacer.gif) no-repeat;
+	margin: 4px 5px 0 5px;
 }
 #spinner {
 	display: none;
 	background: url(../saving.gif) no-repeat;
 	width: 16px;
 	height: 16px;
-}	
+}

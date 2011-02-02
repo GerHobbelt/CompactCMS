@@ -1,8 +1,8 @@
-<?php 
+<?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -35,19 +35,19 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 // Load news preferences
-//$pageID	= getGETparam4Filename('page');
+//$pageID   = getGETparam4Filename('page');
 $page_id = $ccms['page_id'];
 $page_name = $ccms['page_name'];
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $id = getGETparam4IdOrNumber('id');
 $is_printing = ($ccms['printing'] == 'Y');
 
-if(!empty($page_id)) 
+if(!empty($page_id))
 {
 	$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgnews', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
 	if ($db->ErrorNumber() != 0) $db->Kill();
 }
-$locale 	= ($rsCfg ? $rsCfg->showLocale : $cfg['locale']);
+$locale     = ($rsCfg ? $rsCfg->showLocale : $cfg['locale']);
 
 // no need to check whether the given page is a news page; if it isn't we wouldn't have arrived here...
 
@@ -57,20 +57,20 @@ SetUpLanguageAndLocale($locale);
 
 // Do actions for overview
 $newsrows = false;
-if(empty($id)) 
+if(empty($id))
 {
 	$newsID = false;
-	
+
 	// Load recordset for all news on specific news page
 	$newsrows = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsPublished<>'0' AND page_id=" . MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER) . " ORDER BY newsModified DESC");
-} 
-else 
+}
+else
 {
 	// Do actions for specific news
-	
+
 	// Define requested news item
 	$newsID = explode("-", $id, 2);
-	
+
 	// Load recordset for newsID
 	$newsrows = $db->QueryObjects("SELECT * FROM `".$cfg['db_prefix']."modnews` n LEFT JOIN `".$cfg['db_prefix']."users` u ON n.userID=u.userID WHERE newsID=".MySQL::SQLValue($newsID[0], MySQL::SQLVALUE_NUMBER)." AND newsPublished<>'0' AND page_id=".MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER));
 }
@@ -91,36 +91,36 @@ $ccms['previewcode'] = $preview_checkcode;
 
 <!-- lay-out -->
 
-<?php 
+<?php
 // Start switch for news, select all the right details
-if(count($newsrows) > 0) 
+if(count($newsrows) > 0)
 {
-	if(empty($do)) 
+	if(empty($do))
 	{
 		$newsCount = count($newsrows);
-		if($rsCfg) 
+		if($rsCfg)
 		{
-			$listMax 	= ($rsCfg->showMessage > $newsCount ? $newsCount : $rsCfg->showMessage);
-			$showTeaser	= intval($rsCfg->showTeaser);
-			$showAuthor	= intval($rsCfg->showAuthor);
-			$showDate	= intval($rsCfg->showDate);
-		} 
-		else 
+			$listMax    = ($rsCfg->showMessage > $newsCount ? $newsCount : $rsCfg->showMessage);
+			$showTeaser = intval($rsCfg->showTeaser);
+			$showAuthor = intval($rsCfg->showAuthor);
+			$showDate   = intval($rsCfg->showDate);
+		}
+		else
 		{
 			$listMax = $newsCount;
-			$showTeaser	= 1;
-			$showAuthor	= 1;
-			$showDate	= 1;
+			$showTeaser = 1;
+			$showAuthor = 1;
+			$showDate   = 1;
 		}
 		$show_single_item = !empty($id); // ($listMax == 1);
-		
-		for ($i=0; $i < $listMax; $i++) 
-		{ 
+
+		for ($i=0; $i < $listMax; $i++)
+		{
 			$rsNews = $newsrows[$i];
-			
+
 			// Filter spaces, non-file characters and account for UTF-8
 			$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
-			
+
 			if ($show_single_item)
 			{
 				if ($i == 0)
@@ -137,7 +137,7 @@ if(count($newsrows) > 0)
 					//$ccms['keywords']   = $row->keywords;
 					$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 				}
-				
+
 				echo '<div class="news-item-single">';
 			}
 			else
@@ -145,24 +145,24 @@ if(count($newsrows) > 0)
 				echo '<div class="news-item">';
 			}
 
-			if ($showDate) 
-			{ 
+			if ($showDate)
+			{
 			?>
 				<p class="news-date" title="<?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?>"><?php echo htmlentities(strftime('%B',strtotime($rsNews->newsModified))); ?><span><?php echo date('j',strtotime($rsNews->newsModified)); ?></span></p>
-			<?php 
-			} 
+			<?php
+			}
 
-			if(!$show_single_item) 
-			{ 
+			if(!$show_single_item)
+			{
 				?>
 				<h2><a href="<?php echo $cfg['rootdir'].$page_name.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle; ?>.html"><?php echo $rsNews->newsTitle; ?></a></h2>
-				<?php 
-				if ($showTeaser) 
-				{ 
+				<?php
+				if ($showTeaser)
+				{
 				?>
 					<p class="news-teaser"><?php echo $rsNews->newsTeaser; ?></p>
-				<?php 
-				} 
+				<?php
+				}
 				else
 				{
 				?>
@@ -179,47 +179,47 @@ if(count($newsrows) > 0)
 			<?php
 			}
 
-			if($showAuthor) 
-			{ 
+			if($showAuthor)
+			{
 			?>
 				<p class="news-author">
-					<?php 
-					echo '&ndash; '.$rsNews->userFirst.' '.$rsNews->userLast; 
+					<?php
+					echo '&ndash; '.$rsNews->userFirst.' '.$rsNews->userLast;
 					?>
 				</p>
-			<?php 
-			} 
-			
-			if(!$show_single_item) 
-			{ 
+			<?php
+			}
+
+			if(!$show_single_item)
+			{
 			?>
-				<p class="news-view-item">&laquo; <a href="<?php echo $cfg['rootdir'].$page_name; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a> 
-					| <a href="<?php echo $cfg['rootdir'].$page_name; ?>.html"><?php 
-					// echo $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($page_name, MySQL::SQLVALUE_TEXT)), array('pagetitle')); 
+				<p class="news-view-item">&laquo; <a href="<?php echo $cfg['rootdir'].$page_name; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a>
+					| <a href="<?php echo $cfg['rootdir'].$page_name; ?>.html"><?php
+					// echo $db->SelectSingleValue($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($page_name, MySQL::SQLVALUE_TEXT)), array('pagetitle'));
 					echo $ccms['pagetitle'];
 				?></a></p>
-			<?php 
-			} 
+			<?php
+			}
 			?>
 			</div>
 			<hr class="clear" />
 		<?php
 		}
-		
-		if($show_single_item || $newsCount > $listMax) 
-		{ 
+
+		if($show_single_item || $newsCount > $listMax)
+		{
 		?>
-			<p class="news-view-archive<?php 
-				if ($show_single_item) 
+			<p class="news-view-archive<?php
+				if ($show_single_item)
 				{
 					echo '4single';
 				}
 				?>"><a href="<?php echo $cfg['rootdir'].$page_name; ?>.html?do=all"><?php echo $ccms['lang']['news']['viewarchive']; ?></a></p>
-		<?php 
+		<?php
 		}
 	}
-	
-	if($do == "all") 
+
+	if($do == "all")
 	{
 		// and augment the breadcrumb trail and other template variables:
 		$preview_qry = ($preview_checkcode ? '&preview=' . $preview_checkcode : '');
@@ -232,7 +232,7 @@ if(count($newsrows) > 0)
 		//$ccms['desc']       = $rsNews->newsContent;
 		//$ccms['keywords']   = $row->keywords;
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
-		
+
 		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
 
 		$i = 0;
@@ -240,9 +240,9 @@ if(count($newsrows) > 0)
 		{
 			// Filter spaces, non-file characters and account for UTF-8
 			$newsTitle = cvt_text2legibleURL($rsNews->newsTitle);
-			
+
 			?>
-				
+
 			<div class="news-item-short">
 				<h3>&#8594; <a href="<?php echo $cfg['rootdir'].$page_name.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry; ?>"><?php echo $rsNews->newsTitle; ?></a></h3>
 				<div class="news-timestamp"><?php echo strftime('%Y-%m-%d',strtotime($rsNews->newsModified));?> &ndash; <?php echo $rsNews->userFirst.' '.$rsNews->userLast; ?></div>
@@ -252,8 +252,8 @@ if(count($newsrows) > 0)
 			$i++;
 		}
 	}
-} 
-else 
+}
+else
 {
 	echo $ccms['lang']['system']['noresults'];
 }

@@ -10,14 +10,14 @@
 - (%keywords%)      | Keywords (tags) for the current page as specified per file
 - (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
 - (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
-    
+
 >> Menu items
 - (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
 - (%leftmenu%)      | ''
 - (%rightmenu%)     | ''
 - (%footermenu%)    | ''
 - (%extramenu%)     | ''
-    
+
 >> Content tag
 - (%content%)       | The content from the current file that is being requested
 
@@ -53,7 +53,7 @@ Modified   : For CompactCMS.nl 1.4.0+
 	<title>{%title%}</title>
 {%CSS.required_files!css_files(combine)%}
 <?php
-//	<link href="{%rootdir%}lib/templates/nightlights/style.css" rel="stylesheet" type="text/css" media="screen" />
+//  <link href="{%rootdir%}lib/templates/nightlights/style.css" rel="stylesheet" type="text/css" media="screen" />
 ?>
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>

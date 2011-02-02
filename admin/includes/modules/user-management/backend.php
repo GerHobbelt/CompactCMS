@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -33,7 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -49,8 +49,8 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
 // security check done ASAP
-if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{ 
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
 	die("No external access to file");
 }
 
@@ -58,7 +58,7 @@ if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 // Set default variables
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
@@ -78,14 +78,14 @@ $status_message = getGETparam4DisplayHTML('msg');
 <body>
 	<div class="module" id="user-management">
 		<div class="center-text <?php echo $status; ?> clear">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
-				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
-			} 
+			<?php
+			if(!empty($status_message))
+			{
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
+			}
 			?>
 		</div>
-		
+
 		<div class="span-18 colborder clear-left">
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
 			<form action="../../process.inc.php?action=delete-user" method="post" accept-charset="utf-8">
@@ -100,51 +100,51 @@ $status_message = getGETparam4DisplayHTML('msg');
 						<th><?php echo $ccms['lang']['users']['level']; ?></th>
 						<th><?php echo $ccms['lang']['users']['lastlog']; ?></th>
 					</tr>
-				
-					<?php 
+
+					<?php
 					// Open recordset for all users with levels <= to own
 					$usercoll = $db->SelectArray($cfg['db_prefix'].'users', null, null, array('userID'));
 					if ($db->ErrorNumber()) $db->Kill();
-					
+
 					// Loop through results
 					$i = 0;
-					foreach($usercoll as $row) 
+					foreach($usercoll as $row)
 					{
 						// Define $isEven for alternate table coloring
-						if($i % 2 != 1) 
+						if($i % 2 != 1)
 						{
 							echo '<tr class="altrgb">';
-						} 
-						else 
-						{ 
+						}
+						else
+						{
 							echo '<tr>';
-						} 
+						}
 						?>
 							<td>
-							<?php 
-							if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel'] && $_SESSION['ccms_userID'] != rm0lead($row['userID'])) 
-							{ 
-							?>	
-								<input type="checkbox" name="userID[]" value="<?php echo rm0lead($row['userID']); ?>" id="userID" />
-							<?php 
-							} 
-							else 
+							<?php
+							if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel'] && $_SESSION['ccms_userID'] != rm0lead($row['userID']))
 							{
-								echo "&#160;"; 
+							?>
+								<input type="checkbox" name="userID[]" value="<?php echo rm0lead($row['userID']); ?>" id="userID" />
+							<?php
+							}
+							else
+							{
+								echo "&#160;";
 							}
 							?>
 							</td>
 							<td>
-							<?php 
-							if($_SESSION['ccms_userID'] == rm0lead($row['userID']) || ($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel'])) 
-							{ 
+							<?php
+							if($_SESSION['ccms_userID'] == rm0lead($row['userID']) || ($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel']))
+							{
 							?>
 								<a href="user.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><span class="ss_sprite_16 ss_user_edit">&#160;</span><?php echo $row['userName']; ?></a>
-							<?php 
-							} 
-							else 
+							<?php
+							}
+							else
 							{
-								echo $row['userName']; 
+								echo $row['userName'];
 							}
 							?>
 							</td>
@@ -154,29 +154,29 @@ $status_message = getGETparam4DisplayHTML('msg');
 							<td><?php echo $row['userLevel']; ?></td>
 							<td class="nowrap"><?php echo date('d-m-\'y',strtotime($row['userLastlog'])); ?></td>
 						</tr>
-						<?php 
-						$i++; 
-					} 
+						<?php
+						$i++;
+					}
 					?>
 				</table>
 				</div>
 				<hr class="space"/>
-				<?php 
-				if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
-				{ 
+				<?php
+				if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']))
+				{
 				?>
 					<button type="submit" onclick="return confirmation_delete();" name="deleteUser"><span class="ss_sprite_16 ss_user_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
-				<?php 
-				} 
+				<?php
+				}
 				?>
 			</form>
 		</div>
-		
+
 		<div class="span-6 last" id="create-user">
 			<h2><?php echo $ccms['lang']['users']['createuser']; ?></h2>
-			<?php 
-			if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel'])) 
-			{ 
+			<?php
+			if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']))
+			{
 			?>
 				<form action="../../process.inc.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">
 					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label>
@@ -195,30 +195,30 @@ $status_message = getGETparam4DisplayHTML('msg');
 						<input type="text" class="required text" name="userLastname" value="" id="userLastname" />
 					<label for="userEmail"><?php echo $ccms['lang']['users']['email']; ?></label>
 						<input type="text" class="required validate-email text" name="userEmail" value="" id="userEmail" />
-					
+
 					<hr class="space"/>
 					<label for="userLevel"><?php echo $ccms['lang']['users']['userlevel']; ?></label>
 					<select name="userLevel" class="required text" id="userLevel" size="1">
 						<option value="1"><?php echo $ccms['lang']['permission']['level1']; ?></option>
-						<?php 
-						if($_SESSION['ccms_userLevel']>1) 
-						{ 
+						<?php
+						if($_SESSION['ccms_userLevel']>1)
+						{
 						?>
 							<option value="2"><?php echo $ccms['lang']['permission']['level2']; ?></option>
-						<?php 
-						} 
-						if($_SESSION['ccms_userLevel']>2) 
-						{ 
+						<?php
+						}
+						if($_SESSION['ccms_userLevel']>2)
+						{
 						?>
 							<option value="3"><?php echo $ccms['lang']['permission']['level3']; ?></option>
-						<?php 
-						} 
-						if($_SESSION['ccms_userLevel']>3) 
-						{ 
+						<?php
+						}
+						if($_SESSION['ccms_userLevel']>3)
+						{
 						?>
 							<option value="4"><?php echo $ccms['lang']['permission']['level4']; ?></option>
-						<?php 
-						} 
+						<?php
+						}
 						?>
 					</select>
 					<div class="yesno">
@@ -234,11 +234,11 @@ $status_message = getGETparam4DisplayHTML('msg');
 						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 					</div>
 				</form>
-			<?php 
-			} 
-			else 
+			<?php
+			}
+			else
 			{
-				echo $ccms['lang']['auth']['featnotallowed']; 
+				echo $ccms['lang']['auth']['featnotallowed'];
 			}
 			?>
 		</div>
@@ -253,7 +253,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 }
 ?>
 
-	</div>	
+	</div>
 	<script type="text/javascript" charset="utf-8">
 function confirmation_delete()
 {

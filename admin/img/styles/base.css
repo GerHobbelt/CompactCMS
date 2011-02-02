@@ -1,5 +1,5 @@
 /* *****************************************************
-Copyright (C) 2008 - 2011 by Xander Groesbeek (CompactCMS.nl)
+Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
 
 This file is part of CompactCMS.
@@ -33,15 +33,15 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
    @import-ed in the middle of the file. This issue is highly dependent
    on unidentified context, but one thing's for sure: the current state
    of the installer code triggers the issue for me (while it has been
-   resported by others a few times before, but never was reproducible 
+   resported by others a few times before, but never was reproducible
    for me.
-   
+
    The current move, shifting the @import statements to the top of this
-   CSS file, circumvents the issue, but since I cannot the cause, 
+   CSS file, circumvents the issue, but since I cannot the cause,
    this certainly is no fix, just a hack. Start your prayer wheels...
-   
+
    (What seems to 'help' produce this issue is having a completely
-    shot config.inc.php or at least a non-working Combiner)
+	shot config.inc.php or at least a non-working Combiner)
 
 -------------------------------------------------------------- */
 

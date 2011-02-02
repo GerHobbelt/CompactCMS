@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -33,7 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -50,14 +50,14 @@ if (!defined('BASE_PATH'))
 
 
 // security check done ASAP
-if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{ 
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
 	die("No external access to file");
 }
 
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
@@ -79,11 +79,11 @@ $status_message = getGETparam4DisplayHTML('msg');
 <body>
 <div class="module" id="permission-manager">
 	<div class="center-text <?php echo $status; ?>">
-		<?php 
-		if(!empty($status_message)) 
-		{ 
+		<?php
+		if(!empty($status_message))
+		{
 			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
-			if ($status != 'error') 
+			if ($status != 'error')
 			{
 			?>
 				<p class="ss_has_sprite"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['must_refresh']; ?></p>
@@ -92,15 +92,15 @@ $status_message = getGETparam4DisplayHTML('msg');
 				</form>
 			<?php
 			}
-		} 
+		}
 		?>
 	</div>
 
 	<h2><?php echo $ccms['lang']['permission']['header']; ?></h2>
-	<?php 
+	<?php
 
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel'] >= 4) 
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
 	?>
 		<p class="left-text"><?php echo $ccms['lang']['permission']['explain']; ?></p>
@@ -120,22 +120,22 @@ $status_message = getGETparam4DisplayHTML('msg');
 				if (empty($rsCfg)) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 				$i = 0;
-				foreach ($rsCfg as $rec) 
+				foreach ($rsCfg as $rec)
 				{
 					$columnName = $rec['name'];
-					$comments = (array_key_exists($rec['name'], $ccms['lang']['permitem']) ? $ccms['lang']['permitem'][$rec['name']] : null); 
+					$comments = (array_key_exists($rec['name'], $ccms['lang']['permitem']) ? $ccms['lang']['permitem'][$rec['name']] : null);
 					$state = $rec['value'];
 					$dlevel = explode('.', $rec['display_order']);
-				
+
 					?>
 					<tr class="<?php echo ($i % 2 != 1 ? 'altrgb' : 'regrgb'); ?>">
 						<th class="permission-name">
-						<?php 
+						<?php
 							if ($dlevel[1] > 0)
 							{
-								echo '<span class="ss_sprite_16 ss_bullet_white">&#160;</span>'; 
+								echo '<span class="ss_sprite_16 ss_bullet_white">&#160;</span>';
 							}
-							echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName); 
+							echo (!empty($comments) ? '<abbr title="' . $comments . '">' . $columnName . '</abbr>' : $columnName);
 						?>
 						</th>
 						<?php
@@ -151,20 +151,20 @@ $status_message = getGETparam4DisplayHTML('msg');
 						}
 						?>
 					</tr>
-					<?php 
+					<?php
 					$i++;
-				} 
+				}
 				?>
 			</table>
 			</div>
 			<div class="right">
-				<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
+				<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button>
 				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 			</div>
 		</form>
 	<?php
-	} 
-	else 
+	}
+	else
 	{
 		die($ccms['lang']['auth']['featnotallowed']);
 	}

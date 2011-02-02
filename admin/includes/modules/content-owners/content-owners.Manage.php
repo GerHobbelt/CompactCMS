@@ -99,8 +99,8 @@ if (!is_array($users)) $db->Kill();
 
 	<h2><span class="ss_sprite_16 ss_group_gear">&#160;</span><?php echo $ccms['lang']['owners']['header']; ?></h2>
 	<?php
-	if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
-	{ 
+	if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel']))
+	{
 	?>
 	<p class="left-text"><?php echo $ccms['lang']['owners']['explain']; ?></p>
 	<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
@@ -172,8 +172,8 @@ if (!is_array($users)) $db->Kill();
 	</div>
 	</form>
 	<?php
-	} 
-	else 
+	}
+	else
 	{
 		die($ccms['lang']['auth']['featnotallowed']);
 	}
@@ -184,12 +184,12 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 	<hr class="clear" />
-	
+
 	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 
 	<hr class="clear" />
-	
+
 	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
 	<textarea id="elm1" name="elm1" rows="15" cols="80" class="span-25">
 		&lt;p&gt;

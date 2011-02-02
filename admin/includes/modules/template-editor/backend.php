@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -33,7 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -50,14 +50,14 @@ if (!defined('BASE_PATH'))
 
 
 // security check done ASAP
-if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{ 
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
 	die("No external access to file");
 }
 
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
@@ -67,11 +67,11 @@ $dir_temp = BASE_PATH . "/lib/templates/";
 $get_temp = getGETparam4FullFilePath('template', $template[0].'.tpl.html');
 $chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
 $temp_extension = strtolower(substr($get_temp, strrpos($get_temp, '.') + 1));
-	
-// Check for filename	
-if(!empty($get_temp)) 
+
+// Check for filename
+if(!empty($get_temp))
 {
-	if(@fopen($dir_temp.$get_temp, "r")) 
+	if(@fopen($dir_temp.$get_temp, "r"))
 	{
 		$handle = fopen($dir_temp.$get_temp, "r");
 		// PHP5+ Feature
@@ -87,11 +87,11 @@ if(!empty($get_temp))
 		}
 		fclose($handle);
 		$contents = str_replace("<br />", "<br>", $contents);
-	} 
-} 
+	}
+}
 
 
-if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel'])) 
+if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 {
 	$chstatus = false; // templates are viewable but NOT WRITABLE when user doesn't have permission to manage these.
 }
@@ -111,40 +111,40 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 	</head>
 <body>
 	<div class="module" id="template-editor">
-		<?php 
-		if(!$chstatus) 
-		{ 
+		<?php
+		if(!$chstatus)
+		{
 		?>
 		<div class="span-25 last center-text error">
 			<p class="ss_has_sprite"><span class="ss_sprite_16 ss_error">&#160;</span><?php echo $ccms['lang']['template']['nowrite']; ?></p>
 		</div>
-		<?php 
-		} 
-		?>	
+		<?php
+		}
+		?>
 		<div class="span-15 clear">
 			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
 		</div>
-		
+
 		<div class="span-10 right last">
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" id="changeTmp" method="get" class="right" accept-charset="utf-8">
 				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
 				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
 					<?php
-					$x = 0; 
-					while($x<count($template)) 
-					{ 
+					$x = 0;
+					while($x<count($template))
+					{
 					?>
 						<optgroup label="<?php echo ucfirst($template[$x]); ?>">
 							<option <?php echo ($get_temp==$template[$x].".tpl.html") ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>.tpl.html"><?php echo ucfirst($template[$x]).': '.strtolower($ccms['lang']['backend']['template']); ?></option>
-							<?php 
-							
+							<?php
+
 							// Get CSS and other text-editable files which are part of the engine
 							$cssfiles = array();
-							if ($handle = opendir($dir_temp.$template[$x].'/')) 
+							if ($handle = opendir($dir_temp.$template[$x].'/'))
 							{
-								while (false !== ($file = readdir($handle))) 
+								while (false !== ($file = readdir($handle)))
 								{
-							        if ($file != "." && $file != "..")
+									if ($file != "." && $file != "..")
 									{
 										switch (strtolower(substr($file, strrpos($file, '.') + 1)))
 										{
@@ -155,61 +155,61 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 										case 'txt':
 											$cssfiles[$x][] = $file;
 											break;
-											
+
 										default:
 											// don't list image files and such
 											break;
 										}
-							        }
-							    }
-							    closedir($handle);
+									}
+								}
+								closedir($handle);
 							}
-							
-							foreach ($cssfiles[$x] as $css) 
-							{ 
+
+							foreach ($cssfiles[$x] as $css)
+							{
 							?>
 								<option <?php echo ($get_temp==$template[$x].'/'.$css) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x].'/'.$css; ?>"><?php echo ucfirst($template[$x]).': '.$css; ?></option>
-							<?php 
-							} 
+							<?php
+							}
 							?>
 						</optgroup>
-					<?php 
-					$x++; 
-				} 
+					<?php
+					$x++;
+				}
 				?>
 				</select>
 			</form>
 		</div>
 		<hr class="space span-25 clear"/>
-		
-		<?php 
+
+		<?php
 		/*
 		??? ALWAYS saying 'settings saved' instead of the attached message in the old code? Must've been a bug...
-		
+
 		Changed to mimic the layout in the other files...
-		*/                 
-		?>                              
+		*/
+		?>
 		<div class="center-text <?php echo $status; ?> span-25 clear">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
-				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
-			} 
+			<?php
+			if(!empty($status_message))
+			{
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
+			}
 			?>
 		</div>
-		
+
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
 			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
-			
+
 			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
 			<div class="right">
-				<?php 
-				if($chstatus) 
-				{ 
+				<?php
+				if($chstatus)
+				{
 				?>
 					<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
-				<?php 
-				}  
+				<?php
+				}
 				?>
 				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 			</div>
@@ -232,8 +232,8 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 
 ?>
 		<script type="text/javascript">
-	
-	
+
+
 function confirmation()
 {
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
@@ -260,8 +260,8 @@ else
 $eaLanguage = $cfg['editarea_language'];
 $driver_code = <<<EOT
 		// initialisation
-				
-		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!		
+
+		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
 		var supported_syntaxes = ',' + editAreaLoader.default_settings.syntax_selection_allow + ',';
 		var desired_syntax = '$temp_extension';
 		desired_syntax = (supported_syntaxes.indexOf(',' + desired_syntax + ',') >= 0 ? desired_syntax : "");

@@ -1,8 +1,8 @@
-<?php 
+<?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -34,7 +34,7 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 // Set Captcha value
-$_SESSION['ccms_captcha'] = mt_rand('123456','987654'); 
+$_SESSION['ccms_captcha'] = mt_rand('123456','987654');
 
 // Load comment preferences
 $pagename = getGETparam4Filename('page');
@@ -131,7 +131,7 @@ if (!$is_printing)
 ?>
 <div id="preview-display" style="display:none;">
 	<h2><?php echo $ccms['lang']['guestbook']['preview']; ?></h2>
-	<?php 
+	<?php
 	if ($cfg['enable_gravatar'])
 	{
 	?>
@@ -163,7 +163,7 @@ if (!$is_printing)
 			</select><br/>
 			<p><?php echo $ccms['lang']['guestbook']['verinstr']; ?> <span style="font-weight:bold;color: #f00;"><?php echo $_SESSION['ccms_captcha']; ?></span>.</p>
 			<label for="verification"><?php echo $ccms['lang']['guestbook']['verify']; ?></label><input type="input" name="verification" style="width:50px;" maxlength="6" value="" id="verification" class="required validate-match matchInput:'captcha_check' matchName:'captcha' text"/>
-			
+
 			<input type="hidden" name="captcha_check" value="<?php echo $_SESSION['ccms_captcha']; ?>" id="captcha_check" />
 			<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 			<p style="margin-bottom:20px;text-align:center;">

@@ -1,7 +1,7 @@
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-	
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ author, communicating the product to be your own.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -56,11 +56,11 @@ e.g. the headers of the create page, etc. sections, do not alter the mouse piint
 */
 a
 {
-    cursor: pointer;
+	cursor: pointer;
 	text-decoration: none;
 }
 
-a.external 
+a.external
 {
 	background-image: url('../ccms-sprite.png');
 	background-repeat: no-repeat;
@@ -70,7 +70,7 @@ a.external
 /*
 IE6 fix:
 
-See also: 
+See also:
 http://www.webdevout.net/css-hacks#conditional_comments-stand_alone
 
 THANK YOU, David Hammond! I'm glad I finally found that page. !@#$%^ MSIE!
@@ -117,11 +117,11 @@ IE6 fix:
 
 /* === 1. CORE === */
 /* === LAY-OUT === */
-#wrapper 
+#wrapper
 {
 	padding: 20px 0;
 }
-#footer 
+#footer
 {
 	text-align: right;
 	margin-bottom: 20px;
@@ -129,12 +129,12 @@ IE6 fix:
 /*
 blueprint CSS calls this 'last':
 
-#menudepth 
+#menudepth
 {
 	margin-right: 0;
 }
 */
-#createnew, #menudepth, #load_notice 
+#createnew, #menudepth, #load_notice
 {
 	/* margin-top: 10px; */
 }
@@ -168,7 +168,7 @@ Make sure the admin content has a scrollbar when needed. Override body+html:over
 
 /* === 1. CORE === */
 /* === TAGS === */
-#dyn_list.loading 
+#dyn_list.loading
 {
 	background: #ECC6CD url('../spinner.gif') no-repeat center center;
 	border: #D37A8A 4px solid;
@@ -179,11 +179,11 @@ a#clockLink
 {
 	text-decoration: none;
 }
-#notify.loading 
+#notify.loading
 {
 	background: #EED9BA url('../spinner.gif') no-repeat 50% 70%;
 }
-#notify a.right 
+#notify a.right
 {
 	/* undo the p .right BluePrint CSS rule as well! */
 	/* margin: 0 200px 0 0; */
@@ -191,20 +191,20 @@ a#clockLink
 	text-align:left;
 }
 .printloading {background: url('../saving.gif') no-repeat 50% 70%;}
-#desktop fieldset 
-{ 
+#desktop fieldset
+{
 	padding: 0 10px 10px 10px;
 	margin-bottom: 10px;
-	background-color: #E6F5D6; 
-	/* 
-	^^^^ thanks to the negative margin of the <legend> the background shows above 
-	     the border for IE8/IE7/IE6; the only way to fix it that (that I can see) is 
-	     assign a background image with repeat-x for those ones only.
+	background-color: #E6F5D6;
+	/*
+	^^^^ thanks to the negative margin of the <legend> the background shows above
+		 the border for IE8/IE7/IE6; the only way to fix it that (that I can see) is
+		 assign a background image with repeat-x for those ones only.
 	*/
 	border: 3px solid #90D244;
 	border-radius: 10px;
 }
-legend, .installMsg 
+legend, .installMsg
 {
 	background-color: #F4F6F7; /* <-- effective color with opacity applied to white BG for color #C9D3D9; */
 	font-size:1.1em;
@@ -214,16 +214,16 @@ legend, .installMsg
 	border: 2px solid #9DAFBB;
 	border-radius: 5px;
 }
-legend, .installMsg 
+legend, .installMsg
 {
 	/*
 	See also:
 	  http://css-tricks.com/rgba-browser-support/
 	  http://css-tricks.com/non-transparent-elements-inside-transparent-elements/
 	  http://css-tricks.com/ie-background-rgb-bug/
-	
+
 	This assumes the .legend class should NOT propagate the opacity setting.
-	
+
 	Turns out you must put this in a separate scope to make the color fallback work as expected.
 	*/
 	background-color: rgba(201,211,217,0.2);
@@ -231,17 +231,17 @@ legend, .installMsg
 
 /* === 1. CORE === */
 /* === INSIDE SUB-DIVS === */
-#dyn_list td, th 
+#dyn_list td, th
 {
 	vertical-align: top;
 	height: 22px;
 	padding: 5px 0;
 }
-#dyn_list th 
+#dyn_list th
 {
 	border-bottom: #9ACC66 2px solid;
 }
-#dyn_list 
+#dyn_list
 {
 	display: block;
 	min-width: 800px;
@@ -251,11 +251,11 @@ legend, .installMsg
 	height: auto;
 }
 
-#menuFields 
-{ 
-	border: #9ACC66 4px solid; 
+#menuFields
+{
+	border: #9ACC66 4px solid;
 }
-#table_menu th 
+#table_menu th
 {
 	background: #CDE6B3;
 	border-bottom: #9ACC66 2px solid;
@@ -265,7 +265,7 @@ legend, .installMsg
 make sure all padding of the TH/TD for the menu table is GONE, as the TDs carry same-width SELECT elements:
 */
 #menuFields table th, #menuFields table td
-{ 
+{
 	/*
 	also reduce the interline padding: top/bottom=0
 	*/
@@ -284,7 +284,7 @@ a.editinplace
 {
 	background-position: 0 100px;
 }
-a.edit, a.editinplace:hover 
+a.edit, a.editinplace:hover
 {
 	cursor: pointer;
 	font-weight: bold;
@@ -294,7 +294,7 @@ a.edit, a.editinplace:hover
 
 /* === 1. CORE === */
 /* === STATUS BARS === */
-#logo 
+#logo
 {
 	/* height: 100px; */
 	padding-top: 10px;
@@ -303,7 +303,7 @@ a.edit, a.editinplace:hover
 	border-radius: 10px;
 }
 /* #logo{display:block;height:77px} */
-.logo 
+.logo
 {
 	/* display: inline; */
 	height: 67px;
@@ -312,24 +312,24 @@ a.edit, a.editinplace:hover
 
 	background-position: 0 -228px;
 }
-.logo h1 
+.logo h1
 {
 	display: none;
 }
-#logo p 
+#logo p
 {
 	text-align:center;
 	margin-top: 35px;
 	font-weight: bold;
 }
-.twittlogo 
+.twittlogo
 {
 	display:block;
 	width:26px;
 	height:25px;
 	background-position: 0 -199px;
 }
-#notify .rounded-border 
+#notify .rounded-border
 {
 	background-color: #EED9BA;
 	border: 2px solid #C7892E;
@@ -337,7 +337,7 @@ a.edit, a.editinplace:hover
 	min-height: 95px;
 	margin: 0;
 	padding: 0;
-	text-align: left; 
+	text-align: left;
 }
 .notify
 {
@@ -362,7 +362,7 @@ IE6 fix:
 	background-repeat: no-repeat;
 }
 
-#advanced .rounded-border 
+#advanced .rounded-border
 {
 	background-color: #EDE2F8;
 	margin: 0;
@@ -385,7 +385,7 @@ IE6 fix:
 	background: #C6A5E9;
 	border-bottom-color: #E5D6F5;
 }
-#notify_res 
+#notify_res
 {
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -401,8 +401,8 @@ IE6 fix:
 
 /* override the basic 'p + p' CSS rule: */
 #notify_res p + p {
-    margin-top: .1em;
-    text-indent: 0;
+	margin-top: .1em;
+	text-indent: 0;
 }
 
 #notify_res p.versionstatus
@@ -429,12 +429,12 @@ IE6 fix:
 {
 	line-height: 1.8em;
 }
-#notify_res 
+#notify_res
 {
 	min-height: 60px;
 	margin-left: 80px;
 }
-#notify_res p.h1 
+#notify_res p.h1
 {
 	background: none;
 	border: 0;
@@ -445,7 +445,7 @@ IE6 fix:
 
 /* === 1. CORE === */
 /* === ADD PAGE / MANAGE MENU === */
-#fields label 
+#fields label
 {
 	float: left;
 	padding-top: 3px;
@@ -459,18 +459,18 @@ input[type="text"]
 	width: 200px;
 }
 */
-button 
+button
 {
 	margin-right: 15px;
 }
-optgroup option 
+optgroup option
 {
 	padding-left: 10px;
 }
 /*
 We 'solve' this in a more generic way as we need to style all the input/textarea fields in there anyway
 
-#f_de 
+#f_de
 {
 	width: 200px;
 	height: 50px;
@@ -498,7 +498,7 @@ We 'solve' this in a more generic way as we need to style all the input/textarea
 /* #fields */ #editor-options input
 {
 	/* keep a little distance between the 'yes' and 'no' choices */
-	margin-right: 30px; 
+	margin-right: 30px;
 }
 #editor-options span.ss_sprite_16
 {
@@ -537,12 +537,12 @@ We 'solve' this in a more generic way as we need to style all the input/textarea
 
 /* [i_a] fix the default edit_area monospace font to be the admin page's regular serif: */
 /* <div id="fields"> */
-#addForm textarea 
+#addForm textarea
 {
 	font-size: 90%;
 	font-family: "Palatino Linotype", Palatino, Baskerville, "Book Antiqua", Georgia, serif;
 }
-		
+
 /* === 1. CORE === */
 /* === EDIT in PAGE === */
 .liveedit:hover {
@@ -554,7 +554,7 @@ We 'solve' this in a more generic way as we need to style all the input/textarea
 .textarea {
 	background: #ECC6CD;
 	padding: 0 4px;
-	border: #D37A8A 2px solid;	
+	border: #D37A8A 2px solid;
 	font-size: 90%;
 	font-family: "Palatino Linotype", Palatino, Baskerville, "Book Antiqua", Georgia, serif;
 	width: 85%;
@@ -588,7 +588,7 @@ We 'solve' this in a more generic way as we need to style all the input/textarea
 }
 
 /* === CODING PRE-TAG === */
-pre 
+pre
 {
 	font-size: 12px;
 	padding: 0 5px;
@@ -606,11 +606,11 @@ pre.small
 	background-image: url('../pre_bg_small.gif');
 }
 /*
-use a hard width to make sure FF3 adds a scrollbar instead of growing the box 
+use a hard width to make sure FF3 adds a scrollbar instead of growing the box
 */
 #installFrm pre
 {
-	width: 300px; 
+	width: 300px;
 }
 
 /* === 1. CORE === */
@@ -619,7 +619,7 @@ span.ss_help
 {
 	cursor:help;
 }
-div.ss_help 
+div.ss_help
 {
 	color: #000;
 	width: 300px;
@@ -632,7 +632,7 @@ div.ss_help
 	border-radius: 10px;
 }
 /* for large tip boxes, i.e. boxes with lots of content: */
-div.ss_help_large 
+div.ss_help_large
 {
 	color: #000;
 	width: 600px;
@@ -679,37 +679,37 @@ div.tip-text {
 	border-radius: 10px;
 	padding:10px;
 }
-#loginFrm label 
+#loginFrm label
 {
 	display: block;
 }
-#installFrm label 
+#installFrm label
 {
 	display: block;
 	margin-top:10px;
 }
-#login-wrapper h2, #install-wrapper h2 
+#login-wrapper h2, #install-wrapper h2
 {
 	font-size:1.2em;
 	border-bottom:solid 1px #90D244;
 }
-.loginMsg, .installMsg 
+.loginMsg, .installMsg
 {
 	background-color:#e5d7ee;
 	margin-bottom:15px;
 }
 /* rgba() in a separate scope so IE6/IE7 can run with the basic color instead. */
-.loginMsg, .installMsg 
+.loginMsg, .installMsg
 {
 	background-color:rgba(229,215,238,0.8); /* is rejected for IE6/IE7; they'll use the rgb color defined above instead */
 }
-#install.loading 
+#install.loading
 {
 	display:block;
 	height:300px;
 	background:transparent url('../spinner.gif') no-repeat 50% 50%;
 }
-#install 
+#install
 {
 	margin-top:10px;
 }
@@ -722,7 +722,7 @@ div.module
 	color:#222;
 	line-height:1.6em;
 	margin:15px;
-	
+
 	/* float: left; */
 	position: relative;
 }
@@ -730,7 +730,7 @@ div.module
 {
 	display:block;
 }
-.module h1,.module h2 
+.module h1,.module h2
 {
 	font-size:1.2em;
 	padding:2px 5px;
@@ -739,7 +739,7 @@ div.module
 	text-align:center;
 	border-radius: 5px;
 }
-.module h2 
+.module h2
 {
 	font-size:1em;
 }
@@ -767,7 +767,7 @@ div.module
 	display: block;
 	float: left;
 	/* width:212px; */
-	width: 100%; 
+	width: 100%;
 	margin: 0;
 }
 .strength0 div
@@ -852,7 +852,7 @@ div.module
 
 
 /* === BACKUPS === */
-#no-delete-action 
+#no-delete-action
 {
 	margin-top: 20px;
 }
@@ -860,33 +860,33 @@ div.module
 {
 	overflow: auto;
 }
-.spinner  
+.spinner
 {
 	z-index: 9998;
-	/* 
+	/*
 	see also why we removed the MSIE filter lines in here:
-	
+
 	http://developer.yahoo.com/performance/rules.html
 	  (section: Avoid Filters)
-	
-	we can add the opacity filters back in through fixup_css() in 
+
+	we can add the opacity filters back in through fixup_css() in
 	the Combiner, as all CSS travels through there anyway.
 	*/
-	opacity: 0.8;	
+	opacity: 0.8;
 	background-color: #fff;
-	
-    display:block;
 
-    /*set the div in the top-left corner of the screen*/
-    position:fixed;
-    top:0;
-    left:0;
-    
-    /*set the width and height to 100% of the screen*/
-    width:100%;
-    height:100%;
+	display:block;
+
+	/*set the div in the top-left corner of the screen*/
+	position:fixed;
+	top:0;
+	left:0;
+
+	/*set the width and height to 100% of the screen*/
+	width:100%;
+	height:100%;
 }
-.spinner-content .loading 
+.spinner-content .loading
 {
 	background: transparent url('../spinner.gif') no-repeat center center;
 	min-width: 100px;
@@ -903,7 +903,7 @@ div.warning
 	font-family: "Palatino Linotype", Palatino, Baskerville, "Book Antiqua", Georgia, serif;
 	line-height:1.6em;
 	margin:5px;
-	
+
 	/* float: left; */
 	position: relative;
 
@@ -915,7 +915,7 @@ div.warning
 
 	border-radius: 5px;
 }
-.warning h1,.warning h2 
+.warning h1,.warning h2
 {
 	font-size: 1.2em;
 	padding: 2px 5px;
@@ -926,7 +926,7 @@ div.warning
 	text-align: center;
 	border-radius: 5px;
 }
-.warning h2 
+.warning h2
 {
 	font-size:1em;
 }
@@ -989,7 +989,7 @@ div#fields
 {
 	overflow: hidden;
 }
-/* 
+/*
 ... same for the 'manage menu' section.
 */
 form#menuForm
@@ -1005,14 +1005,14 @@ form#delete
 	overflow: hidden;
 }
 /*
-and the other victims of layout: 
+and the other victims of layout:
 
 the backup management page...
 */
 form#create-arch, form#delete-arch
 {
 	overflow: hidden;
-	height: 1%;				/* IE6 needs this */
+	height: 1%;             /* IE6 needs this */
 }
 
 
@@ -1097,7 +1097,7 @@ form#create-arch, form#delete-arch
 
 
 
-#template-editor #changeTmp label 
+#template-editor #changeTmp label
 {
 	display: inline;
 }
@@ -1116,7 +1116,7 @@ form#create-arch, form#delete-arch
 }
 
 /*
-hack to make sure that the extra checkmark label generated/injected by edit_Area renders correctly 
+hack to make sure that the extra checkmark label generated/injected by edit_Area renders correctly
 */
 #EditAreaArroundInfos_content label
 {
@@ -1155,7 +1155,7 @@ same goes for #edit-user-details, which sits in a subpage of the user management
 /*
 The 'password strength' bar in a liquid design is just like a 'liquid two column design':
 
-we have one part floating left, the other right, and we make sure both occupy the entire 
+we have one part floating left, the other right, and we make sure both occupy the entire
 height available to them.
 
 The trick here is that the color remains in the parent, and the right-most 'column' is
@@ -1165,8 +1165,8 @@ To make the liquid layout work for this strength bar, we must 'resize' BOTH left
 column so both keep a total of width=100%.
 
 NOTE: to compensate for testing with borders and IE vs. FF calculation mishaps, we keep
-      the total at 99% instead of 100%!
-	  
+	  the total at 99% instead of 100%!
+
 	  IE6 has a bit of a drawing issue as it doesn't give the second column a real 100%
 	  height; this cannot be remedied by giving it a 100.1% height; instead, putting
 	  some actual content in each column (a non-breaking space) resolves the issue!
@@ -1174,8 +1174,8 @@ NOTE: to compensate for testing with borders and IE vs. FF calculation mishaps, 
 PLUS: same password strength liquid layout story again for #edit-user-details
 */
 #create-user #passwordStrength, #edit-user-details #passwordStrength
-{ 
-	width: 100%; 
+{
+	width: 100%;
 	height: 10px;
 	line-height: 10px; /* <-- needed for IE6 to ensure the bar is /thin/ instead of some thick block! */
 	float: left;
@@ -1317,9 +1317,9 @@ when in dire need, to add a horizontal scrollbar.
 .module form div.table_inside
 {
 	overflow-x: auto;
-	overflow-y: hidden;	/* needed for IE6 */
+	overflow-y: hidden; /* needed for IE6 */
 	border: 1px solid #AD8CCF;
-	width: 99.7%;			/* must be less than 100% for IE6/7/8 to ensure the border is shown on all sides! */
+	width: 99.7%;           /* must be less than 100% for IE6/7/8 to ensure the border is shown on all sides! */
 	margin-left: 0;
 	margin-right: 0;
 }
@@ -1333,15 +1333,15 @@ when in dire need, to add a horizontal scrollbar.
 
 
 
-.nowrap 
+.nowrap
 {
-	white-space: nowrap; 
+	white-space: nowrap;
 }
 
 
 
 
-.log 
+.log
 {
 	font: 10pt Consolas, Monaco, fixed;
 	width: 100%;

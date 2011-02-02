@@ -10,14 +10,14 @@
 - (%keywords%)      | Keywords (tags) for the current page as specified per file
 - (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
 - (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
-    
+
 >> Menu items
 - (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
 - (%leftmenu%)      | ''
 - (%rightmenu%)     | ''
 - (%footermenu%)    | ''
 - (%extramenu%)     | ''
-    
+
 >> Content tag
 - (%content%)       | The content from the current file that is being requested
 
@@ -51,23 +51,23 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <body>
 
 <header>
-    <hgroup>
-        <h1>{%pagetitle%}</h1>
-    </hgroup>
-    <nav>
+	<hgroup>
+		<h1>{%pagetitle%}</h1>
+	</hgroup>
+	<nav>
 		{%mainmenu%}
-    </nav>
-    <a href="#" title="{%sitename%}"><img src="{%rootdir%}lib/templates/html5/logo.png" alt="{%sitename%}" /></a>
+	</nav>
+	<a href="#" title="{%sitename%}"><img src="{%rootdir%}lib/templates/html5/logo.png" alt="{%sitename%}" /></a>
 </header>
 
 <section id="left">
 	<h1>Left menu</h1>
-    {%leftmenu%}
+	{%leftmenu%}
 </section>
 
 <article>
 	<h1>{%subheader%}</h1>
-    {%content%}
+	{%content%}
 </article>
 
 <section id="right">
@@ -102,7 +102,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 // Mark the JS sourcefiles needed by this template itself:
 //if (IE)
 //{
-//	$ccms['JS.required_files']['http://html5shiv.googlecode.com/svn/trunk/html5.js'] = true;
+//  $ccms['JS.required_files']['http://html5shiv.googlecode.com/svn/trunk/html5.js'] = true;
 //}
 //$ccms['JS.required_files']['html5.js?only-when=%3d%3d+IE'] = 0; // the first to load!
 

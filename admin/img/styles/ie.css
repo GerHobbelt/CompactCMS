@@ -15,7 +15,7 @@
 @import url(src/ie.css)
 
 /* A container should group all your columns. */
-.container-1, .container-2, .container-3, .container-4, .container-5, .container-6, 
+.container-1, .container-2, .container-3, .container-4, .container-5, .container-6,
 .container-7, .container-8, .container-9, .container-10, .container-11, .container-12,
 .container-13, .container-14, .container-15, .container-16, .container-17, .container-18,
 .container-19, .container-20, .container-21, .container-22, .container-23, .container-24,
@@ -62,19 +62,19 @@ table th, td
 
 
 legend     /* IE8 */
-{ 
+{
 	margin-left: .7em;
-} 
+}
 *:first-child+html legend  /* IE7 */
-{ 
-	margin-top: -0.4em; 
+{
+	margin-top: -0.4em;
 }
 * html legend     /* IE6 */
-{ 
-	margin-top: 0; 
+{
+	margin-top: 0;
 	/* also fix padding which is completely destroyed on IE6 */
-	padding: .2em 1em; 
-} 
+	padding: .2em 1em;
+}
 
 
 #desktop fieldset
@@ -82,7 +82,7 @@ legend     /* IE8 */
 	background-image: url('../admin_panel_bg.gif');
 	background-repeat: repeat-x;
 	background-position: 0px -3px; /* exactly positioned to push the white upper part as high as the <legend> negative margin needs it to be */
-	background-color: #E6F5D6; 
+	background-color: #E6F5D6;
 }
 * html #desktop fieldset  /* IE6 */
 {
@@ -127,7 +127,7 @@ This is needed so IE6 at least the warning message INSIDE the red/rose warning b
 
 It is NOT enough to make the warning div show where it SHOULD be.
 */
-#media-warning 
+#media-warning
 {
 	zoom: 1;
 }
@@ -153,22 +153,22 @@ may need hasLayout as well!
 
 /*
 If you do not FORCE the outer <div> in the template ditor to hasLayout, then IE7/IE6[*]
-GOES ABSOLUTELY HONKIN' TOOTIN' MENTAL placing the edit_Area control in there: it keeps 
-blinking the dreaded hourglass and you're ab-so-lu-te-ly SOL because you don't get to see, 
-not edit the contents in the <textarea>. Instead, you get the '|' text cursor placed 
+GOES ABSOLUTELY HONKIN' TOOTIN' MENTAL placing the edit_Area control in there: it keeps
+blinking the dreaded hourglass and you're ab-so-lu-te-ly SOL because you don't get to see,
+not edit the contents in the <textarea>. Instead, you get the '|' text cursor placed
 somewhere near the top of your screen.
 
 I !@#$%^&* hate MSIE!
 																	Ger Hobbelt
-																	
+
 This took quite a while to find out, because I hadn't expected the outer div to cause this
-problem (my agony over the backup management page yesterday should've taught me a lesson, 
+problem (my agony over the backup management page yesterday should've taught me a lesson,
 but no-o-o-o-o-o-o-o...); what made 'everything work' was pasting the original edit_Area
-example code in there; after that it was a matter of slowly stripping away JS and HTML 
-until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuckin'-ha!																	
+example code in there; after that it was a matter of slowly stripping away JS and HTML
+until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuckin'-ha!
 
 [*] generally, it would be IE6 going mental most of the time, but I've had occasions
-    during this trial where IE6 did fine while IE7 took over wrecking the joint. So the
+	during this trial where IE6 did fine while IE7 took over wrecking the joint. So the
 	hasLayout hack is magnimoniously delivered to the both of 'em.
 */
 *:first-child+html #template-editor /* IE7 only */
@@ -204,12 +204,12 @@ The solution there is to have the parent node have hasLayout:
 
 
 /*
-Make sure the outer scrollbars disappear in IE6; they screw up the screen on 1024px wide 
+Make sure the outer scrollbars disappear in IE6; they screw up the screen on 1024px wide
 displays.
 */
 /*
 html
 {
-	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should! 
+	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should!
 }
 */

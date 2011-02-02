@@ -1,15 +1,15 @@
 <?php
  /**
  * Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
- * 
+ *
  * Last changed: $LastChangedDate$
  * @author $Author$
  * @version $Revision$
  * @package CompactCMS.nl
  * @license GNU General Public License v3
- * 
+ *
  * This file is part of CompactCMS.
- * 
+ *
  * CompactCMS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,16 +19,16 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * A reference to the original author of CompactCMS and its copyright
  * should be clearly visible AT ALL TIMES for the user of the back-
  * end. You are NOT allowed to remove any references to the original
  * author, communicating the product to be your own, without written
  * permission of the original copyright owner.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * > Contact me for any inquiries.
  * > E: Xander@CompactCMS.nl
  * > W: http://community.CompactCMS.nl/forum
@@ -38,7 +38,7 @@
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're rendering the admin page here, no need to load the user/viewer page content in sitemap.php, etc. 
+We're rendering the admin page here, no need to load the user/viewer page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -61,20 +61,20 @@ if (!defined('BASE_PATH'))
 
 
 /* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth()) 
+if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
 {
 	// this situation should've caught inside process.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']); 
+	die($ccms['lang']['auth']['featnotallowed']);
 }
 
 
 
 // Get the number of users; this is used to dimension some user management window(s); also count INactive users!
 $user_count = $db->SelectSingleValue($cfg['db_prefix'].'users', null, 'COUNT(userID)');
-if ($db->ErrorNumber()) 
+if ($db->ErrorNumber())
 	$db->Kill();
 $total_page_count = $db->SelectSingleValue($cfg['db_prefix'].'pages', null, 'COUNT(page_id)');
-if ($db->ErrorNumber()) 
+if ($db->ErrorNumber())
 	$db->Kill();
 
 
@@ -101,12 +101,12 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 	<style type="text/css">
-		#democlock_collective .clock 
+		#democlock_collective .clock
 		{
-			float:left; 
-			display:block; 
-			margin:10px; 
-			padding:10px; 
+			float:left;
+			display:block;
+			margin:10px;
+			padding:10px;
 			background-color:#eee;
 			box-shadow: 3px 3px 3px #999; border-radius:5px;
 			-moz-box-shadow: 3px 3px 3px #999; -moz-border-radius:5px;
@@ -114,10 +114,10 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		}
 		#democlock_collective .skintitle
 		{
-			float:left; 
-			display:block; 
-			margin:10px; 
-			padding:10px; 
+			float:left;
+			display:block;
+			margin:10px;
+			padding:10px;
 			border: 3px solid black;
 			background-color: #577a9e;
 		}
@@ -140,42 +140,42 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	<div id="notify" class="span-12">
 		<div class="rounded-border">
 			<div class="header">
-				<?php 
+				<?php
 				if($cfg['protect'])
 				{
 				?>
 					<a class="right span-6" href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
-				<?php 
-				} 
+				<?php
+				}
 				?>
 				<a id="clockLink" class="clock"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
 			</div>
 			<div id="notify_icon">&#160;</div>
 			<div id="notify_res">
-				<?php 
+				<?php
 				/*
 				 * Check latest version
 				 */
 				$version_recent = @file_get_contents('http://www.compactcms.nl/version/'.$v.'.txt');
-				if(version_compare($version_recent, $v) != 1) 
-				{ 
-					$version = $ccms['lang']['backend']['uptodate']; 
-				} 
-				else 
+				if(version_compare($version_recent, $v) != 1)
+				{
+					$version = $ccms['lang']['backend']['uptodate'];
+				}
+				else
 				{
 					$version = $ccms['lang']['backend']['outofdate']." <a href=\"http://www.compactcms.nl/changes.html\" class=\"external\" rel=\"external\">".$ccms['lang']['backend']['considerupdate']."</a>.";
 				}
 
-				if(!empty($version_recent) && !empty($v) && $cfg['version']) 
-				{ 
+				if(!empty($version_recent) && !empty($v) && $cfg['version'])
+				{
 				?>
 					<p><?php echo $ccms['lang']['backend']['currentversion']." ".$v; ?>. <?php echo $ccms['lang']['backend']['mostrecent']." ".$version_recent; ?>.</p>
 					<p class="versionstatus"><?php echo $ccms['lang']['backend']['versionstatus']." ".$version; ?></p>
-				<?php 
-				} 
-				else 
+				<?php
+				}
+				else
 				{
-					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>'; 
+					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>';
 				}
 				?>
 			</div>
@@ -186,49 +186,49 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
 			<div id="advanced_res">
 				<ul>
-					<?php 
-					if($_SESSION['ccms_userLevel'] >= 4) 
-					{ 
+					<?php
+					if($_SESSION['ccms_userLevel'] >= 4)
+					{
 					?>
 						<li><a id="sys-perm" href="./includes/modules/permissions/permissions.Manage.php" rel="<?php echo $ccms['lang']['backend']['permissions']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['permissions']; ?></a></li>
-					<?php 
-					} 
-					if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) 
-					{ 
+					<?php
+					}
+					if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel']))
+					{
 					?>
 						<li><a id="sys-pow" href="./includes/modules/content-owners/content-owners.Manage.php" rel="<?php echo $ccms['lang']['backend']['contentowners']; ?>" class="tabs"><span class="ss_sprite_16 ss_folder_user">&#160;</span><?php echo $ccms['lang']['backend']['contentowners']; ?></a></li>
-					<?php 
-					} 
+					<?php
+					}
 					if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
-					{ 
+					{
 					?>
 						<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
-					<?php 
-					} 
+					<?php
+					}
 					// if($perm->get('manageUsers') > 0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
-					{ 
+					{
 					?>
 						<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
-					<?php 
-					} 
-					if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel'])) 
-					{ 
+					<?php
+					}
+					if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
+					{
 					?>
 						<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
-					<?php 
-					} 
-					if($perm->is_level_okay('manageModTranslate', $_SESSION['ccms_userLevel']) && $cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
-					{ 
+					<?php
+					}
+					if($perm->is_level_okay('manageModTranslate', $_SESSION['ccms_userLevel']) && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+					{
 					?>
 						<li><a id="sys-tran" href="./includes/modules/translation/translation.Manage.php" rel="<?php echo $ccms['lang']['backend']['translation']; ?>" class="tabs"><span class="ss_sprite_16 ss_group_key">&#160;</span><?php echo $ccms['lang']['backend']['translation']; ?></a></li>
-					<?php 
-					} 
+					<?php
+					}
 					?>
 				</ul>
 			</div>
 		</div>
 	</div>
-	
+
 <!--[if lt IE 7]>
 <hr class="clear space" />
 <![endif]-->
@@ -243,13 +243,13 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</div>
 
 	<div id="createnew" class="span-9 clear">
-	<?php 
-	
-	// Start main management section 
-	
-	// Create new page 
-	if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
-	{ 
+	<?php
+
+	// Start main management section
+
+	// Create new page
+	if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+	{
 	?>
 	<fieldset>
 		<legend><a class="toggle" rel="form_wrapper"><span class="ss_sprite_16 ss_add">&#160;</span><?php echo $ccms['lang']['backend']['createpage']; ?></a></legend>
@@ -257,76 +257,76 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		<form method="post" id="addForm" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 			<p><?php echo $ccms['lang']['backend']['createtip']; ?></p>
 			<div id="fields">
-				<label for="urlpage"><?php echo $ccms['lang']['forms']['filename']; ?></label> 
+				<label for="urlpage"><?php echo $ccms['lang']['forms']['filename']; ?></label>
 				<input class="required minLength:3 text" type="text" id="urlpage" name="urlpage" />
 				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['filename']; ?>">&#160;</span><br/>
-				
+
 				<label for="f_pt"><?php echo $ccms['lang']['forms']['pagetitle']; ?></label>
 				<input class="required minLength:3 text" type="text" id="f_pt" name="pagetitle" />
 				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle']; ?>">&#160;</span><br/>
-				
-				<label for="f_sh"><?php echo $ccms['lang']['forms']['subheader']; ?></label> 
+
+				<label for="f_sh"><?php echo $ccms['lang']['forms']['subheader']; ?></label>
 				<input class="required minLength:3 text" type="text" id="f_sh" name="subheader" />
 				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['subheader']; ?>">&#160;</span><br/>
-				
+
 				<label for="f_de"><?php echo $ccms['lang']['forms']['description']; ?></label>
 				<textarea class="required minLength:3" id="f_de" name="description" rows="4" cols="30"></textarea>
 				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['description']; ?>">&#160;</span><br/>
-				
-				<?php 
+
+				<?php
 				// Modules which can create a page:
 				$page_creators = array();
-				for ($i = 0; $i < count($modules); $i++) 
-				{ 
+				for ($i = 0; $i < count($modules); $i++)
+				{
 					if (!$modules[$i]['modActive'] || !$modules[$i]['hasPageMaker'])
 						continue;
-						
+
 					$page_creators[] = $modules[$i];
 				}
-				
-				if(count($page_creators) > 0) 
-				{ 
+
+				if(count($page_creators) > 0)
+				{
 				?>
 				<label for="f_mod"><?php echo $ccms['lang']['forms']['module']; ?></label>
 				<select class="text" name="module" id="f_mod" size="1">
 					<option value="editor"><?php echo $ccms['lang']['forms']['contentitem']; ?></option>
 					<optgroup label="<?php echo $ccms['lang']['forms']['additions']; ?>">
-						<?php 
-						for ($i = 0; $i < count($page_creators); $i++) 
-						{ 
+						<?php
+						for ($i = 0; $i < count($page_creators); $i++)
+						{
 						?>
 							<option value="<?php echo $page_creators[$i]['modName']; ?>"><?php echo $page_creators[$i]['modTitle']; ?></option>
-						<?php 
-						} 
+						<?php
+						}
 						?>
 					</optgroup>
 				</select>
 				<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['module']; ?>">&#160;</span><br/>
-				<?php 
-				} 
+				<?php
+				}
 				?>
-				
+
 				<div id="editor-options">
 					<div class="clearfix span-8 last">
-						<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label> 
+						<label><?php echo $ccms['lang']['forms']['printable']; ?>?</label>
 						<label for="f_pr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
-							<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />  
+							<input type="radio" id="f_pr1" checked="checked" name="printable" value="Y" />
 						<label for="f_pr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
 							<input type="radio" id="f_pr2" name="printable" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['printable']; ?>">&#160;</span>
 					</div>
 					<div class="clearfix span-8 last">
-						<label><?php echo $ccms['lang']['forms']['published']; ?>?</label> 
+						<label><?php echo $ccms['lang']['forms']['published']; ?>?</label>
 						<label for="f_pu1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
-							<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />  
+							<input type="radio" id="f_pu1" checked="checked" name="published" value="Y" />
 						<label for="f_pu2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
 							<input type="radio" id="f_pu2" name="published" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['published']; ?>">&#160;</span>
 					</div>
 					<div class="clearfix span-8 last">
-						<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label> 
+						<label><?php echo $ccms['lang']['forms']['iscoding']; ?>?</label>
 						<label for="f_cod" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
-							<input type="radio" id="f_cod" name="iscoding" value="Y" />  
+							<input type="radio" id="f_cod" name="iscoding" value="Y" />
 						<label for="f_co2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
 							<input type="radio" id="f_co2" checked="checked" name="iscoding" value="N" />
 						<span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['iscoding']; ?>">&#160;</span>
@@ -338,25 +338,25 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				</div>
 				<input type="hidden" name="form" value="create" />
 			</div>
-		</form>	
+		</form>
 		</div>
 	</fieldset>
-	<?php 
-	} 
+	<?php
+	}
 	else
 	{
 		// echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span>' . $ccms['lang']['backend']['createpage'] . ': ' . $ccms['lang']['auth']['featnotallowed'] . "</p>\n";
-	} 
+	}
 	?>
 	</div>
 
 	<div id="menudepth" class="span-16 last">
-	<?php 
+	<?php
 
-	// Manage menu depths & languages 
-	
-	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel'])) 
-	{ 
+	// Manage menu depths & languages
+
+	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel']))
+	{
 	?>
 	<fieldset>
 		<legend><a class="toggle" rel="menu_wrapper"><span class="ss_sprite_16 ss_text_list_bullets">&#160;</span><?php echo $ccms['lang']['backend']['managemenu']; ?></a></legend>
@@ -375,21 +375,21 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				<button type="submit" name="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
 			</div>
 			<input type="hidden" name="form" value="menuorder" />
-		</form>	
+		</form>
 		</div>
 	</fieldset>
-	<?php 
-	} 
+	<?php
+	}
 	else
 	{
 		// echo '<p class="ss_has_sprite"><span class="ss_sprite_16 ss_warning">&#160;</span>' . $ccms['lang']['backend']['managemenu'] . ': ' . $ccms['lang']['auth']['featnotallowed'] . "</p>\n";
-	} 
+	}
 	?>
 	</div>
-	<?php 
-	
+	<?php
 
-		
+
+
 	?>
 	<div id="manage" class="span-25 last clear">
 	<fieldset>
@@ -401,7 +401,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		/*
 		 * With lining the header texts with the data and everything, it's simply way too much hassle to keep them in separate tables:
 		 * you never get the alignment right.
-		 * 
+		 *
 		 * So starting with this edition, the header is regenerated with each reload. This has an impact on the filters, but we can fix them
 		 * easily there by re-registering those nodes in the JS code.
 		 */
@@ -412,22 +412,22 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		</div>
 		<table width="100%" cellspacing="0" cellpadding="0">
 			<tr>
-				<?php 
-				if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])) 
-				{ 
+				<?php
+				if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+				{
 				?>
 					<th class="span-17 text-left">
 						<input type="hidden" name="form" value="delete" />
 						<input type="hidden" id="ad_msg01" value="<?php echo $ccms['lang']['backend']['confirmdelete']; ?>" />
 						<button type="submit" name="btn_del"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
 					</th>
-				<?php 
-				} 
-				else 
+				<?php
+				}
+				else
 				{
 				?>
 					<th class="span-17">&#160;</th>
-				<?php 
+				<?php
 				}
 				?>
 				<th class="span-4"><div style="background-color: #CDE6B3; text-align: center; padding-left: 20px; padding-right: 20px;"><span class="ss_sprite_16 ss_accept">&#160;</span><?php echo $ccms['lang']['backend']['active']; ?></div></th>
@@ -494,13 +494,13 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 	<div id="democlock_collective" class="span-25 last clear"> </div>
-	
+
 	<textarea id="jslog" class="log span-25 last" readonly="readonly">
 	</textarea>
 <?php
 }
 ?>
-	
+
 	<?php // Footer block ?>
 	<div id="footer" class="span-25 last clear">
 		<div class="prepend-11 span-11 colborder">

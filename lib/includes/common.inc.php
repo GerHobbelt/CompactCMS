@@ -46,26 +46,26 @@ if (!defined('BASE_PATH'))
  * Remove the effects of the old dreaded magic_quotes setting.
  *
  * WARNING: we have not placed this in a function but run it immediately, right here,
- *          because we know this sourcefile will be loaded once with every request 
+ *          because we know this sourcefile will be loaded once with every request
  *          we receive. Hence tis is the 'perfect place' to put this ****.
  *
  * The JSON encoding/decoding way is due to Alix Axel ( http://nl2.php.net/manual/en/function.get-magic-quotes-gpc.php )
  *
- * Also note 
+ * Also note
  *     http://nl2.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc
  *     (we check if the function exists at all in preparation of PHP6, where it will be gone, finally)
  */
-if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) 
+if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
 {
-    $_GET = json_decode(stripslashes(json_encode($_GET, JSON_HEX_APOS)), true);
-    $_POST = json_decode(stripslashes(json_encode($_POST, JSON_HEX_APOS)), true);
-    $_COOKIE = json_decode(stripslashes(json_encode($_COOKIE, JSON_HEX_APOS)), true);
-    $_REQUEST = json_decode(stripslashes(json_encode($_REQUEST, JSON_HEX_APOS)), true);
+	$_GET = json_decode(stripslashes(json_encode($_GET, JSON_HEX_APOS)), true);
+	$_POST = json_decode(stripslashes(json_encode($_POST, JSON_HEX_APOS)), true);
+	$_COOKIE = json_decode(stripslashes(json_encode($_COOKIE, JSON_HEX_APOS)), true);
+	$_REQUEST = json_decode(stripslashes(json_encode($_REQUEST, JSON_HEX_APOS)), true);
 }
 
 
 
- 
+
 
 
 /**
@@ -153,8 +153,8 @@ ubiquitous underscore character. Any runs of multiple occurrences of that one ar
 one each.
 
 When the transformation would produce an identifier longer than a specified number of characters
-(default: MAX_REASONABLE_FILENAME_LENGTH), it is forcibly shortened to that length and the last 8 
-characters are replaced by the characters produced by the hash of the input text in order to deliver 
+(default: MAX_REASONABLE_FILENAME_LENGTH), it is forcibly shortened to that length and the last 8
+characters are replaced by the characters produced by the hash of the input text in order to deliver
 an identifier with quite tolerable uniqueness guarantees.
 */
 function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false, $max_outlen = MAX_REASONABLE_FILENAME_LENGTH)
@@ -191,7 +191,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	{
 		$dst = preg_replace('/^-+/', '', $dst);
 	}
-	
+
 	$dst = str_replace('\\', '/', $dst);
 	$pos = strrpos($dst, '/');
 	$path = '';
@@ -206,7 +206,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	{
 		$ext = substr($dst, $pos);
 		$dst = substr($dst, 0, $pos);
-	
+
 		// special circumstances for: .tar.gz, .tar.Z, etc.:
 		if (strcasecmp(substr($dst, -4), '.tar') == 0)
 		{
@@ -214,7 +214,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 			$dst = substr($dst, 0, -4);
 		}
 	}
-	
+
 	$max_outlen -= strlen($ext); // discount the extension: it should ALWAYS remain!
 	if ($max_outlen < strlen($dst))
 	{
@@ -222,7 +222,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		$tl = min(32, $max_outlen, 4 + intval($max_outlen / 8)); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
 		$dst = substr($dst, 0, $max_outlen - $tl) . substr($h, -$tl);
 	}
-	
+
 	return $path . $dst . $ext;
 }
 
@@ -1650,33 +1650,33 @@ function cvt_text2legibleURL($text)
  * 2) does *NOT* clean up the generated path!
  *
  */
-function merg_path_elems( /* ... */ )
+function merge_path_elems( /* ... */ )
 {
 	if(func_num_args() == 0)
 	{
 		return false;
 	}
 
-	/*                                                                                                                       \    |    |
-	 * PHP 5.2.x and before:                                                                                                    \ """""""""  /
-	 *                                                                                                                  \  """""""'""""/
-	 * See  http://nl2.php.net/manual/en/function.func-get-arg.php                                                            \""""'"|'"""""----
-	 * where the NOTES section says:                                                                                          "\""'""|""'"""
+	/*                                                                                                                 \         |
+	 * PHP 5.2.x and before:                                                                                            \     """""""""  /
+	 *                                                                                                                   \  """""""'""""/
+	 * See  http://nl2.php.net/manual/en/function.func-get-arg.php                                                        \""""'"|'"""""----
+	 * where the NOTES section says:                                                                                      "\""'""|""'"""
 	 *                                                                                                              -----"""\""'"""""""\
 	 *                                                                                                                  """'""'""'"""   \
-	 *  Because this function depends on the current scope to determine parameter details, it cannot         e@@@@@@@@@^"""'"""""'""      \
+	 *  Because this function depends on the current scope to determine parameter details, it cannot        e@@@@@@@@@^"""'"""""'""      \
 	 *  be used as a function parameter in versions prior to 5.3.0. If this value must be passed, the    _@@@@@@@@@@@  ee""""e"""".@e
-	 *  results should be assigned to a variable, and that variable should be passed.                  _e@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	 *  results should be assigned to a variable, and that variable should be passed.                   _e@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	 *                                                                                                  @@@@@@"@~~~~~~~~@@@.@@~~~~~~.@@e
 	 *                                                                                                  @ @@@@.@     . ..@@@@ .    . ..@
-	 * NOW I recall why I hated PHP! !@#$%^&*!                                                            @ @@@@."   ... ..@@@@e.   . ...@
+	 * NOW I recall why I hated PHP! !@#$%^&*!                                                          @ @@@@."   ... ..@@@@e.   . ...@
 	 *                                                                                                  @."@@@@@eeeeeeee@@~ ~@@eeeeee@@@
-	 *                                              [Ger Hobbelt]                                       @e.@@@@@@@@@@@@@@ | @@@@@@@@@'
-	 *                                                                                                  @eeeeeee@@@@@@@[ : ]@@@@@'
-	 *                                                                                                      "'"""@@@@@@@::@::@@@@@
-	 *                                                                                                      '"""" @@@@@@@@@@@@@@@@@
-	 *                                                                                                  ""'"   v@@@@@@@@@v@@@v@@
-	 *                                                                                                  "'"      V  VV  V  V    V
+	 *                                              [Ger Hobbelt]                                        @e.@@@@@@@@@@@@@@ | @@@@@@@@@'
+	 *                                                                                                    @eeeeeee@@@@@@@[ : ]@@@@@'
+	 *                                                                                                       "'"""@@@@@@@::@::@@@@@
+	 *                                                                                                       '"""" @@@@@@@@@@@@@@@@@
+	 *                                                                                                       ""'"   v@@@@@@@@@v@@@v@@
+	 *                                                                                                      "'"      V  VV  V  V    V
 	 */
 	$arg = func_get_arg(0);
 	$path = str_replace("\\", '/', $arg);
@@ -1960,21 +1960,21 @@ function is_writable_ex($path)
 
 
 
-function recrmdir($dir) 
+function recrmdir($dir)
 {
-	if (is_dir($dir)) 
+	if (is_dir($dir))
 	{
 		$objects = scandir($dir);
-		
-		foreach ($objects as $object) 
+
+		foreach ($objects as $object)
 		{
-			if ($object != "." && $object != "..") 
+			if ($object != "." && $object != "..")
 			{
-				if (is_dir($dir."/".$object)) 
+				if (is_dir($dir."/".$object))
 				{
-					recrmdir($dir."/".$object); 
+					recrmdir($dir."/".$object);
 				}
-				else 
+				else
 				{
 					@unlink($dir."/".$object);
 				}
@@ -1982,7 +1982,7 @@ function recrmdir($dir)
 		}
 		reset($objects);
 		@rmdir($dir);
-	} 
+	}
 	return true;
 }
 
@@ -2589,7 +2589,7 @@ function get_tinyMCE_plugin_list()
 		'contextmenu' => 0,
 		'directionality' => 0,
 		'emotions' => 0,
-	    'example' => 0,
+		'example' => 0,
 		'fullpage' => 0,
 		'fullscreen' => 1,
 		'iespell' => 0,
@@ -2685,7 +2685,7 @@ function get_tinyMCE_button_list($plugin = null)
 		'contextmenu' => '',
 		'directionality' => 'ltr,rtl',
 		'emotions' => 'emotions',
-	    'example' => 'example',
+		'example' => 'example',
 		'fullpage' => 'fullpage',
 		'fullscreen' => 'fullscreen',
 		'iespell' => 'iespell',
@@ -2730,7 +2730,7 @@ function get_tinyMCE_button_list($plugin = null)
 	{
 		$active_plugins = get_tinyMCE_plugin_list();
 	}
-	
+
 	$rv = array();
 	foreach ($mce_plugin_buttons as $plugin => $buttons)
 	{
@@ -2759,15 +2759,15 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 	global $cfg;
 
 	$editarea_tags = explode(',', $editarea_tags);
-	
+
 	switch ($state)
 	{
 	default:
 		return false;
-		
+
 	case 0:
 		$rv = array();
-		
+
 		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
 		if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 		{
@@ -2786,11 +2786,11 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 				$ls .= "Language/Language.en.js,";
 			}
 			$ls .= "Language/Language." . $cfg['fancyupload_language'] . ".js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js";
-			
+
 			$rv[] = $ls;
 		}
 		return $rv;
-	
+
 	case 1:
 		/*
 		 * when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
@@ -2799,18 +2799,18 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 		 */
 		$rv = "";
 		$rv .= "tinyMCEPreInit = {\n";
-		$rv .= "	  suffix: '_src'\n"; /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		$rv .= "	, base: '" . $cfg['rootdir'] . "lib/includes/js/tiny_mce'\n";
-		$rv .= "	, query: 'load_callback=" . $js_load_callback . "'\n"; /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+		$rv .= "      suffix: '_src'\n"; /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
+		$rv .= "    , base: '" . $cfg['rootdir'] . "lib/includes/js/tiny_mce'\n";
+		$rv .= "    , query: 'load_callback=" . $js_load_callback . "'\n"; /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 		$rv .= "};\n";
 		return $rv;
-		
+
 	case 2:
 		$rv = "";
 		// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
 		$rv .= "var dimensions;\n";
 		$rv .= "var editwinwidth;\n";
-		
+
 		foreach($editarea_tags as $tag)
 		{
 			$rv .= "dimensions = window.getSize();\n";
@@ -2820,76 +2820,76 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 			//$rv .= "alert('width: ' + editwinwidth + 'px');\n";
 			$rv .= "\n";
 			$rv .= "tinyMCE.init(\n";
-			$rv .= "	{\n";
-			$rv .= "		mode: 'exact',\n";
-			$rv .= "		elements: '" . $tag . "',\n";
-			$rv .= "		theme: 'advanced',\n";
-			$rv .= "		language: '" . $cfg['tinymce_language'] ."',\n";
-			$rv .= "		skin: 'o2k7',\n";
-			$rv .= "		skin_variant: 'silver',\n";
-			
+			$rv .= "    {\n";
+			$rv .= "        mode: 'exact',\n";
+			$rv .= "        elements: '" . $tag . "',\n";
+			$rv .= "        theme: 'advanced',\n";
+			$rv .= "        language: '" . $cfg['tinymce_language'] ."',\n";
+			$rv .= "        skin: 'o2k7',\n";
+			$rv .= "        skin_variant: 'silver',\n";
+
 			$pluginarr = get_tinyMCE_plugin_list();
 			$pstr = implode(',', $pluginarr);
-			
-			$rv .= "		plugins: '" . $pstr . "',\n";
-			$rv .= "		theme_advanced_toolbar_location: 'top',\n";
-			
-			$rv .= "		theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
-			$rv .= "		theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
-			$rv .= "		theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
-			$rv .= "		theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
-			
-			$rv .= "		theme_advanced_toolbar_align: 'left',\n";
-			$rv .= "		theme_advanced_statusbar_location: 'bottom',\n";
-			$rv .= "		dialog_type: 'modal',\n";
-			$rv .= "		paste_auto_cleanup_on_paste: true,\n";
-			$rv .= "		theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-			$rv .= "		theme_advanced_resize_horizontal : 1,\n";
-			$rv .= "		theme_advanced_resizing_use_cookie : 1,\n";
-			$rv .= "		theme_advanced_resize_horizontal: false,\n";
-			$rv .= "		theme_advanced_resizing_min_width: 400,\n";
-			$rv .= "		theme_advanced_resizing_min_height: 100,\n";
-			$rv .= "		theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-			$rv .= "		theme_advanced_resizing_max_height: 0xFFFF,\n";
-			$rv .= "		relative_urls: true,\n";
-			$rv .= "		convert_urls: false,\n";
-			$rv .= "		remove_script_host: true,\n";
-			$rv .= "		document_base_url: '" . $cfg['rootdir'] . "',\n";
-			
+
+			$rv .= "        plugins: '" . $pstr . "',\n";
+			$rv .= "        theme_advanced_toolbar_location: 'top',\n";
+
+			$rv .= "        theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
+			$rv .= "        theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
+			$rv .= "        theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
+			$rv .= "        theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
+
+			$rv .= "        theme_advanced_toolbar_align: 'left',\n";
+			$rv .= "        theme_advanced_statusbar_location: 'bottom',\n";
+			$rv .= "        dialog_type: 'modal',\n";
+			$rv .= "        paste_auto_cleanup_on_paste: true,\n";
+			$rv .= "        theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+			$rv .= "        theme_advanced_resize_horizontal : 1,\n";
+			$rv .= "        theme_advanced_resizing_use_cookie : 1,\n";
+			$rv .= "        theme_advanced_resize_horizontal: false,\n";
+			$rv .= "        theme_advanced_resizing_min_width: 400,\n";
+			$rv .= "        theme_advanced_resizing_min_height: 100,\n";
+			$rv .= "        theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+			$rv .= "        theme_advanced_resizing_max_height: 0xFFFF,\n";
+			$rv .= "        relative_urls: true,\n";
+			$rv .= "        convert_urls: false,\n";
+			$rv .= "        remove_script_host: true,\n";
+			$rv .= "        document_base_url: '" . $cfg['rootdir'] . "',\n";
+
 			// TODO: determine the template of the given page: fetch those CSS files.
-			
+
 			// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
-			$rv .= "		content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,admin/img/styles/liquid.css,admin/img/styles/layout.css,admin/img/styles/sprite.css,admin/img/styles/last_minute_fixes.css' .
-					                     ",admin/img/styles/ie.css?only-when=%3d%3d+IE',\n";
+			$rv .= "        content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,admin/img/styles/liquid.css,admin/img/styles/layout.css,admin/img/styles/sprite.css,admin/img/styles/last_minute_fixes.css' .
+										 ",admin/img/styles/ie.css?only-when=%3d%3d+IE',\n";
 
 			if($cfg['iframe'])
 			{
-				$rv .= "		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
+				$rv .= "        extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
 			}
-			$rv .= "		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
+			$rv .= "        spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
 			if ($with_fancyupload)
 			{
-				$rv .= "		file_browser_callback: FileManager.TinyMCE(\n";
-				$rv .= "			function(type)\n";
-				$rv .= "			{\n";
-				$rv .= "				return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-				$rv .= "					url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
-				$rv .= "					baseURL: '" . $cfg['rootdir'] . "',\n";
-				$rv .= "					assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
-				$rv .= "					language: '" . $cfg['fancyupload_language'] . "',\n";
-				$rv .= "					selectable: true,\n";
-				$rv .= "					uploadAuthData: {\n";
-				$rv .= "						session: 'ccms_userLevel',\n";
-				$rv .= "						sid: '" . session_id() . "'\n";
-				$rv .= "					}\n";
-				$rv .= "				};\n";
-				$rv .= "			}),\n";
+				$rv .= "        file_browser_callback: FileManager.TinyMCE(\n";
+				$rv .= "            function(type)\n";
+				$rv .= "            {\n";
+				$rv .= "                return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+				$rv .= "                    url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
+				$rv .= "                    baseURL: '" . $cfg['rootdir'] . "',\n";
+				$rv .= "                    assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
+				$rv .= "                    language: '" . $cfg['fancyupload_language'] . "',\n";
+				$rv .= "                    selectable: true,\n";
+				$rv .= "                    uploadAuthData: {\n";
+				$rv .= "                        session: 'ccms_userLevel',\n";
+				$rv .= "                        sid: '" . session_id() . "'\n";
+				$rv .= "                    }\n";
+				$rv .= "                };\n";
+				$rv .= "            }),\n";
 			}
-			//$rv .= "		height: '300px',\n";
-			$rv .= "		width: editwinwidth\n"; // default: width in pixels
-			$rv .= "	});\n";
+			//$rv .= "        height: '300px',\n";
+			$rv .= "        width: editwinwidth\n"; // default: width in pixels
+			$rv .= "    });\n";
 		}
-		
+
 		return $rv;
 
 		/*
@@ -2978,7 +2978,7 @@ function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code
 	{
 		$fs = "'" . implode("',\n'", $js_files) . "'";
 	}
-	else 
+	else
 	{
 		$js_files = trim($js_files);
 		if (!empty($js_files))
@@ -2991,50 +2991,50 @@ function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code
 		$rv = "var jsLogEl = document.getElementById('jslog');\n";
 		$rv .= "var js = [\n";
 		$rv .= $fs . "\n";
-		$rv .= "	];\n";
+		$rv .= "    ];\n";
 		$rv .= "\n";
 		$rv .= "function jsComplete(user_obj, lazy_obj)\n";
 		$rv .= "{\n";
-		$rv .= "	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
-		$rv .= "	\n";
+		$rv .= "    var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
+		$rv .= "    \n";
 		$rv .= "    if (lazy_obj.todo_count)\n";
-		$rv .= "	{\n";
-		$rv .= "		/* nested invocation of LazyLoad added one or more sets to the load queue */\n";
-		$rv .= "		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
-		$rv .= "		return false;\n";
-		$rv .= "	}\n";
-		$rv .= "	else\n";
-		$rv .= "	{\n";
-		$rv .= "		jslog('All JS has been loaded!');\n";
-		$rv .= "	}\n";
+		$rv .= "    {\n";
+		$rv .= "        /* nested invocation of LazyLoad added one or more sets to the load queue */\n";
+		$rv .= "        jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
+		$rv .= "        return false;\n";
+		$rv .= "    }\n";
+		$rv .= "    else\n";
+		$rv .= "    {\n";
+		$rv .= "        jslog('All JS has been loaded!');\n";
+		$rv .= "    }\n";
 		$rv .= "\n";
-		$rv .= "	// window.addEvent('domready',function()\n";
-		$rv .= "	//{\n";
+		$rv .= "    // window.addEvent('domready',function()\n";
+		$rv .= "    //{\n";
 		$rv .= $driver_code . "\n";
-		$rv .= "	//});\n";
+		$rv .= "    //});\n";
 		$rv .= "\n";
-		$rv .= "	//alert('stop_loading = ' + (1 * stop_loading));\n";
-		$rv .= "	return stop_loading;\n";
+		$rv .= "    //alert('stop_loading = ' + (1 * stop_loading));\n";
+		$rv .= "    return stop_loading;\n";
 		$rv .= "}\n";
 		$rv .= "\n";
 		$rv .= "\n";
 		$rv .= "function jslog(message) \n";
 		$rv .= "{\n";
-		$rv .= "	if (jsLogEl)\n";
-		$rv .= "	{\n";
-		$rv .= "		jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
-		$rv .= "	}\n";
+		$rv .= "    if (jsLogEl)\n";
+		$rv .= "    {\n";
+		$rv .= "        jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
+		$rv .= "    }\n";
 		$rv .= "}\n";
 		$rv .= "\n";
 		$rv .= "\n";
 		$rv .= "/* the magic function which will start it all, thanks to the augmented lazyload.js: */\n";
 		$rv .= "function ccms_lazyload_setup_GHO()\n";
 		$rv .= "{\n";
-		$rv .= "	jslog('loading JS (sequential calls)');\n";
+		$rv .= "    jslog('loading JS (sequential calls)');\n";
 		$rv .= "\n";
 		$rv .= $starter_code . "\n";
 		$rv .= "\n";
-		$rv .= "	LazyLoad.js(js, jsComplete);\n";
+		$rv .= "    LazyLoad.js(js, jsComplete);\n";
 		$rv .= "}\n";
 	}
 	else

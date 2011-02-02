@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -34,12 +34,12 @@ if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 
 // the code on this page is currently unused!
-die('Illegal entry point!'); 
+die('Illegal entry point!');
 
 
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -55,17 +55,17 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
 // security check done ASAP
-if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{ 
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
 	die("No external access to file");
 }
 
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $btn_backup = getPOSTparam4IdOrNumber('btn_backup');
 
-if($do=='backup' && $btn_backup=='dobackup') 
+if($do=='backup' && $btn_backup=='dobackup')
 {
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');
@@ -86,6 +86,6 @@ if($do=='backup' && $btn_backup=='dobackup')
 	<![endif]-->
 </head>
 <body class="module">
-		
+
 </body>
 </html>

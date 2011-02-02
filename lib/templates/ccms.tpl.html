@@ -10,14 +10,14 @@
 - (%keywords%)      | Keywords (tags) for the current page as specified per file
 - (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
 - (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
-    
+
 >> Menu items
 - (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
 - (%leftmenu%)      | ''
 - (%rightmenu%)     | ''
 - (%footermenu%)    | ''
 - (%extramenu%)     | ''
-    
+
 >> Content tag
 - (%content%)       | The content from the current file that is being requested
 
@@ -44,7 +44,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <?php
 //<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/base.css,layout.css,sprite.css,last_minute_fixes.css" />
 //<!--[if IE]>
-//	<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/ie.css" />
+//  <link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/ie.css" />
 //<![endif]-->
 ?>
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
@@ -55,11 +55,11 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 	<div id="header" class="span-25 last">
 		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
 		<div class="span-20 last" id="navigation">
-			{%IF extramenu eq ()%} 
+			{%IF extramenu eq ()%}
 				<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
-			{%ELSE%} 
+			{%ELSE%}
 				{%extramenu%}
-			{%/IF%} 
+			{%/IF%}
 		</div>
 	</div>
 
@@ -79,7 +79,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 				<br/><a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:template:print%}</a>
 			{%/IF%}
 		</div>
-		
+
 		{%content%}
 
 		<div id="rightmenu">
@@ -90,7 +90,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
 <div id="footer" class="quiet small">
 	{%footermenu%}
-	
+
 	<p>&copy; <?php echo date('Y'); ?> {%sitename%} | Maintained with <a href="http://www.compactcms.nl">CompactCMS</a></p>
 </div>
 
