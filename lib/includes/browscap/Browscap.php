@@ -418,10 +418,10 @@ class Browscap {
    * Updates the local copy of the ini file (by version checking) and adapts
    * his syntax to the PHP ini parser.
    *
-   * @throws Browscap_Exception
-   *
    * @param string $url The url of the remote server.
    * @param string $path The path of the ini file to update.
+   *
+   * @throws Browscap_Exception
    *
    * @return bool If the ini file was updated.
    */
@@ -449,6 +449,8 @@ class Browscap {
 
     $pattern = self::REGEX_DELIMITER . '(' . self::VALUES_TO_QUOTE . ')="?([^"]*)"?$' . self::REGEX_DELIMITER;
 
+
+    // Ok, lets read the file
     $content = '';
     foreach ($browscap as $subject) {
       $subject = trim($subject);
@@ -456,7 +458,7 @@ class Browscap {
     }
 
     if (!@file_put_contents($path, $content)) {
-      throw new Browscap_Exception("Could not write .ini content to " . $path);
+      throw new Browscap_Exception('Could not write .ini content to ' . $path);
     }
 
     return true;
@@ -560,9 +562,9 @@ class Browscap {
   /**
    * Retrieve the data identified by the URL.
    *
-   * @throws Browscap_Exception
-   *
    * @param string $url The url of the data.
+   *
+   * @throws Browscap_Exception
    *
    * @return string The retrieved data.
    */
@@ -623,15 +625,17 @@ class Browscap {
           }
         } // else try with the next possibility
       case self::UPDATE_CURL:
-        $ch = curl_init($url);
+        if (is_callable("curl_init")) {
+          $ch = curl_init($url);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->_getUserAgent());
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
+          curl_setopt($ch, CURLOPT_USERAGENT, $this->_getUserAgent());
 
-        $file = curl_exec($ch);
+          $file = curl_exec($ch);
 
-        curl_close($ch);
+          curl_close($ch);
+        }
 
         if ($file !== false) {
           return $file;
