@@ -978,7 +978,7 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	$error = null;
 
 	// are you allowed to run this action?
-	if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+	if($perm->is_level_okay('manageMenu', $_SESSION['ccms_userLevel']))
 	{
 		if(!empty($_POST['page_id']))
 		{
