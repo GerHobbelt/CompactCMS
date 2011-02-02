@@ -2859,8 +2859,9 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 			// TODO: determine the template of the given page: fetch those CSS files.
 
 			// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
-			$rv .= "        content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,admin/img/styles/liquid.css,admin/img/styles/layout.css,admin/img/styles/sprite.css,admin/img/styles/last_minute_fixes.css' .
-										 ",admin/img/styles/ie.css?only-when=%3d%3d+IE',\n";
+			$rv .= "        content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,' . $cfg['rootdir'] . 'admin/img/styles/liquid.css,' . $cfg['rootdir'] . 'admin/img/styles/layout.css' .
+										',' . $cfg['rootdir'] . 'admin/img/styles/sprite.css,' . $cfg['rootdir'] . 'admin/img/styles/last_minute_fixes.css' .
+										',' . $cfg['rootdir'] . 'admin/img/styles/ie.css?only-when=%3d%3d+IE' . "',\n";
 
 			if($cfg['iframe'])
 			{
