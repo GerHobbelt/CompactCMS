@@ -986,14 +986,46 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 	$contents = filter4browser($contents, $client_browser);
 
-	// make sure the @import statements are on their own lines: easier for us to process them:
+	/*
+	 ASSUMPTION: make sure the @import statements are on their own lines: easier for us to process them!
+	 
+	 WARNING: Note that we should skip all mention of @import inside comments!
+	*/
 	$prev_content = '';
 	for($idx = strpos($contents, "@import"); $idx !== false; $idx = strpos($contents, "@import"))
 	{
 		// shift non-@import-ing lead off to other buffer, so we're never bothered with it again in this loop: speed!
-		$prev_content .= substr($contents, 0, $idx);
-
+		$lead_in = substr($contents, 0, $idx);
+		$prev_content .= $lead_in;
+		
 		$contents = substr($contents, $idx);
+		
+		$idx = strrpos($lead_in, "/*");
+		if ($idx !== false)
+		{
+			$lead_in = substr($lead_in, $idx + 2);
+			// do we have an end-of-comment before we hit the @import or not?
+			$idx = strpos($lead_in, "*/");
+			if ($idx === false)
+			{
+				// no, we don't. So this @import sits right smack inside a comment: skip it!
+				
+				// see where the honest goods continue again:
+				$idx = strpos($contents, "*/");
+				if ($idx === false)
+				{
+					// unterminated comment in CSS
+					send_response_status_header(500); // Internal Failure
+					die('unterminated comment in CSS');
+				}
+				$idx += 2;
+				$prev_content .= substr($contents, 0, $idx);
+				
+				$contents = substr($contents, $idx);
+				continue;
+			}
+		}
+
 		if (!preg_match('/@import\s+url\(([^)]+)\);?(.*)/s', $contents, $matches))
 		{
 			send_response_status_header(500); // Internal Failure
