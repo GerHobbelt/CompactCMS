@@ -157,20 +157,9 @@ $client_browser = $client_browser->getBrowser();
 
 if (0)
 {
-	echo "/*\r\n";
-	echo '<h1>$client_browser</h1>';
-	echo "<pre>";
-	var_dump($client_browser);
-	echo "</pre>";
-	echo "<p>CFG:</p>\n";
-	echo "<pre>";
-	var_dump($cfg);
-	echo "</pre>";
-	echo "<p>OPTIMIZE:</p>\n";
-	echo "<pre>";
-	var_dump($optimize);
-	echo "</pre>";
-	echo "*/\r\n";
+	dump_request_to_logfile(array('client_browser' => $client_browser,
+							       'OPTIMIZE' => $optimize),
+							false);
 }
 
 /*

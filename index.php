@@ -59,31 +59,7 @@ ccmsParser::setTemplateAndEchoPHP(BASE_PATH . '/lib/templates/'.$ccms['template'
 
 if (0)
 {
-	global $_SERVER;
-	global $_ENV;
-	global $ccms;
-	global $cfg;
-
-	echo '<h1>$_SERVER</h1>';
-	echo "<pre>";
-	var_dump($_SERVER);
-	echo "</pre>";
-	echo '<h1>$_ENV</h1>';
-	echo "<pre>";
-	var_dump($_ENV);
-	echo "</pre>";
-	echo '<h1>$_SESSION</h1>';
-	echo "<pre>";
-	var_dump($_SESSION);
-	echo "</pre>";
-	echo '<h1>$ccms</h1>';
-	echo "<pre>";
-	var_dump($ccms);
-	echo "</pre>";
-	echo '<h1>$cfg</h1>';
-	echo "<pre>";
-	var_dump($cfg);
-	echo "</pre>";
+	dump_request_to_logfile(null, true);
 }
 
 ?>

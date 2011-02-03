@@ -398,14 +398,7 @@ if ($do == 'update')
 		echo "boom!";
 		if (0)
 		{
-			echo '<h1>$_POST</h1>';
-			echo "<pre>";
-			var_dump($_POST);
-			echo "</pre>";
-			echo '<h1>$_COOKIE</h1>';
-			echo "<pre>";
-			var_dump($_COOKIE);
-			echo "</pre>";
+			dump_request_to_logfile();
 		}
 		die();
 	}

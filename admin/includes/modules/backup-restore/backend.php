@@ -449,36 +449,10 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 
 if (0)
 {
-	global $ccms;
-	global $cfg;
-
-	echo '<h1>My Code</h1>';
-	echo "<pre>\nbtn_backup = $btn_backup\ndo = $do\nbtn_delete = $btn_delete\n";
-	echo "</pre>";
-	echo '<h1>$_SERVER</h1>';
-	echo "<pre>";
-	var_dump($_SERVER);
-	echo "</pre>";
-	echo '<h1>$_ENV</h1>';
-	echo "<pre>";
-	var_dump($_ENV);
-	echo "</pre>";
-	echo '<h1>$_SESSION</h1>';
-	echo "<pre>";
-	var_dump($_SESSION);
-	echo "</pre>";
-	echo '<h1>$_POST</h1>';
-	echo "<pre>";
-	var_dump($_POST);
-	echo "</pre>";
-	echo '<h1>$_GET</h1>';
-	echo "<pre>";
-	var_dump($_GET);
-	echo "</pre>";
-	echo '<h1>$cfg</h1>';
-	echo "<pre>";
-	var_dump($cfg);
-	echo "</pre>";
+	dump_request_to_logfile(array('btn_backup' => $btn_backup,
+								   'do' => $do,
+								   'btn_delete' => $btn_delete),
+						    true);
 }
 ?>
 

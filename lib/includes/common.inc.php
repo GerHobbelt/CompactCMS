@@ -64,6 +64,15 @@ if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
 }
 
 
+if (0)
+{
+	dump_request_to_logfile();
+}
+
+
+
+
+
 
 
 
@@ -2410,6 +2419,156 @@ function cvt_ordercode2list($ordercode)
 	return $dlorder;
 }
 
+
+
+
+/*
+Derived from code by phella.net: 
+
+  http://nl3.php.net/manual/en/function.var-dump.php
+*/
+function var_dump_ex($value, $level = 0)
+{
+	if ($level == -1)
+	{
+		$trans[' '] = '&there4;';
+		$trans["\t"] = '&rArr;';
+		$trans["\n"] = '&para;;';
+		$trans["\r"] = '&lArr;';
+		$trans["\0"] = '&oplus;';
+		return strtr(htmlspecialchars($value, ENT_COMPAT, 'UTF-8'), $trans);
+	}
+	
+	$rv = '';
+	if ($level == 0) 
+	{
+		$rv .= '<pre>';
+	}
+	$type = gettype($value);
+	$rv .= $type;
+
+	switch ($type)
+	{
+	case 'string':
+		$rv .= '(' . strlen($value) . ')';
+		$value = var_dump_ex($value, -1);
+		break;
+  
+	case 'boolean':
+		$value = ($value ? 'true' : 'false');
+		break;
+	
+	case 'object':
+		$props = get_class_vars(get_class($value));
+		$rv .= '(' . count($props) . ') <u>' . get_class($value) . '</u>';
+		foreach($props as $key => $val)
+		{
+			$rv .= "\n" . str_repeat("\t", $level + 1) . $key . ' => ';
+			$rv .= var_dump_ex($value->$key, $level + 1);
+		}
+		$value = '';
+		break;
+  
+	case 'array':
+		$rv .= '(' . count($value) . ')';
+		foreach($value as $key => $val)
+		{
+			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1) . ' => ';
+			$rv .= var_dump_ex($val, $level + 1);
+		}
+		$value = '';
+		break;
+		
+	default:
+		break;
+	}
+	$rv .= ' <b>' . $value . '</b>';
+	if ($level == 0) 
+	{
+		$rv .= '</pre>';
+	}
+	return $rv;
+}
+
+
+function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
+{
+	global $_SERVER;
+	global $_ENV;
+	global $_COOKIE;
+	global $_SESSION;
+	global $ccms;
+	global $cfg;
+
+	$rv = '<html><body>';
+	
+	if (!empty($_SESSION['dbg_last_dump']))
+	{
+		$rv .= '<p><a href="' . $_SESSION['dbg_last_dump'] . '">Go to previous dump</a></p>' ."\n";
+	}
+	$rv .= '<h1>$_ENV</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_ENV);
+	$rv .= "</pre>";
+	$rv .= '<h1>$_SESSION</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_SESSION);
+	$rv .= "</pre>";
+	$rv .= '<h1>$_POST</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_POST);
+	$rv .= "</pre>";
+	$rv .= '<h1>$_GET</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_GET);
+	$rv .= "</pre>";
+	$rv .= '<h1>$_FILES</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_FILES);
+	$rv .= "</pre>";
+	$rv .= '<h1>$_COOKIE</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_COOKIE);
+	$rv .= "</pre>";
+	$rv .= '<h1>$_REQUEST</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_REQUEST);
+	$rv .= "</pre>";
+
+	if (!empty($extra))
+	{
+		$rv .= '<h1>EXTRA</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($extra);
+		$rv .= "</pre>";
+	}
+
+	if ($dump_CCMS_arrays_too)
+	{
+		$rv .= '<h1>$ccms</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($ccms);
+		$rv .= "</pre>";
+		$rv .= '<h1>$cfg</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($cfg);
+		$rv .= "</pre>";
+	}
+
+	$rv .= '<h1>$_SERVER</h1>';
+	$rv .= "<pre>";
+	$rv .= var_dump_ex($_SERVER);
+	$rv .= "</pre>";
+	$rv .= '</body></html>';
+	
+	$tstamp = date('Y-m-d.His');
+	
+	$fname = 'LOG-' . $tstamp . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
+	$_SESSION['dbg_last_dump'] = $fname;
+	$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
+	
+	file_put_contents($fname, $rv);
+}
 
 
 

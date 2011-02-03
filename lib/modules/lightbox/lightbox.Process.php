@@ -350,9 +350,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && ($do_action == 'save-files' || $do_ac
 	{
 if (0)
 {
-		echo "<p>" . (empty($_GET['SIDCHK']) ? '----' : $_GET['SIDCHK']) . ', ' . $_SESSION['fup1'] . "</p>\n";
-		var_dump($_GET);
-		var_dump($_COOKIES);
+		dump_request_to_logfile();
 }
 		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 
