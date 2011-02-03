@@ -393,7 +393,7 @@ if (0)
 	$target_filename = filterParam4Filename($target_filename, null, true);
 	
 	// Set file and get file extension
-	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
+	$extension = strtolower(pathinfo($target_filename, PATHINFO_EXTENSION));
 
 	if (empty($error) && (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)))
 	{
