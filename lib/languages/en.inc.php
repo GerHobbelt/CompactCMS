@@ -179,6 +179,7 @@ $ccms['lang']['forms']['setlocale']             = "Front-end language";
 $ccms['lang']['forms']['filter_showing']        = "right now we're only showing pages which have at least this text in here";
 $ccms['lang']['forms']['edit_remove']           = "Edit or remove filter for";
 $ccms['lang']['forms']['add']                   = "Add filter for";
+$ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
 
 // Administration hints for form fields
 $ccms['lang']['hints']['filename']              = "The page url (home.html) :: The file name which this page is called upon (without .html)";

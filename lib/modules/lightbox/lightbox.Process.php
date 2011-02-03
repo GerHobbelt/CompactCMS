@@ -383,16 +383,27 @@ if (0)
 	// Validation
 	$size       = false; // init to prevent PHP errors about unknown vars further down
 
+	$overwrite_existing = getGETparam4Boolean('overwrite_existing');
+
 	// get the local (temporary) filename:
 	$uploadedfile = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['tmp_name']) ? $_FILES['Filedata']['tmp_name'] : null); // RAW is okay: it's generated locally (server-side) and contains a temp filename
 	// and what it's supposed to be named (as specced by the uploader):
-	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? filterParam4Filename($_FILES['Filedata']['name']) : null);
+	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? $_FILES['Filedata']['name'] : null);
+	// make filename safe but try to keep it unique at the same time!
+	$target_filename = filterParam4Filename($target_filename, null, true);
+	
 	// Set file and get file extension
 	$extension = pathinfo($target_filename, PATHINFO_EXTENSION);
 
 	if (empty($error) && (empty($extension) || empty($target_filename) || empty($uploadedfile) || !is_uploaded_file($uploadedfile)))
 	{
 		$error = 'Invalid file or no file at all uploaded';
+		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
+	}
+
+	if (empty($error) && is_file($target_filename) && !$overwrite_existing)
+	{
+		$error = 'File already exists on server';
 		$error_code = $uploadedfile . ' : ' . $extension . ' : ' . $target_filename;
 	}
 

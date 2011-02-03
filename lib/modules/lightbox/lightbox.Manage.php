@@ -456,7 +456,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 				 */
 				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 				echo '&SIDCHK=' . $_SESSION['fup1'];
-
+				
 				/* whitespace is important here... */ ?>&action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
 
 				<label><?php echo $ccms['lang']['album']['toexisting']; ?>
@@ -471,6 +471,15 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 						?>
 					</select>
 				</label>
+				
+				<div class="clearfix">
+					<label><?php echo $ccms['lang']['forms']['overwrite_imgs']; ?>?</label>
+					<label for="f_ovr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+						<input type="radio" id="f_ovr1" name="overwrite_existing" value="Y" />
+					<label for="f_ovr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+						<input type="radio" id="f_ovr2" checked="checked" name="overwrite_existing" value="N" />
+				</div>
+				
 				<div id="lightbox-status">
 					<p>
 						<a id="lightbox-browse"><span class="ss_sprite_16 ss_folder_image">&#160;</span><?php echo $ccms['lang']['album']['browse']; ?></a> |

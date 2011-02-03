@@ -1187,12 +1187,12 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 
 
 
-#create-user label.yesno, #edit-user-details label.yesno
+#create-user label.yesno, #edit-user-details label.yesno, #lightboxForm label.yesno, #lightbox-fallback label.yesno
 {
 	display: inline;
 	font-weight: normal;
 }
-#create-user div.yesno input, #edit-user-details div.yesno input
+#create-user div.yesno input, #edit-user-details div.yesno input, #lightboxForm label.yesno input, #lightbox-fallback label.yesno input
 {
 	width: auto;
 }

@@ -166,7 +166,7 @@ When the transformation would produce an identifier longer than a specified numb
 characters are replaced by the characters produced by the hash of the input text in order to deliver
 an identifier with quite tolerable uniqueness guarantees.
 */
-function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false, $max_outlen = MAX_REASONABLE_FILENAME_LENGTH)
+function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus = false, $max_outlen = MAX_REASONABLE_FILENAME_LENGTH, $try_to_keep_unique = false)
 {
 	static $regex4var;
 
@@ -224,10 +224,49 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		}
 	}
 
+	$h = md5($src);
+	
+	if ($try_to_keep_unique)
+	{
+		/*
+		Try to ensure -- with high probability -- that even a transformed filename remains unique.
+		
+		This is done by appending a part of the MD5 hash of the RAW, original filename to the 
+		transformed filename: where the transformation will have lost some characters (turning them
+		into underscores or removing them entirely), the extra MD5 characters will add that 
+		uniqueness again.
+		*/
+		$src = str_replace('\\', '/', $src);
+		$pos = strrpos($src, '/');
+		if ($pos !== false)
+		{
+			$src = substr($src, $pos + 1);
+		}
+		$pos = strrpos($src, '.');
+		if ($pos !== false)
+		{
+			$src = substr($src, 0, $pos);
+
+			// special circumstances for: .tar.gz, .tar.Z, etc.:
+			if (strcasecmp(substr($src, -4), '.tar') == 0)
+			{
+				$src = substr($src, 0, -4);
+			}
+		}
+		// only when there's been a transformation effect do we pad/uniquify the filename:
+		if ($src != $dst)
+		{
+			$tl = min(32, max(4, abs(strlen($src) - strlen($dst))));
+			$dst .= '.' . substr($h, -$tl);
+		}
+	}
+	
+	/*
+	now check the length of the filename: when it is too large, we must reduce it!
+	*/
 	$max_outlen -= strlen($ext); // discount the extension: it should ALWAYS remain!
 	if ($max_outlen < strlen($dst))
 	{
-		$h = md5($src);
 		$tl = min(32, $max_outlen, 4 + intval($max_outlen / 8)); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
 		$dst = substr($dst, 0, $max_outlen - $tl) . substr($h, -$tl);
 	}
@@ -311,31 +350,31 @@ function filterParam4IdOrNumber($value, $def = null)
 
 
 
-function getGETparam4Filename($name, $def = null)
+function getGETparam4Filename($name, $def = null, $try_to_keep_unique = false)
 {
 	if (!isset($_GET[$name]))
 		return $def;
 
-	return filterParam4Filename(rawurldecode($_GET[$name]), $def);
+	return filterParam4Filename(rawurldecode($_GET[$name]), $def, $try_to_keep_unique);
 }
 
-function getPOSTparam4Filename($name, $def = null)
+function getPOSTparam4Filename($name, $def = null, $try_to_keep_unique = false)
 {
 	if (!isset($_POST[$name]))
 		return $def;
 
-	return filterParam4Filename($_POST[$name], $def);
+	return filterParam4Filename($_POST[$name], $def, $try_to_keep_unique);
 }
 
 /**
  * As filterParam4IdOrNumber(), but also accepts '_' underscores and '.' dots, but NOT at the start or end of the filename!
  */
-function filterParam4Filename($value, $def = null)
+function filterParam4Filename($value, $def = null, $try_to_keep_unique = false)
 {
 	if (!isset($value))
 		return $def;
 
-	$value = str2VarOrFileName($value, '~\.');
+	$value = str2VarOrFileName($value, '~\.', false, MAX_REASONABLE_FILENAME_LENGTH, $try_to_keep_unique);
 
 	return $value;
 }
@@ -2489,6 +2528,7 @@ function var_dump_ex($value, $level = 0)
 	}
 	return $rv;
 }
+
 
 
 function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
