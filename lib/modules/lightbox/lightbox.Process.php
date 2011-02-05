@@ -128,7 +128,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['auth']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_forged']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -324,7 +324,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['auth']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_forged']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -815,7 +815,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['auth']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_forged']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)

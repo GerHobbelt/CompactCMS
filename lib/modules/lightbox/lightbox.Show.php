@@ -215,7 +215,7 @@ if(count($albums) > 1 && $singleShow == false)
 
 			// If album is not empty and thumbnail is found
 			$show_thumb = 0;
-			if (count($images)>0)
+			if (count($images) > 0)
 			{
 				$thumb_path = $album_path.'/'.$album.'/_thumbs/'.$images[0];
 				$img_path = $album_path.'/'.$album.'/'.$images[0];
