@@ -59,6 +59,9 @@ if(empty($_GET['do']))
 // Start the current session
 session_start();
 
+// Load installer-specific configuration bits
+/*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
+
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 

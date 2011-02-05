@@ -42,6 +42,9 @@ if (!defined('BASE_PATH'))
 // Start the current session
 session_start();
 
+// Load installer-specific configuration bits
+/*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
+
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 
@@ -58,7 +61,6 @@ $nextstep = getPOSTparam4IdOrNumber('do');
 $may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] != false); 
 $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] != false); 
 
-$dump_queries_n_stuff_in_devmode = true;
 
 
 /**
@@ -572,7 +574,7 @@ if($nextstep == md5('final') && CheckAuth())
 			if (empty($tok))
 				continue;
 
-			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || EXECUTE_QUERIES)
 			{
 				$results = $db->Query($tok);
 				if ($results == false)
@@ -603,7 +605,7 @@ if($nextstep == md5('final') && CheckAuth())
 		{
 			$log[] = "Database structure and data successfully imported";
 		}
-		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && $dump_queries_n_stuff_in_devmode)
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
 		{
 ?>
 			<h2>Database Initialization</h2>
@@ -812,7 +814,7 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 
 		// Write the new setup to the config file
-		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
 		{
 			// make sure the fopen(..., 'w') is only called when the destination is writable; otherwise an empty file may be produced.
 			if (is_writable_ex(BASE_PATH . '/lib/config.inc.php') && ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w')))
@@ -837,7 +839,7 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 		else
 		{
-			if ($dump_queries_n_stuff_in_devmode)
+			if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
 			{
 ?>
 				<h2>config.inc.php Configuration Values - after modification</h2>
@@ -856,57 +858,109 @@ if($nextstep == md5('final') && CheckAuth())
 		$htaccess   = @file_get_contents(BASE_PATH.'/.htaccess');
 		$newpath    = $_SESSION['variables']['rootdir'];
 
-		if(strpos($htaccess, $newline)===false)
-		{
-			// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
-			$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
-			$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
+		// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
+		$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
+		$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
 
-			// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
-			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
-			$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
-			if (!$htaccess)
+		// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
+		$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
+		$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
+		if (!$htaccess)
+		{
+			$errors[] = 'Fatal: could not set the RewriteBase in the .htaccess file.';
+			$err++;
+		}
+		else
+		{
+			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
 			{
-				$errors[] = 'Fatal: could not set the RewriteBase in the .htaccess file.';
-				$err++;
-			}
-			else
-			{
-				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+				if (is_writable_ex(BASE_PATH . '/.htaccess') && ($fp = fopen(BASE_PATH . '/.htaccess', 'w')))
 				{
-					if (is_writable_ex(BASE_PATH . '/.htaccess') && ($fp = fopen(BASE_PATH . '/.htaccess', 'w')))
+					if(fwrite($fp, $htaccess, strlen($htaccess)))
 					{
-						if(fwrite($fp, $htaccess, strlen($htaccess)))
-						{
-							$log[] = "Successfully rewrote the .htaccess file";
-						}
-						else
-						{
-							$errors[] = "Fatal: Problem saving new .htaccess file.";
-							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
-							$err++;
-						}
-						fclose($fp);
+						$log[] = "Successfully rewrote the .htaccess file";
 					}
 					else
 					{
-						$errors[] = 'Fatal: the .htaccess file is not writable.';
+						$errors[] = "Fatal: Problem saving new .htaccess file.";
 						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
 						$err++;
 					}
+					fclose($fp);
 				}
 				else
 				{
-					if ($dump_queries_n_stuff_in_devmode)
-					{
-?>
-						<h2>.htaccess Rewrite Rules - after modification</h2>
-						<pre class="small"><?php echo htmlspecialchars($htaccess, ENT_COMPAT, 'UTF-8'); ?></pre>
-<?php
-					}
-					
-					$log[] = "Successfully rewrote the .htaccess file";
+					$errors[] = 'Fatal: the .htaccess file is not writable.';
+					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+					$err++;
 				}
+			}
+			else
+			{
+				if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
+				{
+?>
+					<h2>.htaccess Rewrite Rules - after modification</h2>
+					<pre class="small"><?php echo htmlspecialchars($htaccess, ENT_COMPAT, 'UTF-8'); ?></pre>
+<?php
+				}
+				
+				$log[] = "Successfully rewrote the .htaccess file";
+			}
+		}
+	}
+
+	//
+	// Modify robots.txt file
+	//
+	if($err == 0)
+	{
+		$robots_txt   = @file_get_contents(BASE_PATH.'/robots.txt');
+		$newpath    = $_SESSION['variables']['rootdir'];
+
+		// make sure the regexes tolerate a setup where the robots.txt points at a subdirectory instead of the / root, so we can use a robots.txt in a development environment too:
+		$robots_txt = preg_replace('/(llow:\s+)\//', '\\1' . $newpath, $robots_txt);
+		if (!$robots_txt)
+		{
+			$errors[] = 'Fatal: could not set the base path in the robots.txt file.';
+			$err++;
+		}
+		else
+		{
+			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
+			{
+				if (is_writable_ex(BASE_PATH . '/robots.txt') && ($fp = fopen(BASE_PATH . '/robots.txt', 'w')))
+				{
+					if(fwrite($fp, $robots_txt, strlen($robots_txt)))
+					{
+						$log[] = "Successfully rewrote the robots.txt file";
+					}
+					else
+					{
+						$errors[] = "Fatal: Problem saving new robots.txt file.";
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$err++;
+					}
+					fclose($fp);
+				}
+				else
+				{
+					$errors[] = 'Fatal: the robots.txt file is not writable.';
+					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+					$err++;
+				}
+			}
+			else
+			{
+				if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
+				{
+?>
+					<h2>robots.txt Rewrite Rules - after modification</h2>
+					<pre class="small"><?php echo htmlspecialchars($robots_txt, ENT_COMPAT, 'UTF-8'); ?></pre>
+<?php
+				}
+				
+				$log[] = "Successfully rewrote the robots.txt file";
 			}
 		}
 	}
