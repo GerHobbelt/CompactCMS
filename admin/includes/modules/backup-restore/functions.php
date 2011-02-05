@@ -166,11 +166,10 @@ class createZip
 	}
 
 	/**
-	 * Fucntion to return the zip file
+	 * Function to return the zip file
 	 *
 	 * @return zipfile (archive)
 	 */
-
 	public function getZippedfile() {
 
 		$data = implode("", $this -> compressedData);
@@ -186,8 +185,6 @@ class createZip
 			pack("V", strlen($data)).
 			"\x00\x00";
 	}
-
-
 }
 
 

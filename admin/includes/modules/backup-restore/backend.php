@@ -257,7 +257,7 @@ if($do == "backup" && !empty($btn_backup))
 		echo '<div class="error center-text">';
 		foreach($error as $msg)
 		{
-			echo '<p>'.msg.'</p>';
+			echo '<p>'.$msg.'</p>';
 		}
 		echo '</div>';
 	}
