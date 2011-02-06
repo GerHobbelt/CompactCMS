@@ -183,6 +183,14 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 	}
 }
 
+$album = getGETparam4Filename('album');
+$album_path = (in_array($album, $albums) ? BASE_PATH.'/media/albums/'.$album : null);
+
+// TODO: get suitable page_id for given album, or none at all
+$page_id = 0;
+$preview_checkcode = GenerateNewPreviewCode($page_id);
+
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -208,9 +216,7 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 		<div class="span-16 colborder">
 		<?php
 		// more secure: only allow showing specific albums if they are in the known list; if we change that set any time later, this code will not let undesirable items slip through
-		$album = getGETparam4Filename('album');
-		$album_path = (in_array($album, $albums) ? BASE_PATH.'/media/albums/'.$album : null);
-		if($album==null)
+		if($album == null)
 		{
 		?>
 			<form action="lightbox.Process.php?action=del-album" method="post" accept-charset="utf-8">
@@ -226,17 +232,20 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 						if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 						{
 						?>
-							<th class="span-1">&#160;</th>
+							<th class="span-1 nowrap">&#160;</th>
 						<?php
 						}
 						?>
-						<th class="span-5"><?php echo $ccms['lang']['album']['album']; ?></th>
-						<th class="span-2"><?php echo $ccms['lang']['album']['files']; ?></th>
-						<th class="span-4"><?php echo $ccms['lang']['album']['lastmod']; ?></th>
+						<th class="span-8 nowrap"><?php echo $ccms['lang']['album']['album']; ?></th>
+						<th class="span-3 nowrap"><?php echo $ccms['lang']['album']['files']; ?></th>
+						<th class="span-7 nowrap"><?php echo $ccms['lang']['album']['lastmod']; ?></th>
+						<th class="span-5 nowrap"><?php echo $ccms['lang']['album']['assigned_page']; ?></th>
 						</tr>
 						<?php
 						foreach ($albums as $key => $value)
 						{
+							$pageName = 'light';  // TODO
+							
 							// Alternate rows
 							if($key % 2 != 1)
 							{
@@ -250,13 +259,28 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 							if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 							{
 							?>
-								<td><input type="checkbox" name="albumID[<?php echo $key+1; ?>]" value="<?php echo $value; ?>" id="newsID"></td>
+								<td class="nowrap">
+									<input type="checkbox" name="albumID[<?php echo $key + 1; ?>]" value="<?php echo $value; ?>" id="newsID">
+									<?php 
+									echo '<a href="' . $cfg['rootdir'] . $pageName . '/' . $value . '.html?preview=' . $preview_checkcode . '" ' .
+											'title="' . $ccms['lang']['backend']['previewpage'] . '"><span class="ss_sprite_16 ss_eye">&#160;</span></a>';
+									?>
+								</td>
 							<?php
 							}
 							?>
-							<td><a href="lightbox.Manage.php?album=<?php echo $value;?>"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $value;?></a></td>
-							<td><span class="ss_sprite_16 ss_pictures">&#160;</span><?php echo $count[$key]; ?></td>
-							<td><span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
+							<td class="nowrap">
+								<a href="lightbox.Manage.php?album=<?php echo $value;?>"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $value;?></a>
+							</td>
+							<td class="nowrap">
+								<span class="ss_sprite_16 ss_pictures">&#160;</span><?php echo $count[$key]; ?>
+							</td>
+							<td class="nowrap">
+								<span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?>
+							</td>
+							<td class="nowrap">
+								<span class="ss_sprite_16 ss_page">&#160;</span><?php echo $pageName; ?>
+							</td>
 						</tr>
 						<?php
 						}
@@ -304,6 +328,24 @@ if ($handle = opendir(BASE_PATH.'/media/albums/'))
 				if (count($images) > 0 && $perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 				{
 				?>
+					<a class="button" onclick="move_up_in_order(); return false;" title="Move to front in display order." >
+						<span class="ss_sprite_16 ss_bullet_arrow_top">&#160;</span>
+					</a>
+					<a class="button" onclick="move_up_in_order(); return false;" title="Move up in display order." >
+						<span class="ss_sprite_16 ss_bullet_arrow_up">&#160;</span>
+					</a>
+					<a class="button" onclick="move_up_in_order(); return false;" title="Move down in display order." >
+						<span class="ss_sprite_16 ss_bullet_arrow_down">&#160;</span>
+					</a>
+					<a class="button" onclick="move_up_in_order(); return false;" title="Move to bottom in display order." >
+						<span class="ss_sprite_16 ss_bullet_arrow_bottom">&#160;</span>
+					</a>
+					<a class="button" onclick="move_up_in_order(); return false;" title="Group these images." >
+						<span class="ss_sprite_16 ss_pictures">&#160;</span>
+					</a>
+					<a class="button" onclick="toggle_image_edit_mode(); return false;" title="Edit the title and description of each of these images." >
+						<span class="ss_sprite_16 ss_pencil">&#160;</span>
+					</a>
 					<a class="button" onclick="delete_these_files(); return false;">
 						<span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?>
 					</a>

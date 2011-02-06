@@ -306,6 +306,7 @@ $ccms['lang']['album']['noalbums']              = "No albums have been created y
 $ccms['lang']['album']['files']                 = "Files";
 $ccms['lang']['album']['nodir']                 = "Please make sure the directory <strong>albums</strong> exists in the ./media/ directory";
 $ccms['lang']['album']['lastmod']               = "Last modified";
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
 $ccms['lang']['album']['please_wait']           = "Please wait ...";
 
 // News messages
