@@ -1,24 +1,35 @@
--- phpMyAdmin SQL Dump
--- version 3.2.4
--- http://www.phpmyadmin.net
+--
+-- MySQL database dump
+-- Created for CompactCMS (www.compactcms.nl)
 --
 -- Host: localhost
--- Generation Time: Jan 28, 2011 at 04:53 PM
--- Server version: 5.1.41
--- PHP Version: 5.3.1
-
-
-SET CHARACTER SET 'utf8';
--- ALTER DATABASE `compactcms` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-
-
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
-
-
+-- Generated: Feb 6, 2011 at 19:14
+-- MySQL version: 5.1.41
+-- PHP version: 5.3.1
 --
 -- Database: `compactcms`
 --
+
+
+
+
+-- ========================================================
+
+--
+-- Create the database if it doesn't exist yet for database `compactcms`
+--
+
+CREATE DATABASE IF NOT EXISTS `compactcms` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */ ; 
+
+USE `compactcms`;
+
+ALTER DATABASE `compactcms` DEFAULT CHARACTER SET `utf8` COLLATE `utf8_unicode_ci`;
+
+
+SET CHARACTER SET `utf8`;
+
+
+
 
 -- --------------------------------------------------------
 
@@ -39,6 +50,8 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgcomment` (
 -- Dumping data for table `ccms_cfgcomment`
 --
 
+TRUNCATE TABLE `ccms_cfgcomment`;
+
 
 -- --------------------------------------------------------
 
@@ -57,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `ccms_cfglightbox` (
   `keywords` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `dirname` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'name of the directory where the album images are stored',
   `display_type` smallint(5) NOT NULL DEFAULT '0' COMMENT 'the way the album and the album images are shown (0: lightbox, 1: alt.lightbox, 2: kanochan, 3: full sized overview)',
-  `order_by` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'filename' COMMENT 'the sort order for the images in this album (by filename, by title, by sequence number, by timestamp, ...)',
+  `order_by` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'GFD' COMMENT 'the sort order for the images in this album (by [F]=filename, by [T]=title, by [G]=sequence/group number, by [D]=timestamp, ...)',
   `pagination` smallint(5) NOT NULL DEFAULT '0' COMMENT 'number of images per page (0 = no pagination)',
   `album_template` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'template override when showing individual albums',
   `img_template` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'the template used to render a single image',
@@ -71,6 +84,12 @@ CREATE TABLE IF NOT EXISTS `ccms_cfglightbox` (
 --
 -- Dumping data for table `ccms_cfglightbox`
 --
+
+TRUNCATE TABLE `ccms_cfglightbox`;
+
+-- table `ccms_cfglightbox` has 0 records.
+--
+
 
 
 -- --------------------------------------------------------
@@ -96,6 +115,8 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgnews` (
 -- Dumping data for table `ccms_cfgnews`
 --
 
+TRUNCATE TABLE `ccms_cfgnews`;
+
 
 -- --------------------------------------------------------
 
@@ -114,6 +135,8 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
 --
 -- Dumping data for table `ccms_cfgpermissions`
 --
+
+TRUNCATE TABLE `ccms_cfgpermissions`;
 
 INSERT INTO `ccms_cfgpermissions` (`name`, `value`, `display_order`) VALUES
 ('manageModTranslate', 0, '100.10'),
@@ -158,6 +181,12 @@ CREATE TABLE IF NOT EXISTS `ccms_modacl` (
 -- Dumping data for table `ccms_modacl`
 --
 
+TRUNCATE TABLE `ccms_modacl`;
+
+-- table `ccms_modacl` has 0 records.
+--
+
+
 
 -- --------------------------------------------------------
 
@@ -181,6 +210,10 @@ CREATE TABLE IF NOT EXISTS `ccms_modcomment` (
 
 --
 -- Dumping data for table `ccms_modcomment`
+--
+
+TRUNCATE TABLE `ccms_modcomment`;
+
 
 -- --------------------------------------------------------
 
@@ -192,7 +225,9 @@ DROP TABLE IF EXISTS `ccms_modlightbox`;
 CREATE TABLE IF NOT EXISTS `ccms_modlightbox` (
   `img_id` int(8) unsigned NOT NULL AUTO_INCREMENT,
   `album_id` int(5) NOT NULL,
-  `filename` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `filename` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `subheader` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   `width` int(5) NOT NULL COMMENT 'derived info (cached in this record)',
   `height` int(5) NOT NULL COMMENT 'derived info (cached in this record)',
@@ -206,6 +241,12 @@ CREATE TABLE IF NOT EXISTS `ccms_modlightbox` (
 --
 -- Dumping data for table `ccms_modlightbox`
 --
+
+TRUNCATE TABLE `ccms_modlightbox`;
+
+-- table `ccms_modlightbox` has 0 records.
+--
+
 
 
 -- --------------------------------------------------------
@@ -235,6 +276,12 @@ CREATE TABLE IF NOT EXISTS `ccms_modmixer` (
 -- Dumping data for table `ccms_modmixer`
 --
 
+TRUNCATE TABLE `ccms_modmixer`;
+
+-- table `ccms_modmixer` has 0 records.
+--
+
+
 
 -- --------------------------------------------------------
 
@@ -258,6 +305,9 @@ CREATE TABLE IF NOT EXISTS `ccms_modnews` (
 --
 -- Dumping data for table `ccms_modnews`
 --
+
+TRUNCATE TABLE `ccms_modnews`;
+
 
 
 -- --------------------------------------------------------
@@ -284,6 +334,8 @@ CREATE TABLE IF NOT EXISTS `ccms_modules` (
 -- Dumping data for table `ccms_modules`
 --
 
+TRUNCATE TABLE `ccms_modules`;
+
 INSERT INTO `ccms_modules` (`modID`, `modName`, `modTitle`, `modLocation`, `modVersion`, `modPermissionName`, `hasPageMaker`, `hasAdminSection`, `modActive`) VALUES
 (1, 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', 1, 0, 1),
 (2, 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', 1, 0, 1),
@@ -295,6 +347,8 @@ INSERT INTO `ccms_modules` (`modID`, `modName`, `modTitle`, `modLocation`, `modV
 (8, 'backup-restore', 'Backup / Restore', './admin/modules/backup-restore/backup.%.php', '1.00', 'manageBackups', 0, 1, 1),
 (9, 'content-owners', 'Content Ownership', './admin/modules/content-owners/owners.%.php', '1.00', 'manageContentOwners', 0, 1, 1),
 (10, 'translation', 'Translation Assistant', './admin/modules/translation/translation.%.php', '0.10', 'manageTranslations', 0, 1, 1);
+
+
 
 -- --------------------------------------------------------
 
@@ -330,6 +384,8 @@ CREATE TABLE IF NOT EXISTS `ccms_pages` (
 -- Dumping data for table `ccms_pages`
 --
 
+TRUNCATE TABLE `ccms_pages`;
+
 INSERT INTO `ccms_pages` (`page_id`, `user_ids`, `urlpage`, `module`, `toplevel`, `sublevel`, `menu_id`, `variant`, `pagetitle`, `subheader`, `description`, `keywords`, `srcfile`, `printable`, `islink`, `iscoding`, `published`) VALUES
 (00001, '0', 'home', 'editor', 1, 0, 1, 'ccms', 'Home', 'The CompactCMS demo homepage', 'The CompactCMS demo homepage', 'compactcms, light-weight cms', 'home.php', 'Y', 'Y', 'N', 'Y'),
 (00002, '0', 'contact', 'editor', 2, 0, 1, 'sweatbee', 'Contact form', 'A basic contact form using Ajax', 'This is an example of a basic contact form based using Ajax', 'compactcms, light-weight cms', 'contact.php', 'Y', 'Y', 'Y', 'Y');
@@ -361,6 +417,8 @@ CREATE TABLE IF NOT EXISTS `ccms_users` (
 --
 -- Dumping data for table `ccms_users`
 --
+
+TRUNCATE TABLE `ccms_users`;
 
 INSERT INTO `ccms_users` (`userID`, `userName`, `userPass`, `userFirst`, `userLast`, `userEmail`, `userActive`, `userLevel`, `userToken`, `userLastlog`, `userCreationDate`, `userTimestamp`) VALUES
 (00001, 'admin', '52dcb810931e20f7aa2f49b3510d3805', 'Xander', 'G.', 'xander@compactcms.nl', 1, 4, '5168774687486', '2010-08-30 06:44:57', '2010-08-30 06:44:57', '2010-08-30 08:44:57');
