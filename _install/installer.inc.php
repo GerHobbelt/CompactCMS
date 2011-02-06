@@ -855,7 +855,7 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	if($err==0)
 	{
-		$htaccess   = @file_get_contents(BASE_PATH.'/.htaccess');
+		$htaccess   = @file_get_contents(BASE_PATH . '/.htaccess');
 		$newpath    = $_SESSION['variables']['rootdir'];
 
 		// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
@@ -915,53 +915,64 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	if($err == 0)
 	{
-		$robots_txt   = @file_get_contents(BASE_PATH.'/robots.txt');
-		$newpath    = $_SESSION['variables']['rootdir'];
+		$targetpath = $_SERVER['DOCUMENT_ROOT'] .  '/robots.txt';
+		
+		// only set up robots.txt if it hasn;t been set up yet:
+		if (!file_exists($targetpath))
+		{
+			$robots_txt = @file_get_contents(BASE_PATH . '/robots.txt');
+			$newrootpath = $_SESSION['variables']['rootdir'];
 
-		// make sure the regexes tolerate a setup where the robots.txt points at a subdirectory instead of the / root, so we can use a robots.txt in a development environment too:
-		$robots_txt = preg_replace('/(llow:\s+)\//', '\\1' . $newpath, $robots_txt);
-		if (!$robots_txt)
-		{
-			$errors[] = 'Fatal: could not set the base path in the robots.txt file.';
-			$err++;
-		}
-		else
-		{
-			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
+			// make sure the regexes tolerate a setup where the robots.txt points at a subdirectory instead of the / root, so we can use a robots.txt in a development environment too:
+			$robots_txt = preg_replace('/(llow:\s+)(\/|'. str_replace('/', '\/', $newrootpath) . ')/', '\\1' . $newrootpath, $robots_txt);
+			if (!$robots_txt)
 			{
-				if (is_writable_ex(BASE_PATH . '/robots.txt') && ($fp = fopen(BASE_PATH . '/robots.txt', 'w')))
-				{
-					if(fwrite($fp, $robots_txt, strlen($robots_txt)))
-					{
-						$log[] = "Successfully rewrote the robots.txt file";
-					}
-					else
-					{
-						$errors[] = "Fatal: Problem saving new robots.txt file.";
-						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
-						$err++;
-					}
-					fclose($fp);
-				}
-				else
-				{
-					$errors[] = 'Fatal: the robots.txt file is not writable.';
-					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
-					$err++;
-				}
+				$errors[] = 'Fatal: could not set the base path in the robots.txt file.';
+				$err++;
 			}
 			else
 			{
-				if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
+				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
 				{
-?>
-					<h2>robots.txt Rewrite Rules - after modification</h2>
-					<pre class="small"><?php echo htmlspecialchars($robots_txt, ENT_COMPAT, 'UTF-8'); ?></pre>
-<?php
+					$fp = fopen($targetpath, 'w');
+					if ($fp)
+					{
+						if(fwrite($fp, $robots_txt, strlen($robots_txt)))
+						{
+							$log[] = "Successfully rewrote the robots.txt file.";
+						}
+						else
+						{
+							$errors[] = "Fatal: Problem saving new robots.txt file.";
+							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+							$err++;
+						}
+						fclose($fp);
+					}
+					else
+					{
+						$errors[] = 'Fatal: the robots.txt file is not writable.';
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$err++;
+					}
 				}
-				
-				$log[] = "Successfully rewrote the robots.txt file";
+				else
+				{
+					if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
+					{
+?>
+						<h2>robots.txt Rewrite Rules - after modification</h2>
+						<pre class="small"><?php echo htmlspecialchars($robots_txt, ENT_COMPAT, 'UTF-8'); ?></pre>
+<?php
+					}
+					
+					$log[] = "Successfully wrote the robots.txt file.";
+				}
 			}
+		}
+		else
+		{
+			$log[] = "<strong>Skipped configuring the robots.txt file as it already exists.</strong>";
 		}
 	}
 
