@@ -173,6 +173,7 @@ $ccms['ccms_version'] = $v = "1.4.2";
 
 // preparation for plugins, et.c which want to load JavaScript files through the template:
 $ccms['CSS.required_files'] = array();
+$ccms['CSS.inline'] = array();
 $ccms['JS.required_files'] = array();
 $ccms['JS.done'] = array();
 

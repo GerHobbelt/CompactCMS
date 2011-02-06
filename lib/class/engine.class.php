@@ -217,9 +217,27 @@ class ccmsParser
 			if (is_array($v) && count($v) == 2 && array_key_exists($v[0], $vars))
 			{
 				$rv = $this->getvar($vars, $v[0]);
-				$pm = preg_match('/^(\w+)(\s*\(\s*([^,]*)(\s*,\s*([^,]*))*\s*\))?$/s', trim($v[1]), $fbits);
+				/*
+				Note: we extract the argument list as a simple, single regex since this
+				      regex only returns the last argument matching the (....)* section of
+					  that regex:
+					  
+				*/
+				$pm = preg_match('/^(\w+)(\s*\(\s*(.*)\s*\))?$/s', trim($v[1]), $fbits);
 				if (!$pm)
 					return 'regex match failure for "' . $v[1] . '"';
+				if (count($fbits) > 3)
+				{
+					$argset = explode(',', $fbits[3]);
+					// ditch the full arguments match itself
+					array_pop($fbits); 
+					// and replace it with each of the arguments individually
+					foreach ($argset as $v)
+					{
+						$fbits[] = trim($v);
+					}
+					// now arguments start at index [3] ...
+				}
 
 				switch ($fbits[1])
 				{
@@ -237,7 +255,7 @@ class ccmsParser
 					{
 						// reduce the data string to a maximum length; clip at the last whitespace when this is required.
 						$maxlen = intval($fbits[3]);
-						$clip_on_ws = (count($fbits) > 5 ? $fbits[5] : false);
+						$clip_on_ws = (count($fbits) > 4 ? $fbits[4] : false);
 						if ($maxlen > 0)
 						{
 							if ($clip_on_ws == 'true' || $clip_on_ws == 1)
@@ -373,10 +391,23 @@ class ccmsParser
 					$merge = "\n\n";
 					if (count($fbits) > 3)
 					{
-						$merge = $fbits[3];
+						if (!empty($fbits[3]))
+						{
+							$merge = $fbits[3];
+						}
 					}
-
-					return implode($merge, $rv);
+					$leadin = '';
+					if (count($fbits) > 4)
+					{
+						$leadin = $fbits[4];
+					}
+					$leadout = '';
+					if (count($fbits) > 5)
+					{
+						$leadout = $fbits[5];
+					}
+					
+					return $leadin . implode($merge, $rv) . $leadout;
 				}
 			}
 			return '';

@@ -41,6 +41,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <meta name="keywords" content="{%keywords!protect4attr%}" />
 <title>{%title%}</title>
 {%CSS.required_files!css_files(combine)%}
+{%CSS.inline!implode( ,<style type="text/css">, </style>)%}
 <?php
 //<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/base.css,layout.css,sprite.css,last_minute_fixes.css" />
 //<!--[if IE]>
