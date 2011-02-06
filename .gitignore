@@ -1,0 +1,13 @@
+.svn
+.cvsignore
+CVS
+*.bak
+*~
+BuildLog.htm
+_docs/*_files/*
+_install/sprites-src/*
+lib/includes/cache/*
+media/*
+content/doc-bits/*
+
+

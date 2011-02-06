@@ -1,0 +1,59 @@
+﻿/*
+The documentation format
+*/
+
+div#the_oddities_log
+{
+	margin-left: 2%;
+	margin-right: 2%;
+	background-color: #fff;
+}
+
+#the_oddities_log p
+{
+	text-indent: 0;
+	
+/*
+	border: 1px solid blue;
+	padding-left: 10px;
+	padding-right: 10px;
+*/
+}
+
+h1
+{
+	font-size: 3em;
+}
+h2
+{
+	font-size: 2em;
+}
+
+
+/*
+Don't know why, but the padding is needed to keep FF3 from clipping the sprite within a <pre> section:
+*/
+pre .ss_sprite
+{
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+blockquote
+{
+	overflow: auto;
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+	padding: 2px;
+	background-color: #F8FAFC;
+	border: 1px solid #5791FE;
+}
+blockquote h1
+{
+	font-size: 1.5em;
+}
+blockquote h2
+{
+	font-size: 1.2em;
+}

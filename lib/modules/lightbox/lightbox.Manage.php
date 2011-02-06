@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,200 +23,594 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
+/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
+if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
+
+/*
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
+*/
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
+
+
+// Define default location
+if (!defined('BASE_PATH'))
+{
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(__FILE__)))));
+	define('BASE_PATH', $base);
+}
+
 // Include general configuration
-require_once('../../sitemap.php');
+/*MARKER*/require_once(BASE_PATH . '/admin/includes/security.inc.php'); // when session expires or is overridden, the login page won't show if we don't include this one, but a cryptic error will be printed.
 
-$canarycage	= md5(session_id());
-$currenthost= md5($_SERVER['HTTP_HOST']);
-$do 		= (isset($_GET['do'])?$_GET['do']:null);
 
-// Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+// security check done ASAP
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
+	die("No external access to file");
+}
+
+$do = getGETparam4IdOrNumber('do');
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
+
+
+
+
+// Read through selected album, get first and count all
+function fileList($d)
+{
+	$l = array();
+	foreach(array_diff(scandir($d),array('.','..','index.html','info.txt','_thumbs')) as $f)
+	{
+		if(is_file($d.'/'.$f))
+		{
+			$ext = strtolower(substr($f, strrpos($f, '.') + 1));
+			if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif")
+			{
+				$l[] = $f;
+			}
+		}
+	}
+	sort($l, SORT_STRING);
+	return $l;
+}
+
+
+function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $max_width = 80)
+{
+	$show_thumb = 0;
+	$height = null;
+	$width = null;
+	$aspect_ratio = null;
+	if(!empty($thumb_path) && file_exists($thumb_path))
+	{
+		$imginfo = @getimagesize($thumb_path);
+		if (!empty($imginfo[0]))
+		{
+			$height = floatval($imginfo[1]);
+			$width = floatval($imginfo[0]);
+			$aspect_ratio = (floatval($height)/floatval($width));
+
+			$show_thumb = 1;
+		}
+	}
+	if ($show_thumb != 1)
+	{
+		$thumb_path = $img_path;
+		if(file_exists($thumb_path))
+		{
+			$imginfo = @getimagesize($thumb_path);
+			if (!empty($imginfo[0]))
+			{
+				$height = floatval($imginfo[1]);
+				$width = floatval($imginfo[0]);
+				$aspect_ratio = (floatval($height)/floatval($width));
+
+				$show_thumb = 2;
+			}
+		}
+	}
+
+	if ($show_thumb == 0)
+	{
+		return null;
+	}
+
+	// Resize thumbnail to approx 80 x 80
+	$newheight = $height;
+	$newwidth = $width;
+	if ($newwidth > $max_width)
+	{
+		$newwidth = $max_width;
+		$newheight = intval($aspect_ratio * $newwidth);
+	}
+	if ($newheight > $max_height)
+	{
+		$newheight = $max_height;
+		$newwidth = intval($newheight / $aspect_ratio);
+	}
+
+	// calc padding to fill box up to max_h x max_w
+	$pad_height = $max_height - $newheight;
+	$pad_width = $max_width - $newwidth;
+
+	$rv = array();
+	$rv['h'] = $newheight;
+	$rv['w'] = $newwidth;
+	$rv['show'] = $show_thumb;
+	$rv['ph1'] = intval($pad_height / 2);
+	$pad_height -= $rv['ph1'];
+	$rv['ph2'] = $pad_height;
+	$rv['pw1'] = intval($pad_width / 2);
+	$pad_width -= $rv['pw1'];
+	$rv['pw2'] = $pad_width;
+
+	$rv['style'] = 'style="padding:' . $rv['ph1'] . 'px ' . $rv['pw2'] . 'px ' . $rv['ph2'] . 'px ' . $rv['pw1'] . 'px; width:' . $rv['w'] . 'px; height:' . $rv['h'] . 'px;"';
+
+	return $rv;
+}
+
 
 // Fill array with albums
 $albums = array();
 $count = array();
-$index = 0;
 
-if ($handle = opendir(BASE_PATH.'/media/albums/')) {
-	while (false !== ($file = readdir($handle))) {
-		if ($file != "." && $file != ".svn" && $file != ".." && is_dir(BASE_PATH.'/media/albums/'.$file)) {
+if ($handle = opendir(BASE_PATH.'/media/albums/'))
+{
+	while (false !== ($file = readdir($handle)))
+	{
+		if ($file != "." && $file != ".." && is_dir(BASE_PATH.'/media/albums/'.$file))
+		{
 			// Fill albums array
 			$albums[] = $file;
-			
-			// Count files in album
-			if ($countdir = opendir(BASE_PATH.'/media/albums/'.$file)) {
-				$count[$index] = '0';
-				while (false !== ($counthandle = readdir($countdir))) {
-					$ext = strtolower(substr($counthandle, strrpos($counthandle, '.') + 1));
-					if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif") {
-						$count[$index]++;
-					}
-				} closedir($countdir);
-			}
-			$index++;
-		} 
+		}
 	}
 	closedir($handle);
+	sort($albums, SORT_STRING);
+
+	// to make sure $count[] array is in sync with the $albums[] array, we need to perform this extra round AFTER the sort() operation.
+	foreach($albums as $key => $file)
+	{
+		// Count files in album
+		$images = fileList(BASE_PATH.'/media/albums/'.$file);
+		$count[$key] = count($images);
+	}
+}
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>Lightbox module</title>
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,uploader.css,last_minute_fixes.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
+	<![endif]-->
+</head>
+<body>
+	<div class="module" id="lightbox-management">
+		<div class="center-text <?php echo $status; ?>">
+			<?php
+			if(!empty($status_message))
+			{
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
+			}
+			?>
+		</div>
+
+		<div class="span-16 colborder">
+		<?php
+		// more secure: only allow showing specific albums if they are in the known list; if we change that set any time later, this code will not let undesirable items slip through
+		$album = getGETparam4Filename('album');
+		$album_path = (in_array($album, $albums) ? BASE_PATH.'/media/albums/'.$album : null);
+		if($album==null)
+		{
+		?>
+			<form action="lightbox.Process.php?action=del-album" method="post" accept-charset="utf-8">
+			<h2><?php echo $ccms['lang']['album']['currentalbums']; ?></h2>
+			<div class="table_inside">
+				<table cellspacing="0" cellpadding="0">
+					<?php
+					if(count($albums) > 0)
+					{
+					?>
+					<tr>
+						<?php
+						if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+						{
+						?>
+							<th class="span-1">&#160;</th>
+						<?php
+						}
+						?>
+						<th class="span-5"><?php echo $ccms['lang']['album']['album']; ?></th>
+						<th class="span-2"><?php echo $ccms['lang']['album']['files']; ?></th>
+						<th class="span-4"><?php echo $ccms['lang']['album']['lastmod']; ?></th>
+						</tr>
+						<?php
+						foreach ($albums as $key => $value)
+						{
+							// Alternate rows
+							if($key % 2 != 1)
+							{
+								echo '<tr class="altrgb">';
+							}
+							else
+							{
+								echo '<tr>';
+							}
+
+							if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+							{
+							?>
+								<td><input type="checkbox" name="albumID[<?php echo $key+1; ?>]" value="<?php echo $value; ?>" id="newsID"></td>
+							<?php
+							}
+							?>
+							<td><a href="lightbox.Manage.php?album=<?php echo $value;?>"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $value;?></a></td>
+							<td><span class="ss_sprite_16 ss_pictures">&#160;</span><?php echo $count[$key]; ?></td>
+							<td><span class="ss_sprite_16 ss_calendar">&#160;</span><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
+						</tr>
+						<?php
+						}
+					}
+					else
+					{
+						echo $ccms['lang']['system']['noresults'];
+					}
+					?>
+				</table>
+			</div>
+			<hr />
+			<?php
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']) && count($albums) > 0)
+			{
+			?>
+				<button type="submit" onclick="return confirmation_delete();" name="deleteAlbum"><span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
+			<?php
+			}
+			?>
+			</form>
+		<?php
+		}
+		else
+		{
+			// Load all images
+			$images = fileList($album_path);
+			$imagethumbs = array();
+			$imginfo = array();
+			if (count($images) > 0)
+			{
+				foreach($images as $index => $file)
+				{
+					$imagethumbs[$index] = '../../../media/albums/'.$album.'/_thumbs/'.$file;
+					$thumb_path = $album_path.'/_thumbs/'.$file;
+					$img_path = $album_path.'/'.$file;
+					$imginfo[$index] = calc_thumb_padding($img_path, $thumb_path);
+				}
+			}
+			?>
+			<h2><?php echo $ccms['lang']['album']['manage']; ?></h2>
+			<form action="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=del-images" accept-charset="utf-8" method="post" id="album-pics">
+			<div class="right">
+				<?php
+				if (count($images) > 0 && $perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+				{
+				?>
+					<a class="button" onclick="delete_these_files(); return false;">
+						<span class="ss_sprite_16 ss_bin_empty">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?>
+					</a>
+					<a class="button" onclick="return confirm_regen();" href="lightbox.Process.php?album=<?php echo $album; ?>&amp;action=confirm_regen">
+						<span class="ss_sprite_16 ss_arrow_in">&#160;</span><?php echo $ccms['lang']['album']['regenalbumthumbs']; ?>
+					</a>
+				<?php
+				}
+				?>
+				<a class="button" href="lightbox.Manage.php">
+					<span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['album']['albumlist']; ?>
+				</a>
+			</div>
+			<div class="clear">
+			<?php
+			foreach ($images as $key => $value)
+			{
+				echo '<label class="thumbimgwdel"><span style="background-image: url(' . path2urlencode($imagethumbs[$key]) . ');" class="thumbview" title="Thumbnail of ' . $value . '" ' . /* $imginfo[$key]['style'] . */ ' >&#160;</span>';
+
+				if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+				{
+					echo '<input type="checkbox" name="imageName['. ($key+1) .']" value="' . $value . '">';
+				}
+				echo "</label>\n";
+			}
+			?>
+			</div>
+			</form>
+			<hr class="clear space" />
+			<?php
+		}
+		?>
+		</div>
+
+		<div class="span-8 last">
+		<?php
+		if(empty($album))
+		{
+		?>
+			<h2><?php echo $ccms['lang']['album']['newalbum']; ?></h2>
+			<?php
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+			{
+			?>
+				<form action="lightbox.Process.php?action=create-album" method="post" accept-charset="utf-8">
+					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" name="album" value="" id="album-create" />
+					<button type="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
+				</form>
+			<?php
+			}
+			else
+			{
+				echo $ccms['lang']['auth']['featnotallowed'];
+			}
+			?>
+
+			<hr class="clear space" />
+		<?php
+		}
+		else
+		{
+			$lines = @file($album_path.'/info.txt');
+			?>
+			<h2><?php echo $ccms['lang']['album']['settings']; ?></h2>
+			<?php
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+			{
+			?>
+				<form action="lightbox.Process.php?action=apply-album" method="post" accept-charset="utf-8">
+					<label for="albumtopage"><?php echo $ccms['lang']['album']['apply_to']; ?></label>
+					<select class="text" name="albumtopage" id="albumtopage" size="1">
+						<option value=""><?php echo $ccms['lang']['backend']['none']; ?></option>
+						<?php
+						$lightboxes = $db->SelectArray($cfg['db_prefix'].'pages', array('module' => "'lightbox'"));
+						if ($db->ErrorNumber()) $db->Kill();
+						for ($i=0; $i < count($lightboxes); $i++)
+						{
+						?>
+							<option <?php echo (!empty($lines[0])&&trim($lines[0])==$lightboxes[$i]['urlpage']?'selected="selected"':null); ?> value="<?php echo $lightboxes[$i]['urlpage'];?>"><?php echo $lightboxes[$i]['urlpage'];?>.html</option>
+						<?php
+						}
+						?>
+					</select>
+					<?php
+					$desc = '';
+					for ($x=1; $x<count($lines); $x++)
+					{
+						$desc = trim($desc.' '.$lines[$x]); // [i_a] double invocation of htmlspecialchars, together with the form input (lightbox.Process.php)
+					}
+					?>
+					<label for="description"><?php echo $ccms['lang']['album']['description']; ?></label>
+					<textarea name="description" rows="3" cols="40" id="description"><?php echo $desc; ?></textarea>
+					<input type="hidden" name="album" value="<?php echo $album; ?>" id="album-cfg" />
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
+					</div>
+				</form>
+			<?php
+			}
+			else
+			{
+				echo $ccms['lang']['auth']['featnotallowed'];
+			}
+			?>
+
+			<hr class="clear space" />
+		<?php
+		}
+
+		if(count($albums) > 0)
+		{
+		?>
+			<h2><?php echo $ccms['lang']['album']['uploadcontent']; ?></h2>
+			<?php
+			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+			{
+			?>
+			<form action="./lightbox.Process.php?<?php
+				/*
+				 * FancyUpload 3.0 uses a Flash object, which doesn't pass the session ID cookie, hence it BREAKS the session.
+				 * Given that we now finally DO check the session variables, FancyUpload suddenly b0rks with timeout errors as
+				 * lightbox.Process.php didn't produce ANY output in such circumstances.
+				 *
+				 * We need to make sure the Flash component forwards the session ID anyway. Use SID for that. See also:
+				 *
+				 *  http://www.php.net/manual/en/function.session-id.php
+				 *  http://devzone.zend.com/article/1312
+				 *  http://www.php.net/manual/en/session.idpassing.php
+				 */
+				$sesid = null;
+				if (defined('SID'))
+				{
+					$sesid = SID;
+				}
+
+				if (!empty($sesid))
+				{
+					echo $sesid;
+				}
+				else
+				{
+					echo 'SID' . md5($cfg['authcode'].'x') . '=' . session_id();
+				}
+
+				/*
+				 * Because sessions are long-lived, we need to add an extra check as well, which will ensure that the current
+				 * form display will only produce a single permitted upload request; we can do this using a few random values
+				 * which may be stored in the session, but we MUST DESTROY those values once we've handled the corresponding
+				 * 'save-files' action resulting from a form submit.
+				 */
+				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+				echo '&SIDCHK=' . $_SESSION['fup1'];
+				
+				/* whitespace is important here... */ ?>&action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
+
+				<label><?php echo $ccms['lang']['album']['toexisting']; ?>
+					<select name="album" id="album-upl-target" class="text" size="1">
+						<?php
+						foreach ($albums as $value)
+						{
+						?>
+							<option <?php echo ($album === $value ? "selected" : null); ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
+						<?php
+						}
+						?>
+					</select>
+				</label>
+				
+				<div class="clearfix">
+					<label><?php echo $ccms['lang']['forms']['overwrite_imgs']; ?>?</label>
+					<label for="f_ovr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
+						<input type="radio" id="f_ovr1" name="overwrite_existing" value="Y" />
+					<label for="f_ovr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
+						<input type="radio" id="f_ovr2" checked="checked" name="overwrite_existing" value="N" />
+				</div>
+				
+				<div id="lightbox-status">
+					<p>
+						<a id="lightbox-browse"><span class="ss_sprite_16 ss_folder_image">&#160;</span><?php echo $ccms['lang']['album']['browse']; ?></a> |
+						<a id="lightbox-clear"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['album']['clear']; ?></a> |
+						<a id="lightbox-upload"><span class="ss_sprite_16 ss_picture_save">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></a>
+					</p>
+					<div>
+						<strong class="overall-title"></strong>
+						<br />
+						<img src="../../../lib/includes/js/fancyupload/Assets/bar.gif" class="progress overall-progress" />
+					</div>
+					<div>
+						<strong class="current-title"></strong>
+						<br />
+						<img src="../../../lib/includes/js/fancyupload/Assets/bar.gif" class="progress current-progress" />
+					</div>
+					<div class="current-text"></div>
+				</div>
+
+				<ul id="lightbox-list"></ul>
+			</form>
+
+			<div id="lightbox-fallback" class="clear" >
+				<form action="lightbox.Process.php?action=save-files1" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+					<?php echo $ccms['lang']['album']['singlefile']; ?>
+
+					<label><?php echo $ccms['lang']['album']['toexisting']; ?>
+						<select name="album" id="album_upload1" class="text" size="1">
+							<?php
+							foreach ($albums as $value)
+							{
+							?>
+								<option <?php echo ($album === $value ? "selected" : null); ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
+							<?php
+							}
+							?>
+						</select>
+					</label>
+					<input id="lightbox-photoupload" type="file" name="Filedata" />
+					<div class="right">
+						<button type="submit"><span class="ss_sprite_16 ss_add"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></button>
+					</div>
+				</form>
+			</div>
+			<?php
+			}
+			else
+			{
+				echo $ccms['lang']['auth']['featnotallowed'];
+			}
+		}
+		?>
+		</div>
+
+		<div id="lightbox-pending" class="lightbox-spinner-bg">
+			<p class="loading-img" ><?php echo $ccms['lang']['album']['please_wait']; ?></p>
+		</div>
+
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+<?php
 }
 ?>
 
-<?php if(checkAuth($canarycage,$currenthost) && isset($_SESSION['rc1']) && !empty($_SESSION['rc2'])) { ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-		<title>Lightbox module</title>
-		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,layout.css,sprite.css,uploader.css" />
-		<script type="text/javascript" src="../../includes/js/mootools.js" charset="utf-8"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Swiff.Uploader.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/Source/Uploader/Fx.ProgressBar.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/FancyUpload2.js"></script>
-		<script type="text/javascript" src="../../../admin/includes/fancyupload/modLightbox.js"></script>
-	</head>
-	
-<body>
-	<div class="module">
-			
-		<div class="center <?php echo (isset($_GET['status'])?$_GET['status']:null); ?>">
-			<?
-			// Show relevant statuses
-			if(isset($_GET['msg'])) {
-				if($_GET['msg']=="writerr") { echo $ccms['lang']['system']['error_dirwrite']; }
-				elseif($_GET['msg']=="created"||$_GET['msg']=="success") { echo $ccms['lang']['backend']['success']; }
-				elseif($_GET['msg']=="duperr") { echo $ccms['lang']['system']['error_exists']; }
-				elseif($_GET['msg']=="invalid"||$_GET['msg']=="failed") { echo $ccms['lang']['system']['error_value']; }
-			} ?>
-		</div>
-		
-		<div class="span-12 colborder">
-		<?php 
-		// 
-		$album_path = (isset($_GET['album'])&&!empty($_GET['album'])?BASE_PATH.'/media/albums/'.$_GET['album']:null);
-		$album_path = (is_dir($album_path)?$album_path:null);
-		if($album_path==null) { ?>
-			<form action="lightbox.Process.php?action=del-album" method="post" accept-charset="utf-8">
-			<h2>Current albums</h2>
-				<table border="0" cellspacing="5" cellpadding="5">
-						<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) { ?><th class="span-1">&#160;</th><?php } ?>
-						<th class="span-5">Album</th>
-						<th class="span-2">Files</th>
-						<th class="span-4">Last modified</th>
-					</tr>
-					<?php 
-					$i = 0;
-					foreach ($albums as $value) {
-						// Alternate rows
-				    	if($i%2 != '1') {
-							echo '<tr style="background-color: #E6F2D9;">';
-						} else { 
-							echo '<tr>';
-						} ?>
-							<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) { ?>
-								<td><input type="checkbox" name="albumID[<?php echo $i+1;?>]" value="<?php echo $value; ?>" id="newsID"></td>
-							<?php } ?>
-							<td><span class="ss_sprite ss_folder_picture"><a href="lightbox.Manage.php?album=<?php echo $value;?>"><?php echo $value;?></a></span></td>
-							<td><span class="ss_sprite ss_pictures"><?php echo ($count[$i]>0?$count[$i]:'0'); ?></span></td>
-							<td><span class="ss_sprite ss_calendar"><?php echo date("Y-m-d G:i:s", filemtime(BASE_PATH.'/media/albums/'.$value)); ?></td>
-						</tr>
-					<?php
-			  			$i++;
-	  				} ?>
-				</table>
-				<hr />
-				<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) { ?><button type="submit" name="deleteAlbum"><span class="ss_sprite ss_bin_empty">Delete</span></button><?php } ?>
-			</form>
-				
-		<?php } elseif($album_path!=null) { 
-			// Load all images
-			$images = array();
-			if ($handle = opendir($album_path)) {
-				while (false !== ($file = readdir($handle))) {
-					$ext = strtolower(substr($file, strrpos($file, '.') + 1));
-					if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif") {
-						$images[$file] = '../../../media/albums/'.$_GET['album'].'/_thumbs/'.$file;
-					}
-				} closedir($handle);
-			} ?>
-			<h2>Album content</h2>
-				<?php foreach ($images as $key => $value) { ?>
-					<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {?>
-					<a href="lightbox.Process.php?album=<?php echo $_GET['album']; ?>&amp;image=<?php echo $key; ?>&amp;action=del-image">
-					<?php } ?>
-						<img src="<?php echo $value; ?>" class="thumbview" alt="Thumbnail of <?php echo $key; ?>" />
-					<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {?>
-					</a>
-					<?php } ?>
-				<?php } ?>
-				
-				<p class="clear right"><span class="ss_sprite ss_arrow_undo"><a href="lightbox.Manage.php">All albums</a></span></p>
-		<?php } ?>
-		</div>
-	
-		<div class="span-8">
-			
-		<?php if(!isset($_GET['album'])&&empty($_GET['album'])) { ?>
-			<h2>Create new album</h2>
-			<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {?>
-			<form action="lightbox.Process.php?action=create-album" method="post" accept-charset="utf-8">
-				<label for="album">Album name</label><input type="text" class="text" style="width:185px;" name="album" value="" id="album" />
-				<button type="submit"><span class="ss_sprite ss_wand">Create</span></button>
-			</form>
-			<?php } else echo $ccms['lang']['auth']['featnotallowed']; ?>
-		
-		<hr class="space" />
-		<?php } ?>
-		
-		<h2>Upload content</h2>
-		<?php if($_SESSION['ccms_userLevel']>=$perm['manageModLightbox']) {?>
-		<form action="./lightbox.Process.php?action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
-	
-			<label for="album" style="margin-right:5px;display:inline;">Upload to existing album</label>
-			<select name="album" id="album" class="span-4" size="1">
-				<?php foreach ($albums as $value) { ?>
-					<option <?php echo (isset($_GET['album'])&&$_GET['album']===$value?"selected":null); ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
-				<?php } ?>
-			</select>
-			<hr class="space"/>
-			<div id="lightbox-fallback">
-				<form action="lightbox.Process.php?action=save-files" method="post" accept-charset="utf-8">
-					<strong>Single file upload</strong><br/>
-					<p>The Flash loader failed to initialize. Make sure Javascript is enabled and Flash is installed. Single file uploads are possible, but not optimized.</p>
-					<label for="lightbox-photoupload">Upload a single photo</label>
-					<input id="lightbox-photoupload" type="file" name="ccms_file" />
-					<p><button type="submit"><span class="ss_sprite ss_add">Upload</span></button></p>
-				</form>
-			</div>
-		
-			<div id="lightbox-status" class="hide">
-				<p>
-					<span class="ss_sprite ss_folder_image"><a href="#" id="lightbox-browse">Browse files</a></span> |
-					<span class="ss_sprite ss_cross"><a href="#" id="lightbox-clear">Clear list</a></span> |
-					<span class="ss_sprite ss_picture_save"><a href="#" id="lightbox-upload">Start upload</a></span>
-				</p>
-				<div>
-					<strong class="overall-title"></strong><br />
-					<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress overall-progress" />
-				</div>
-				<div>
-					<strong class="current-title"></strong><br />
-					<img src="../../../admin/includes/fancyupload/Assets/bar.gif" class="progress current-progress" />
-				</div>
-				<div class="current-text"></div>
-			</div>
-		
-			<ul id="lightbox-list"></ul>
-		</form>	
-		<?php } else echo $ccms['lang']['auth']['featnotallowed']; ?>
-		</div>
-		
 	</div>
+<?php
+// prevent JS errors when permissions don't allow uploading (and all the rest)
+if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
+{
+?>
+	<script type="text/javascript" charset="utf-8">
+
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+function confirm_regen()
+{
+	var answer=confirm('<?php echo $ccms['lang']['backend']['confirmthumbregen']; ?>');
+	if(answer)
+	{
+		try
+		{
+			$('lightbox-pending').setStyle('visibility', 'visible');
+			return true;
+		}
+		catch(e)
+		{
+			$('lightbox-pending').setStyle('visibility', 'hidden');
+			return false;
+		}
+	}
+	else
+	{
+		$('lightbox-pending').setStyle('visibility', 'hidden');
+		return false;
+	}
+}
+
+function delete_these_files()
+{
+	var go = confirmation_delete();
+
+	if (go)
+	{
+		var form = $('album-pics');
+		form.submit();
+	}
+}
+
+
+<?php
+$js_files = array();
+$js_files[] = '../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
+$js_files[] = '../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js';
+
+$driver_code = "lazyload_done_now_init('" . $cfg['rootdir'] . "');   // defined in modLightbox.js\n";
+
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
+</script>
+<script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
+<?php
+}
+?>
 </body>
 </html>
-<?php } else die("No external access to file");?>

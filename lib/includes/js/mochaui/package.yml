@@ -1,0 +1,34 @@
+name: "MochaUI"
+
+version: "0.9.8-dev"
+
+exports: "mochaui.js"
+
+web: "[mochaui.com](http://mochaui.com/)"
+
+description: "MochaUI, A web applications user interface library"
+
+license: "[MIT License](http://mochaui.com/demo/license.txt)"
+
+copyright: "&copy; [AUTHORS.txt]"
+
+authors:
+  - "[Chris Doty](http://polaropposite.com/)"
+  - "[Greg Houston](http://greghoustondesign.com/)"
+  - "Scott F. Frederick"
+  - "Joel Lindau"
+  - "Harry Roberts"
+
+sources:
+  - "Source/Core/Core.js"
+  - "Source/Core/Canvas.js"
+  - "Source/Core/Content.js"
+  - "Source/Core/Desktop.js"
+  - "Source/Controls/column/Column.js"
+  - "Source/Controls/panel/Panel.js"
+  - "Source/Controls/taskbar/Taskbar.js"
+  - "Source/Controls/window/Window.js"
+  - "Source/Controls/window/Modal.js"
+  - "Source/Core/Themes.js"
+  
+  

@@ -1,0 +1,215 @@
+/* -----------------------------------------------------------------------
+
+
+ Blueprint CSS Framework 1.0
+ http://blueprintcss.org
+
+   * Copyright (c) 2007-Present. See LICENSE for more info.
+   * See README for instructions on how to use Blueprint.
+   * For credits and origins, see AUTHORS.
+   * This is a compressed file. See the sources in the 'src' directory.
+
+----------------------------------------------------------------------- */
+
+/* Combiner takes care of this: */
+@import url(src/ie.css)
+
+/* A container should group all your columns. */
+.container-1, .container-2, .container-3, .container-4, .container-5, .container-6,
+.container-7, .container-8, .container-9, .container-10, .container-11, .container-12,
+.container-13, .container-14, .container-15, .container-16, .container-17, .container-18,
+.container-19, .container-20, .container-21, .container-22, .container-23, .container-24,
+.container-25
+{
+	text-align: left;
+}
+
+
+
+* html .span-25 { display:inline; overflow-x: hidden; }
+
+
+
+/* IE6 fix only */
+* html .small
+{
+	margin-bottom: .25em;
+}
+
+/*
+numbers fall partly outside the box: IE7+6
+*/
+*:first-child+html ol
+{
+	padding-left: 2em;
+	/* margin-left: 2em; */
+}
+* html ol
+{
+	padding-left: 2em;
+	/* margin-left: 2em; */
+}
+
+
+
+/*
+table th, td
+{
+	height: 18px;
+}
+*/
+
+
+
+legend     /* IE8 */
+{
+	margin-left: .7em;
+}
+*:first-child+html legend  /* IE7 */
+{
+	margin-top: -0.4em;
+}
+* html legend     /* IE6 */
+{
+	margin-top: 0;
+	/* also fix padding which is completely destroyed on IE6 */
+	padding: .2em 1em;
+}
+
+
+#desktop fieldset
+{
+	background-image: url('../admin_panel_bg.gif');
+	background-repeat: repeat-x;
+	background-position: 0px -3px; /* exactly positioned to push the white upper part as high as the <legend> negative margin needs it to be */
+	background-color: #E6F5D6;
+}
+* html #desktop fieldset  /* IE6 */
+{
+	background-position: 0px 0px; /* shift down for IE6 */
+}
+#desktop #load_notice fieldset
+{
+	background-image: url('../admin_panel_bg_red.gif');
+	background-color: #fdd;
+}
+
+
+/*
+Only IE7 shows a horizontal scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
+
+Here we tweak the margin to make that useless scrollbar disappear at that resolution.
+
+We only nibble 1px off the right side to keep the (useful!) vertical scrollbar from looking damaged.
+
+Tested on a Dutch XP SP3 Win32 + KB's installed up to Nov/2010, default setup, + IE7 installed, otherwise empty.
+*/
+*:first-child+html #pageWrapper /* IE7 only? Turns out the '*:first-child+html' hack also seems to affect IE6 */
+{
+	margin-right: -1px;
+	margin-left: -5px;
+}
+* html #pageWrapper /* IE6 */
+{
+	margin-right: 0;
+	margin-left: 0;
+}
+
+
+
+
+
+
+
+
+/*
+This is needed so IE6 at least the warning message INSIDE the red/rose warning box.
+
+It is NOT enough to make the warning div show where it SHOULD be.
+*/
+#media-warning
+{
+	zoom: 1;
+}
+/*
+THIS is required to make the backup screen place that warning DIV properly within
+the parent .span-8.
+
+So the info at
+
+http://www.dracos.co.uk/code/ie6-css-bug/
+
+is close. But one must not limit oneself to only tweaking the PARENT, the GRANDPARENT
+may need hasLayout as well!
+*/
+#backup-module
+{
+	zoom: 1;
+}
+
+
+
+
+
+/*
+If you do not FORCE the outer <div> in the template ditor to hasLayout, then IE7/IE6[*]
+GOES ABSOLUTELY HONKIN' TOOTIN' MENTAL placing the edit_Area control in there: it keeps
+blinking the dreaded hourglass and you're ab-so-lu-te-ly SOL because you don't get to see,
+not edit the contents in the <textarea>. Instead, you get the '|' text cursor placed
+somewhere near the top of your screen.
+
+I !@#$%^&* hate MSIE!
+																	Ger Hobbelt
+
+This took quite a while to find out, because I hadn't expected the outer div to cause this
+problem (my agony over the backup management page yesterday should've taught me a lesson,
+but no-o-o-o-o-o-o-o...); what made 'everything work' was pasting the original edit_Area
+example code in there; after that it was a matter of slowly stripping away JS and HTML
+until we got to 'the edge', which turned out to be a lone <h2> at the top. A-fuckin'-ha!
+
+[*] generally, it would be IE6 going mental most of the time, but I've had occasions
+	during this trial where IE6 did fine while IE7 took over wrecking the joint. So the
+	hasLayout hack is magnimoniously delivered to the both of 'em.
+*/
+*:first-child+html #template-editor /* IE7 only */
+{
+	zoom: 1; /* force hasLayout */
+}
+* html #template-editor /* IE6 */
+{
+	zoom: 1; /* force hasLayout */
+}
+
+
+
+
+
+/*
+Add a <hr class="space clear" /> between the <div>s and MSIE7 renders an entire white screen. :-(
+
+The solution there is to have the parent node have hasLayout:
+*/
+*:first-child+html #edit-user-details /* IE7 only */
+{
+	zoom: 1; /* force hasLayout */
+}
+* html #edit-user-details /* IE6 */
+{
+	zoom: 1; /* force hasLayout */
+}
+
+
+
+
+
+
+/*
+Make sure the outer scrollbars disappear in IE6; they screw up the screen on 1024px wide
+displays.
+*/
+/*
+html
+{
+	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should!
+}
+*/

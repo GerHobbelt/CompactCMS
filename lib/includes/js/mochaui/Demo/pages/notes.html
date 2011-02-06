@@ -1,0 +1,76 @@
+<div>
+	<h3>MUI.Content.update</h3>
+    <p>MUI.Content.update function has had some enhancements made to it.</p>
+    <ul>
+        <li>Content loadMethods can be added without modifying the MochaUI code base.</li>
+        <li>The MUI.Content.update process now allows a window, panel, and control to intercept the update process at four different points.  See Content.js for more detail.</li>
+        <li>MUI.Content.update can now be executed against an element that is not a MochaUI a window, panel, or control instance</li>
+        <li>The <b>scrollbars</b> and <b>padding</b> options have been removed from MUI.Content.update.  The new flow interception mention above allows this to be done by the instance itself.  This allowed MUI.Content.update to be more generic.</li>
+        <li><b>section</b> option has been added to make it easier to process events on controls that have multiple sections being updated during control construction.</li>
+    </ul>
+
+    <h3>Columns</h3>
+    <p>Columns now fire resize events to their neighbor column and all of their child columns</p>
+
+    <h3>Panels</h3>
+    <p>Panels now fire resize events to their neighbor panel.  Panel footer have also made a come back and are available again.  They also will scroll without scrolling the footer,</p>
+    
+	<h3>Color Options</h3>
+
+	<p>All of the color options in Window.js are depreciated. They should now be defined in the CSS.</p>
+	
+	<ul>
+		<li><strong>headerStartColor: </strong>.mochaTitlebar background-color (See notes below.)</li>
+		<li><strong>headerStopColor: </strong>.mochaTitlebar background-color (See notes below.)</li>
+		<li><strong>bodyBgColor: </strong>.mocha background-color</li>
+		<li><strong>minimizeColor: </strong>.mochaMinimizeButton color</li>
+		<li><strong>minimizeBgColor: </strong>.mochaMinimizeButton background-color</li>
+		<li><strong>maximizeColor: </strong>.mochaMaximizeButton color</li>				
+		<li><strong>maximizeBgColor: </strong>.mochaMaximizeButton background-color</li>
+		<li><strong>closeColor: </strong>.mochaCloseButton color</li>		
+		<li><strong>closeBgColor: </strong>.mochaCloseButton background-color</li>
+		<li><strong>resizableColor: </strong>.mocha .cornerSE background-color</li>
+	</ul>
+	
+	<p>If you set the background color of .mochaTitlebar, a gradient will be created from that value. The gradient will start with the value you gave plus 20% white, and end with the value you assigned plus 20% black. So the color in the middle of the gradient should be the color you defined.</p>	
+	
+	<p>If you want more control over the start and end colors of the gradient then set the background-image of .mochaTitlebar in the following way. Here we got a bit creative using a query string appended to a background image.</p>
+		
+	<pre>background: url(../images/spacer.gif?from=fafafa&amp;to=e5e5e5);</pre>
+	
+	<p>"from" is the top color of the gradient. "to" is the bottom color of the gradient. Both must be hex values without the leading # sign.</p>
+	
+	<p>To style some windows or panels differently than others use the cssClass option. The example windows created from with JSON for instance have been given the class, "jsonExample". We can change their title bar color like so:</p>
+	
+<pre>.jsonExample .mochaTitlebar {
+	background-color: #6db6db;
+}		
+</pre>	
+	
+<h3>Window methods</h3>
+<p>It is now even easier to fire window methods and some new methods have been added.</p>
+
+<pre>
+
+// Element Class methods that get mapped into Mocha controls, panels, and windows
+$('myWindow').close();
+$('myWindow').hide();
+$('myWindow').show();
+$('myWindow').shake();
+$('myWindow').resize({width:500,height:300});
+
+// Additional Window methods that are extended to the element Class instance
+$('myWindow').minimize();
+$('myWindow').maximize();
+$('myWindow').restore();
+$('myWindow').center();
+
+// depreciated methods
+MUI.closeColumn('myColumn') - use $('myColumn').close()
+MUI.closePanel('myPanel') - use $('myPanel').close()
+MUI.closeWindow('myWindow') - use $('myWindow').close()
+
+</pre>
+
+</div>
+

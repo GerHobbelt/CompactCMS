@@ -1,23 +1,61 @@
+<?php
+/*
+>> General tags (replace '(' with '{' when using them - using the 'active' version within this comment will cause severe trouble, depending on the substituted content of the variables!)
+- (%urlpage%)       | The current filename that is being shown
+- (%title%)         | Use this tag within your <title></title> tag for optimal SEO
+- (%pagetitle%)     | Displays the current pagetitle (good for a <h1> tag)
+- (%subheader%)     | A short slogan, descriptive text for the current page (<h2>)
+- (%sitename%)      | Use this anywhere you want to show your sitename
+- (%desc%)          | An "extensive" description of the current page
+- (%keywords%)      | Keywords (tags) for the current page as specified per file
+- (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
+- (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
+
+>> Menu items
+- (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
+- (%leftmenu%)      | ''
+- (%rightmenu%)     | ''
+- (%footermenu%)    | ''
+- (%extramenu%)     | ''
+
+>> Content tag
+- (%content%)       | The content from the current file that is being requested
+
+See below for a simple example that uses all of the tags listed above.
+*/
+
+/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
+if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
+
+//global $cfg, $ccms; // also available: $template_instance;
+
+
+
+
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 Design by Free CSS Templates
 http://www.freecsstemplates.org
 Released for free under a Creative Commons Attribution 2.5 License
 
-Name       : Sweat Bee 
+Name       : Sweat Bee
 Description: A two-column, fixed-width design for 1024x768 screen resolutions.
 Version    : 1.0
 Released   : 20090912
 Modified   : For CompactCMS.nl 1.4.0+
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{%language%}">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="keywords" content="{%keywords%}" />
-	<meta name="description" content="{%sitename%} | {%desc%}" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
+	<meta name="keywords" content="{%keywords!protect4attr%}" />
 	<title>{%title%}</title>
-	<link href="{%rootdir%}lib/templates/sweatbee/style.css" rel="stylesheet" type="text/css" media="screen" />
-    <script type="text/javascript" src="{%rootdir%}lib/includes/js/mootools.js" charset="utf-8"></script>
+{%CSS.required_files!css_files(combine)%}
+<?php
+//  <link href="{%rootdir%}lib/templates/sweatbee/style.css" rel="stylesheet" type="text/css" media="screen" />
+?>
+<link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 <body>
 <div id="header-wrapper">
@@ -76,9 +114,42 @@ Modified   : For CompactCMS.nl 1.4.0+
 <!-- end #page -->
 <div id="footer-bgcontent">
 	<div id="footer">
+		{%footermenu%}
+
 		<p>&copy; <?php echo date('Y'); ?> {%sitename%} | Maintained with <a href="http://www.compactcms.nl">CompactCMS</a></p>
 	</div>
 </div>
 <!-- end #footer -->
+
+	<!-- Support me by keeping this link (it's not visible to your visitors!). It will help my search engine ranking. -->
+	<div style="display: none;"><a href="http://www.compactcms.nl">Maintained with CompactCMS.nl</a></div>
+	<!-- That's it! Of course you're free to show off CompactCMS anywhere on your website -->
+
+
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+<?php
+}
+?>
+
+<script type="text/javascript" charset="utf-8">
+<?php
+
+$js_files = <<<EOT42
+{%JS.required_files!js_files(combine)%}
+EOT42;
+
+$driver_code = <<<EOT42
+{%JS.done!implode("\n\n")%}
+EOT42;
+
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
+</script>
+<script type="text/javascript" src="{%rootdir%}lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>

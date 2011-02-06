@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,178 +23,497 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
+/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
+if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
+
+/*
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
+*/
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
+
+
 // Compress all output and coding
 header('Content-type: text/html; charset=UTF-8');
 
+// Define default location
+if (!defined('BASE_PATH'))
+{
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+	define('BASE_PATH', $base);
+}
+
 // Include general configuration
-require_once('../../../../lib/sitemap.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
 
-$canarycage	= md5(session_id());
-$currenthost= md5($_SERVER['HTTP_HOST']);
-$do 		= (isset($_GET['do'])?$_GET['do']:null);
+$do = getGETparam4IdOrNumber('do');
 
-// Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
 
- /**
- *
- * Create requested backup archive
- *
- */
-if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && checkAuth($canarycage,$currenthost)) {
-	
-	// Include back-up functions
-	include_once('functions.php');
-	
-	$configBackup 		= array('../../../../content/','../../../../lib/templates/');
-	$configBackupDir 	= 'files/';
-	$backupName 		= "backup-".date('d-m-y H-i-s').'.zip';
-	
-	$createZip = new createZip;
-	if (isset($configBackup) && is_array($configBackup) && count($configBackup)>0) {
-	    foreach ($configBackup as $dir) {
-	        $basename = basename($dir);
-	        if (is_file($dir)) {
-	            $fileContents = file_get_contents($dir);
-	            $createZip->addFile($fileContents,$basename);
-	        } else {
-	            $createZip->addDirectory($basename."/");
-	            $files = directoryToArray($dir,true);
-	            $files = array_reverse($files);
-	
-	            foreach ($files as $file) {
-	                $zipPath = explode($dir,$file);
-	                $zipPath = $zipPath[1];
-	                if (is_dir($file)) {
-	                    $createZip->addDirectory($basename."/".$zipPath);
-	                } else {
-	                    $fileContents = file_get_contents($file);
-	                    $createZip->addFile($fileContents,$basename."/".$zipPath);
-	                }
-	            }
-	        }
-	    }
-	}
-	
-	$backup = new MySQL_Backup(); 
-	$backup->server   = $cfg['db_host'];
-	$backup->username = $cfg['db_user'];
-	$backup->password = $cfg['db_pass'];
-	$backup->database = $cfg['db_name'];
-	
-	// Get all current tables in database
-	$tables = $db->GetTables();
-	foreach ($tables as $table) {
-    	$backup->tables[] = $table;
-	}
-	
-	$backup->backup_dir = $configBackupDir;
-	$sqldump = $backup->Execute(MSB_STRING,"",false);
-	$createZip->addFile($sqldump,$cfg['db_name'].'-sqldump.sql');
-	
-	$fileName	= $configBackupDir.$backupName;
-	$fd			= fopen ($fileName, "wb");
-	$out		= fwrite ($fd, $createZip -> getZippedfile());
-	fclose ($fd);
+
+
+if ($perm->get('manageModBackup') <= 0 || !checkAuth())
+{
+	die("No external access to file");
 }
 
- /**
- *
- * Delete current backup archives
- *
- */
-if($do=="delete" && !empty($_POST['file']) && $_POST['btn_delete']=="dodelete" && checkAuth($canarycage,$currenthost)) {
-	
-	// Only if current user has the rights
-	if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) {
-	
-		echo "<div class=\"notice center\">";
-		foreach ($_POST['file'] as $key => $value) {
-			unlink('./files/'.$value);
-			echo ucfirst($value)." ".$ccms['lang']['backend']['statusremoved'].".<br/>";
-		}
-		echo "</div>";
-	} else die($ccms['lang']['auth']['featnotallowed']);
-	
-} elseif($do=="delete" && empty($_POST['file']) && $_POST['btn_delete']=="dodelete" && checkAuth($canarycage,$currenthost)) {
-	echo "<div class=\"error center\">".$ccms['lang']['system']['error_selection']."</div>";
-}
 ?>
-<?php if(md5(session_id())==$canarycage && isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && md5($_SERVER['HTTP_HOST']) == $currenthost) { ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Back-up &amp; Restore module</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,layout.css,sprite.css" />
-		<script type="text/javascript">
-			<!--
-			function confirmation() {
-				try {
-					parent.window.hs.getExpander('backup_restore').close();
-				} catch (e) {}
-			}
-			//-->
-		</script>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<![endif]-->
 	</head>
 <body>
-	<div class="module">
-		
-		<?php if(!empty($backupName)) { 
-			echo "<p class=\"success center\">".$ccms['lang']['backend']['newfilecreated'].", <a href=\"./files/$backupName\">".strtolower($ccms['lang']['backup']['download'])."</a>.</p>"; 
-		} ?>
-	
-		<div class="span-7 colborder">
-		<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
-			<p><?php echo $ccms['lang']['backup']['explain'];?></p>
-			<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=backup" method="post" accept-charset="utf-8">
-				<p><button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite ss_package_add"><?php echo $ccms['lang']['forms']['createbutton'];?></span></button></p>
+	<div id="backup-module" class="module">
+
+<?php
+
+
+/**
+ *
+ * Create requested backup archive
+ *
+ */
+$btn_backup = getPOSTparam4IdOrNumber('btn_backup');
+if($do == 'backup' && !empty($btn_backup))
+{
+	// Include back-up functions
+	/*MARKER*/require_once('./functions.php');
+
+	$error = null;
+
+	$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
+
+	/*
+	 * Also backup the config php file: that one contains critical data, such as
+	 * the auth code, without which, the backup is not complete: the authcode is
+	 * required to ensure the MD5 hashes stored in the DB per user are still valid
+	 * when the backup is restored at an unfortunate moment later in time.
+	 */
+	$configBackup       = array('../../../../content/','../../../../lib/templates/','../../../../lib/config.inc.php','../../../../media/albums/:/\.txt$/i' /* ,'../../../../media/albums/:/\/_thumbs\//i' */ );
+	$configBackupDir    = '../../../../media/files/';
+	$backupName         = date('Ymd_His').'-data'.$current_user.'.zip';
+
+	$createZip = new createZip;
+	if (isset($configBackup) && is_array($configBackup) && count($configBackup) > 0)
+	{
+		foreach ($configBackup as $spec)
+		{
+			$pathspec = explode(':', $spec);
+			$dir = $pathspec[0];
+			$regex_to_match = (count($pathspec) > 1 ? $pathspec[1] : null);
+
+			/*
+			 strip off the relative-path-to-root so we're left with the full, yet relative, path.
+
+			 Handy when restoring data: extract zip equals (almost) done.
+			*/
+			$basename = substr($dir, strlen('../../../../'));
+			if (is_file($dir))
+			{
+				$fileContents = file_get_contents($dir);
+				$createZip->addFile($fileContents,$basename);
+			}
+			else
+			{
+				$basename .= (substr($basename, -1, 1) != '/' ? '/' : '');
+				$createZip->addDirectory($basename);
+				$files = directoryToArray($dir, true, $regex_to_match);
+				/*
+				 * opendir+readdir deliver the file set in arbitrary order.
+				 *
+				 * In order for this code to work, we'll need a known order of the files.
+				 */
+				sort($files, SORT_STRING);
+				//$files = array_reverse($files);
+
+				foreach ($files as $file)
+				{
+					$zipPath = explode($dir,$file);
+					$zipPath = $zipPath[1];
+					if (is_dir($file))
+					{
+						$createZip->addDirectory($basename . $zipPath);
+					}
+					else
+					{
+						$fileContents = file_get_contents($file);
+						$createZip->addFile($fileContents, $basename . $zipPath);
+					}
+				}
+			}
+		}
+	}
+
+	$sqldump = $db->Dump();
+	if ($sqldump === false)
+	{
+		$error[] = $db->Error();
+	}
+	else
+	{
+		/*
+		 * And make sure we 'position' the .sql file just right for a subsequent
+		 * restore through our installer/wizard: to make that happen it has to live
+		 * in the /_docs/ directory.
+		 */
+		$createZip->addDirectory('media');
+		$createZip->addDirectory('media/files');
+		$createZip->addDirectory('media/files/ccms-restore');
+		$createZip->addFile($sqldump, 'media/files/ccms-restore/compactcms-sqldump.sql');
+	}
+
+	$fileName = $configBackupDir.$backupName;
+	$fd = @fopen($fileName, "wb");
+	if (!$fd)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $fileName;
+	}
+	else
+	{
+		$out = fwrite($fd, $createZip->getZippedfile());
+		if (!$out)
+		{
+			$error[] = $ccms['lang']['system']['error_write'] . ": " . $fileName;
+		}
+		fclose($fd);
+	}
+
+	/*
+	 * To facilitate the auto-upgrade path we copy the current config.inc.php
+	 * and write the SQL dump to another location:
+	 *   /media/files/ccms-restore/config.inc.php
+	 *   /media/files/ccms-restore/compactcms-sqldump.sql
+	 * These files will be picked up by the installer/wizard to perform an
+	 * automated upgrade when the admin so desires.
+	 *
+	 * Note the comment in /_install/inde.php: the SQL DUMP must be the
+	 * VERY LAST FILE WRITTEN during the backup action (as we depend on
+	 * its 'last modified' timestamp to be the latest thing in the
+	 * content/media zone!
+	 */
+	if (!file_exists(BASE_PATH . '/media/files/ccms-restore'))
+	{
+		@mkdir(BASE_PATH . '/media/files/ccms-restore', fileperms(BASE_PATH . '/media/files'));
+	}
+
+	$cfgfile = BASE_PATH . '/lib/config.inc.php';
+	$fileContents = file_get_contents($cfgfile);
+	if (!$fileContents)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $cfgfile;
+	}
+	$cfgfile = BASE_PATH . '/media/files/ccms-restore/config.inc.php';
+	$fd = @fopen($cfgfile, "wb");
+	if (!$fd)
+	{
+		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $cfgfile;
+	}
+	else
+	{
+		$out = fwrite($fd, $fileContents);
+		if (!$out)
+		{
+			$error[] = $ccms['lang']['system']['error_write'] . ": " . $cfgfile;
+		}
+		fclose($fd);
+	}
+
+	if ($sqldump !== false)
+	{
+		$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/compactcms-sqldump.sql';
+		$fd = @fopen($sqldumpfile, "wb");
+		if (!$fd)
+		{
+			$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;
+		}
+		else
+		{
+			$out = fwrite($fd, $sqldump);
+			if (!$out)
+			{
+				$error[] = $ccms['lang']['system']['error_write'] . ": " . $sqldumpfile;
+			}
+			fclose($fd);
+		}
+	}
+	// else: error has already been registered before, no sweat, mate!
+
+	if (empty($error))
+	{
+		echo '<div class="success center-text"><p>'.$ccms['lang']['backend']['newfilecreated'].', <a href="../../../../media/files/'.$backupName.'">'.strtolower($ccms['lang']['backup']['download']).'</a>.</p></div>';
+	}
+	else
+	{
+		echo '<div class="error center-text">';
+		foreach($error as $msg)
+		{
+			echo '<p>'.$msg.'</p>';
+		}
+		echo '</div>';
+	}
+}
+
+/**
+ *
+ * Delete current backup archives
+ *
+ */
+$btn_delete = getPOSTparam4IdOrNumber('btn_delete');
+if($do=="delete" && !empty($btn_delete))
+{
+	if (!empty($_POST['file']))
+	{
+		// Only if current user has the rights
+		if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
+		{
+			echo '<div class="notice center-text">';
+			foreach ($_POST['file'] as $value)
+			{
+				$value = filterParam4Filename($value); // strips any slashes as well, so attacks like '../../../../../../../../../etc/passwords' won't pass
+				if (!empty($value))
+				{
+					unlink('../../../../media/files/'.$value);
+					echo ucfirst($value).' '.$ccms['lang']['backend']['statusremoved'].'.<br/>';
+				}
+				else
+				{
+					echo $ccms['lang']['auth']['featnotallowed'];
+				}
+			}
+			echo '</div>';
+		}
+		else
+		{
+			echo '<div class="error center-text">'.$ccms['lang']['auth']['featnotallowed'].'</div>';
+		}
+	}
+	else
+	{
+		echo '<div class="error center-text">'.$ccms['lang']['system']['error_selection'].'</div>';
+	}
+}
+
+
+
+
+/*
+ * See if the site uses the lightbox or any other 'predefined' plugin/module: if so, warn
+ * about those bits not being backed up entirely (or not at all).
+ */
+$modules_in_use = $db->SelectArray($cfg['db_prefix'].'pages', null, 'DISTINCT module');
+if ($db->ErrorNumber())
+	$db->Kill();
+$show_warn_about_partial_backup = false;
+foreach($modules_in_use as $row)
+{
+	switch ($row['module'])
+	{
+	case 'editor':
+	case 'news':
+	case 'comment':
+		break;
+
+	case 'lightbox':
+	default:
+		// when you use the lightbox or some plugin we don't know all about, the backup will be incomplete.
+		$show_warn_about_partial_backup = true;
+		break;
+	}
+}
+
+$mediawarning = explode(' :: ', $ccms['lang']['backup']['warn4media']);
+$mediawarning[1] = explode("\n", $mediawarning[1]);
+
+
+?>
+		<div class="span-8 colborder">
+			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
+			<p><?php echo $ccms['lang']['backup']['explain']; ?></p>
+			<form id="create-arch" action="<?php echo $_SERVER['PHP_SELF']; ?>?do=backup" method="post" accept-charset="utf-8" class="clearfix" >
+				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 			</form>
+			<?php
+			if ($show_warn_about_partial_backup)
+			{
+			?>
+				<div class="warning error left-text" id="media-warning">
+					<h2><?php echo $mediawarning[0]; ?></h2>
+					<?php
+					foreach ($mediawarning[1] as $line)
+					{
+						echo '<p class="left">' . $line . "</p>\n";
+					}
+					?>
+				</div>
+			<?php
+			}
+			?>
 		</div>
-		
-		<div class="span-11 last">
+
+		<div class="span-16 last">
 		<h2><?php echo $ccms['lang']['backup']['currenthd'];?></h2>
-			<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
-				<table border="0" cellspacing="5" cellpadding="5">
+			<form id="delete-arch" action="<?php echo $_SERVER['PHP_SELF'];?>?do=delete" method="post" accept-charset="utf-8">
+				<div class="table_inside">
+				<table cellspacing="0" cellpadding="0">
 					<tr>
-						<?php if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) { ?><th class="span-1">&#160;</th><?php } ?>
-						<th class="span-4"><?php echo $ccms['lang']['backup']['timestamp'];?></th>
+						<?php
+						if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
+						{
+						?>
+							<th class="span-1">&#160;</th>
+						<?php
+						}
+						?>
+						<th class="span-14"><?php echo $ccms['lang']['backup']['timestamp'];?></th>
 						<th>&#160;</th>
 					</tr>
-					<?php 
-					if ($handle = opendir('./files/')) {
+					<?php
+					if ($handle = opendir('../../../../media/files/'))
+					{
 						$i=0;
-						while (false !== ($file = readdir($handle))) {
-					        if ($file != "." && $file != ".." && strpos($file, ".zip")) {
-					        	$timestamp	= explode('-',$file);
-						        $isEven 	= !($i % 2);
-						        echo ($isEven=='1')?'<tr>':'<tr style="background-color: #E6F2D9;">';
-						        if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) {
-						        	echo '<td><input type="checkbox" name="file[]" value="'.$file.'" id="'.$i.'"></td>';
-						        }
-						        echo '<td>'.$timestamp['1'].'/'.$timestamp['2'].'/20'.$timestamp['3'].':'.$timestamp['4'].'</td>';
-						        echo '<td><span class="ss_sprite ss_package_green"><a href="./files/'.$file.'" title="'.ucfirst($file).'">'.$ccms['lang']['backup']['download'].'</a></span></td>';
-						        echo '</tr>';
-					        } 
-					    $i++; }
-					    closedir($handle);
+						while (false !== ($file = readdir($handle)))
+						{
+							if ($file != "." && $file != ".." && strmatch_tail($file, ".zip"))
+							{
+								// Alternate rows
+								if($i%2 != 1)
+								{
+									echo '<tr class="altrgb">';
+								}
+								else
+								{
+									echo '<tr>';
+								}
+								echo "\n";
+								if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
+								{
+									echo '<td><input type="checkbox" name="file[]" value="'.$file.'" id="'.$i.'"></td>';
+								}
+								echo "\n";
+								echo '<td>'.$file.'</td>';
+								echo "\n";
+								echo '<td><a href="../../../../media/files/'.$file.'" title="'.$file.'"><span class="ss_sprite_16 ss_package_green">&#160;</span>'.$ccms['lang']['backup']['download'].'</a></td>';
+								echo "\n</tr>\n";
+								$i++;
+							}
+						}
+						closedir($handle);
 					}
 					?>
 				</table>
-			<?php if($_SESSION['ccms_userLevel']>=$perm['manageModBackup']) { ?>
-				<hr />
-				<p><br/><button type="submit" name="btn_delete" value="dodelete"><span class="ss_sprite ss_package_delete"><?php echo $ccms['lang']['backend']['delete'];?></span></button></p>
-			<?php } ?>
+				</div>
+			<?php
+			if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
+			{
+				if($i>0)
+				{
+				?>
+					<div class="right">
+						<button type="submit" onclick="return confirmation_delete();" name="btn_delete" value="dodelete"><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></button>
+						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					</div>
+				<?php
+				}
+				else
+				{
+					echo $ccms['lang']['system']['noresults'];
+				}
+			}
+			else
+			{
+			?>
+				<div id="no-delete-action">
+					<h2><span class="ss_sprite_16 ss_package_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete'];?></h2>
+					<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+				</div>
+				<div class="right">
+					<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+				</div>
+			<?php
+			}
+			?>
 			</form>
 		</div>
-		
 	</div>
+<?php
+
+if (0)
+{
+	dump_request_to_logfile(array('btn_backup' => $btn_backup,
+								   'do' => $do,
+								   'btn_delete' => $btn_delete),
+						    true);
+}
+?>
+
+
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
+	<textarea id="jslog" class="log span-25" readonly="readonly">
+	</textarea>
+<?php
+}
+?>
+
+
+<script type="text/javascript" charset="utf-8">
+
+function confirmation_delete()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'D') !== false ? 'confirm("'.$ccms['lang']['backend']['confirmdelete'].'")' : 'true'); ?>;
+	return !!answer;
+}
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-bck_ccms');
+	}
+	return false;
+}
+
+
+<?php
+$js_files = array(
+	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
+	'../../../../lib/includes/js/the_goto_guy.js'
+	);
+
+$wait4backup = $ccms['lang']['backup']['wait4backup'];
+$driver_code = <<<EOT
+		$('create-arch').addEvent('click', function()
+			{
+				var el = $('backup-module');
+				el.set('spinner', {
+						message: "$wait4backup",
+						img: {
+							'class': 'loading'
+						}
+					});
+				el.spin(); //obscure the element with the spinner
+
+				//alert('go! ' + el);
+				return true;
+			});
+EOT;
+
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>
-<?php } else die("No external access to file");?>

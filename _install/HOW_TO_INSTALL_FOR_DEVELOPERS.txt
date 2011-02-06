@@ -1,0 +1,34 @@
+How to install on Ubuntu
+========================
+
+When you have a minimal Ubuntu install, e.g. when running Ubuntu Server on a
+VPS machine, then you should make sure all repositories are accessible by
+apt-get et al by running:
+
+    ./setup_aptget_sourceslist.sh
+
+which will install an extra sources.list file in the /etc/apt/sources.list.d/
+directory and update the dictionary accordingly.
+
+In all circumstances, you should execute the
+
+    ./install_vps_everything.sh
+
+script to install all the basics on any Ubuntu system, including apache and
+PHP.
+
+Note that the script can prompt for a few passwords near the end (when
+installing mySQL) which you must provide manually; hence this install is
+not entirely automatic, alas.
+
+Next you can go and install CCMS manualy or fetch the latest code from
+github by running this script:
+
+    ./install_site_from_github_code.sh
+
+NOTE that this script will fetch a development revision at or near the current
+bleading edge so your mileage will vary, depending on when you run this.
+When you want to play it safe, fetch a release archive for CCMS and follow
+the install instructions for that one!
+
+

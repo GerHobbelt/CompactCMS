@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.1
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,98 +23,270 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
 ************************************************************ */
 
-// Include general configuration
-require_once('../../../../lib/sitemap.php');
+/* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
+if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
-$canarycage	= md5(session_id());
-$currenthost= md5($_SERVER['HTTP_HOST']);
-$do 		= (isset($_GET['do'])?$_GET['do']:null);
+/*
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
+*/
+if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
-if(!empty($do) && $_GET['do']=="backup" && $_POST['btn_backup']=="dobackup" && md5(session_id())==$canarycage && isset($_SESSION['rc1']) && md5($_SERVER['HTTP_HOST'])==$currenthost) {
-	
-	// Include back-up functions
-	include_once('functions.php');
+
+// Define default location
+if (!defined('BASE_PATH'))
+{
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+	define('BASE_PATH', $base);
 }
 
+// Include general configuration
+/*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
+
+
+// security check done ASAP
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
+	die("No external access to file");
+}
+
+
+
+$do = getGETparam4IdOrNumber('do');
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
+
+
 // Set the default template
-$dir_temp = "../../../../lib/templates/";
-$get_temp = (isset($_GET['template'])?htmlentities($_GET['template']).".tpl.html":$template[0].".tpl.html");
-	
-// Check for filename	
-if(!empty($get_temp)) {
-	if(@fopen($dir_temp.$get_temp, "r")) {
+$dir_temp = BASE_PATH . "/lib/templates/";
+$get_temp = getGETparam4FullFilePath('template', $template[0].'.tpl.html');
+$chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
+$temp_extension = strtolower(substr($get_temp, strrpos($get_temp, '.') + 1));
+
+// Check for filename
+if(!empty($get_temp))
+{
+	if(@fopen($dir_temp.$get_temp, "r"))
+	{
 		$handle = fopen($dir_temp.$get_temp, "r");
 		// PHP5+ Feature
-		// $contents = stream_get_contents($handle);
-		// PHP4 Compatibility
-		$contents = @fread($handle, filesize($dir_temp.$get_temp));
-		$contents = str_replace("<br />", "<br>", $contents);
+		$contents = stream_get_contents($handle);
+		if (0)
+		{
+			// PHP4 Compatibility
+			$flen = filesize($dir_temp.$get_temp);
+			if ($flen > 0)
+			{
+				$contents = @fread($handle, $flen);
+			}
+		}
 		fclose($handle);
-	} 
-} 
+		$contents = str_replace("<br />", "<br>", $contents);
+	}
+}
 
-// Get permissions
-$perm = $db->QuerySingleRowArray("SELECT * FROM ".$cfg['db_prefix']."cfgpermissions");
+
+if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
+{
+	$chstatus = false; // templates are viewable but NOT WRITABLE when user doesn't have permission to manage these.
+}
+
+
+
 ?>
-<?php if(checkAuth($canarycage,$currenthost) && $_SESSION['ccms_userLevel']>=$perm['manageTemplate']) { ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-		<title>Back-up &amp; Restore module</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,layout.css,sprite.css" />
-		<script type="text/javascript" src="../../../../lib/includes/js/editorwindow.js"></script>
-		<script type="text/javascript" src="../../edit_area/edit_area_compressor.php"></script>
-		<script type="text/javascript">editAreaLoader.init({id:"content",allow_resize:'both',allow_toggle:false,word_wrap:true,start_highlight:true,<?php echo 'language:"'.$cfg['language'].'",'; ?>syntax:"html"});</script>
-		<script type="text/javascript">function confirmation(){var answer=confirm(<?php echo"'".$ccms['lang']['editor']['confirmclose']."'";?>);if(answer){try{parent.MochaUI.closeWindow(parent.$('sys-tmp_ccms'));}catch(e){}}else{return false;}}</script>
+		<title>Template Editing module</title>
+		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<!--[if IE]>
+			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<![endif]-->
 	</head>
 <body>
-	<div class="module">
-
-		<div class="span-9">
-			<h1 class="editor">Manage templates</h1>
+	<div class="module" id="template-editor">
+		<?php
+		if(!$chstatus)
+		{
+		?>
+		<div class="span-25 last center-text error">
+			<p class="ss_has_sprite"><span class="ss_sprite_16 ss_error">&#160;</span><?php echo $ccms['lang']['template']['nowrite']; ?></p>
 		</div>
-		
-		<div class="span-9">
+		<?php
+		}
+		?>
+		<div class="span-15 clear">
+			<h1 class="editor"><?php echo $ccms['lang']['template']['manage']; ?></h1>
+		</div>
+
+		<div class="span-10 right last">
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" id="changeTmp" method="get" class="right" accept-charset="utf-8">
-				<label for="template" style="display:inline;"><?php echo $ccms['lang']['backend']['template'];?></label>
+				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
 				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
-					<optgroup label="<?php echo $ccms['lang']['backend']['template'];?>">
-						<?php $x = 0; while($x<count($template)) { ?>
-						<option <?php echo ($get_temp==$template[$x].".tpl.html") ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>"><?php echo ucfirst($template[$x]); ?></option>
-						<?php $x++; } ?>
-					</optgroup>
+					<?php
+					$x = 0;
+					while($x<count($template))
+					{
+					?>
+						<optgroup label="<?php echo ucfirst($template[$x]); ?>">
+							<option <?php echo ($get_temp==$template[$x].".tpl.html") ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>.tpl.html"><?php echo ucfirst($template[$x]).': '.strtolower($ccms['lang']['backend']['template']); ?></option>
+							<?php
+
+							// Get CSS and other text-editable files which are part of the engine
+							$cssfiles = array();
+							if ($handle = opendir($dir_temp.$template[$x].'/'))
+							{
+								while (false !== ($file = readdir($handle)))
+								{
+									if ($file != "." && $file != "..")
+									{
+										switch (strtolower(substr($file, strrpos($file, '.') + 1)))
+										{
+										case 'css':
+										case 'js':
+										case 'php':
+										case 'html':
+										case 'txt':
+											$cssfiles[$x][] = $file;
+											break;
+
+										default:
+											// don't list image files and such
+											break;
+										}
+									}
+								}
+								closedir($handle);
+							}
+
+							foreach ($cssfiles[$x] as $css)
+							{
+							?>
+								<option <?php echo ($get_temp==$template[$x].'/'.$css) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x].'/'.$css; ?>"><?php echo ucfirst($template[$x]).': '.$css; ?></option>
+							<?php
+							}
+							?>
+						</optgroup>
+					<?php
+					$x++;
+				}
+				?>
 				</select>
-				<br/><span class="quiet small">Always make sure that templates are writable</span>
 			</form>
 		</div>
-		<hr class="space"/>
-		
-		<?php if(isset($_GET['status'])&&$_GET['status']=="success") { ?>
-			<div class="success"><?php echo $ccms['lang']['editor']['savesuccess'].strtolower($ccms['lang']['backend']['template']." ".$_GET['template']);?></div>
-		<?php } ?>
-		
+		<hr class="space span-25 clear"/>
+
+		<?php
+		/*
+		??? ALWAYS saying 'settings saved' instead of the attached message in the old code? Must've been a bug...
+
+		Changed to mimic the layout in the other files...
+		*/
+		?>
+		<div class="center-text <?php echo $status; ?> span-25 clear">
+			<?php
+			if(!empty($status_message))
+			{
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
+			}
+			?>
+		</div>
+
 		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
-		
-			<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">
-				<?php echo htmlspecialchars($contents); ?>
-			</textarea>
-			
-			<p>
-				<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
-				<button type="submit" name="do" id="submit"><span class="ss_sprite ss_disk"><?php echo $ccms['lang']['editor']['savebtn']; ?></span></button>
-				<span class="ss_sprite ss_cross"><a href="javascript:;" onClick="confirmation()" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a></span>
-			</p>
-			
+			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
+
+			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
+			<div class="right">
+				<?php
+				if($chstatus)
+				{
+				?>
+					<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
+				<?php
+				}
+				?>
+				<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+			</div>
 		</form>
-	
+
+<?php
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
+?>
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
+	</textarea>
+<?php
+}
+?>
+
 	</div>
+<?php
+
+// TODO: call edit_area_compressor.php only from the combiner: combine.inc.php when constructing the edit_area.js file for the first time.
+
+?>
+		<script type="text/javascript">
+
+
+function confirmation()
+{
+	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
+	if(answer)
+	{
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", 'sys-tmp_ccms');
+	}
+	return false;
+}
+
+
+<?php
+$js_files = array();
+$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+{
+	$js_files[] = '../../../../lib/includes/js/edit_area/edit_area_full.js';
+}
+else
+{
+	$js_files[] = '../../../../lib/includes/js/edit_area/edit_area_full.js';
+}
+
+$eaLanguage = $cfg['editarea_language'];
+$driver_code = <<<EOT
+		// initialisation
+
+		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
+		var supported_syntaxes = ',' + editAreaLoader.default_settings.syntax_selection_allow + ',';
+		var desired_syntax = '$temp_extension';
+		desired_syntax = (supported_syntaxes.indexOf(',' + desired_syntax + ',') >= 0 ? desired_syntax : "");
+
+		editAreaLoader.init(
+			{
+				id: "content",
+				start_highlight: true,
+				allow_resize: 'both',
+				allow_toggle: true,
+				word_wrap: true,
+				language: "$eaLanguage",
+				syntax: desired_syntax
+			});
+		/*
+		for (syn in editAreaLoader.load_syntax)
+		{
+			alert("syntax: " + syn);
+		}
+		*/
+EOT;
+
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
+</script>
+<script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
 </html>
-<?php } else die("No external access to file");?>
