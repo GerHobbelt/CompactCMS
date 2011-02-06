@@ -132,6 +132,7 @@ function rm0lead($str)
 function str2USASCII($src)
 {
 	static $regex;
+	static $iconv_ok;
 
 	if (!$regex)
 	{
@@ -142,17 +143,48 @@ function str2USASCII($src)
 
 		//$regex[0][] = '"';
 		//$regex[0][] = "'";
+		
+		// also check whether iconv exists AND performs correctly in transliteration:
+		$iconv_ok = false;
+		if (function_exists('iconv'))
+		{
+			$test = 'é1ê2Ā3€4';
+			$soll = 'e1e2A3EUR4';
+			$r = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $test);
+			$iconv_ok = ($r == $soll);
+		}
 	}
 
 	$src = strval($src); // force cast to string before we do anything
 
 	// US-ASCII-ize known characters...
+	if ($iconv_ok)
+	{
+		/*
+		iconv may still b0rk by prematurely aborting the process. 
+		We check for that by placing a recognizable tail at the
+		end of the input string: if it's not there in the output, 
+		we know we got b0rked after all.
+		*/
+		$rv = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $src . ' (tail)');
+		if (substr($rv, -7) == ' (tail)')
+		{
+			// strip off the telltale:
+			$src = substr($rv, strlen($rv) - 6);
+		}
+		// else: fall through: let the next step do the ASCIIfication.
+	}
+	
+	// ... even if we don't have a iconv at all or a b0rked iconv!
 	$src = str_replace($regex[0], $regex[1], $src);
 	// replace any remaining non-ASCII chars...
 	$src = preg_replace('/([^ -~])+/', '~', $src);
 
 	return trim($src);
 }
+
+
+
 
 /**
 Convert any input text ($src) to a decent identifier which can serve as variable name and/or filename.
@@ -185,9 +217,35 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 
 	$dst = str_replace($regex4var[0], $regex4var[1], $dst);
 
-	$dst = preg_replace('/(?:[^\-A-Za-z0-9_' . $extra_accept_set . ']|_)+/', '_', $dst);
-	// reduce series of underscores to a single one:
-	$dst = preg_replace('/_+/', '_', $dst);
+	if (!empty($extra_accept_set))
+	{
+		// escape certain characters which may clash with the regex:
+		$es = '';
+		for ($i = strlen($extra_accept_set) - 1; $i >= 0; $i--)
+		{
+			$c = $extra_accept_set[$i];
+			switch ($c)
+			{
+			case ']': // would be interpreted as 'end of set'
+				$es .= '\]';
+				break;
+				
+			case '-': // would be interpreted as 'range from..to'
+				$es .= '\-';
+				break;
+				
+			default:
+				$es .= $c;
+				break;
+			}
+		}
+		$extra_accept_set = $es;
+	}
+	$dst = preg_replace('/[^\-A-Za-z0-9_' . $extra_accept_set . ']+/', '-', $dst);
+	// reduce series of underscores to a single one (to ensure unscores remain underscore ;-) )
+	$dst = preg_replace('/__+/', '_', $dst);
+	// reduce series of underscores / minuses / mixes thereof to a single one:
+	$dst = preg_replace('/[_-][_-]+/', '-', $dst);
 
 	// remove leading and trailing underscores (which may have been whitespace or other stuff before)
 	// except... we have directories which start with an underscore. So I guess a single
@@ -224,12 +282,11 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		}
 	}
 
-	$h = md5($src);
-	
+	$tl = 0;
 	if ($try_to_keep_unique)
 	{
 		/*
-		Try to ensure -- with high probability -- that even a transformed filename remains unique.
+		Try to ensure -- with reasonably high probability -- that even a transformed filename remains unique.
 		
 		This is done by appending a part of the MD5 hash of the RAW, original filename to the 
 		transformed filename: where the transformation will have lost some characters (turning them
@@ -256,8 +313,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		// only when there's been a transformation effect do we pad/uniquify the filename:
 		if ($src != $dst)
 		{
-			$tl = min(32, max(4, abs(strlen($src) - strlen($dst))));
-			$dst .= '.' . substr($h, -$tl);
+			$tl = 4;
 		}
 	}
 	
@@ -267,8 +323,24 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	$max_outlen -= strlen($ext); // discount the extension: it should ALWAYS remain!
 	if ($max_outlen < strlen($dst))
 	{
-		$tl = min(32, $max_outlen, 4 + intval($max_outlen / 8)); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
-		$dst = substr($dst, 0, $max_outlen - $tl) . substr($h, -$tl);
+		$tl = 2 + intval($max_outlen / 16); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
+	}
+	
+	if ($tl > 0)
+	{
+		$max_outlen--; // account for the extra '-' or '.' inserted
+		
+		$tl = min(21, $max_outlen, $tl); // make sure we only go as far as the available range produced by the hash string
+		
+		// compact the hash into ~21 characters, so each char/byte has the maximum possible range --> more hash in fewer chars
+		$h = strtr(base64_encode(md5($src)), '+/=', '-__');
+	
+		// flexible way to pick a neat character as a separator, depending on what is allowed in the output:
+		$extra_accept_set .= '-_';
+		$markerpos = strcspn($extra_accept_set, '.-_~!,');
+		$marker = substr($extra_accept_set, $markerpos, 1); 
+		
+		$dst = substr($dst, 0, $max_outlen - $tl) . $marker . substr($h, -$tl);
 	}
 
 	return $path . $dst . $ext;
@@ -2198,6 +2270,16 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 	if (!$only_set_cfg_array)
 	{
 		// Set local for time, currency, etc
+		if (substr($locale, -6) != '.UTF-8')
+		{
+			/*
+			This is required to make iconv work (instead of making it spit out '?' question 
+			marks for anything not in the target charset). See also comments in:
+			
+			http://nl.php.net/manual/en/function.iconv.php
+			*/
+			$locale .= '.UTF-8';
+		}
 		setlocale(LC_ALL, $locale);
 	}
 
@@ -2604,7 +2686,10 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
 	$tstamp = date('Y-m-d.His');
 	
 	$fname = 'LOG-' . $tstamp . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
-	$_SESSION['dbg_last_dump'] = $fname;
+	if (isset($_SESSION))
+	{
+		$_SESSION['dbg_last_dump'] = $fname;
+	}
 	$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
 	
 	file_put_contents($fname, $rv);
