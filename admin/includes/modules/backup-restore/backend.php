@@ -84,7 +84,7 @@ if ($perm->get('manageModBackup') <= 0 || !checkAuth())
  *
  */
 $btn_backup = getPOSTparam4IdOrNumber('btn_backup');
-if($do == "backup" && !empty($btn_backup))
+if($do == 'backup' && !empty($btn_backup))
 {
 	// Include back-up functions
 	/*MARKER*/require_once('./functions.php');
@@ -99,12 +99,12 @@ if($do == "backup" && !empty($btn_backup))
 	 * required to ensure the MD5 hashes stored in the DB per user are still valid
 	 * when the backup is restored at an unfortunate moment later in time.
 	 */
-	$configBackup       = array('../../../../content/','../../../../lib/templates/','../../../../lib/config.inc.php','../../../../media/albums/:/\.txt$/i','../../../../media/albums/:/\/_thumbs\//i');
+	$configBackup       = array('../../../../content/','../../../../lib/templates/','../../../../lib/config.inc.php','../../../../media/albums/:/\.txt$/i' /* ,'../../../../media/albums/:/\/_thumbs\//i' */ );
 	$configBackupDir    = '../../../../media/files/';
 	$backupName         = date('Ymd_His').'-data'.$current_user.'.zip';
 
 	$createZip = new createZip;
-	if (isset($configBackup) && is_array($configBackup) && count($configBackup)>0)
+	if (isset($configBackup) && is_array($configBackup) && count($configBackup) > 0)
 	{
 		foreach ($configBackup as $spec)
 		{
