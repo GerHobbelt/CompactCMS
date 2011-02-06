@@ -340,7 +340,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 		$markerpos = strcspn($extra_accept_set, '.-_~!,');
 		$marker = substr($extra_accept_set, $markerpos, 1); 
 		
-		$dst = substr($dst, 0, $max_outlen - $tl) . $marker . substr($h, -$tl);
+		$dst = substr($dst, 0, $max_outlen - $tl) . $marker . substr($h, 0, $tl);
 	}
 
 	return $path . $dst . $ext;
