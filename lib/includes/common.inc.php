@@ -64,7 +64,7 @@ if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
 }
 
 
-if (0)
+if (01)
 {
 	dump_request_to_logfile();
 }

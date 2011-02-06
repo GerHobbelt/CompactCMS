@@ -2,7 +2,7 @@
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-    
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-    
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -45,10 +45,10 @@ This config file is only loaded /once/ during regular web site operation.
 //
 
 // Standard configuration
-$cfg['sitename']    = "";           // Your site name - this will show in the front-end, e.g. "CompactCMS"
-$cfg['language']    = "en";         // Select the language of your (front-end) website - en, nl, de, es.
-$cfg['rootdir']     = "/";          // The root directory where CCMS is installed under, must include trailing slash ('/').
-$cfg['authcode']    = "";           // The salt for the user password hashes and preview authorization code. Add ?preview=X (where X is your authcode-based hash) to your address bar to preview unpublished items. 
+$cfg['sitename']    = '';           // Your site name - this will show in the front-end, e.g. "CompactCMS"
+$cfg['language']    = 'en';         // Select the language of your (front-end) website - en, nl, de, es.
+$cfg['rootdir']     = '/';          // The root directory where CCMS is installed under, must include trailing slash ('/').
+$cfg['authcode']    = '';           // The salt for the user password hashes and preview authorization code. Add ?preview=X (where X is your authcode-based hash) to your address bar to preview unpublished items. 
 
 // Detailed configuration. By default shouldn't need adjusting.
 $cfg['version']     = true;         // Check for the latest CompactCMS version [true/false]
@@ -59,11 +59,11 @@ $cfg['wysiwyg']     = true;         // Enable the WYSIWYG editor [true/false]
 $cfg['protect']     = true;         // Password protect your administration [true/false]
 
 // Database settings (case sensitive)
-$cfg['db_host']     = "localhost";  // MySQL setting - your database host.
-$cfg['db_user']     = "root";       // MySQL setting - your database username.
-$cfg['db_pass']     = "";           // MySQL setting - your database password.
-$cfg['db_name']     = "compactcms"; // MySQL setting - your database name.
-$cfg['db_prefix']   = "ccms_";      // MySQL setting - the table prefix.
+$cfg['db_host']     = 'localhost';  // MySQL setting - your database host.
+$cfg['db_user']     = 'root';       // MySQL setting - your database username.
+$cfg['db_pass']     = '';           // MySQL setting - your database password.
+$cfg['db_name']     = 'compactcms'; // MySQL setting - your database name.
+$cfg['db_prefix']   = 'ccms_';      // MySQL setting - the table prefix.
 
 // Restrict for editing with the editor. Use the filenames without extension.
 $cfg['restrict']    = array();      // restrictions will apply to all pages listed in this array, e.g. array("foo","bar") will deny editing access to the pages called 'foo' and 'bar' (a.k.a. foo.html & bar.html). Note that only the OWNER(S) of such pages will be allowed editing access!

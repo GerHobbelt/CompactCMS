@@ -272,6 +272,7 @@ $ccms['lang']['permitem']['manageModBackup']    = "From what user level on can u
 $ccms['lang']['permitem']['manageModNews']      = "From what user level on can users manage news items through the news module (add, modify, delete)";
 $ccms['lang']['permitem']['manageModLightbox']  = "From what user level on can users manage albums throught the lightbox module (add, modify, delete)";
 $ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
+$ccms['lang']['permitem']['manageModTranslate'] = "The level of a user that is allowed to use the (experimental) translation support utility";
 $ccms['lang']['permitem']['managePageEditing']  = "From what user level on can users edit pages (content, title, subheader, keywords, etc.)";
 
 
