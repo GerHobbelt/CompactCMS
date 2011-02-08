@@ -97,6 +97,9 @@ function strmatch_tail($a, $b)
 
 
 
+
+
+
 /**
  * Remove leading zeroes from the given string.
  *
@@ -2539,6 +2542,77 @@ function cvt_ordercode2list($ordercode)
 	}
 	return $dlorder;
 }
+
+
+
+
+
+/**
+The various attributes which can be requested through 
+checkSpecialPageName()
+*/
+define('SPG_IS_NONREMOVABLE', 1);  // you cannot delete 'home', 'index', etc.
+define('SPG_GIVE_PAGE_URL', 2);    // returns the page URL for /any/ page; special transformations for the special pages are applied
+define('SPG_MUST_BE_LINKED_IN_MENU', 3); // when a page /must/ occur in the menu with a hyperlink to it
+define('SPG_GIVE_PAGENAME', 4); // return the pagename for /any/ page; apply special transformations for special pages
+define('SPG_IS_HOMEPAGE', 5); // whether the page is the site homepage (or not)
+define('SPG_GIVE_MENU_SPECIAL', 6);  // if the page needs special formatting when appearing in a menu, this produces an array of settings
+define('SPG_GIVE_SITEMAP_SPECIAL', 7); // if the page needs special treatment when producing the sitemap.xml, this produces an array of settings
+
+
+/**
+Check a given page name to see whether it's one of the special ones (ome, index, 404, ...) and
+return the required attribute for it.
+*/
+function checkSpecialPageName($name, $reqd_attrib)
+{
+	if (empty($name) || in_array($name, array('home', 'index')))
+	{
+		$name = 'home';
+	}
+	
+	switch ($reqd_attrib)
+	{
+	case SPG_IS_NONREMOVABLE:
+		return in_array($name, array('403', '404', 'sitemap', 'home'));
+		
+	case SPG_IS_HOMEPAGE:
+		return ($name == 'home');
+		
+	case SPG_GIVE_PAGE_URL:
+		return ($name != 'home' ? $name . '.html' : '');
+
+	case SPG_GIVE_PAGENAME:
+		return $name;
+
+	case SPG_GIVE_MENU_SPECIAL:
+		if ($name == 'home')
+		{
+			return array('link' => $cfg['rootdir'],
+						   'class' => 'menu_item_home');
+		}
+		return null;
+					   
+	case SPG_GIVE_SITEMAP_SPECIAL:
+		if ($name == 'home')
+		{
+			return array('loc' => 'http://' . $_SERVER['SERVER_NAME'] . $cfg['rootdir'],
+						   'prio' => 0.80);
+		}
+		return null;
+					   
+	case SPG_MUST_BE_LINKED_IN_MENU:
+		if (in_array($name, array('403', '404')))
+			return false;
+		if ($name == 'home')
+			return true;
+		return null;
+		
+	default:
+		throw new Exception('Undefined attribute requested in checkSpecialPageName()');
+	}
+}
+
 
 
 

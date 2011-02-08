@@ -149,11 +149,7 @@ $current = basename(filterParam4FullFilePath($_SERVER['REQUEST_URI']));
 
 
 // [i_a] $curr_page was identical (enough) to $pagereq before
-$pagereq = getGETparam4Filename('page');
-if (empty($pagereq) || in_array($pagereq, array('home', 'index')))
-{
-	$pagereq = 'home';
-}
+$pagereq = checkSpecialPageName(getGETparam4Filename('page'), SPG_GIVE_PAGENAME);
 $ccms['pagereq'] = $pagereq;
 
 $ccms['printing'] = getGETparam4boolYN('printing', 'N');
@@ -463,13 +459,13 @@ if (0)
 
 		$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
 
-		if($row->urlpage == 'home')
+		if(checkSpecialPageName($row->urlpage, SPG_IS_HOMEPAGE))
 		{
 			$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' Home">Home</a></span>';
 		}
 		else
 		{
-			if($row->sublevel==0)
+			if($row->sublevel == 0)
 			{
 				$ccms['breadcrumb'] = '<span class="breadcrumb">&raquo; <a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a></span>';
 			}
@@ -651,10 +647,10 @@ if (0)
 				$menu_item_class = 'menu_item_extref';
 				$current_link = $msg[0];
 			}
-			else if ($row['urlpage'] == 'home')
+			else if (($msv = checkSpecialPageName($row['urlpage'], SPG_GIVE_MENU_SPECIAL)) !== null)
 			{
-				$current_link = $cfg['rootdir'];
-				$menu_item_class = 'menu_item_home';
+				$current_link = $msv['link'];
+				$menu_item_class = $msv['class'];
 			}
 			else
 			{
@@ -765,10 +761,13 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 		if(!regexUrl($row->description))
 		{
 			echo "<url>\n";
-				if($row->urlpage == 'home')
+				if(($ssv = checkSpecialPageName($row->urlpage, SPG_GIVE_SITEMAP_SPECIAL)) !== null)
 				{
-					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."</loc>\n";
-					echo "<priority>0.80</priority>\n";
+					if (!empty($ssv['loc']))
+					{
+						echo '<loc>' . $ssv['loc'] . "</loc>\n";
+						echo '<priority>' . $ssv['prio'] . "</priority>\n";
+					}
 				}
 				else if($row->islink == 'N')
 				{

@@ -272,7 +272,7 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				<td class="leftpad-2">
 				<?php
-				if($row->urlpage == 'home' || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])))
+				if(checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE) || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])))
 				{
 				?>
 					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
@@ -379,7 +379,7 @@ if ($do_update_or_livefilter && checkAuth())
 							class="tabs sprite edit"
 						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
 						|
-						<a href="../<?php echo ($row->urlpage != 'home' ? $row->urlpage . '.html' : '') . '?preview=' . $preview_checkcode; ?>"
+						<a href="../<?php echo checkSpecialPageName($row->urlpage, SPG_GIVE_PAGE_URL) . '?preview=' . $preview_checkcode; ?>"
 							class="external"
 						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
 					</td>
@@ -604,10 +604,10 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 					</td>
 					<td class="center-text" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php
-						if($row->urlpage == 'home')
+						if(($cv = checkSpecialPageName($row->urlpage, SPG_MUST_BE_LINKED_IN_MENU)) !== null)
 						{
 						?>
-							<input type="checkbox" checked="checked" disabled="disabled" />
+							<input type="checkbox" <?php echo ($cv ? 'checked="checked"' : ''); ?> disabled="disabled" />
 						<?php
 						}
 						else
@@ -739,9 +739,8 @@ if($do_action == 'reordermenu' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
  */
 if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 {
-	// Remove all system friendly characters
-	$post_urlpage = getPOSTparam4Filename('urlpage');
-	// $post_urlpage = strtolower(str_replace(' ','-',$post_urlpage));   -- superfluous, is already done as part of the filtering inside getPOSTparam4Filename()
+	// Remove all system friendly characters; map index and home, etc. to their default names so we don't get duplicates for special pages
+	$post_urlpage = checkSpecialPageName(getPOSTparam4Filename('urlpage'), SPG_GIVE_PAGENAME);
 
 	// Check for non-empty module variable
 	$post_module = strtolower(getPOSTparam4Filename('module', 'editor'));
@@ -783,8 +782,12 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		{ $errors[] = $ccms['lang']['system']['error_subtitle_2']; }
 	if (strlen($description) > 250)
 		{ $errors[] = $ccms['lang']['system']['error_description_2']; }
+
+if (0) // it's okay to try to create special pages, particularly when you're trying to recover manually from a completely b0rked install/upgrade!
+{		
 	if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
 		{ $errors[] = $ccms['lang']['system']['error_reserved']; }
+}
 
 	$file_freshly_created = false;
 
