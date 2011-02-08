@@ -365,21 +365,20 @@ $ccms['lang']['guestbook']['configuration']     = "Configuration";
             a bug report regarding the ./collect_lang_items.sh script.
        
          ----------------------------------------------------------
-    
-    $ccms['lang']['album']['nodir']            
-    $ccms['lang']['backend']['fileexists']         
-    $ccms['lang']['backend']['startedittitle']     
-    $ccms['lang']['backend']['updatelist']        
-    $ccms['lang']['editor']['closeeditor']    
-    $ccms['lang']['guestbook']['reaction']    
-    $ccms['lang']['guestbook']['removed']     
-    $ccms['lang']['login']['falsetries']        
-    $ccms['lang']['login']['provide']            
-    $ccms['lang']['system']['error_default']    
-    $ccms['lang']['system']['error_sitemap']     
+	
+	$ccms['lang']['album']['nodir']                 
+	$ccms['lang']['backend']['fileexists']          
+	$ccms['lang']['backend']['startedittitle']      
+	$ccms['lang']['backend']['updatelist']          
+	$ccms['lang']['editor']['closeeditor']          
+	$ccms['lang']['guestbook']['removed']           
+	$ccms['lang']['login']['falsetries']            
+	$ccms['lang']['login']['provide']               
+	$ccms['lang']['system']['error_default']        
+	$ccms['lang']['system']['error_sitemap']        
        
          ----------------------------------------------------------
-    
+	
          ### MISSING ENTRIES ###
 
          The entries below have been found to be missing from this 
@@ -391,10 +390,10 @@ $ccms['lang']['guestbook']['configuration']     = "Configuration";
        
          ----------------------------------------------------------
       */
-      
+	  
        
       /*
          ----------------------------------------------------------
       */
-      
+	  
 ?>
