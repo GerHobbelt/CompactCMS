@@ -51,7 +51,7 @@ function fileList($d)
 		{
 			if(is_file($d.'/'.$f))
 			{
-				$ext = strtolower(substr($f, strrpos($f, '.') + 1));
+				$ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
 				if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif")
 				{
 					$l[] = $f;

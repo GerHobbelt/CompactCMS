@@ -319,7 +319,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 			}
 			else
 			{
-				throw new FbX($ccms['lang']['system']['featnotallowed']);
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
 			}
 		}
 		else
@@ -777,7 +777,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 						imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
 
 						// Save newly generated versions
-						$thumbnail  = $dest.'/_thumbs/'.$f;
+						$thumbnail  = $dest . '/_thumbs/' . $f;
 
 						@unlink($thumbnail);
 
