@@ -19,6 +19,10 @@ body {font-family: "Myriad Pro",helvetica,arial,sans-serif;background: url('body
 #header h1 {background: url('logo.gif') no-repeat;height: 81px;}
 #header h1 span {display: none;}
 
+#printable .print_link
+{
+	margin-left: 20px;
+}
 
 
 

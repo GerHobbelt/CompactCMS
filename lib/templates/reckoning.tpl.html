@@ -47,16 +47,12 @@ Modified   : For CompactCMS.nl 1.4.0+
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{%language%}">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
-	<meta name="keywords" content="{%keywords!protect4attr%}" />
-	<title>{%title%}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
+<meta name="keywords" content="{%keywords!protect4attr%}" />
+<title>{%title!protect4attr%}</title>
 {%CSS.required_files!css_files(combine)%}
-<?php
-//  <link href="{%rootdir%}lib/templates/reckoning/style.css,layout.css" rel="stylesheet" type="text/css" media="screen" />
-//  <!-- Enable the <link> below to view this template in your WYSIWYG editor offline -->
-//  <!--<link href="./reckoning/style.css" rel="stylesheet" type="text/css" media="screen" />-->
-?>
+{%CSS.inline!implode('', '<style type="text/css">', '</style>')%}
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 <body>
@@ -91,7 +87,7 @@ Modified   : For CompactCMS.nl 1.4.0+
 		<p style="clear:both; text-align:right;" class="breadcrumb">
 			{%breadcrumb%}
 			{%IF printable (eq Y)%}
-				<span class="breadcrumb-print"> &raquo <a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:template:print%}</a></span>
+				<span class="breadcrumb-print"><a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}"><span class="ss_sprite_16 ss_printer">&#160;</span>{%lang:template:print%}</a>
 			{%/IF printable%}
 		</p>
 		<div class="entry">

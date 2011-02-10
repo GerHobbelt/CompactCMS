@@ -14,5 +14,12 @@ tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/templates/
 
 
 
+// Mark the JS sourcefiles needed by this template itself:
+//if (IE)
+//{
+//  $ccms['JS.required_files']['http://html5shiv.googlecode.com/svn/trunk/html5.js'] = true;
+//}
+//$ccms['JS.required_files']['html5.js?only-when=%3d%3d+IE'] = 0; // the first to load!
+
 
 ?>
