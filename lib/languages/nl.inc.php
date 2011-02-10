@@ -393,6 +393,7 @@ $ccms['lang']['permitem']['managePageCoding']    = "From what user level on can 
 $ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
 $ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
 $ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
+$ccms['lang']['system']['home']                 = "Home";
        
       /*
          ----------------------------------------------------------

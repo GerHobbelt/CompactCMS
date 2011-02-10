@@ -393,6 +393,7 @@ $ccms['lang']['permitem']['managePages']        = "From what user level on can u
 $ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
 $ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
 $ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database.";
+$ccms['lang']['system']['home']                 = "Home";
        
       /*
          ----------------------------------------------------------
