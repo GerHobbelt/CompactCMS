@@ -26,6 +26,8 @@ You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ************************************************************ */
 
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/htmLawed/htmLawed.php');
+
 class ccmsParser
 {
 	// Do NOT call variables from the outside ! (Use the public methods instead.)
@@ -301,8 +303,13 @@ class ccmsParser
 
 				case 'protect4attr':
 					/* make data suitable for an attribute value: strip tags and encode quotes! */
-					$rv = strip_tags($rv);
-					$rv = preg_replace('/\s+/', ' ', $rv);
+					$config = array(
+								'safe' => 1,
+								'elements' => '-*',
+								'keep_bad' => 6
+								);
+					$rv = htmLawed($rv, $config);
+					$rv = trim(preg_replace('/\s+/', ' ', $rv));
 					if (count($fbits) > 3)
 					{
 						// reduce the data string to a maximum length; clip at the last whitespace when this is required.
