@@ -619,7 +619,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 						?>
 					</td>
 					<td class="last">
-						<?php echo $row->urlpage; ?><em>(.html)</em>
+						<abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage, 0, 25); ?></abbr>
 						<input type="hidden" name="page_id[<?php echo $pageIdAsStr; ?>]" value="<?php echo $pageIdAsStr; ?>" id="page_id"/>
 					</td>
 				</tr>
