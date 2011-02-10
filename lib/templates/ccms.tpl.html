@@ -99,7 +99,7 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
 	<div id="content" class="span-20 last">
 		<div id="printable" class="span-21 last" style="text-align: right;">
-			{%breadcrumb%}
+			{%breadcrumb!implode(' &raquo; ', '<span class="breadcrumb">&raquo; ', '</span>')%}
 			{%IF printable eq (Y)%}
 				<span class="print_link"><a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}"><span class="ss_sprite_16 ss_printer">&#160;</span>{%lang:template:print%}</a>
 			{%/IF%}

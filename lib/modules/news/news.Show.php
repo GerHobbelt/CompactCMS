@@ -127,8 +127,7 @@ if(count($newsrows) > 0)
 				{
 					// and augment the breadcrumb trail and other template variables:
 					$preview_qry = ($ccms['preview'] == 'Y' ? '?preview=' . $preview_checkcode : '');
-					$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$page_name.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a></span>';
-					$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+					$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$page_name.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a>';
 
 					$ccms['urlpage']   = $page_name . '/' . rm0lead($rsNews->newsID).'-'.$newsTitle;
 					$ccms['pagetitle'] = $rsNews->newsTitle;
@@ -218,15 +217,13 @@ if(count($newsrows) > 0)
 		<?php
 		}
 	}
-
-	if($do == "all")
+	else if($do == "all")
 	{
 		// and augment the breadcrumb trail and other template variables:
 		$preview_qry = ($preview_checkcode ? '&preview=' . $preview_checkcode : '');
-		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a></span>';
-		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+		$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$page_name.'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a>';
 
-		$ccms['urlpage']   .= '?do=all';
+		$ccms['urlpage']   = $page_name . '?do=all';
 		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['news']['viewarchive'];
 		//$ccms['subheader']  = $row->subheader;
 		//$ccms['desc']       = $rsNews->newsContent;
