@@ -71,7 +71,7 @@ function fileList($d)
 		if(is_file($d.'/'.$f))
 		{
 			$ext = strtolower(substr($f, strrpos($f, '.') + 1));
-			if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif")
+			if ($ext=='jpg'||$ext=='jpeg'||$ext=='png'||$ext=='gif')
 			{
 				$l[] = $f;
 			}
@@ -155,6 +155,9 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 
 	return $rv;
 }
+
+
+
 
 
 // Fill array with albums
@@ -554,7 +557,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 {
 ?>
-	<script type="text/javascript" charset="utf-8">
+<script type="text/javascript" charset="utf-8">
 
 function confirmation_delete()
 {

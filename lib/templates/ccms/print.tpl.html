@@ -40,14 +40,14 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 - (%keywords%)      | Keywords (tags) for the current page as specified per file
 - (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
 - (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
-    
+
 >> Menu items
 - (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
 - (%leftmenu%)      | ''
 - (%rightmenu%)     | ''
 - (%footermenu%)    | ''
 - (%extramenu%)     | ''
-    
+
 >> Content tag
 - (%content%)       | The content from the current file that is being requested
 
@@ -87,7 +87,7 @@ global $db,$cfg,$ccms;
 		<div id="printable" style="text-align: right;">
 			<span id="pageref"><a href="{%rootdir%}{%urlpage%}.html{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:system:tooriginal%}</a></span>
 		</div>
-		
+
 		{%content%}
 	</div>
 </div>

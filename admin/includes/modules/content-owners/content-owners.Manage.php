@@ -225,14 +225,14 @@ $js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 	$with_fancyuploader = false;
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, "elm1", $with_fancyuploader));
+	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'elm1', $with_fancyuploader));
 }
 $js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
 
 $driver_code = null;
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$driver_code = <<<EOT
+	$driver_code = <<<EOT42
 		tinyMCE.init({
 			mode : "exact",
 			elements : "elm1",
@@ -247,13 +247,13 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			//theme_advanced_toolbar_location: 'top'
 			theme_simple_toolbar_location: 'top'
 		});
-EOT;
+EOT42;
 }
 
 $starter_code = null;
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$starter_code = generateJS4TinyMCEinit(1, "elm1", false);
+	$starter_code = generateJS4TinyMCEinit(1, 'elm1', false);
 }
 
 echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);

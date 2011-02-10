@@ -287,7 +287,7 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				</td>
 				<td>
-					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
+					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage, 0, 25); ?></abbr></em></label>
 				</td>
 				<td>
 					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="pagetitle"><?php echo $row->pagetitle; ?></span>

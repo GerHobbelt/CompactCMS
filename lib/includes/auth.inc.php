@@ -213,7 +213,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 			<h1>CompactCMS administration</h1>
 		</div>
 		<h2><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></h2>
-		<p><?php echo $ccms['lang']['login']['welcome'];?></p>
+		<p><?php echo $ccms['lang']['login']['welcome']; ?></p>
 	</div>
 
 	<div id="login" class="span-9 last">
@@ -228,7 +228,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 		</form>
 	</div>
 </div>
-<p class="quiet small" style="text-align:center;">&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
+<p class="quiet small center-text" >&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
 
 <script type="text/javascript" charset="utf-8">
 
