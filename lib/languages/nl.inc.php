@@ -61,7 +61,7 @@ $ccms['lang']['system']['error_versioninfo'] = "Geen versie informatie beschikba
 $ccms['lang']['system']['error_misconfig'] = "<strong>Onjuiste configuratie aangetroffen.</strong><br/>Controleer of het .htaccess bestand correct is geconfigureerd aan de huidige mapstructuur. Als CompactCMS in<br/>een submap is geinstalleerd, dan dient het .htaccess bestand daarop aangepast te worden.";
 $ccms['lang']['system']['error_deleted'] = "<h1>Het geselecteerd bestand lijkt al verwijderd</h1><p>Vernieuw de pagina lijst om het meest recente overzicht te zien en zo deze foutmelding te voorkomen. Als dit het probleem niet oplost, controleer dan handmating of het desbetreffende bestand &uuml;berhaupt in de content map bestaat.</p>";
 $ccms['lang']['system']['error_404title'] = "Bestand niet gevonden";
-$ccms['lang']['system']['error_404header'] = "Er deed zich een 404 fout voor, de pagina werd niet gevonden.";
+$ccms['lang']['system']['error_404header'] = "Er deed zich een 404 fout voor, de pagina <strong>{%pagereq%}.html</strong> werd niet gevonden.";
 $ccms['lang']['system']['error_404content'] = "Het gevraagde bestand <strong>{%pagereq%}.html</strong> kon niet worden gevonden.";
 $ccms['lang']['system']['error_403title'] = "Verboden toegang";
 $ccms['lang']['system']['error_403header'] = "Er is een 403-fout opgetreden: U hebt geen toestemming om het gevraagde bestand te openen.";
@@ -356,17 +356,17 @@ $ccms['lang']['guestbook']['configuration'] = "Configuratie";
        
          ----------------------------------------------------------
 	
-	$ccms['lang']['album']['nodir']			
-	$ccms['lang']['backend']['fileexists'] 		
-	$ccms['lang']['backend']['startedittitle'] 	
-	$ccms['lang']['backend']['updatelist']		
-	$ccms['lang']['editor']['closeeditor']	
-	$ccms['lang']['guestbook']['reaction']	
-	$ccms['lang']['guestbook']['removed'] 	
-	$ccms['lang']['login']['falsetries']		
-	$ccms['lang']['login']['provide']			
-	$ccms['lang']['system']['error_default']	
-	$ccms['lang']['system']['error_sitemap'] 	
+	$ccms['lang']['album']['nodir'] 
+	$ccms['lang']['backend']['fileexists'] 
+	$ccms['lang']['backend']['startedittitle'] 
+	$ccms['lang']['backend']['updatelist'] 
+	$ccms['lang']['editor']['closeeditor'] 
+	$ccms['lang']['guestbook']['delentry'] 
+	$ccms['lang']['guestbook']['removed'] 
+	$ccms['lang']['login']['falsetries'] 
+	$ccms['lang']['login']['provide'] 
+	$ccms['lang']['system']['error_default'] 
+	$ccms['lang']['system']['error_sitemap'] 
        
          ----------------------------------------------------------
 	
@@ -382,6 +382,17 @@ $ccms['lang']['guestbook']['configuration'] = "Configuratie";
          ----------------------------------------------------------
       */
 	  
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
+$ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
+$ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
+$ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
+$ccms['lang']['permitem']['manageModTranslate'] = "The level of a user that is allowed to use the (experimental) translation support utility";
+$ccms['lang']['permitem']['manageOwners']       = "To allow to appoint certain users to a specific page";
+$ccms['lang']['permitem']['managePageActivation']     = "From what user level on can users manage the activeness of pages (published vs. unpublished)";
+$ccms['lang']['permitem']['managePageCoding']    = "From what user level on can users set whether a page contains coding (wysiwyg vs. code editor)";
+$ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
+$ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
+$ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
        
       /*
          ----------------------------------------------------------

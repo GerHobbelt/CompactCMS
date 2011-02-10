@@ -60,7 +60,7 @@ $ccms['lang']['system']['error_versioninfo']    = "No version information is ava
 $ccms['lang']['system']['error_misconfig']      = "<strong>There seems to be a misconfiguration.</strong><br/>Please make sure the .htaccess file is correctly configured to reflect your file structure. If you have<br/>installed CompactCMS in a subdirectory, then adjust the .htaccess file accordingly.";
 $ccms['lang']['system']['error_deleted']        = "<h1>The file you selected seems to be deleted</h1><p>Refresh the filelist to see the most recent list of available files to prevent this error from happening. If this doesn't solve this error, manually check the content folder for the file you're trying to open.</p>";
 $ccms['lang']['system']['error_404title']       = "File not found";
-$ccms['lang']['system']['error_404header']      = "A 404 error occurred, the requested file could not be found.";
+$ccms['lang']['system']['error_404header']      = "A 404 error occurred, the requested file <strong>{%pagereq%}.html</strong> could not be found.";
 $ccms['lang']['system']['error_404content']     = "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
 $ccms['lang']['system']['error_403title']       = "Forbidden";
 $ccms['lang']['system']['error_403header']      = "A 403 error occurred: you don't have permission to access the requested file.";
@@ -74,6 +74,7 @@ $ccms['lang']['system']['noresults']            = "No results";
 $ccms['lang']['system']['tooriginal']           = "Back to original";
 $ccms['lang']['system']['message_rights']       = "All rights reserved";
 $ccms['lang']['system']['message_compatible']   = "Successfully tested on";
+$ccms['lang']['system']['home']                 = "Home";
 
 // Administration general messages
 $ccms['lang']['backend']['gethelp']             = "Got suggestions, feedback or having trouble? Visit <a href=\"http://community.compactcms.nl/forum/\" title=\"Visit the official forum\" class=\"external\" rel=\"external\">the forum</a>!";
@@ -306,6 +307,7 @@ $ccms['lang']['album']['noalbums']              = "No albums have been created y
 $ccms['lang']['album']['files']                 = "Files";
 $ccms['lang']['album']['nodir']                 = "Please make sure the directory <strong>albums</strong> exists in the ./media/ directory";
 $ccms['lang']['album']['lastmod']               = "Last modified";
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
 $ccms['lang']['album']['please_wait']           = "Please wait ...";
 
 // News messages

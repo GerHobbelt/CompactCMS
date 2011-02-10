@@ -62,7 +62,7 @@ $ccms['lang']['system']['error_versioninfo'] = "Det finns ingen versioninformati
 $ccms['lang']['system']['error_misconfig'] = "<strong>Det verkar finnas en felkonfigurering.</strong><br/>Vad vänlig se till att .htaccess filens inställningar motsvarar nuvarande filstruktur. Om du har<br/>installerat CompactCMS i en underkatalog, justera då .htaccess filen i enlighet med detta.";
 $ccms['lang']['system']['error_deleted'] = "<h1>Filen du har valt verkar ha raderats</h1><p>Uppdatera listan av filer för att undvika att detta händer. Om detta inte hjälper måste du manuellt öppna sökvägen och leta reda på filen du vill ha.</p>";
 $ccms['lang']['system']['error_404title'] = "Flen hittades ej";
-$ccms['lang']['system']['error_404header'] = "Ett 404 fel inträffade, den begärda filen kunde ej hittas.";
+$ccms['lang']['system']['error_404header'] = "Ett 404 fel inträffade, den begärda filen <strong>{%pagereq%}.html</strong> kunde ej hittas.";
 $ccms['lang']['system']['error_404content'] = /* BABELFISH */ "Den begärda filen <strong>{%pagereq%}.html</strong> inte kunde hittas.";
 $ccms['lang']['system']['error_403title'] = "Forbidden";
 $ccms['lang']['system']['error_403header'] = /* BABELFISH */ "En 403 fel uppstod: Du har inte behörighet att komma åt den önskade filen.";
@@ -340,17 +340,17 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Din kommentar har avvi
        
          ----------------------------------------------------------
 	
-	$ccms['lang']['album']['nodir']			
-	$ccms['lang']['backend']['fileexists'] 		
-	$ccms['lang']['backend']['startedittitle'] 	
-	$ccms['lang']['backend']['updatelist']		
-	$ccms['lang']['editor']['closeeditor']	
-	$ccms['lang']['guestbook']['reaction']	
-	$ccms['lang']['guestbook']['removed'] 	
-	$ccms['lang']['login']['falsetries']		
-	$ccms['lang']['login']['provide']			
-	$ccms['lang']['system']['error_default']	
-	$ccms['lang']['system']['error_sitemap'] 	
+	$ccms['lang']['album']['nodir'] 
+	$ccms['lang']['backend']['fileexists'] 
+	$ccms['lang']['backend']['startedittitle'] 
+	$ccms['lang']['backend']['updatelist'] 
+	$ccms['lang']['editor']['closeeditor'] 
+	$ccms['lang']['guestbook']['delentry'] 
+	$ccms['lang']['guestbook']['removed'] 
+	$ccms['lang']['login']['falsetries'] 
+	$ccms['lang']['login']['provide'] 
+	$ccms['lang']['system']['error_default'] 
+	$ccms['lang']['system']['error_sitemap'] 
        
          ----------------------------------------------------------
 	
@@ -366,6 +366,34 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Din kommentar har avvi
          ----------------------------------------------------------
       */
 	  
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
+$ccms['lang']['backend']['floatingtitle']       = "Other";
+$ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
+$ccms['lang']['backend']['reload_admin_screen'] = "Refresh the admininistration screen";
+$ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned new (renumbered) menu positions";
+$ccms['lang']['backend']['warning']             = "Warning";
+$ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
+$ccms['lang']['forms']['reorderbutton']         = "Re-order";
+$ccms['lang']['guestbook']['author']            = "Author";
+$ccms['lang']['guestbook']['configuration']     = "Configuration";
+$ccms['lang']['guestbook']['date']              = "Date";
+$ccms['lang']['guestbook']['host']              = "IP address";
+$ccms['lang']['hints']['reordercmdhelp']        = "Renumber all menu entries to ensure both each menu entry has a unique top+sublevel position and the positions are sequential";
+$ccms['lang']['permitem']['manageMenu']         = "From what user level on can users manage menu preferences";
+$ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
+$ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
+$ccms['lang']['permitem']['manageModLightbox']  = "From what user level on can users manage albums throught the lightbox module (add, modify, delete)";
+$ccms['lang']['permitem']['manageModNews']      = "From what user level on can users manage news items through the news module (add, modify, delete)";
+$ccms['lang']['permitem']['manageModTranslate'] = "The level of a user that is allowed to use the (experimental) translation support utility";
+$ccms['lang']['permitem']['manageModules']      = "From what user level on can users manage modules";
+$ccms['lang']['permitem']['manageOwners']       = "To allow to appoint certain users to a specific page";
+$ccms['lang']['permitem']['managePageActivation']     = "From what user level on can users manage the activeness of pages (published vs. unpublished)";
+$ccms['lang']['permitem']['managePageCoding']    = "From what user level on can users set whether a page contains coding (wysiwyg vs. code editor)";
+$ccms['lang']['permitem']['managePageEditing']  = "From what user level on can users edit pages (content, title, subheader, keywords, etc.)";
+$ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
+$ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
+$ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
+$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database.";
        
       /*
          ----------------------------------------------------------
