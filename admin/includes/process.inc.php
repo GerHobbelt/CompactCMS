@@ -272,10 +272,22 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				<td class="leftpad-2">
 				<?php
-				if(checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE) || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])))
+				if (checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE))
 				{
 				?>
-					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
+					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . lcfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+				<?php
+				}
+				else if (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+				{
+				?>
+					<span class="ss_sprite_16 ss_bullet_orange" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . lcfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+				<?php
+				}
+				else if (!$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+				{
+				?>
+					<span class="ss_sprite_16 ss_bullet_yellow" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . lcfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
 				<?php
 				}
 				else
@@ -903,6 +915,8 @@ if (0) // it's okay to try to create special pages, particularly when you're try
 	exit();
 }
 
+
+
 /**
  *
  * Process the request for page deletion
@@ -912,56 +926,63 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 {
 	if(!empty($_POST['page_id']))
 	{
-		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['statusdelete'].'</p>';
-
-		// Loop through all submitted page ids
-		foreach ($_POST['page_id'] as $index)
+		if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 		{
-			$value = explode('-', $index);
-			$page_id = filterParam4Number($value[1]);
-			if($page_id != 0 && $value[0] == $_SESSION['rc1'] . $_SESSION['rc2'])   // [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
+			echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['statusdelete'].'</p>';
+
+			// Loop through all submitted page ids
+			foreach ($_POST['page_id'] as $index)
 			{
-				// Select file name and module with given page_id
-				$pagerow = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)), array('urlpage', 'module'));
-				if (!$pagerow) $db->Kill();
-				$correct_filename = $pagerow['urlpage'];
-				$module = $pagerow['module'];
-
-				// Delete details from the database
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['page_id'] = MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER);
-				$result = $db->DeleteRows($cfg['db_prefix'].'pages', $values);
-
-				// Delete linked rows from module tables
-				if($module != 'editor')
+				$value = explode('-', $index);
+				$page_id = filterParam4Number($value[1]);
+				if($page_id != 0 && $value[0] == $_SESSION['rc1'] . $_SESSION['rc2'])   // [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
 				{
-					$filter = array(); // [i_a] make sure $filter is an empty array to start with here
-					$filter['pageID'] = MySQL::SQLValue($correct_filename,MySQL::SQLVALUE_TEXT);
-					$delmod = $db->DeleteRows($cfg['db_prefix'].'mod'.$module, $filter);
-					$delcfg = $db->DeleteRows($cfg['db_prefix'].'cfg'.$module, $filter);
-				}
+					// Select file name and module with given page_id
+					$pagerow = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)), array('urlpage', 'module'));
+					if (!$pagerow) $db->Kill();
+					$correct_filename = $pagerow['urlpage'];
+					$module = $pagerow['module'];
 
-				if ($result)
-				{
-					// Delete the actual file
-					if(@unlink('../../content/'.$correct_filename.'.php'))
+					// Delete details from the database
+					$values = array(); // [i_a] make sure $values is an empty array to start with here
+					$values['page_id'] = MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER);
+					$result = $db->DeleteRows($cfg['db_prefix'].'pages', $values);
+
+					// Delete linked rows from module tables
+					if($module != 'editor')
 					{
-						echo '<p>- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'</p>';
+						$filter = array(); // [i_a] make sure $filter is an empty array to start with here
+						$filter['pageID'] = MySQL::SQLValue($correct_filename, MySQL::SQLVALUE_TEXT);
+						$delmod = $db->DeleteRows($cfg['db_prefix'].'mod'.$module, $filter);
+						$delcfg = $db->DeleteRows($cfg['db_prefix'].'cfg'.$module, $filter);
+					}
+
+					if ($result)
+					{
+						// Delete the actual file
+						if(@unlink('../../content/'.$correct_filename.'.php'))
+						{
+							echo '<p>- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'</p>';
+						}
+						else
+						{
+							die($ccms['lang']['system']['error_delete']);
+						}
 					}
 					else
 					{
-						die($ccms['lang']['system']['error_delete']);
+						die($db->Error($ccms['lang']['system']['error_general']));
 					}
 				}
 				else
 				{
-					die($db->Error($ccms['lang']['system']['error_general']));
+					die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 				}
 			}
-			else
-			{
-				die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
-			}
+		}
+		else
+		{
+			die($ccms['lang']['auth']['featnotallowed']);
 		}
 	}
 	else
