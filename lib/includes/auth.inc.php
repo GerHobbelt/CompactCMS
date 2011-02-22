@@ -235,46 +235,30 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 /*
 we're parsed before the external file will be; make it call back to us to execute the check and optional redirect:
 */
-function jump_if_not_top()
+function jump_if_not_top2()
 {
-	/*
-	 * make sure we are NOT loaded in a [i]frame (~ MochaUI window)
-	 *
-	 * code bit taken from mootools 'domready' internals; rest derived from
-	 *   http://tjkdesign.com/articles/frames/4.asp#breaking
-	 */
-	var isFramed = false;
-	// Thanks to Rich Dougherty <http://www.richdougherty.com/>
-	try
+	if (typeof window.jump_if_not_top == 'function')
 	{
-		isFramed = (window.frameElement != null);
-	}
-	catch(e){}
-	/* another way to detect placement in a frame/iframe */
-	try
-	{
-		var f = (top != this);
-		if (f) isFramed = true;
-	}
-	catch(e){}
-	/* and for those rare occasions where the login screen is (inadvertedly) loaded through an AJAX load into a <div> or other in the current document: */
-	try
-	{
-		if (this.location && this.location.href)
-		{
-			var f = (this.location.href.indexOf("<?php echo $_SERVER['PHP_SELF']; ?>") < 0);
-			if (f) isFramed = true;
-		}
-	}
-	catch(e){}
-
-	if (isFramed)
-	{
-		close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>", null);
+		//alert('invoking jump_if_not_top');
+		window.jump_if_not_top("<?php echo $_SERVER['PHP_SELF']; ?>", "<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>");
 	}
 }
 
+jump_if_not_top2();
+
 </script>
-<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top" charset="utf-8"></script>
+<?php
+/*
+This external script won't be loaded when this page is fetched due to a session timeout or authentication error, when the request
+is performed through a mootools Request.HTML action. (stripScripts() drops items like these!)
+
+Hence we have to check above whether the functions loaded here actually exist and only act when they do.
+
+This is further complicated due to the semi-lazy-loading process: when this page is loaded as-is, the external file will be 
+parsed AFTER the code above has been executed, so we must make sure we don't crash the browser by invoking functions which
+are not (yet) available when executing the code above.
+*/
+?>
+<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top2" charset="utf-8"></script>
 </body>
 </html>
