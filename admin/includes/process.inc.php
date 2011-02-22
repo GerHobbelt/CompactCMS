@@ -187,9 +187,9 @@ if ($do_update_or_livefilter && checkAuth())
 		<table id="table_manage" cellspacing="0" cellpadding="0">
 			<tr>
 				<th class="span-1a">&#160;</th>
-				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
 				<th class="span-2a nowrap center-text">
 					<?php
 					if($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']))
