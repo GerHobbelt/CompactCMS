@@ -142,9 +142,13 @@ pre{
 	padding: 0;
 }
 
-.hidden{
-	opacity: 0.2; 
-	filter:alpha(opacity=20);
+.hidden
+{
+	/* 
+	with Safari, this produces a eye-watering 'echo', hence we dial down the opacity to 0.0:
+	*/
+	opacity: 0.0; /* 0.2; */
+	/* filter:alpha(opacity=20);  -- the Combiner will take of this by replacing the 'opacity' line with the proper MSIE line when needs must. */
 }
 
 #result .edit_area_cursor{
