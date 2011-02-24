@@ -79,6 +79,12 @@ class CcmsAjaxFbException extends Exception
 		self::$url_query_data = $query_data;
 	}
 
+	public static function GetFeedbackLocation(&$query_data = null)
+	{
+		$query_data = self::$url_query_data;
+		return self::$feedback_url;
+	}
+
 	// Redefine the exception so message isn't optional
 	public function __construct($message, $more_url_query_data = null, $code = 0, Exception $previous = null)
 	{
