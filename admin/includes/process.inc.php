@@ -444,15 +444,19 @@ if ($do_update_or_livefilter && checkAuth())
 				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php
-					if($row->module == 'editor' && !empty($row->toplevel) && !empty($row->menu_id))
+					if($row->module == 'editor')
 					{
-					?>
-						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em>
-							<?php echo '<strong>' . strtolower($ccms['lang']['menu'][$row->menu_id]) . '</strong> | <em>' . $ccms['lang']['backend']['item'] . ' </em> <strong>' . $row->toplevel . ':' . $row->sublevel . '</strong>';
-						?>
-					<?php
+						if(!empty($row->toplevel) && !empty($row->menu_id))
+						{
+							echo '<em>' . $ccms['lang']['backend']['inmenu'] . ':</em> ';
+							echo '<strong>' . strtolower($ccms['lang']['menu'][$row->menu_id]) . '</strong> | <em>' . $ccms['lang']['backend']['item'] . ' </em> <strong>' . $row->toplevel . ':' . $row->sublevel . '</strong>';
+						}
+						else
+						{
+							echo '<em>'.$ccms['lang']['backend']['notinmenu'].'</em>';
+						}
 					}
-					elseif($row->module != 'editor')
+					else //if($row->module != 'editor')
 					{
 						// TODO: add a module/plugin hook to provide the proper icon/formatting for the module name:
 						$modID = '<span class="ss_sprite_16 ss_information">&#160;</span><strong>' . ucfirst($row->module) . '</strong></span>';
@@ -476,10 +480,6 @@ if ($do_update_or_livefilter && checkAuth())
 							break;
 						}
 						echo $modID . ' '.strtolower($ccms['lang']['forms']['module']);
-					}
-					else
-					{
-						echo '<em>'.$ccms['lang']['backend']['notinmenu'].'</em>';
 					}
 					?>
 				</td>
@@ -795,11 +795,11 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	if (strlen($description) > 250)
 		{ $errors[] = $ccms['lang']['system']['error_description_2']; }
 
-if (0) // it's okay to try to create special pages, particularly when you're trying to recover manually from a completely b0rked install/upgrade!
-{		
-	if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
-		{ $errors[] = $ccms['lang']['system']['error_reserved']; }
-}
+	if (0) // it's okay to try to create special pages, particularly when you're trying to recover manually from a completely b0rked install/upgrade!
+	{		
+		if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
+			{ $errors[] = $ccms['lang']['system']['error_reserved']; }
+	}
 
 	$file_freshly_created = false;
 
@@ -992,6 +992,9 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	exit();
 }
 
+
+
+
 /**
  *
  * Save the menu order, individual templating & menu allocation preferences
@@ -1050,7 +1053,9 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	exit();
 }
 
- /**
+
+
+/**
  *
  * Set actual hyperlink behind menu item to true/false
  *
@@ -1087,6 +1092,9 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
 	}
 	exit();
 }
+
+
+
 
 /**
  *
