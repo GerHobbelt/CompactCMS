@@ -684,7 +684,7 @@ function filterParam4Number($value, $def = null)
 
 	// see if the value is a valid integer (plus or minus)
 	$value = rm0lead($value);
-	$numval = (is_numeric($value)?intval($value):null);
+	$numval = (is_numeric($value) ? intval($value) : null);
 	if (strval($numval) !== $value)
 	{
 		// no full match for the integer check, so this is a non-numeric string:

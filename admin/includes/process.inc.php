@@ -175,6 +175,25 @@ if ($do_update_or_livefilter && checkAuth())
 		}
 	}
 
+	
+	/*
+	Required to keep the HTML output compliant: a 'id' attribute must be globally unique in the page!
+	*/
+	function mk_unique_page_id($page_id)
+	{
+		static $count;
+		
+		if (empty($count))
+		{
+			$count = 1;
+		}
+		else
+		{
+			$count++;
+		}
+		return 'pageitem' . $count . '-' . rm0lead($page_id);
+	}
+	
 
 	// Open recordset for sites' pages
 	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
@@ -268,19 +287,19 @@ if ($do_update_or_livefilter && checkAuth())
 				if (checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE))
 				{
 				?>
-					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . lcfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . ucfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
 				<?php
 				}
 				else if (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 				{
 				?>
-					<span class="ss_sprite_16 ss_bullet_orange" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . lcfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+					<span class="ss_sprite_16 ss_bullet_orange" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . ucfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
 				<?php
 				}
 				else if (!$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 				{
 				?>
-					<span class="ss_sprite_16 ss_bullet_yellow" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . lcfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+					<span class="ss_sprite_16 ss_bullet_yellow" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . ucfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
 				<?php
 				}
 				else
@@ -295,10 +314,10 @@ if ($do_update_or_livefilter && checkAuth())
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage, 0, 25); ?></abbr></em></label>
 				</td>
 				<td>
-					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
+					<span id="<?php echo mk_unique_page_id($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
 				<td>
-					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="subheader"><?php echo $row->subheader; ?></span>
+					<span id="<?php echo mk_unique_page_id($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
 				<td class="center-text">
 					<?php
@@ -378,10 +397,9 @@ if ($do_update_or_livefilter && checkAuth())
 
 				?>
 					<td class="last right-text nowrap">
-						<a id="<?php echo $row->urlpage; ?>"
-							href="<?php echo $module; ?>?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=edit"
-							rel="Edit <?php echo $row->urlpage.'.html'; ?>"
-							class="tabs sprite edit"
+						<a href="<?php echo $module; ?>?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=edit"
+						   rel="Edit <?php echo $row->urlpage.'.html'; ?>"
+						   class="tabs sprite edit"
 						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
 						|
 						<a href="../<?php echo checkSpecialPageName($row->urlpage, SPG_GIVE_PAGE_URL) . '?preview=' . $preview_checkcode; ?>"
@@ -434,7 +452,7 @@ if ($do_update_or_livefilter && checkAuth())
 					$description = ucfirst($description);
 				}
 				?>
-				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
+				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo mk_unique_page_id($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php
 					if($row->module == 'editor')
@@ -791,7 +809,9 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	if (0) // it's okay to try to create special pages, particularly when you're trying to recover manually from a completely b0rked install/upgrade!
 	{		
 		if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
-			{ $errors[] = $ccms['lang']['system']['error_reserved']; }
+		{ 
+			$errors[] = $ccms['lang']['system']['error_reserved']; 
+		}
 	}
 
 	$file_freshly_created = false;
@@ -926,7 +946,7 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 			// Loop through all submitted page ids
 			foreach ($_POST['page_id'] as $index)
 			{
-				$value = explode('-', $index);
+				$value = explode('-', $index, 2);
 				$page_id = filterParam4Number($value[1]);
 				if($page_id != 0 && $value[0] == $_SESSION['rc1'] . $_SESSION['rc2'])   // [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
 				{
@@ -1166,19 +1186,28 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		}
 
 		// Continue with content update
-		$page_id = getPOSTparam4Number('id');
+		$page_idcode = explode('-', getPOSTparam4IdOrNumber('id'), 2);
+		$page_id = filterParam4Number(count($page_idcode) == 2 ? $page_idcode[1] : 0);
+
 		$dest    = getGETparam4IdOrNumber('part');
 
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
-
-		if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+		if ($page_id > 0 && !empty($dest))
 		{
-			$db->Kill();
+			$values = array(); // [i_a] make sure $values is an empty array to start with here
+			$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
+
+			if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+			{
+				$db->Kill();
+			}
+			else
+			{
+				echo $content;
+			}
 		}
 		else
 		{
-			echo $content;
+			die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ', ' . getGETparam4IdOrNumber('id') . ')' );
 		}
 	}
 	else

@@ -88,7 +88,7 @@ $do_action = getGETparam4IdOrNumber('action');
 if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth())   // action=edit
 {
 	// Set the necessary variables
-	$page_id = getGETparam4Filename('page_id');
+	$page_id = getGETparam4Number('page_id');
 	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
 	if (!$row) $db->Kill();
 
