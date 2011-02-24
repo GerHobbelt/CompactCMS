@@ -3,7 +3,7 @@
 -- Created for CompactCMS (www.compactcms.nl)
 --
 -- Host: localhost
--- Generated: Feb 6, 2011 at 19:14
+-- Generated: Feb 24, 2011 at 15:26
 -- MySQL version: 5.1.41
 -- PHP version: 5.3.1
 --
@@ -139,20 +139,22 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
 TRUNCATE TABLE `ccms_cfgpermissions`;
 
 INSERT INTO `ccms_cfgpermissions` (`name`, `value`, `display_order`) VALUES
-('manageModTranslate', 0, '100.10'),
-('manageOwners', 0, '10.10'),
-('managePages', 0, '10.00'),
-('manageMenu', 0, '3.00'),
-('manageTemplate', 0, '2.00'),
-('manageModules', 0, '100.00'),
-('managePageActivation', 2, '10.60'),
-('managePageCoding', 2, '10.70'),
-('manageModBackup', 0, '100.10'),
-('manageModNews', 0, '100.40'),
-('manageModLightbox', 0, '100.30'),
-('manageModComment', 0, '100.20'),
-('manageUsers', 0, '1.00'),
-('managePageEditing', 2, '10.50');
+('manageModTranslate', '0', '100.10'),
+('manageOwners', '2', '10.10'),
+('managePages', '2', '10.00'),
+('manageMenu', '2', '3.00'),
+('manageTemplate', '2', '2.00'),
+('manageModules', '2', '100.00'),
+('managePageActivation', '2', '10.60'),
+('managePageCoding', '2', '10.70'),
+('manageModBackup', '2', '100.10'),
+('manageModNews', '2', '100.40'),
+('manageModLightbox', '2', '100.30'),
+('manageModComment', '2', '100.20'),
+('manageUsers', '2', '1.00'),
+('managePageEditing', '2', '10.50');
+
+
 
 -- --------------------------------------------------------
 
@@ -261,6 +263,7 @@ CREATE TABLE IF NOT EXISTS `ccms_modmixer` (
   `user_id` int(5) DEFAULT NULL COMMENT 'user for which this mix applies',
   `page_id` int(5) NOT NULL COMMENT 'reference to the MixIn page itself',
   `mixin_page_id` int(5) NOT NULL COMMENT 'reference to the page which will be placed at this location/position',
+  `args_passing` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'which arguments to be passed to the subpage, and as which parameters?',
   `location` smallint(5) NOT NULL DEFAULT '0' COMMENT '0: main section; 1..N: menu structure; 100: head; 200: header; 1000: footer',
   `position` smallint(5) NOT NULL DEFAULT '0' COMMENT 'order = 0: main/center stage; -1000..-1: before; 1..1000: after',
   `published` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'is this part included in the generated page?',
@@ -307,6 +310,8 @@ CREATE TABLE IF NOT EXISTS `ccms_modnews` (
 --
 
 TRUNCATE TABLE `ccms_modnews`;
+
+
 
 
 
