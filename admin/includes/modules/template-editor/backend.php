@@ -196,7 +196,7 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 			?>
 		</div>
 
-		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&amp;action=save-template" method="post" accept-charset="utf-8">
+		<form action="../../process.inc.php?template=<?php echo $get_temp; ?>&action=save-template" method="post" accept-charset="utf-8">
 			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 
 			<input type="hidden" name="template" value="<?php echo $get_temp; ?>" id="template" />
