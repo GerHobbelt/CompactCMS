@@ -2892,6 +2892,23 @@ function IsValidPreviewCode($previewCode)
 
 
 
+/*
+Push a 'hack attempt!' error message to the output; when possible, redirect to the login page immediately.
+*/
+function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $extra = null)
+{
+	$msg = $ccms['lang']['system']['error_forged'] . ' (' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')';
+	
+	if (!headers_sent())
+	{
+		header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($msg)));
+	}
+	die($msg);
+}
+
+
+
+
 
 function get_tinyMCE_plugin_list()
 {
@@ -3129,21 +3146,21 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
 		if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 		{
-			$rv[] = $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js";
+			$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js';
 		}
 		else
 		{
-			$rv[] = $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js";
+			$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js';
 		}
 		if ($with_fancyupload)
 		{
 			/* File uploader JS */
-			$ls = $cfg['rootdir'] . "lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,";
+			$ls = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,';
 			if ($cfg['fancyupload_language'] != 'en')
 			{
-				$ls .= "Language/Language.en.js,";
+				$ls .= 'Language/Language.en.js,';
 			}
-			$ls .= "Language/Language." . $cfg['fancyupload_language'] . ".js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js";
+			$ls .= 'Language/Language.' . $cfg['fancyupload_language'] . '.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
 
 			$rv[] = $ls;
 		}
