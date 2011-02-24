@@ -60,15 +60,15 @@ Styling the back-to-overview text for a lightbox album
 
 
 
-.nowrap 
+.nowrap
 {
-	white-space: nowrap; 
+	white-space: nowrap;
 }
 
 
 
 
-.log 
+.log
 {
 	font: 10pt Consolas, Monaco, fixed;
 	width: 100%;
