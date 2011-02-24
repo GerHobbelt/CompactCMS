@@ -152,11 +152,41 @@ override the green colors of the (#desktop fieldset)
 	background-color: #fdd;
 }
 
-.ff{display:inline-block;width:80px;height:15px;background-position: 0 0;}
-.ie{display:inline-block;width:80px;height:15px;background-position: 0 -20px;}
-.opera{display:inline-block;width:80px;height:15px;background-position: 0 -40px;}
-.safari{display:inline-block;width:80px;height:15px;background-position: 0 -60px;}
-.chrome{display:inline-block;width:80px;height:15px;background-position: 0 -80px;}
+.ff
+{
+	display: inline-block;
+	width: 80px;
+	height: 15px;
+	background-position: 0 0;
+}
+.ie
+{
+	display: inline-block;
+	width: 80px;
+	height: 15px;
+	background-position: 0 -20px;
+}
+.opera
+{
+	display: inline-block;
+	width: 80px;
+	height: 15px;
+	background-position: 0 -40px;
+}
+.safari
+{
+	display: inline-block;
+	width: 80px;
+	height: 15px;
+	background-position: 0 -60px;
+}
+.chrome
+{
+	display: inline-block;
+	width: 80px;
+	height: 15px;
+	background-position: 0 -80px;
+}
 
 /*
 Make sure the admin content has a scrollbar when needed. Override body+html:overflow=hidden CSS setup in Mocha: we want our Y-scrollbar!
@@ -282,6 +312,7 @@ further reduction of the vertical spacing:
 
 a.editinplace
 {
+	/* must point at a blank icon: this happens by pointing ABOVE the actual image! */
 	background-position: 0 100px;
 }
 a.edit, a.editinplace:hover
