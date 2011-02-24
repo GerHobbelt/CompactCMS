@@ -61,7 +61,7 @@ function build_tips()
 
 			/* ... plus our custom edit: */
 			var txt = el.retrieve('tip:text');
-			if (txt.length > 500)
+			if (typeof txt != 'null' && txt.length > 500)
 			{
 				tip.setStyles({
 					width: '600px'
