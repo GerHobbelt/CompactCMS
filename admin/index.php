@@ -524,7 +524,7 @@ $js_files[] = '../lib/includes/js/mootools-core.js,mootools-more.js';
 /*--MOCHAUI--*/
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,Core/Core.js,Core/Canvas.js,Core/Content.js,Core/Desktop.js,Controls/column/Column.js,Controls/panel/Panel.js,Controls/taskbar/Taskbar.js,Controls/window/Window.js,Controls/window/Modal.js,Core/Themes.js';
+	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,Core/core.js,Core/canvas.js,Core/content.js,Core/desktop.js,Controls/column/column.js,Controls/panel/panel.js,Controls/taskbar/taskbar.js,Controls/window/window.js,Controls/window/modal.js,Core/themes.js';
 }
 else
 {

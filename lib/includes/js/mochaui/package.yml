@@ -20,15 +20,15 @@ authors:
   - "Harry Roberts"
 
 sources:
-  - "Source/Core/Core.js"
-  - "Source/Core/Canvas.js"
-  - "Source/Core/Content.js"
-  - "Source/Core/Desktop.js"
-  - "Source/Controls/column/Column.js"
-  - "Source/Controls/panel/Panel.js"
-  - "Source/Controls/taskbar/Taskbar.js"
-  - "Source/Controls/window/Window.js"
-  - "Source/Controls/window/Modal.js"
-  - "Source/Core/Themes.js"
+  - "Source/Core/core.js"
+  - "Source/Core/canvas.js"
+  - "Source/Core/content.js"
+  - "Source/Core/desktop.js"
+  - "Source/Controls/column/column.js"
+  - "Source/Controls/panel/panel.js"
+  - "Source/Controls/taskbar/taskbar.js"
+  - "Source/Controls/window/window.js"
+  - "Source/Controls/window/modal.js"
+  - "Source/Core/themes.js"
   
   
