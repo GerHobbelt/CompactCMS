@@ -109,7 +109,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 
 		<div class="span-15 colborder clear">
 			<h2><?php echo $ccms['lang']['users']['editdetails']; ?></h2>
-			<form action="../../process.inc.php?action=edit-user-details" id="userDetailForm" method="post" accept-charset="utf-8">
+			<form action="user-management.Process.php?action=edit-user-details" id="userDetailForm" method="post" accept-charset="utf-8">
 				<label><?php echo $ccms['lang']['users']['username']; ?></label>
 					<span style="display:block;height:30px;"><?php echo $row->userName; ?></span>
 				<label for="first"><?php echo $ccms['lang']['users']['firstname']; ?></label>
@@ -133,7 +133,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			?>
 			<h2><?php echo $ccms['lang']['users']['editpassword']; ?></h2>
 			<div class="prepend-1">
-				<form action="../../process.inc.php?action=edit-user-password" id="userPassForm" method="post" accept-charset="utf-8">
+				<form action="user-management.Process.php?action=edit-user-password" id="userPassForm" method="post" accept-charset="utf-8">
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?>
 						<br/>
 						<a class="small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_bullet_key">&#160;</span><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
@@ -162,7 +162,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			{
 			?>
 			<div class="prepend-1">
-				<form action="../../process.inc.php?action=edit-user-level" id="userLevelForm" method="post" accept-charset="utf-8">
+				<form action="user-management.Process.php?action=edit-user-level" id="userLevelForm" method="post" accept-charset="utf-8">
 					<label for="userLevel"><?php echo $ccms['lang']['users']['userlevel']; ?></label>
 					<select name="userLevel" class="required" id="userLevel" size="1">
 						<option value="1" <?php echo ($row->userLevel==1 ? "selected='selected'" : null); ?>><?php echo $ccms['lang']['permission']['level1']; ?></option>
@@ -215,7 +215,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 		<hr class="space clear" />
 
 		<div class="right">
-			<a href="backend.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
+			<a href="user-management.Manage.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
 		</div>
 
 <?php

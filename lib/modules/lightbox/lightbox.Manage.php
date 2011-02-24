@@ -203,7 +203,8 @@ $tinyMCE_required = false;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Lightbox module</title>
-	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,uploader.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="modLightbox.css" />
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
 	<![endif]-->
@@ -667,14 +668,14 @@ $starter_code = null;
 if (!$tinyMCE_required)
 {
 	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js';
-	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/modLightbox.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/modules/lightbox/modLightbox.js';
 }
 else
 {	
 	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'description', true));
 	// these must FOLLOW the tinyMCE JS list as that part will include the basics for these ones as well:
 	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,FancyUpload2.js';
-	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/modLightbox.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/modules/lightbox/modLightbox.js';
 
 	$driver_code = <<<EOT42
 		tinyMCE.init({

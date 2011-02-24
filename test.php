@@ -59,9 +59,9 @@ function show($foo)
 
 <p> link: <a href="/c/lib/includes/js/tiny_mce/examples/index.html"> tiny_mce/examples/index.html </a> -- the tinyMCE examples directory for testing
 
-<p> link: <a href="/c/lib/includes/js/fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js,../../modLightbox.js"> fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js,../../modLightbox.js </a> -- it's about the ',../' bits in there: FF3.6 reduces those CLIENT-side, so this type of mixed URL will NEVER work on such a browser. Hence the need for the dummy.js:
+<p> link: <a href="/c/lib/includes/js/fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js"> fancyupload/Source/Uploader/Swiff.Uploader.js,Fx.ProgressBar.js,../../FancyUpload2.js </a> -- it's about the ',../' bits in there: FF3.6 reduces those CLIENT-side, so this type of mixed URL will NEVER work on such a browser. Hence the need for the dummy.js:
 
-<p> link <a href="/c/lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js"> fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js </a> -- which is /meant/ to be exactly the same as the one above, but this one does NOT get damaged by '..'-path optimizing browsers such as FF3.6!
+<p> link <a href="/c/lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js"> fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js </a> -- which is /meant/ to be exactly the same as the one above, but this one does NOT get damaged by '..'-path optimizing browsers such as FF3.6!
 
 <p> link <a href="/c/lib/includes/js/fancyupload/selectImage.php"> fancyupload's FileManager </a>
 

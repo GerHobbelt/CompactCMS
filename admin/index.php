@@ -202,19 +202,19 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 					if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
 					{
 					?>
-						<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
+						<li><a id="sys-tmp" href="./includes/modules/template-editor/template-editor.Manage.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
 					<?php
 					}
 					// if($perm->get('manageUsers') > 0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
 					{
 					?>
-						<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
+						<li><a id="sys-usr" href="./includes/modules/user-management/user-management.Manage.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
 					<?php
 					}
 					if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
 					{
 					?>
-						<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
+						<li><a id="sys-bck" href="./includes/modules/backup-restore/backup-restore.Manage.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
 					<?php
 					}
 					if($perm->is_level_okay('manageModTranslate', $_SESSION['ccms_userLevel']) && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])

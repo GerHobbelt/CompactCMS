@@ -88,7 +88,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 
 		<div class="span-18 colborder clear-left">
 			<h2><?php echo $ccms['lang']['users']['overviewusers']; ?></h2>
-			<form action="../../process.inc.php?action=delete-user" method="post" accept-charset="utf-8">
+			<form action="user-management.Process.php?action=delete-user" method="post" accept-charset="utf-8">
 				<div class="table_inside">
 				<table cellspacing="0" cellpadding="0">
 					<tr>
@@ -139,7 +139,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 							if($_SESSION['ccms_userID'] == rm0lead($row['userID']) || ($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= $row['userLevel']))
 							{
 							?>
-								<a href="user.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><span class="ss_sprite_16 ss_user_edit">&#160;</span><?php echo $row['userName']; ?></a>
+								<a href="user-management.Edit.php?userID=<?php echo rm0lead($row['userID']); ?>"><span class="ss_sprite_16 ss_user_edit">&#160;</span><?php echo $row['userName']; ?></a>
 							<?php
 							}
 							else
@@ -178,7 +178,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 			if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']))
 			{
 			?>
-				<form action="../../process.inc.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">
+				<form action="user-management.Process.php?action=add-user" method="post" id="addUser" accept-charset="utf-8">
 					<label for="userName"><?php echo $ccms['lang']['users']['username']; ?></label>
 					<input type="text" class="minLength:3 text" name="user" value="" id="userName" />
 					<label for="userPass"><?php echo $ccms['lang']['users']['password']; ?><br/>

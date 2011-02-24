@@ -49,7 +49,7 @@
  *
  * <pre>
  * // start of run due to AJAX request incoming
- * CcmsAjaxFbException::SetFeedbackLocation($cfg['rootdir'] . "admin/modules/template-editor/backend.php");
+ * CcmsAjaxFbException::SetFeedbackLocation($cfg['rootdir'] . "admin/modules/template-editor/template-editor.Manage.php");
  *
  * try
  * {
@@ -58,7 +58,7 @@
  *   if (some_operation() == failed)
  *     throw new CcmsAjaxFbException("urgh! we failed dramtically!");
  *   ...
- *   header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/modules/template-editor/backend.php&status=success&msg=hunky+dory!'));
+ *   header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/modules/template-editor/template-editor.Manage.php&status=success&msg=hunky+dory!'));
  *   exit();
  * }
  * catch (CcmsAjaxFbException $e)
