@@ -231,10 +231,32 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 <p class="quiet small center-text" >&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
 
 <script type="text/javascript" charset="utf-8">
-
+<?php
 /*
-we're parsed before the external file will be; make it call back to us to execute the check and optional redirect:
+In-line JavaScript is parsed before the external file will be; make it call back to us to execute the check and optional redirect.
+
+However...
+
+The /external/ script won't be loaded when this page is fetched due to a session timeout or authentication error, when the request
+is performed through a mootools Request.HTML action. (stripScripts() drops items like these!)
+
+Hence we have to check whether the functions loaded there actually exist and only act when they do. (We can assume the functions
+have been loaded by the page issuing the Request.HTML action, so there's no need for panic when we are in such a situation where
+our external script load is discarded through Request.HTML + stripScripts() inside mootools.
+
+This is further complicated due to the lazy-loading process: when this page is loaded as-is, the external file will be 
+parsed AFTER the code above has been executed, while, when loaded through Request.HTML, we cannot be sure the functions we need
+have been lazyloaded yet, so we must make sure we don't crash the browser by invoking functions which
+are not (yet) available when executing the code above.
+
+
+The real redirect-when-we're-not-the-top-page-itself magicking happens in the jump_if_not_top() function. jump_if_not_top2() is
+here to make sure we invoke it only when it is actually available.
+
+This means that EVERY admin page MUST load 'the_goto_guy.js', whether they use it themselves or not: the unlying code may decide
+the session is invalid and go through here, where availability is required for suitable action.
 */
+?>
 function jump_if_not_top2()
 {
 	if (typeof window.jump_if_not_top == 'function')
@@ -247,18 +269,6 @@ function jump_if_not_top2()
 jump_if_not_top2();
 
 </script>
-<?php
-/*
-This external script won't be loaded when this page is fetched due to a session timeout or authentication error, when the request
-is performed through a mootools Request.HTML action. (stripScripts() drops items like these!)
-
-Hence we have to check above whether the functions loaded here actually exist and only act when they do.
-
-This is further complicated due to the semi-lazy-loading process: when this page is loaded as-is, the external file will be 
-parsed AFTER the code above has been executed, so we must make sure we don't crash the browser by invoking functions which
-are not (yet) available when executing the code above.
-*/
-?>
 <script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top2" charset="utf-8"></script>
 </body>
 </html>
