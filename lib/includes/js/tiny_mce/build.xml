@@ -91,6 +91,7 @@
 			<fileset dir="${classes_dir}" includes="dom/RangeUtils.js" />
 
 			<!-- tinymce.ui.* -->
+			<fileset dir="${classes_dir}" includes="ui/KeyboardNavigation.js" />
 			<fileset dir="${classes_dir}" includes="ui/Control.js" />
 			<fileset dir="${classes_dir}" includes="ui/Container.js" />
 			<fileset dir="${classes_dir}" includes="ui/Separator.js" />
@@ -103,6 +104,7 @@
 			<fileset dir="${classes_dir}" includes="ui/MenuButton.js" />
 			<fileset dir="${classes_dir}" includes="ui/SplitButton.js" />
 			<fileset dir="${classes_dir}" includes="ui/ColorSplitButton.js" />
+			<fileset dir="${classes_dir}" includes="ui/ToolbarGroup.js" />
 			<fileset dir="${classes_dir}" includes="ui/Toolbar.js" />
 
 			<!-- tinymce.* -->
@@ -309,7 +311,6 @@
 		<zip destfile="${temp_dir}/tinymce_${file_version}_jquery.zip" excludes="**/classes">
 			<fileset dir="${temp_dir}">
 				<include name="tinymce/jscripts/**" />
-				<include name="tinymce/examples/**" />
 				<include name="tinymce/changelog.txt" />
 				<exclude name="tinymce/examples/**" />
 				<exclude name="tinymce/classes/**" />
@@ -322,6 +323,7 @@
 				<exclude name="tinymce/tiny_mce_prototype_src.js" />
 			</fileset>
 
+			<zipfileset dir="${temp_dir}" includes="tinymce/examples/css/content.css" fullpath="tinymce/examples/css/content.css"/>
 			<zipfileset dir="${temp_dir}" includes="tinymce/examples/full_jquery.html" fullpath="tinymce/examples/index.html"/>
 			<zipfileset dir="${temp_dir}" includes="tinymce/tiny_mce_jquery.js" fullpath="tinymce/tiny_mce.js"/>
 			<zipfileset dir="${temp_dir}" includes="tinymce/tiny_mce_jquery_src.js" fullpath="tinymce/tiny_mce_src.js"/>
