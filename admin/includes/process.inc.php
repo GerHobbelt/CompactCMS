@@ -257,6 +257,7 @@ if ($do_update_or_livefilter && checkAuth())
 				$module = '../lib/modules/'.$row->module.'/'.$row->module.'.Manage.php';
 
 				$editing_mode = $perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']);
+				$renaming_mode = false;
 
 				// Define $isEven for alternate table coloring
 				if($i % 2 != 1)
@@ -304,6 +305,7 @@ if ($do_update_or_livefilter && checkAuth())
 				}
 				else
 				{
+					$renaming_mode = true;
 				?>
 					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].'-'.rm0lead($row->page_id); ?>" />
 				<?php
@@ -311,6 +313,14 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				</td>
 				<td>
+					<?php
+					if ($renaming_mode)
+					{
+						?>
+						<span class="ss_sprite_16 ss_pencil_go liverename" title="<?php echo $ccms['lang']['backend']['rename_file']; ?>" rel="<?php echo $row->urlpage; ?>" id="<?php echo mk_unique_page_id($row->page_id); ?>" >&#160;</span>
+						<?php
+					}
+					?>
 					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage, 0, 25); ?></abbr></em></label>
 				</td>
 				<td>
@@ -1216,6 +1226,87 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	}
 	exit();
 }
+
+
+
+
+
+
+
+
+/**
+ *
+ * Change the page/file name inline.
+ *
+ * To make it a proper transaction, first try to change the filename, and only if that succeeds edit the database record.
+ *
+ */
+if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
+{
+	$page_idcode = explode('-', getPOSTparam4IdOrNumber('id'), 2);
+	$page_id = filterParam4Number(count($page_idcode) == 2 ? $page_idcode[1] : 0);
+	
+	if ($page_id > 0)
+	{
+		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)));
+		if (!$row) $db->Kill();
+
+		$owner = explode('||', strval($row->user_ids));
+		$oldname = $row->urlpage;
+		
+		if (checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE)
+			|| (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+			|| !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+		{
+			die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ); // feature not allowed, really...
+		}
+		else
+		{
+			$newname = getPOSTparam4Filename('newname');
+			if(empty($newname) || strlen($newname) < 3 || strlen($newname) > 240)
+			{
+				die($ccms['lang']['system']['error_value']);
+			}
+
+			$old_filepath = BASE_PATH . '/content/' . $oldname . '.php';
+			$new_filepath = BASE_PATH . '/content/' . $newname . '.php';
+			if (!file_exists($old_filepath))
+			{
+				die($ccms['lang']['system']['error_deleted']);
+			}
+			else if (file_exists($new_filepath))
+			{
+				die($ccms['lang']['system']['error_rename_target_exists']);
+			}
+			else if (!rename($old_filepath, $new_filepath))
+			{
+				die($ccms['lang']['system']['error_rename']);
+			}
+			else
+			{
+				// successfully renamed the file; now adjust the database record accordingly!
+				$values = array();
+				$values['urlpage'] = MySQL::SQLValue($newname,MySQL::SQLVALUE_TEXT);
+
+				if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+				{
+					$db->Kill();
+				}
+				else
+				{
+					printf($ccms['lang']['backend']['file_renamed_from_to'], $oldname, $newname);
+				}
+			}
+		}
+	}
+	else
+	{
+		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+	}
+	exit();
+}
+
+
 
 
 

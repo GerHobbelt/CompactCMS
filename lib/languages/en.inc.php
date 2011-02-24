@@ -69,7 +69,9 @@ $ccms['lang']['system']['error_sitemap']        = "An overview of all pages";
 $ccms['lang']['system']['error_tooshort']       = "One or multiple submitted values were either too short or incorrect";
 $ccms['lang']['system']['error_passshort']      = "A password should contain more than 6 characters";
 $ccms['lang']['system']['error_passnequal']     = "The entered passwords did not match";
-$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database.";
+$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database";
+$ccms['lang']['system']['error_rename']         = "Failed to rename the file";
+$ccms['lang']['system']['error_rename_target_exists'] = "Cannot rename the file as a file with the new name already exists";
 $ccms['lang']['system']['noresults']            = "No results";
 $ccms['lang']['system']['tooriginal']           = "Back to original";
 $ccms['lang']['system']['message_rights']       = "All rights reserved";
@@ -140,6 +142,8 @@ $ccms['lang']['backend']['see_forum']           = "See forum";
 $ccms['lang']['backend']['warning']             = "Warning";
 $ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
 $ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned new (renumbered) menu positions";
+$ccms['lang']['backend']['rename_file']         = "Rename file";
+$ccms['lang']['backend']['file_renamed_from_to'] = "Succesfully renamed file '%s' to '%s'";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']               = "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
