@@ -88,13 +88,13 @@ if ($db->ErrorNumber())
 	<title>CompactCMS Administration</title>
 	<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 	<link rel="icon" type="image/ico" href="../media/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="img/styles/base.css,layout.css,editor.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/base.css,layout.css,editor.css,sprite.css" />
 <!--
 	<link rel="stylesheet" type="text/css" href="../lib/includes/js/mochaui/Source/Themes/default/css/Window.css,Taskbar.css"/>
 -->
-	<link rel="stylesheet" type="text/css" href="img/styles/last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
 	<![endif]-->
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])

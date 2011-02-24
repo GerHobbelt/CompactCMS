@@ -95,9 +95,9 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Template Editing module</title>
-		<link rel="stylesheet" type="text/css" href="../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 		<!--[if IE]>
-			<link rel="stylesheet" type="text/css" href="../../img/styles/ie.css" />
+			<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
 		<![endif]-->
 <?php
 

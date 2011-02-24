@@ -130,7 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['system']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_tooshort']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)

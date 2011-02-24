@@ -214,8 +214,9 @@ $ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-core.js'] = coun
 $ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-more.js'] = count($ccms['JS.required_files']);
 
 $js_files = array();
-$js_files[] = '../../includes/js/the_goto_guy.js';
-$js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
+
 $js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent,newsTeaser'));
 
 $driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT

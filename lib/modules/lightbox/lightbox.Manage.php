@@ -396,8 +396,9 @@ $tinyMCE_required = false;
 			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 			{
 			?>
-				<form action="lightbox.Process.php?page_id=<?php echo $page_id; ?>&action=create-album" method="post" accept-charset="utf-8">
-					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label><input type="text" class="text" name="album" value="" id="album-create" />
+				<form action="lightbox.Process.php?page_id=<?php echo $page_id; ?>&action=create-album" id="createAlbum" method="post" accept-charset="utf-8">
+					<label for="album"><?php echo $ccms['lang']['album']['album']; ?></label>
+					<input type="text" class="required minLength:1 text" name="album" value="" id="album-create" />
 					<button type="submit"><span class="ss_sprite_16 ss_wand">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
 				</form>
 			<?php
@@ -427,7 +428,7 @@ $tinyMCE_required = false;
 						<?php
 						$lightboxes = $db->SelectArray($cfg['db_prefix'].'pages', array('module' => "'lightbox'"));
 						if ($db->ErrorNumber()) $db->Kill();
-						for ($i=0; $i < count($lightboxes); $i++)
+						for ($i = 0; $i < count($lightboxes); $i++)
 						{
 						?>
 							<option <?php echo (!empty($lines[0])&&trim($lines[0])==$lightboxes[$i]['urlpage']?'selected="selected"':null); ?> value="<?php echo $lightboxes[$i]['urlpage'];?>"><?php echo $lightboxes[$i]['urlpage'];?>.html</option>
@@ -437,7 +438,7 @@ $tinyMCE_required = false;
 					</select>
 					<?php
 					$desc = '';
-					for ($x=1; $x<count($lines); $x++)
+					for ($x = 1; $x < count($lines); $x++)
 					{
 						$desc = trim($desc.' '.$lines[$x]); // [i_a] double invocation of htmlspecialchars, together with the form input (lightbox.Process.php)
 					}
@@ -568,8 +569,17 @@ $tinyMCE_required = false;
 							?>
 						</select>
 					</label>
-					<input id="lightbox-photoupload" type="file" name="Filedata" />
-					<div class="right">
+<?php
+/* 
+the file input element cannot be styled without a lot of hassle. The extra effort required is deemed not worth it, since the 'usual' process
+wouldn't even get here as it uses the Flash-based multifile upload feature available further above.
+
+See also: http://www.quirksmode.org/dom/inputfile.html
+*/
+?>
+					<input id="lightbox-photoupload" type="file" name="Filedata" class="span-24" />
+					<hr class="space" />
+					<div class="right clear">
 						<button type="submit"><span class="ss_sprite_16 ss_add"><span class="ss_sprite_16 ss_folder_picture">&#160;</span><?php echo $ccms['lang']['album']['upload']; ?></button>
 					</div>
 				</form>
@@ -649,20 +659,22 @@ function delete_these_files()
 
 <?php
 $js_files = array();
-$js_files[] = '../../../lib/includes/js/the_goto_guy.js';
-$js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 
-$js_files = null;
 $driver_code = '';
 $starter_code = null;
 if (!$tinyMCE_required)
 {
-	$js_files[] = '../../../lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js,modLightbox.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader/Fx.ProgressBar.js,FancyUpload2.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/modLightbox.js';
 }
 else
 {	
-	$js_files[] = '../../../lib/includes/js/fancyupload/dummy.js,FancyUpload2.js,modLightbox.js';
 	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'description', true));
+	// these must FOLLOW the tinyMCE JS list as that part will include the basics for these ones as well:
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,FancyUpload2.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/modLightbox.js';
 
 	$driver_code = <<<EOT42
 		tinyMCE.init({

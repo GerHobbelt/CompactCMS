@@ -104,9 +104,9 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>Template Editing module</title>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 		<!--[if IE]>
-			<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+			<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
 		<![endif]-->
 	</head>
 <body>
@@ -130,12 +130,11 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 				<label for="template"><?php echo $ccms['lang']['backend']['template'];?></label>
 				<select class="text" onChange="document.getElementById('changeTmp').submit();" id="template" name="template">
 					<?php
-					$x = 0;
-					while($x<count($template))
+					for ($x = 0; $x < count($template); $x++)
 					{
 					?>
 						<optgroup label="<?php echo ucfirst($template[$x]); ?>">
-							<option <?php echo ($get_temp==$template[$x].".tpl.html") ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x]; ?>.tpl.html"><?php echo ucfirst($template[$x]).': '.strtolower($ccms['lang']['backend']['template']); ?></option>
+							<option <?php echo ($get_temp == $template[$x].'.tpl.html') ? 'selected="selected"' : ''; ?> value="<?php echo $template[$x]; ?>.tpl.html"><?php echo ucfirst($template[$x]).': '.strtolower($ccms['lang']['backend']['template']); ?></option>
 							<?php
 
 							// Get CSS and other text-editable files which are part of the engine
@@ -168,15 +167,14 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 							foreach ($cssfiles[$x] as $css)
 							{
 							?>
-								<option <?php echo ($get_temp==$template[$x].'/'.$css) ? "selected=\"selected\"" : ""; ?> value="<?php echo $template[$x].'/'.$css; ?>"><?php echo ucfirst($template[$x]).': '.$css; ?></option>
+								<option <?php echo ($get_temp == $template[$x].'/'.$css) ? 'selected="selected"' : ''; ?> value="<?php echo $template[$x].'/'.$css; ?>"><?php echo ucfirst($template[$x]).': '.$css; ?></option>
 							<?php
 							}
 							?>
 						</optgroup>
 					<?php
-					$x++;
-				}
-				?>
+					}
+					?>
 				</select>
 			</form>
 		</div>

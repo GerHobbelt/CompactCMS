@@ -79,9 +79,9 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Edit users</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
 	<![endif]-->
 </head>
 <body>
@@ -106,13 +106,6 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 			}
 			?>
 		</div>
-
-<!-- looks better without this one...
-
-		<div class="right">
-			<a href="backend.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tooverview']; ?></a>
-		</div>
--->
 
 		<div class="span-15 colborder clear">
 			<h2><?php echo $ccms['lang']['users']['editdetails']; ?></h2>

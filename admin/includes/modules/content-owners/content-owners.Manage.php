@@ -80,9 +80,9 @@ if (!is_array($users)) $db->Kill();
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Page-owners</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
 	<![endif]-->
 </head>
 <body>
@@ -220,14 +220,14 @@ function confirmation()
 
 <?php
 $js_files = array();
-$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
-$js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 	$with_fancyuploader = false;
 	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'elm1', $with_fancyuploader));
 }
-$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
 
 $driver_code = null;
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
