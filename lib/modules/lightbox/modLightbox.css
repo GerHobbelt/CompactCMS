@@ -56,7 +56,7 @@ a:hover, a.hover {color: red;}
 	margin-left: 56px;
 	font-size: 0.9em;
 	line-height: 20px;
-	clear
+	clear: both;
 }
 #lightbox-list li.file .file-remove {
 	clear: right;
