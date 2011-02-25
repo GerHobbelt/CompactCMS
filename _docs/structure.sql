@@ -52,6 +52,10 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgcomment` (
 
 TRUNCATE TABLE `ccms_cfgcomment`;
 
+-- table `ccms_cfgcomment` has 0 records.
+--
+
+
 
 -- --------------------------------------------------------
 
@@ -117,6 +121,10 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgnews` (
 
 TRUNCATE TABLE `ccms_cfgnews`;
 
+-- table `ccms_cfgnews` has 0 records.
+--
+
+
 
 -- --------------------------------------------------------
 
@@ -140,18 +148,18 @@ TRUNCATE TABLE `ccms_cfgpermissions`;
 
 INSERT INTO `ccms_cfgpermissions` (`name`, `value`, `display_order`) VALUES
 ('manageModTranslate', '0', '100.10'),
-('manageOwners', '2', '10.10'),
+('manageOwners', '4', '10.10'),
 ('managePages', '2', '10.00'),
 ('manageMenu', '2', '3.00'),
-('manageTemplate', '2', '2.00'),
-('manageModules', '2', '100.00'),
+('manageTemplate', '3', '2.00'),
+('manageModules', '4', '100.00'),
 ('managePageActivation', '2', '10.60'),
 ('managePageCoding', '2', '10.70'),
-('manageModBackup', '2', '100.10'),
+('manageModBackup', '3', '100.10'),
 ('manageModNews', '2', '100.40'),
 ('manageModLightbox', '2', '100.30'),
 ('manageModComment', '2', '100.20'),
-('manageUsers', '2', '1.00'),
+('manageUsers', '4', '1.00'),
 ('managePageEditing', '2', '10.50');
 
 
@@ -215,6 +223,10 @@ CREATE TABLE IF NOT EXISTS `ccms_modcomment` (
 --
 
 TRUNCATE TABLE `ccms_modcomment`;
+
+-- table `ccms_modcomment` has 0 records.
+--
+
 
 
 -- --------------------------------------------------------
@@ -311,7 +323,8 @@ CREATE TABLE IF NOT EXISTS `ccms_modnews` (
 
 TRUNCATE TABLE `ccms_modnews`;
 
-
+-- table `ccms_modnews` has 0 records.
+--
 
 
 
@@ -395,6 +408,8 @@ INSERT INTO `ccms_pages` (`page_id`, `user_ids`, `urlpage`, `module`, `toplevel`
 (00001, '0', 'home', 'editor', 1, 0, 1, 'ccms', 'Home', 'The CompactCMS demo homepage', 'The CompactCMS demo homepage', 'compactcms, light-weight cms', 'home.php', 'Y', 'Y', 'N', 'Y'),
 (00002, '0', 'contact', 'editor', 2, 0, 1, 'sweatbee', 'Contact form', 'A basic contact form using Ajax', 'This is an example of a basic contact form based using Ajax', 'compactcms, light-weight cms', 'contact.php', 'Y', 'Y', 'Y', 'Y');
 
+
+
 -- --------------------------------------------------------
 
 --
@@ -417,7 +432,7 @@ CREATE TABLE IF NOT EXISTS `ccms_users` (
   `userTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`),
   UNIQUE KEY `userName` (`userName`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table with users for CompactCMS administration' AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table with users for CompactCMS administration';
 
 --
 -- Dumping data for table `ccms_users`
@@ -429,10 +444,4 @@ INSERT INTO `ccms_users` (`userID`, `userName`, `userPass`, `userFirst`, `userLa
 (00001, 'admin', '52dcb810931e20f7aa2f49b3510d3805', 'Xander', 'G.', 'xander@compactcms.nl', 1, 4, '5168774687486', '2010-08-30 06:44:57', '2010-08-30 06:44:57', '2010-08-30 08:44:57');
 
 
-
-
-
-
-
--- --------------------------------------------------------
 
