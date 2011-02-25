@@ -91,7 +91,7 @@ if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck']))
 	SetAuthSafety();
 } 
 
-$do_ftp_chmod = ($do == md5('ftp') && CheckAuth());
+$do_ftp_chmod = ($do == 'ftp' && CheckAuth());
 
 
 
@@ -305,6 +305,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 
 
 
+session_write_close(); 
+
 
 
 ?>
@@ -321,6 +323,12 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<![endif]-->
 	</head>
 <body>
+
+<pre>
+<?php
+var_dump(headers_list());
+?>
+</pre>
 
 <noscript class="noscript" id="noscript">
 	<h1>Your browser does not support JavaScript</h1>
@@ -516,7 +524,7 @@ if ($die_on_old_hacks)
 						}
 						?>   	
 					</select>
-					<input type="hidden" name="do" value="<?php echo md5('2'); ?>" id="do" />
+					<input type="hidden" name="do" value="<?php echo '2'; ?>" id="do" />
 				<?php 
 				} 
 				// Populate optional FTP form
@@ -538,7 +546,7 @@ if ($die_on_old_hacks)
 					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
 					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
 					
-					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
+					<input type="hidden" name="do" value="<?php echo 'final'; ?>" id="do" />
 				<?php 
 				} 
 				?>

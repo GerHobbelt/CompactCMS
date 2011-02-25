@@ -40,7 +40,8 @@ if (!defined('BASE_PATH'))
 
 
 // Start the current session
-session_start();
+if (!session_start()) die('session_start(INSTALLER_INC) failed');
+
 
 // Load installer-specific configuration bits
 /*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
@@ -70,7 +71,7 @@ $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variab
  **/
 
 // Step two
-if($nextstep == md5('2') && CheckAuth())
+if($nextstep == '2' && CheckAuth())
 {
 	//
 	// Installation actions
@@ -83,7 +84,11 @@ if($nextstep == md5('2') && CheckAuth())
 
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$rootdir,$sitename,$language);
-	
+
+	echo 'WRITE_CFG_FILES_TO_DISK: ' . (1*WRITE_CFG_FILES_TO_DISK) . '<br>';
+	echo 'EXECUTE_QUERIES: ' . (1*EXECUTE_QUERIES) . '<br>';
+	echo 'DUMP_QUERIES_N_STUFF_IN_DEVMODE: ' . (1*DUMP_QUERIES_N_STUFF_IN_DEVMODE) . '<br>';
+
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
 		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password
@@ -154,7 +159,7 @@ if($nextstep == md5('2') && CheckAuth())
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo '3'; ?>" id="do" />
 		<script>
 function mkNewAuthCode()		
 {
@@ -196,7 +201,7 @@ if ($nextstep == 'mkNewAuthCode')
 }
 
 // Step three
-if($nextstep == md5('3') && CheckAuth()) 
+if($nextstep == '3' && CheckAuth()) 
 {
 	//
 	// Installation actions
@@ -239,14 +244,14 @@ if($nextstep == md5('3') && CheckAuth())
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_information">&#160;</span>To confirmation</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo '4'; ?>" id="do" />
 <?php
 
 	exit();
 } // Close step three
 
 // Step four
-if($nextstep == md5('4') && CheckAuth())
+if($nextstep == '4' && CheckAuth())
 {
 	//
 	// Installation actions
@@ -306,7 +311,7 @@ if($nextstep == md5('4') && CheckAuth())
 			<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span>Warning</h2>
 			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> 
 			for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the 
-			<a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
+			<a href="index.php?do=ftp">built-in FTP chmod function</a>.</p>
 			<span>&rarr; <em>Files that still require chmod():</em></span>
 			<ul>
 				<?php 
@@ -415,7 +420,7 @@ if($nextstep == md5('4') && CheckAuth())
 			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite_16 ss_accept">&#160;</span>Install <strong>CompactCMS</strong></button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo 'final'; ?>" id="do" />
 <?php
 
 	exit();
@@ -428,7 +433,7 @@ if($nextstep == md5('4') && CheckAuth())
  **/
 
 // Final step
-if($nextstep == md5('final') && CheckAuth())
+if($nextstep == 'final' && CheckAuth())
 {
 	//
 	// Installation actions
@@ -681,7 +686,7 @@ if($nextstep == md5('final') && CheckAuth())
 			{
 				$errors[] = $value;
 			}
-			$errors[] = 'Either use the <a href="index.php?do=' . md5('ftp') . '">built-in FTP chmod function</a>, or manually perform chmod().';
+			$errors[] = 'Either use the <a href="index.php?do=ftp">built-in FTP chmod function</a>, or manually perform chmod().';
 		}
 	}
 
@@ -833,7 +838,7 @@ if($nextstep == md5('final') && CheckAuth())
 			else
 			{
 				$errors[] = 'Fatal: the configuration file is not writable.';
-				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 				$err++;
 			}
 		}
@@ -883,7 +888,7 @@ if($nextstep == md5('final') && CheckAuth())
 					else
 					{
 						$errors[] = "Fatal: Problem saving new .htaccess file.";
-						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 						$err++;
 					}
 					fclose($fp);
@@ -891,7 +896,7 @@ if($nextstep == md5('final') && CheckAuth())
 				else
 				{
 					$errors[] = 'Fatal: the .htaccess file is not writable.';
-					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 					$err++;
 				}
 			}
@@ -944,7 +949,7 @@ if($nextstep == md5('final') && CheckAuth())
 						else
 						{
 							$errors[] = "Fatal: Problem saving new robots.txt file.";
-							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 							$err++;
 						}
 						fclose($fp);
@@ -952,7 +957,7 @@ if($nextstep == md5('final') && CheckAuth())
 					else
 					{
 						$errors[] = 'Fatal: the robots.txt file is not writable.';
-						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 						$err++;
 					}
 				}
