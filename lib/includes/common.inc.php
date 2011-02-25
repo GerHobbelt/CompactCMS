@@ -2689,7 +2689,7 @@ function var_dump_ex($value, $level = 0)
 
 
 
-function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
+function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $strip_CCMS_i18n_n_cfg_subarrays = true, $dump_to_stdout_as_well = false)
 {
 	global $_SERVER;
 	global $_ENV;
@@ -2755,7 +2755,22 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
 	{
 		$rv .= '<h1>$ccms</h1>';
 		$rv .= "<pre>";
-		$rv .= var_dump_ex($ccms);
+
+		$ccms_copy = array_merge($ccms); // fastest way to clone the array
+		if ($strip_CCMS_i18n_n_cfg_subarrays)
+		{
+			if (isset($ccms_copy['lang']))
+			{
+				$ccms_copy['lang'] = '(skipped)';
+			}
+			if (isset($ccms_copy['cfg']))
+			{
+				$ccms_copy['cfg'] = '(skipped)';
+			}
+		}
+		ksort($ccms_copy);
+		
+		$rv .= var_dump_ex($ccms_copy);
 		$rv .= "</pre>";
 		$rv .= '<h1>$cfg</h1>';
 		$rv .= "<pre>";
@@ -2779,6 +2794,12 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
 	$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
 	
 	file_put_contents($fname, $rv);
+	
+	if ($dump_to_stdout_as_well)
+	{
+		$rv = preg_replace('/^.*?<body>(.+)<\/body>.*?$/sD', '\\1', $rv);
+		echo $rv;
+	}
 }
 
 

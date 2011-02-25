@@ -59,7 +59,7 @@ ccmsParser::setTemplateAndEchoPHP(BASE_PATH . '/lib/templates/'.$ccms['template'
 
 if (0)
 {
-	dump_request_to_logfile(null, true);
+	dump_request_to_logfile(null, true, true, true);
 }
 
 ?>
