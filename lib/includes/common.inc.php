@@ -2695,7 +2695,17 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
 	global $_SESSION;
 	global $ccms;
 	global $cfg;
+	static $sequence_number;
 
+	if (!$sequence_number)
+	{
+		$sequence_number = 1;
+	}
+	else
+	{
+		$sequence_number++;
+	}
+	
 	$rv = '<html><body>';
 	
 	if (!empty($_SESSION['dbg_last_dump']))
@@ -2759,7 +2769,7 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
 	
 	$tstamp = date('Y-m-d.His');
 	
-	$fname = 'LOG-' . $tstamp . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
+	$fname = 'LOG-' . $tstamp . '-' . sprintf('%03u', $sequence_number) . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
 	if (isset($_SESSION))
 	{
 		$_SESSION['dbg_last_dump'] = $fname;
