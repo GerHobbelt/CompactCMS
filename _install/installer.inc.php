@@ -550,6 +550,7 @@ if($nextstep == 'final' && CheckAuth())
 		$sqldump = array();
 
 		$sql = file_get_contents(BASE_PATH.'/_docs/structure.sql');
+		$sql = preg_replace('/compactcms/', $_SESSION['variables']['db_name'], $sql);
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
 		$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
 		$sql = str_replace("\r\n", "\n", $sql);
