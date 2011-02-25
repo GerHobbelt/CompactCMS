@@ -160,6 +160,8 @@ $ccms['preview'] = ($preview ? 'Y' : 'N');
 $ccms['responsecode'] = null; // default: 200 : OK
 $ccms['page_id'] = false;
 $ccms['page_name'] = false;
+$ccms['content'] = false;
+$ccms['template'] = null;
 
 
 
@@ -620,9 +622,10 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	// (2) the requested page doesn't necessarily need to appear in any menu!
 	
 	// one or two rounds: one round for good pages; the second round is for when we need to report an error (through a user-editable error page):
+	$dbpage = $pagereq;
 	for ($round = 0; $round < 2; $round++)
 	{
-		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($pagereq, MySQL::SQLVALUE_TEXT)));
+		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($dbpage, MySQL::SQLVALUE_TEXT)));
 		if ($db->ErrorNumber()) $db->Kill();
 
 		// Start switch for pages, select all the right details
@@ -744,7 +747,7 @@ if (0)
 				$ccms['responsecode'] = $rcode;
 			}
 			
-			$pagereq = 404;
+			$dbpage = 404;
 			
 			// we already know we're in a state of error handling: loop so we use the second round to fetch the error page itself.
 			continue;
@@ -768,7 +771,7 @@ if (0)
 			$rcode = (is_http_response_code($ccms['responsecode']) ? $ccms['responsecode'] : 404);
 			setup_ccms_for_40x_error($rcode, $pagereq);
 			
-			$pagereq = $rcode;
+			$dbpage = $rcode;
 			
 			// we now know we're in a state of error handling: loop so we use the second round to fetch the error page itself.
 			continue;
@@ -780,7 +783,10 @@ if (0)
 
 	if ($ccms['content'] === false)
 	{
-		$ccms['content'] = '';
+		// failure occurred! produce a 'response code page' after all!
+
+		$rcode = (is_http_response_code($ccms['responsecode']) ? $ccms['responsecode'] : 404);
+		setup_ccms_for_40x_error($rcode, $pagereq);
 	}
 
 	if ($ccms['responsecode'] > 0)
