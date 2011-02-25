@@ -2566,6 +2566,8 @@ return the required attribute for it.
 */
 function checkSpecialPageName($name, $reqd_attrib)
 {
+	global $cfg;
+	
 	if (empty($name) || in_array($name, array('home', 'index')))
 	{
 		$name = 'home';
