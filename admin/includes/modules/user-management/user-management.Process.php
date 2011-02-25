@@ -114,8 +114,8 @@ if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
 			$values['userName']     = MySQL::SQLValue($userName,MySQL::SQLVALUE_TEXT);
 			$values['userPass']     = MySQL::SQLValue($userPass,MySQL::SQLVALUE_TEXT);
-			$values['userFirst']    = MySQL::SQLValue($userFirstname,MySQL::SQLVALUE_TEXT);
-			$values['userLast']     = MySQL::SQLValue($userLastname,MySQL::SQLVALUE_TEXT);
+			$values['userFirst']    = MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);
+			$values['userLast']     = MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
 			$values['userEmail']    = MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
 			$values['userActive']   = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
 			$values['userLevel']    = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
