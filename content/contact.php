@@ -72,7 +72,7 @@ define('USE_HONEYTRAP_AGAINST_SPAM', true);
  */
 if (empty($_SESSION))
 {
-	session_start();
+	if (!session_start()) die('session_start() failed');
 }
 
 

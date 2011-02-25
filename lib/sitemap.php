@@ -60,7 +60,7 @@ function check_session_sidpatch_and_start()
 		 * however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
 		 */
 		session_id($sesid);
-		session_start();
+		if (!session_start()) die('session_start(SIDPATCH) failed');
 		//session_write_close();
 		if (!empty($_GET['SIDCHK']) && !empty($_SESSION['fup1']) && $_SESSION['fup1'] == $_GET['SIDCHK'])
 		{
@@ -79,7 +79,7 @@ function check_session_sidpatch_and_start()
 	}
 	else
 	{
-		session_start();
+		if (!session_start()) die('session_start(SIDCHECK_ALT) failed');
 	}
 }
 
@@ -209,7 +209,6 @@ if ($handle = @opendir(BASE_PATH . '/lib/templates/'))
 		array_unshift($template, $cfg['default_template']);
 	}
 	$ccms['template_collection'] = $template;
-
 }
 else
 {
@@ -321,7 +320,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			break;
 		}
 
-		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+		$ccms['title'] = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 	}
 
 
