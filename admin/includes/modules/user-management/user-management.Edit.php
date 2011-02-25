@@ -138,7 +138,7 @@ if(isset($_SESSION['rc1']) && !empty($_SESSION['rc2']) && checkAuth())
 						<br/>
 						<a class="small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_bullet_key">&#160;</span><?php echo $ccms['lang']['auth']['generatepass']; ?></a>
 					</label>
-					<input type="text" onkeyup="passwordStrength(this.value);" class="required minLength:6 text" name="userPass" value="" id="userPass" />
+					<input type="password" onkeyup="passwordStrength(this.value);" class="required minLength:6 text" name="userPass" value="" id="userPass" />
 					<div class="clear strength0" id="passwordStrength">
 						<div id="pws1">&#160;</div>
 					</div>
