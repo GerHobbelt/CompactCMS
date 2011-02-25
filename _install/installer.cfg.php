@@ -45,9 +45,9 @@ if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
  
  To tweak, edit the true/false values in the define() expressions below.
  */
-define('WRITE_CFG_FILES_TO_DISK', false);
-define('EXECUTE_QUERIES', false);
-define('DUMP_QUERIES_N_STUFF_IN_DEVMODE', true || !EXECUTE_QUERIES);
+define('WRITE_CFG_FILES_TO_DISK', true);
+define('EXECUTE_QUERIES', true);
+define('DUMP_QUERIES_N_STUFF_IN_DEVMODE', false || !EXECUTE_QUERIES);
 
 
 ?>
