@@ -1270,7 +1270,12 @@ if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAu
 
 			$old_filepath = BASE_PATH . '/content/' . $oldname . '.php';
 			$new_filepath = BASE_PATH . '/content/' . $newname . '.php';
-			if (!file_exists($old_filepath))
+			if ($old_filepath == $new_filepath)
+			{
+				// no actual rename happening...
+				die($ccms['lang']['backend']['success']);
+			}
+			else if (!file_exists($old_filepath))
 			{
 				die($ccms['lang']['system']['error_deleted']);
 			}
