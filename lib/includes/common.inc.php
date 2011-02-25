@@ -2807,7 +2807,7 @@ function checkAuth()
 	$canarycage = session_id();
 	$currenthost = md5($_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] /* . '::' . $_SERVER['HTTP_USER_AGENT'] */ );
 
-	if (!empty($_SESSION['id']) && $canarycage == $_SESSION['id']
+	if (is_array($_SESSION) && !empty($_SESSION['id']) && $canarycage == $_SESSION['id']
 		&& !empty($_SESSION['authcheck']) && $currenthost == $_SESSION['authcheck'])
 	{
 		return true;
