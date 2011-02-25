@@ -3,7 +3,7 @@
 -- Created for CompactCMS (www.compactcms.nl)
 --
 -- Host: localhost
--- Generated: Feb 24, 2011 at 15:26
+-- Generated: Feb 25, 2011 at 19:22
 -- MySQL version: 5.1.41
 -- PHP version: 5.3.1
 --
@@ -341,12 +341,12 @@ CREATE TABLE IF NOT EXISTS `ccms_modules` (
   `modTitle` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Friendly name',
   `modLocation` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'where you''ld find the plugin sources for management & display (use % as a marker where the mode (''Manage'', ''Show'') should be inserted into the specified path)',
   `modVersion` decimal(5,2) NOT NULL,
-  `modPermissionName` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'the permission name used in the admin permissions management screen to configure which users have what permissions',
+  `modPermissionName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'the permission name used in the admin permissions management screen to configure which users have what permissions',
   `hasPageMaker` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'If module may act as a page content generator',
   `hasAdminSection` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'if module requires a link to access it from the admin screen',
   `modActive` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`modID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the installed modules, their version and activation state' AUTO_INCREMENT=11 ;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the installed modules, their version and activation state';
 
 --
 -- Dumping data for table `ccms_modules`
@@ -355,16 +355,18 @@ CREATE TABLE IF NOT EXISTS `ccms_modules` (
 TRUNCATE TABLE `ccms_modules`;
 
 INSERT INTO `ccms_modules` (`modID`, `modName`, `modTitle`, `modLocation`, `modVersion`, `modPermissionName`, `hasPageMaker`, `hasAdminSection`, `modActive`) VALUES
-(1, 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', 1, 0, 1),
-(2, 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', 1, 0, 1),
-(4, 'mixer', 'Layout Mixer', './lib/modules/mixer/mixer.%.php', '1.00', 'manageModMixer', 1, 0, 1),
-(3, 'comment', 'Comments', './lib/modules/comment/comment.%.php', '1.20', 'manageModComment', 1, 0, 1),
-(5, 'acl', 'Access Control', './lib/modules/acl/acl.%.php', '1.00', 'manageModACL', 0, 1, 1),
-(6, 'template-editor', 'Template Editor', './admin/modules/template-editor/tpedt.%.php', '1.00', 'manageTemplateEditor', 0, 1, 1),
-(7, 'user-management', 'User Management', './admin/modules/user-management/usrmgr.%.php', '1.00', 'manageUsers', 0, 1, 1),
-(8, 'backup-restore', 'Backup / Restore', './admin/modules/backup-restore/backup.%.php', '1.00', 'manageBackups', 0, 1, 1),
-(9, 'content-owners', 'Content Ownership', './admin/modules/content-owners/owners.%.php', '1.00', 'manageContentOwners', 0, 1, 1),
-(10, 'translation', 'Translation Assistant', './admin/modules/translation/translation.%.php', '0.10', 'manageTranslations', 0, 1, 1);
+('1', 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', '1', '0', '1'),
+('2', 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', '1', '0', '1'),
+('4', 'mixer', 'Layout Mixer', './lib/modules/mixer/mixer.%.php', '1.00', 'manageModMixer', '1', '0', '0'),
+('3', 'comment', 'Comments', './lib/modules/comment/comment.%.php', '1.20', 'manageModComment', '1', '0', '1'),
+('5', 'acl', 'Access Control', './lib/modules/acl/acl.%.php', '1.00', 'manageModACL', '0', '1', '0'),
+('6', 'template-editor', 'Template Editor', './admin/modules/template-editor/tpedt.%.php', '1.00', 'manageTemplateEditor', '0', '1', '1'),
+('7', 'user-management', 'User Management', './admin/modules/user-management/usrmgr.%.php', '1.00', 'manageUsers', '0', '1', '1'),
+('8', 'backup-restore', 'Backup / Restore', './admin/modules/backup-restore/backup.%.php', '1.00', 'manageBackups', '0', '1', '1'),
+('9', 'content-owners', 'Content Ownership', './admin/modules/content-owners/owners.%.php', '1.00', 'manageContentOwners', '0', '1', '1'),
+('10', 'translation', 'Translation Assistant', './admin/modules/translation/translation.%.php', '0.10', 'manageTranslations', '0', '1', '1'),
+('11', 'editor', 'HTML/PHP Editor', './lib/modules/editor/editor.%.php', '1.10', NULL, '1', '0', '1'),
+('12', 'permissions', 'CCMS Permissions', './admin/modules/permissions/permissions.%.php', '1.00', NULL, '0', '1', '1');
 
 
 

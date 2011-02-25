@@ -157,11 +157,12 @@ $ccms['printing'] = getGETparam4boolYN('printing', 'N');
 $preview = getGETparam4IdOrNumber('preview'); // in fact, it's a hash plus ID!
 $preview = IsValidPreviewCode($preview);
 $ccms['preview'] = ($preview ? 'Y' : 'N');
-$ccms['responsecode'] = null; // default: 200 : OK
-$ccms['page_id'] = false;
-$ccms['page_name'] = false;
-$ccms['content'] = false;
-$ccms['template'] = null;
+
+//$ccms['responsecode'] = null; // default: 200 : OK
+//$ccms['page_id'] = false;
+//$ccms['page_name'] = false;
+//$ccms['content'] = false;
+//$ccms['template'] = null;
 
 
 
@@ -222,9 +223,15 @@ else
 
 
 // Fill active module array and load the plugin code
-$modules = $db->SelectArray($cfg['db_prefix'].'modules' /* , array('modActive' => MySQL::SQLValue(1, MySQL::SQLVALUE_NUMBER)) */ );
+$modules = $db->SelectArray($cfg['db_prefix'].'modules');
 if ($db->ErrorNumber())
 	$db->Kill();
+// add index to quickly access items in the $modules array:
+$modules_index = array();
+for($i = count($modules) - 1; $i >= 0; $i--)
+{
+	$modules_index[$modules[$i]['modName']] = $i;
+}
 
 
 
@@ -252,11 +259,37 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT'))
 {
 
 
-// OPERATION MODE ==
-// 1) Start normal operation mode (if sitemap.php is not requested directly).
-// This will fill all variables based on the requested page, or throw a 403/404 error when applicable.
 if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitemap')
 {
+	/*
+	 * OPERATION MODE ==
+	 *
+	 * 1) Start normal operation mode (if sitemap.php is not requested directly).
+	 *
+	 * This will fill all variables based on the requested page, or throw a 403/404 error when applicable.
+	 */
+
+	/*
+	 * set $ccms[$item] only when it has not been set before.
+	 *
+	 * Return the actual value of $ccms[$item]
+	 */
+	function set_ccms_opt($item, $value, $overwrite_on_empty = false)
+	{
+		global $ccms;
+		
+		if (!isset($ccms[$item]))
+		{
+			$ccms[$item] = $value;
+		}
+		else if ($overwrite_on_empty && empty($ccms[$item]))
+		{
+			$ccms[$item] = $value;
+		}
+		return $ccms[$item];
+	}
+
+
 	function setup_ccms_for_40x_error($code, $pagereq)
 	{
 		global $cfg, $ccms;
@@ -264,48 +297,43 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		// ERROR 403/404; if not 403, then we default to 404
 		// Or if DB query returns zero, show error 404: file does not exist
 
-		$ccms['module']      = 'error';
-		$ccms['module_path'] = null;
+		set_ccms_opt('module', 'error');
+		set_ccms_opt('module_info', null);
 
-		$ccms['cfg']        = $cfg;
-		$ccms['language']   = $cfg['language'];
-		$ccms['tinymce_language']   = $cfg['language'];
-		$ccms['editarea_language']   = $cfg['language'];
-		$ccms['sitename']   = $cfg['sitename'];
-		$ccms['pagetitle']  = $ccms['lang']['system']['error_404title'];
-		$ccms['subheader']  = $ccms['lang']['system']['error_404header'];
-		$ccms['printable']  = "N";
-		$ccms['published']  = "Y";
-		// [i_a] fix: close <span> here as well
-		$ccms['breadcrumb'] = array();
-		$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' '.$ccms['lang']['system']['home'].'">'.$ccms['lang']['system']['home'].'</a>';
-		$ccms['breadcrumb'][] = $ccms['lang']['system']['error_404title'];
-		$ccms['iscoding']   = "Y";
-		$ccms['rootdir']    = (substr($cfg['rootdir'],-1) !== '/' ? $cfg['rootdir'].'/' : $cfg['rootdir']);
-		if (empty($ccms['page_name']))
-		{
-			$ccms['urlpage'] = $pagereq; // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
-		}
-		$ccms['desc']       = $ccms['lang']['system']['error_404title'];
-		$ccms['desc_extra'] = '';
-		$ccms['keywords']   = strval($code);
-		if (empty($ccms['responsecode']))
-		{
-			$ccms['responsecode'] = intval($code);
-		}
-		if (empty($ccms['page_name']))
-		{
-			$ccms['page_name'] = $pagereq;
-		}
-		$ccms['toplevel']   = 0;
-		$ccms['sublevel']   = 0;
-		$ccms['menu_id']    = 0;
-		$ccms['islink']     = 'N';
+		set_ccms_opt('cfg', $cfg);
+		set_ccms_opt('language', $cfg['language']);
+		set_ccms_opt('tinymce_language', $cfg['language']);
+		set_ccms_opt('editarea_language', $cfg['language']);
+		set_ccms_opt('sitename', $cfg['sitename']);
+		$pagetitle = $ccms['lang']['system']['error_404title'];
+		$subheader = $ccms['lang']['system']['error_404header'];
+		set_ccms_opt('printable', "N");
+		set_ccms_opt('published', "Y");
+		
+		$bc = array();
+		$bc[] = '<a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' '.$ccms['lang']['system']['home'].'">'.$ccms['lang']['system']['home'].'</a>';
+		$bc[] = $ccms['lang']['system']['error_404title'];
+		
+		set_ccms_opt('iscoding', "Y");
+		set_ccms_opt('rootdir', $cfg['rootdir']);
+		set_ccms_opt('urlpage', $pagereq); // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
+		$desc = $ccms['lang']['system']['error_404title'];
+		set_ccms_opt('desc_extra', '');
+		set_ccms_opt('keywords', strval($code));
+		set_ccms_opt('responsecode', intval($code));
+		set_ccms_opt('page_name', $pagereq);
+		set_ccms_opt('toplevel', 0);
+		set_ccms_opt('sublevel', 0);
+		set_ccms_opt('menu_id', 0);
+		set_ccms_opt('islink', 'N');
 
-		$ccms['template'] = DetermineTemplateName(null, $ccms['printing']);
-		$tplel = explode('/', $ccms['template']);
-		$ccms['templatedir'] = $tplel[0];
+		$tpl = DetermineTemplateName(null, $ccms['printing']);
+		$tplel = explode('/', $tpl);
+		set_ccms_opt('templatedir', $tplel[0]);
+		set_ccms_opt('template', $tpl);
 
+		$content = $ccms['lang']['system']['error_404content'];
+		
 		switch (intval($code))
 		{
 		default:
@@ -314,15 +342,31 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 		case 403:
 			// patch the $ccms[] data for the 403 error:
-			$ccms['pagetitle']  = $ccms['lang']['system']['error_403title'];
-			$ccms['subheader']  = $ccms['lang']['system']['error_403header'];
-			array_pop($ccms['breadcrumb']);  // ditch the '404' entry and replace it with...
-			$ccms['breadcrumb'][] = $ccms['lang']['system']['error_403title'];
-			$ccms['desc']       = $ccms['lang']['system']['error_403title'];
+			$pagetitle = $ccms['lang']['system']['error_403title'];
+			$subheader = $ccms['lang']['system']['error_403header'];
+			
+			array_pop($bc);  // ditch the '404' entry and replace it with...
+			$bc[] = $ccms['lang']['system']['error_403title'];
+		
+			$content = $ccms['lang']['system']['error_404content'];
+			
+			$desc = $ccms['lang']['system']['error_403title'];
 			break;
 		}
+		set_ccms_opt('breadcrumb', $bc);
 
-		$ccms['title'] = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
+		set_ccms_opt('pagetitle', $pagetitle);
+		set_ccms_opt('subheader', $subheader);
+		set_ccms_opt('desc', $desc);
+		
+		set_ccms_opt('title', ucfirst($ccms['pagetitle']).' - '.$ccms['sitename'].' | '.$ccms['subheader']);
+
+		// even under error conditions, we need the side-effect of the content loader code: a properly initialized template!
+		$rendered_page = ccmsContent(null, 'Y', false);
+		//$content = $rendered_page['content'];
+		//$rcode = $rendered_page['responsecode'];
+		
+		set_ccms_opt('content', $content);
 	}
 
 
@@ -330,10 +374,11 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	 * Load the page ($page) Parse contents function when it is either signalled as published ($published),
 	 * identified by the preview page ID code ($preview).
 	 *
-	 * Return FALSE when the page does not exist or could not be loaded due to either the restrictions above
-	 * or file system access rights denying the web server read access to the specified page.
+	 * Return ['content'] == FALSE when the page does not exist or could not be loaded due to either the restrictions above
+	 * or file system access rights denying the web server read access to the specified page. A suitable HTTP responsecode
+	 * will be available in ['responsecode'].
 	 *
-	 * Return the rendered page content otherwise.
+	 * Return the rendered page content and ['responsecode'] == FALSE otherwise.
 	 */
 	function ccmsContent($page, $published, $preview)
 	{
@@ -342,7 +387,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		 *   -->
 		 * We want the db connection and the config ($cfg) and content ($ccms) arrays available anywhere inside the include()'d content.
 		 */
-		global $ccms, $cfg, $db, $modules, $v;
+		global $ccms, $cfg, $db, $modules, $modules_index, $v;
 
 		$content = false;
 		$ccms_load_failure = false; // this variable should have a name that will not get used/redefined inadvertedly in the loaded PHP page!
@@ -351,44 +396,36 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			$tpl_init_path = BASE_PATH . '/lib/templates/' . $ccms['templatedir'] . '/init.inc.php';
 			
 			// Parse content for active or preview mode
-			if ($published == 'Y' || $preview)
+			$filepath = BASE_PATH . '/content/' . $page . '.php';
+
+			if (!empty($page) && is_file($filepath))
 			{
-				$filepath = BASE_PATH . '/content/' . $page . '.php';
-
-				if (is_file($filepath))
+				if (is_readable($filepath))
 				{
-					if (is_readable($filepath))
+					// Check for preview variable
+					//
+					// Warning message when page is disabled and authcode is correct
+					if ($preview && $published != 'Y')
 					{
-						// Check for preview variable
-						//
-						// Warning message when page is disabled and authcode is correct
-						if ($preview && $published != 'Y')
-						{
-							echo '<p class="unpublished_preview_note">'.$msg[0].': <strong>'.strtolower($ccms['lang']['backend']['disabled']).'</strong></p>';
-						}
-
-						// load template init code BEFORE we load the page content itself:
-						if (is_file($tpl_init_path))
-						{
-							/*MARKER*/include($tpl_init_path);
-						}
-
-						/*MARKER*/include($filepath);
+						echo '<p class="unpublished_preview_note">'.$msg[0].': <strong>'.strtolower($ccms['lang']['backend']['disabled']).'</strong></p>';
 					}
-					else
+
+					// load template init code BEFORE we load the page content itself:
+					if (is_file($tpl_init_path))
 					{
-						$ccms_load_failure = 403;
+						/*MARKER*/include($tpl_init_path);
 					}
+
+					/*MARKER*/include($filepath);
 				}
 				else
 				{
-					$ccms_load_failure = 404;
+					$ccms_load_failure = 403;
 				}
 			}
 			else
 			{
-				// Parse 403 contents (disabled and no preview token)
-				$ccms_load_failure = 403;
+				$ccms_load_failure = 404;
 			}
 			
 			// Make sure to load the template init code at least once, even when the content page couldn't be loaded:
@@ -401,17 +438,14 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			$content = ob_get_contents();
 		ob_end_clean();
 
-		if ($ccms_load_failure)
-		{
-			if (empty($ccms['responsecode']))
-			{
-				$ccms['responsecode'] = $ccms_load_failure;
-			}
-			return false;
-		}
-		return $content;
+		$rv = array();
+		$rv['content'] = $content;
+		$rv['responsecode'] = $ccms_load_failure;
+		return $rv;
 	}
 
+	
+	
 	// collect the menu entries first so we can peruse them in the breadcrumb code below.
 	$menu_in_set = '1';
 	for($i = 2; $i <= MENU_TARGET_COUNT; $i++)
@@ -613,122 +647,198 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		}
 	}
 
-	// OPERATION MODE ==
-	//
-	// Select the appropriate statement (home page versus specified page)
-	//
-	// This is a separate query for two reasons:
-	// (1) the above might be cached as a whole one day, and
-	// (2) the requested page doesn't necessarily need to appear in any menu!
-	
-	// one or two rounds: one round for good pages; the second round is for when we need to report an error (through a user-editable error page):
+	/*
+	 * OPERATION MODE ==
+	 *
+	 * Select the appropriate statement (home page versus specified page)
+	 *
+	 * This is a separate query for two reasons:
+	 *
+	 * (1) the above might be cached as a whole one day, and
+	 *
+	 * (2) the requested page doesn't necessarily need to appear in any menu!
+	 *
+	 * - We fetch the page
+	 * - If it does not exist (or when there's no database record at all), we 
+	 *   try to fetch a suitable error page
+	 * - If that one isn't available for whatever reason, we default to a basic
+	 *   error response (the content of which depending on the situation at hand
+	 *
+	 * Hence we run up to two rounds below: one round for good pages; the second 
+	 * round is for when we need to report an error (through a user-editable error page)
+	 *
+	 * NOTE: since we wish to keep as much info from the intended page as possible,
+	 *       we mix&merge the two rows in the second round.
+	 */
 	$dbpage = $pagereq;
+	$pagerow = null;
+	$rcode = false;
+	
 	for ($round = 0; $round < 2; $round++)
 	{
 		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($dbpage, MySQL::SQLVALUE_TEXT)));
 		if ($db->ErrorNumber()) $db->Kill();
 
-		// Start switch for pages, select all the right details
 		if($row)
 		{
-			// Internal reference
-			$ccms['published']  = $row->published;
-			$ccms['iscoding']   = $row->iscoding;
-
-			// Content variables
-			$ccms['cfg']        = $cfg;
-			$ccms['page_id']    = $row->page_id;
-			$ccms['page_name']  = $row->urlpage;
-			$ccms['language']   = $cfg['language'];
-			$ccms['tinymce_language'] = $cfg['language'];
-			$ccms['editarea_language'] = $cfg['language'];
-			$ccms['sitename']   = $cfg['sitename'];
-			$ccms['rootdir']    = (substr($cfg['rootdir'], -1) !== '/' ? $cfg['rootdir'] . '/' : $cfg['rootdir']);
-			if (empty($ccms['urlpage']))
+			// don't collect ANY data from unpublished pages (security issue: don't leak titles, etc. when marked as UNpublished!)
+			if($preview || $row->published == 'Y')
 			{
-				$ccms['urlpage']    = $row->urlpage;
-			}
-			$ccms['pagetitle']  = $row->pagetitle;
-			$ccms['subheader']  = $row->subheader;
-
-			// mirror the menu builder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
-			$msg = explode(' ::', $row->description, 2);
-			$ccms['desc']       = $msg[0];
-			$ccms['desc_extra'] = (!empty($msg[1]) ? trim($msg[1]) : '');
-
-			$ccms['keywords']   = $row->keywords;
-			$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
-			$ccms['printable']  = $row->printable;
-			// $ccms['responsecode'] = null; // default: 200 : OK
-			$ccms['menu_id']    = intval($row->menu_id);
-			if ($ccms['menu_id'])
-			{
-				$ccms['toplevel']   = intval($row->toplevel);
-				$ccms['sublevel']   = intval($row->sublevel);
-			}
-			else
-			{
-				$ccms['toplevel']   = 0;
-				$ccms['sublevel']   = 0;
-			}
-			$ccms['islink']     = $row->islink;
-
-			// TEMPLATING ==
-			// Check whether template exists, specify default or throw "no templates" error.
-			$ccms['template'] = DetermineTemplateName($row->variant, $ccms['printing']);
-			$tplel = explode('/', $ccms['template']);
-			$ccms['templatedir'] = $tplel[0];
-
-			$ccms['module']      = $row->module;
-			$ccms['module_path'] = null;
-
-if (0)
-{
-			// create a plugin/module instance tailored to this particular page
-			if($row->module != 'editor' && is_object($modules[$row->module]) && method_exists($modules[$row->module], 'getInstance'))
-			{
-				$ccms['module_instance'] = $modules[$row->module]->getInstance($ccms);
-				if (!is_object($ccms['module_instance']))
+				if (!$pagerow)
 				{
-					die('FATAL: module ' . $row->module . ' failed to initialize for page ' . $row->urlpage);
-				}
-			}
-}
-
-			// BREADCRUMB ==
-			// Create breadcrumb for the current page
-			$preview_checkcode = GenerateNewPreviewCode($row->page_id, null);
-			$ccms['previewcode'] = $preview_checkcode;
-
-			$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
-
-			$ccms['breadcrumb'] = array();
-			$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' '.$ccms['lang']['system']['home'].'">'.$ccms['lang']['system']['home'].'</a>';
-			if(!checkSpecialPageName($row->urlpage, SPG_IS_HOMEPAGE))
-			{
-				if($row->sublevel == 0)
-				{
-					$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a>';
+					$pagerow = $row;
 				}
 				else
 				{
-					// sublevel page
-					if (is_array($pagelist) && count($pagelist) > 0)
+					// mix original data into the error record:
+				}
+				
+				// Internal reference
+				set_ccms_opt('published', $row->published);
+				set_ccms_opt('iscoding', $row->iscoding);
+
+				// Content variables
+				set_ccms_opt('cfg', $cfg);
+				set_ccms_opt('page_id', $row->page_id);
+				set_ccms_opt('page_name', $row->urlpage);
+				set_ccms_opt('language', $cfg['language']);
+				set_ccms_opt('tinymce_language', $cfg['language']);
+				set_ccms_opt('editarea_language', $cfg['language']);
+				set_ccms_opt('sitename', $cfg['sitename']);
+				set_ccms_opt('rootdir', $cfg['rootdir']);
+				set_ccms_opt('urlpage', $row->urlpage);
+				set_ccms_opt('pagetitle', $row->pagetitle);
+				set_ccms_opt('subheader', $row->subheader);
+
+				// mirror the menu builder below; orthogonal code: ALL descriptions with a ' ::' in there are split, not just the ones with a URL inside.
+				$msg = explode(' ::', $row->description, 2);
+				set_ccms_opt('desc', $msg[0]);
+				set_ccms_opt('desc_extra', (!empty($msg[1]) ? trim($msg[1]) : ''));
+
+				set_ccms_opt('keywords', $row->keywords);
+				set_ccms_opt('title', ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader']);
+				set_ccms_opt('printable', $row->printable);
+				//set_ccms_opt('responsecode', null);			// default: 200 : OK
+				$m_id = intval($row->menu_id);
+				set_ccms_opt('menu_id', $m_id);
+				if ($m_id)
+				{
+					set_ccms_opt('toplevel', intval($row->toplevel));
+					set_ccms_opt('sublevel', intval($row->sublevel));
+				}
+				else
+				{
+					set_ccms_opt('toplevel', 0);
+					set_ccms_opt('sublevel', 0);
+				}
+				set_ccms_opt('islink', $row->islink);
+
+				// TEMPLATING ==
+				// Check whether template exists, specify default or throw "no templates" error.
+				$tpl = DetermineTemplateName($row->variant, $ccms['printing']);
+				$tplel = explode('/', $tpl);
+				set_ccms_opt('templatedir', $tplel[0]);
+				set_ccms_opt('template', $tpl);
+
+				set_ccms_opt('module', $row->module);
+				set_ccms_opt('module_info', $modules[$modules_index[$row->module]]);
+
+				if (0)
+				{
+					// create a plugin/module instance tailored to this particular page
+					if(is_object($modules[$row->module]) && method_exists($modules[$row->module], 'getInstance'))
 					{
-						foreach($pagelist as $entry)
+						set_ccms_opt('module_instance', $modules[$row->module]->getInstance($ccms));
+						if (!is_object($ccms['module_instance']))
 						{
-							if ($entry['menu_id'] == $row->menu_id // make sure to check the menu_id: we want OUR parent, which sits in OUR menu!
-								&& $entry['sublevel'] == 0  // accepts NULL or 0 which exactly what we want here!
-								&& $entry['toplevel'] == $row->toplevel)
-							{
-								$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$parent['urlpage'].'.html'.$preview_qry.'" title="'.$parent['subheader'].'">'.$parent['pagetitle'].'</a>';
-								break;
-							}
+							die('FATAL: module ' . $row->module . ' failed to initialize for page ' . $row->urlpage);
 						}
 					}
-
-					$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a>';
 				}
+
+				// BREADCRUMB ==
+				// Create breadcrumb for the current page
+				$preview_checkcode = GenerateNewPreviewCode($row->page_id, null);
+				set_ccms_opt('previewcode', $preview_checkcode);
+
+				$preview_qry = ($preview ? '?preview=' . $preview_checkcode : '');
+
+				$bc = array();
+				$bc[] = '<a href="'.$cfg['rootdir'].$preview_qry.'" title="'.ucfirst($cfg['sitename']).' '.$ccms['lang']['system']['home'].'">'.$ccms['lang']['system']['home'].'</a>';
+				if(!checkSpecialPageName($row->urlpage, SPG_IS_HOMEPAGE))
+				{
+					if($row->sublevel == 0)
+					{
+						$bc[] = '<a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a>';
+					}
+					else
+					{
+						// sublevel page
+						if (is_array($pagelist) && count($pagelist) > 0)
+						{
+							foreach($pagelist as $entry)
+							{
+								if ($entry['menu_id'] == $row->menu_id // make sure to check the menu_id: we want OUR parent, which sits in OUR menu!
+									&& $entry['sublevel'] == 0  // accepts NULL or 0 which exactly what we want here!
+									&& $entry['toplevel'] == $row->toplevel)
+								{
+									$bc[] = '<a href="'.$cfg['rootdir'].$entry['urlpage'].'.html'.$preview_qry.'" title="'.$entry['subheader'].'">'.$entry['pagetitle'].'</a>';
+									break;
+								}
+							}
+						}
+
+						$bc[] = '<a href="'.$cfg['rootdir'].$row->urlpage.'.html'.$preview_qry.'" title="'.$row->subheader.'">'.$row->pagetitle.'</a>';
+					}
+				}
+				set_ccms_opt('breadcrumb', $bc);
+
+
+				/*
+				 * The CONTENT collection should be the very last thing happening.
+				 *
+				 * This is important for 'code' pages: these can only now assume that all
+				 * $ccms[] entries for the current page have been set up completely.
+				 * ATM no modules use this assumption (for example to modify/postprocess the $ccms[]
+				 * data) but this code flow enables the existence of such modules (plugins)
+				 * as they are loaded through the 'iscoding'-marked page.
+				 */
+				$rendered_page = ccmsContent($row->urlpage, $row->published, $preview);
+				$content = $rendered_page['content'];
+				$rcode = $rendered_page['responsecode'];
+				
+				if ($content === false || $rcode !== false)
+				{
+					// failure occurred! produce a 'response code page' after all!
+					$rcode = (is_http_response_code($rcode) ? $rcode : 404);
+					set_ccms_opt('responsecode', $rcode);
+					//setup_ccms_for_40x_error($rcode, $pagereq);
+					
+					$dbpage = $rcode;
+					
+					// we now know we're in a state of error handling: loop so we use the second round to fetch the error page itself.
+					continue;
+				}
+				else
+				{
+					set_ccms_opt('content', $content);
+					set_ccms_opt('responsecode', $rcode);
+				}
+
+				// we're done!
+				break;
+			}
+			else
+			{
+				// Parse 403 contents (disabled and no preview token)
+				$content = false;
+				$rcode = (is_http_response_code($rcode) ? $rcode : 403);
+				set_ccms_opt('page_name', $pagereq);
+				set_ccms_opt('responsecode', $rcode);
+				
+				$dbpage = $rcode;
+				
+				// loop so we use the second round to fetch the error page itself.
 			}
 		}
 		else
@@ -737,55 +847,22 @@ if (0)
 			//$ccms['page_id'] = false;
 			//$ccms['page_name'] = false;
 
+			$content = false;
 			$rcode = (is_http_response_code($pagereq) ? intval($pagereq) : 404);
-			if (empty($ccms['page_name']))
-			{
-				$ccms['page_name'] = $rcode;
-			}
-			if (empty($ccms['responsecode']))
-			{
-				$ccms['responsecode'] = $rcode;
-			}
-			
-			$dbpage = 404;
-			
-			// we already know we're in a state of error handling: loop so we use the second round to fetch the error page itself.
-			continue;
-		}
-
-
-		/*
-		 * The CONTENT collection should be the very last thing happening.
-		 *
-		 * This is important for 'code' pages: these can only now assume that all
-		 * $ccms[] entries for the current page have been set up completely.
-		 * ATM no modules use this assumption (for example to modify/postprocess the $ccms[]
-		 * data) but this code flow enables the existence of such modules (plugins)
-		 * as they are loaded through the 'iscoding'-marked page.
-		 */
-		$ccms['content'] = ccmsContent($ccms['page_name'], $ccms['published'], $preview);
-		if ($ccms['content'] === false)
-		{
-			// failure occurred! produce a 'response code page' after all!
-
-			$rcode = (is_http_response_code($ccms['responsecode']) ? $ccms['responsecode'] : 404);
-			setup_ccms_for_40x_error($rcode, $pagereq);
+			set_ccms_opt('page_name', $pagereq);
+			set_ccms_opt('responsecode', $rcode);
 			
 			$dbpage = $rcode;
 			
-			// we now know we're in a state of error handling: loop so we use the second round to fetch the error page itself.
-			continue;
+			// loop so we use the second round to fetch the error page itself.
 		}
+	} // end of 2-round loop
 
-		// we're done!
-		break;
-	}
-
-	if ($ccms['content'] === false)
+	if ($content === false || $rcode !== false)
 	{
 		// failure occurred! produce a 'response code page' after all!
 
-		$rcode = (is_http_response_code($ccms['responsecode']) ? $ccms['responsecode'] : 404);
+		$rcode = (is_http_response_code($rcode) ? $rcode : 404);
 		setup_ccms_for_40x_error($rcode, $pagereq);
 	}
 
@@ -794,12 +871,16 @@ if (0)
 		send_response_status_header($ccms['responsecode']);
 	}
 }
-
-// OPERATION MODE ==
-// 3) Start dynamic sitemap creation used by spiders and various webmaster tools.
-// e.g. You can use this function to submit a dynamic sitemap to Google Webmaster Tools.
 else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a] if() removed so the GET URL index.php?page=sitemap doesn't slip through the cracks.
 {
+	/*
+	 * OPERATION MODE ==
+	 *
+	 * 3) Start dynamic sitemap creation used by spiders and various webmaster tools.
+	 *
+	 * e.g. You can use this function to submit a dynamic sitemap to Google Webmaster Tools.
+	 */
+	 
 	$dir = $cfg['rootdir'];   // [i_a] the original substr($_SERVER[]) var would fail when called with this req URL: index.php?page=sitemap
 
 	/*
@@ -809,13 +890,14 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 	*/
 	header("content-type: application/xml");
 
-	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-	?>
-	<urlset
-		xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-	<?php
+	echo <<<EOT42
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+	xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+EOT42;
+
 	// Select all published pages
 	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', array('published' => "'Y'"), array('urlpage', 'description', 'islink'));
 	if ($rows === false) $db->Kill();
@@ -837,19 +919,19 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 				else if($row->islink == 'N')
 				{
 					// [i_a] put pages which are not accessible through the menus (and thus the home/index page, at a higher scan priority.
-					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."".$row->urlpage.".html</loc>\n";
+					echo "<loc>http://".$_SERVER['SERVER_NAME'].''.$dir.''.$row->urlpage.".html</loc>\n";
 					echo "<priority>0.70</priority>\n";
 				}
 				else
 				{
-					echo "<loc>http://".$_SERVER['SERVER_NAME']."".$dir."".$row->urlpage.".html</loc>\n";
+					echo "<loc>http://".$_SERVER['SERVER_NAME'].''.$dir.''.$row->urlpage.".html</loc>\n";
 					echo "<priority>0.50</priority>\n";
 				}
 			echo "<changefreq>weekly</changefreq>\n";
 			echo "</url>\n";
 		}
 	}
-	echo "</urlset>";
+	echo "</urlset>\n";
 
 	exit(); // [i_a] exit now; no need nor want to run the XML through the template engine
 }
