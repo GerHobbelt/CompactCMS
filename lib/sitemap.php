@@ -290,7 +290,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	}
 
 
-	function setup_ccms_for_40x_error($code, $pagereq)
+	function setup_ccms_for_40x_error($rcode, $pagereq)
 	{
 		global $cfg, $ccms;
 
@@ -319,8 +319,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('urlpage', $pagereq); // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
 		$desc = $ccms['lang']['system']['error_404title'];
 		set_ccms_opt('desc_extra', '');
-		set_ccms_opt('keywords', strval($code));
-		set_ccms_opt('responsecode', intval($code));
+		set_ccms_opt('keywords', strval($rcode));
+		set_ccms_opt('responsecode', $rcode);
 		set_ccms_opt('page_name', $pagereq);
 		set_ccms_opt('toplevel', 0);
 		set_ccms_opt('sublevel', 0);
@@ -334,7 +334,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 		$content = $ccms['lang']['system']['error_404content'];
 		
-		switch (intval($code))
+		switch ($rcode)
 		{
 		default:
 			// assume 404 ~ default $ccms[] setup above.
@@ -348,7 +348,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			array_pop($bc);  // ditch the '404' entry and replace it with...
 			$bc[] = $ccms['lang']['system']['error_403title'];
 		
-			$content = $ccms['lang']['system']['error_404content'];
+			$content = $ccms['lang']['system']['error_403content'];
 			
 			$desc = $ccms['lang']['system']['error_403title'];
 			break;
@@ -672,7 +672,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	 */
 	$dbpage = $pagereq;
 	$pagerow = null;
-	$rcode = false;
+	$rcode = (is_http_response_code($pagereq) ? intval($pagereq) : false);
+	//set_ccms_opt('content', '<pre>rcode = ' . $rcode . ', ' . $pagereq);
 	
 	for ($round = 0; $round < 2; $round++)
 	{
@@ -805,12 +806,18 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				 */
 				$rendered_page = ccmsContent($row->urlpage, $row->published, $preview);
 				$content = $rendered_page['content'];
-				$rcode = $rendered_page['responsecode'];
-				
-				if ($content === false || $rcode !== false)
+				if (!$rcode)
+				{
+					$rcode = $rendered_page['responsecode'];
+				}
+
+				if ($content === false)
 				{
 					// failure occurred! produce a 'response code page' after all!
-					$rcode = (is_http_response_code($rcode) ? $rcode : 404);
+					if (!$rcode)
+					{
+						$rcode = 404;
+					}
 					set_ccms_opt('responsecode', $rcode);
 					//setup_ccms_for_40x_error($rcode, $pagereq);
 					
@@ -832,7 +839,10 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			{
 				// Parse 403 contents (disabled and no preview token)
 				$content = false;
-				$rcode = (is_http_response_code($rcode) ? $rcode : 403);
+				if (!$rcode)
+				{
+					$rcode = 403;
+				}
 				set_ccms_opt('page_name', $pagereq);
 				set_ccms_opt('responsecode', $rcode);
 				
@@ -848,7 +858,10 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			//$ccms['page_name'] = false;
 
 			$content = false;
-			$rcode = (is_http_response_code($pagereq) ? intval($pagereq) : 404);
+			if (!$rcode)
+			{
+				$rcode = 404;
+			}
 			set_ccms_opt('page_name', $pagereq);
 			set_ccms_opt('responsecode', $rcode);
 			
@@ -862,11 +875,14 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	{
 		// failure occurred! produce a 'response code page' after all!
 
-		$rcode = (is_http_response_code($rcode) ? $rcode : 404);
+		if (!$rcode)
+		{
+			$rcode = 404;
+		}
 		setup_ccms_for_40x_error($rcode, $pagereq);
 	}
 
-	if ($ccms['responsecode'] > 0)
+	if (is_http_response_code($ccms['responsecode']))
 	{
 		send_response_status_header($ccms['responsecode']);
 	}
