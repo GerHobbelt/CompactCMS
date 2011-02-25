@@ -1013,7 +1013,7 @@ if($nextstep == 'final' && CheckAuth())
 		<p>The installation has been successful! You should now follow the steps below, to get you started.</p>
 		<ol>
 			<li>Delete the <em>./_install</em> directory</li>
-			<li><a href="../admin/">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
+			<li><a href="../lib/includes/auth.inc.php?logon_user=admin">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
 			<li>Change your password through the back-end</li>
 			<li><a href="http://www.compactcms.nl/contact.html" target="_blank">Let me know</a> how you like CompactCMS!</li>
 		</ol>

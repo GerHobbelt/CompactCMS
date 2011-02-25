@@ -68,6 +68,11 @@ if(is_dir(BASE_PATH . '_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 }
 
 $userName = strtolower(getPOSTparam4IdOrNumber('userName'));
+// also allow logon actions where the user is already 'pre-configured'; easy logon!
+if (empty($userName))
+{
+	$userName = strtolower(getGETparam4IdOrNumber('logon_user'));
+}
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
