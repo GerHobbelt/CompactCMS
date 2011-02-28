@@ -1,11 +1,8 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-
-<head>
-<meta http-equiv="Content-Language" content="en-us" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Bloody Hell</title>
-		<link rel="stylesheet" href="docs_files/screen.css,layout.css,sprite.css,syntax.css" type="text/css" charset="utf-8">
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Documentation - CompactCMS | Getting started and advanced tips</title>
+<link rel="stylesheet" href="fmt/screen.css,layout.css,sprite.css,syntax.css" type="text/css" charset="utf-8">
 <style type="text/css">
 .light_up_editing {
 	color: #FF0000;
@@ -15,10 +12,11 @@
 	text-decoration: line-through;
 }
 </style>
-</head>
+</head><body class="container">
 
-<body>
-<div id="the_oddities_log">
+
+
+
 <h1 class="center-text">Bloody Hell, I should keep a log of this <em>shit</em>!</h1>
 <p>So I do now. It's simply way too, ah, odd, what you come across when testing a CMS on multiple browsers while doing development. Currently (Q4 2010) I'm working on a nice little nifty CMS (CompactCMS) and doing the things I do, I've had already quite a surprises this last month (after I went from plugging security gaps to actively turning the bugger into something I would truly like to present to folks who want 'a website').</p>
 <p>But this is not about that, this is about surprises during development, so without further ado, here's about the creepy things I ran into.</p>
@@ -171,8 +169,8 @@ if($do=="delete" &amp;&amp; <span class="light_up_editing">!empty($btn_delete)</
 <p>Turns out the info at <a href="http://www.dracos.co.uk/code/ie6-css-bug/"> http://www.dracos.co.uk/code/ie6-css-bug/</a> is right, but note that you shouldn't limit yourself to tweaking just the parent to make it have hasLayout; you may also need to tweak the grandparent, like I had to do.</p>
 <p>The thing that made me try that was the fact that running a backup did also move that warning message into the proper place, the difference being another added &lt;div&gt; at the top where the feedback message appears.</p>
 <h1>JavaScript : why your onsubmit / onclick actions don't work like they should</h1>
-<p>Found out the hard way&mdash;the only way when I once again succumb to the prevalent 'common sense' out there and forego reading the reference manual front to back; in this case the ECMA spec plus a few other</span> choice bits. (See also the the_goto_guy.js script for code and further reading):</p>
-<p>IE6 in strict mode&mdash;which is the default setting on a clean install, so you'll find this on otherwise 'pristine', yet old, machines&mdash;is not the only one who performs a 'double action' for HTML / JS like this (it seems to work like this on all browsers I tested up to now: latest Chrome, Opera, FireFox and the various MSIE's: 6, 7 and 8):</span></p>
+<p>Found out the hard way&mdash;the only way when I once again succumb to the prevalent 'common sense' out there and forego reading the reference manual front to back; in this case the ECMA spec plus a few otherchoice bits. (See also the the_goto_guy.js script for code and further reading):</p>
+<p>IE6 in strict mode&mdash;which is the default setting on a clean install, so you'll find this on otherwise 'pristine', yet old, machines&mdash;is not the only one who performs a 'double action' for HTML / JS like this (it seems to work like this on all browsers I tested up to now: latest Chrome, Opera, FireFox and the various MSIE's: 6, 7 and 8):</p>
 <p class="large">JavaScript:</p>
 <pre>&lt;script type="text/javascript"&gt;
 function confirmation()
@@ -210,12 +208,15 @@ function confirmation()
 	{
 		try
 		{
-			return <span class="light_up_editing">(true !== </span>parent.MochaUI.closeWindow(parent.$('sys-usr_ccms'))<span class="light_up_editing">)</span>;<span class="light_up_editing"> // when it fails, mochaUI doesn't always seem to return 'false' either... </span>		}
+			return <span class="light_up_editing">(true !== </span>parent.MochaUI.closeWindow(parent.$('sys-usr_ccms'))<span class="light_up_editing">)</span>;<span class="light_up_editing"> // when it fails, mochaUI doesn't always seem to return 'false' either... </span>
+		}
 		catch(e)
 		{
 		}
-<span class="light_up_editing"> // answer == true, so we're going to 'fall back' to the coded href= action here... </span>	}
-<span class="light_up_editing"> <strong>return answer;</strong> </span>}
+<span class="light_up_editing"> // answer == true, so we're going to 'fall back' to the coded href= action here... </span>
+	}
+<span class="light_up_editing"> <strong>return answer;</strong></span>
+}
 &lt;/script&gt;	</pre>
 <p class="large">HTML</p>
 <pre>&lt;a class="button" <strong>href="../index.php" onClick="<span class="light_up_editing">return </span>confirmation();"</strong> title="..."&gt;Going down, Mr. Tyler?&lt;/a&gt;</pre>
@@ -225,14 +226,15 @@ function confirmation()
 <p class="large">HTML</p>
 <pre>&lt;a class="button" <span class="style2">href="../index.php"</span> <strong>onClick="<span>return </span>confirmation();"</strong> title="..."&gt;Going down, Mr. Tyler?&lt;/a&gt;
 ...or...
-&lt;form <span class="style2">action="Process.php"</span> method="post" accept-charset="utf-8" <strong>onsubmit="return </strong><strong>refresh_adminmain();"</strong>&gt;...&lt;/form&gt;</pre>
+&lt;form <span class="style2">action="Process.php"</span> method="post" accept-charset="utf-8" <strong>onsubmit="return refresh_adminmain();"</strong>&gt;...&lt;/form&gt;</pre>
 <p><strong>i.e.</strong></p>
 <pre>&lt;a class="button" <strong> onClick="<span>return </span>confirmation();"</strong> title="..."&gt;Going down, Mr. Tyler?&lt;/a&gt;
 ...or...
-&lt;form  method="post" accept-charset="utf-8" <strong>onsubmit="return </strong><strong>refresh_adminmain();"</strong>&gt;...&lt;/form&gt;</pre>
+&lt;form  method="post" accept-charset="utf-8" <strong>onsubmit="return refresh_adminmain();"</strong>&gt;...&lt;/form&gt;</pre>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
+

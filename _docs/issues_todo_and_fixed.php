@@ -1,11 +1,8 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"  >
-
-<head>
-<meta http-equiv="Content-Language" content="en-us" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Bloody Hell</title>
-		<link rel="stylesheet" href="docs_files/screen.css,layout.css,sprite.css,syntax.css" type="text/css" charset="utf-8">
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Documentation - CompactCMS | Getting started and advanced tips</title>
+<link rel="stylesheet" href="fmt/screen.css,layout.css,sprite.css,syntax.css" type="text/css" charset="utf-8">
 <style type="text/css">
 .light_up_editing {
 	color: #FF0000;
@@ -38,14 +35,14 @@ td {
 
 
 </style>
-</head>
+</head><body class="container">
 
-<body>
-<div id="the_oddities_log">
+
+
 <h1 class="center-text">Issues overview</h1>
 <p>(I tend to write these things on paper (haven't got the same issue tracker around everywhere I go); moved the paper notes here for easier transportation.)</p>
 <p>These issues have been identified and need to be fixed. Issues may be bugs, 'oddities' or change requests. When done, an issue is marked as such: &#10004;</p>
-<table class="" cellspacing="0" cellpadding="0">
+<table cellspacing="0" cellpadding="0">
 <tbody>
 <tr><th class="span-2">
 <p>Done</p>
@@ -125,11 +122,13 @@ td {
 </td>
 </tr>
 <tr>
-<td><p>&#10004;&#10006;
+<td><p>✔
 <p>2010/12/29</p>
 </td>
 <td><p>Xander says: CCMS fails when using a different table prefix than ccms_ and/or a different database name ('compactcms').</p>
 <p>Fixed. Tested this with bleeding edge today and it's not reproducible, at least not now any more.</p>
+<p>Fixed (2011/02/27). Tested both <strong>database name</strong> change and
+<strong>table prefix</strong> change in installer: okay.</p>
 </td>
 </tr>
 <tr>
@@ -172,7 +171,7 @@ td {
 <p>2010/12/??</p>
 </td>
 <td><p>On-line Help tips are not shown properly formatted in the admin screen.</p>
-<p>Fixed. Cause was that the Tipz assignment JS code was not re-run on every dyn-list / menu magement table load.</p>
+<p>Fixed. Cause was that the Tipz assignment JS code was not re-run on every dyn-list / menu management table load.</p>
 </td>
 </tr>
 <tr>
@@ -310,7 +309,6 @@ td {
 </td>
 <td><p>Bug: Open the lightbox admin page for an album (which you created previously), e.g. <a href="http://example.com/c/lib/modules/lightbox/lightbox.Manage.php?album=0rn3"> http://example.com/c/lib/modules/lightbox/lightbox.Manage.php?album=0rn3</a> and then click on the 'Start Upload' button without browsing/picking a couple of images first. The result will be a little JSON dump instead of a properly HTML formatted page avec du error report:</p>
 <pre>{"status":"0","error":"Invalid Upload: ","code":" : : "}</pre>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -326,7 +324,6 @@ td {
 <p><a href="http://www.avonvale.co.uk/index.php/events_calendar_2009/"> http://www.avonvale.co.uk/index.php/events_calendar_2009/</a></p>
 <p><a href="http://www.trumba.com/connect/onlinecalendars/new_york_times.aspx"> http://www.trumba.com/connect/onlinecalendars/new_york_times.aspx</a> (now these are serious buggers! :-) If possible, let's do something like this, eh?)</p>
 <p><a href="https://events.rit.edu/help.cfm"> https://events.rit.edu/help.cfm</a> (and if you'ld get on-line help of a quality like this, then we're absolutely super-fine!)</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -340,7 +337,7 @@ td {
 <td><p>&#10004;&#10006;&#8263; 
 <p>2011/01/11</p>
 </td>
-<td><p>Restored the rounded-corner look for the admin pages. (The non-development mode CSS processing in the Combiner now inserts the correct incantation for FF3 at least.</p>
+<td><p>Restored the rounded-corner look for the admin pages. (The non-development mode CSS processing in the Combiner now inserts the correct incantation for FF3 at least.)</p>
 <p>TODO: do the same magick for Chrome and others.</p>
 </td>
 </tr>
@@ -374,9 +371,7 @@ PRIMARY KEY (`MixerID`),
 KEY `PageID` (`PageID`),
 KEY `UserID` (`UserID`),
 KEY `MixIn_PageID` (`MixIn_PageID`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT=&#39;N:M relationships which define the page layout mix per page/&#39; AUTO_INCREMENT=1 ;
-</pre>
-<p>&nbsp;</p>
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT=&#39;N:M relationships which define the page layout mix per page/&#39; AUTO_INCREMENT=1;</pre>
 </td>
 </tr>
 <tr>
@@ -384,18 +379,16 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/14</p>
 </td>
 <td><p>Feature Request: integrate <a href="https://github.com/paulirish/html5-boilerplate">HTML5 Boilerplate</a> in admin and templates?</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
 <td><p>&#10004;&#10006;&#8263; 
 <p>2011/01/14</p>
 </td>
-<td><p>Feature Request: seen on orther sites: use lazy image loading for when we don't want a lightbox-ed image gallery (or for pages which show lots of (large) images).</p>
+<td><p>Feature Request: seen on other sites: use lazy image loading for when we don't want a lightbox-ed image gallery (or for pages which show lots of (large) images).</p>
 <p><a href="http://www.webresourcesdepot.com/lazy-loading-of-images-resources-you-need/"> http://www.webresourcesdepot.com/lazy-loading-of-images-resources-you-need/</a></p>
 <p><a href="http://davidwalsh.name/mootools-lazyload"> http://davidwalsh.name/mootools-lazyload</a></p>
 <p><a href="http://www.appelsiini.net/projects/lazyload"> http://www.appelsiini.net/projects/lazyload</a></p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -404,7 +397,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 </td>
 <td><p>Template generator? Or a dynamic template which uses PHP/MySQL + asset collections to produce different 'templates' suitable for the CompactCMS render engine?</p>
 <p>Something that starts like this: <a href="http://www.mycelly.com/"> http://www.mycelly.com/</a></p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -422,17 +414,17 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/15</p>
 </td>
 <td><p>tinyMCE does not resize when the browser window is resized. With a liquid layout (like the module management windows) the rest of the pages resizes, but tinyMCE editors do not.</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
-<td><p>&#10004;&#10006;&#8263; 
-<p>2011/01/15</p>
+<td><p>✔<p>2011/01/15</p>
 </td>
 <td><p>news module: the &lt;meta description&gt; tag is filled directly from the content, screwing up the page render severely when there's any HTML in the content of the news article.</p>
 <pre id="line1">&lt;<span class="start-tag">meta</span><span class="attribute-name"> name</span>=<span class="attribute-value">"description" </span><span class="attribute-name">content</span>=<span class="attribute-value">"{site} | {content}" /&gt;</span></pre>
 <p>What <em>should</em> happen is that the news module produces a (reduced) strip of text for the description, preferably the preview/teaser text instead of the content itself, as the content can be quite large!</p>
-<p>&nbsp;</p>
+<p>Fixed: added &#39;!xxx&#39; filtering capability to the template engine; here we need 
+to apply the &#39;protect4attrib&#39; filter, e.g.:</p>
+<pre>&lt;meta name=&quot;description&quot; content=&quot;{%sitename!protect4attr%} | {%desc!protect4attr%}&quot; /&gt;</pre>
 </td>
 </tr>
 <tr>
@@ -441,7 +433,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 </td>
 <td><p>Feature Request: use a different lightbox (e.g. a la the one used at bakabt.org) or no lightbox at all: a configurable option how we want our images displayed. Regular, thumbnails with one image per page in full view, or a kanochan-like N-thumbs per page display, or a 'all full sized images in one page, but using image lazy loading').</p>
 <p>(The thought is that once we got that down, we can either copy or extend the module to provide generic downloads.)</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -449,7 +440,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/15</p>
 </td>
 <td><p>Feature Request: news, comments, lightbox management: add selectable so we can edit either only those items targeting the given page (click on edit in page row in admin then gives only the entries for that particular page!) or 'all of them' (as is the current behaviour).</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -457,7 +447,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/15</p>
 </td>
 <td><p>Feature Request: move lightbox data to the database.</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -465,7 +454,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/15</p>
 </td>
 <td><p>Bug: SQL backup scripts do not have CREATE TABLE statements with UTF8 / utf8_unicode collation: this is probably why the upgrade/update installer process fails to handle non-US text properly!</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -473,11 +461,10 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/15</p>
 </td>
 <td><p>Bug: IE8? 'modals don't show' (Xander)</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
-<td><p>&#10006;<span class="ss_sprite_16 ss_exclamation" title="TODO / pending"> <br /></span>
+<td><p>&#10006;&#8263;
 <p>2011/01/15</p>
 </td>
 <td><p>Bug: IE8? installer shows the two &lt;div&gt; sections BELOW one another instead of NEXT TO one another. (Xander)</p>
@@ -490,7 +477,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/16</p>
 </td>
 <td><p>Feed edit_area JS load requests through its own Compressor; include that one in the combiner and mix in the code to make it adapt to the dev/dbg settings -- reason: right now the dev/dbg version also delivers a minified edit_area script and that's dang right bothersome to debug when you got a b0rk inside edit_area.</p>
-<p>.</p>
 </td>
 </tr>
 <tr>
@@ -498,7 +484,6 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 <p>2011/01/16</p>
 </td>
 <td><p>Bug: open multiple mochaUI windows, while the first is a window with the edit_area control in it (e.g. template editor window); open other mochaUI window after that one and edit_area b0rks in the template editor window about some undefined element.</p>
-<p>&nbsp;</p>
 </td>
 </tr>
 <tr>
@@ -1070,6 +1055,3 @@ KEY `MixIn_PageID` (`MixIn_PageID`)
 </tr>
 </tbody>
 </table>
-</div>
-</body>
-</html>
