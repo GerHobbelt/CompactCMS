@@ -492,7 +492,21 @@ else
 		// make sure to paste the callback invocation at the end:
 		if (!empty($extra_JS_callback))
 		{
-			$contents .= "\n\nif (typeof window.$extra_JS_callback == 'function')\n{\n //alert('invoking $extra_JS_callback');\n window.$extra_JS_callback();\n}\n";
+			$contents .= <<<EOT42
+
+			
+			
+if (typeof window.$extra_JS_callback == 'function')
+{
+	//alert('invoking $extra_JS_callback');
+	window.$extra_JS_callback();
+}
+else
+{
+	alert('NOT existing function $extra_JS_callback');
+}
+
+EOT42;
 		}
 
 		switch ($optimize['javascript'])
@@ -1286,44 +1300,56 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	$mce_basepath = merge_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
 
 	$mce_files = array();
-	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
+	$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
 
 	// Add core
 	$mce_files[] = merge_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
-	// Add core language(s)
-	$languages = array($cfg['tinymce_language']);
-	if ($cfg['tinymce_language'] != 'en')
+	if ($suffix != '_full')
 	{
-		$languages[] = 'en';
-	}
-	foreach ($languages as $lang)
-	{
-		$mce_files[] = merge_path_elems($mce_basepath, "langs/" . $lang . ".js");
-	}
-	// Add themes
-	$themes = array('advanced');
-	foreach ($themes as $theme)
-	{
-		$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
-
-		foreach ($languages as $lang)
+		/*
+		_full is a prebuilt version with everything included by the ant build.
+		
+		In all other cases, we need to load the language files and plugins ourselves in some way.
+		*/
+			
+		// Add core language(s)
+		$languages = array($cfg['tinymce_language']);
+		if ($cfg['tinymce_language'] != 'en')
 		{
-			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
-			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
+			$languages[] = 'en';
 		}
-	}
-	// Add plugins
-
-	$pluginarr = get_tinyMCE_plugin_list();
-
-	foreach ($pluginarr as $plugin)
-	{
-		$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
-
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
-			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
+			$mce_files[] = merge_path_elems($mce_basepath, "langs/" . $lang . ".js");
+		}
+		// Add themes
+		$themes = array('advanced');
+		foreach ($themes as $theme)
+		{
+			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
+
+			foreach ($languages as $lang)
+			{
+				$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
+				$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
+			}
+		}
+
+		// Add plugins
+		$pluginarr = get_tinyMCE_plugin_list();
+
+		foreach ($pluginarr as $plugin => $info)
+		{
+			if (!is_real_tinyMCE_plugin($plugin))
+				continue;
+				
+			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
+
+			foreach ($languages as $lang)
+			{
+				$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
+				$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
+			}
 		}
 	}
 
@@ -1338,9 +1364,20 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 		$path = realpath($jsf);
 		if (is_file($path))
 		{
-			$c = file_get_contents($path) . "\n";
+			$c = @file_get_contents($path) . "\n";
 			if ($c !== false)
 			{
+			$my_content .= <<<EOT42
+
+
+/*
+#------------------------------------------------------------------------------------
+# processed: ($path :: $jsf)
+#------------------------------------------------------------------------------------
+*/
+
+
+EOT42;
 				$my_content .= $c;
 			}
 			else
@@ -1348,6 +1385,20 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 				send_response_status_header(404); // Not Found
 				die();
 			}
+		}
+		else
+		{
+			$my_content .= <<<EOT42
+
+
+/*
+#####################################################################################
+# file not found: ($path :: $jsf)
+#####################################################################################
+*/
+
+
+EOT42;
 		}
 	}
 

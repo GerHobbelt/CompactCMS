@@ -64,7 +64,7 @@ if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
 }
 
 
-if (01)
+if (0)
 {
 	dump_request_to_logfile();
 }
@@ -2943,7 +2943,16 @@ function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $
 
 
 
-function get_tinyMCE_plugin_list()
+
+/*
+Produce the list of tinyMCE plugins (and their properties) as an array.
+
+When the $desired_plugins argument is not NULL, it must be either a string 
+specifying a prefined set name ('*': all; 'basic': a limited set of plugins, ...)
+or a comma-separated list of required plugins, or the argument can be an array,
+where each entry specifies a required plugin.
+*/
+function get_tinyMCE_plugin_list($desired_plugins = null)
 {
 	/*
 	 * available plugins:
@@ -2951,7 +2960,6 @@ function get_tinyMCE_plugin_list()
 	 *   advimage
 	 *   advlink
 	 *   advlist
-	 *   autolink
 	 *   autoresize
 	 *   autosave
 	 *   bbcode
@@ -2966,7 +2974,6 @@ function get_tinyMCE_plugin_list()
 	 *   insertdatetime
 	 *   layer
 	 *   legacyoutput
-	 *   lists
 	 *   media
 	 *   nonbreaking
 	 *   noneditable
@@ -2986,51 +2993,95 @@ function get_tinyMCE_plugin_list()
 	 *   xhtmlxtras
 	 */
 	static $mce_plugins = array(
-		'advhr' => 1,
-		'advimage' => 1,
-		'advlink' => 1,
-		'advlist' => 1,
-		'autolink' => 0,
-		'autoresize' => 0,
-		'autosave' => 1,
-		'bbcode' => 0,
-		'contextmenu' => 0,
-		'directionality' => 0,
-		'emotions' => 0,
-		'example' => 0,
-		'fullpage' => 0,
-		'fullscreen' => 1,
-		'iespell' => 0,
-		'inlinepopups' => 1,
-		'insertdatetime' => 0,
-		'layer' => 0,
-		'legacyoutput' => 0,
-		'lists' => 1,
-		'media' => 1,
-		'nonbreaking' => 1,
-		'noneditable' => 0,
-		'pagebreak' => 1,
-		'paste' => 1,
-		'preview' => 1,
-		'print' => 1,
-		'save' => 0,
-		'searchreplace' => 1,
-		'spellchecker' => 1,
-		'style' => 1,
-		'tabfocus' => 0,
-		'table' => 1,
-		'template' => 0,
-		'visualchars' => 1,
-		'wordcount' => 0,
-		'xhtmlxtras' => 0
-		);
+		// DEV NOTE: search for .addButton() invocations in the plugins to dig out the button names
+		'advhr'              => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'advhr'),  
+		'advimage'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
+		'advlink'            => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link'),
+		'advlist'            => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'autoresize'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // scale editor height to actual content
+		'autosave'           => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'restoredraft'),
+		'bbcode'             => array('default_on' => 0, 'grouping' =>   0, 'buttons' => ''),           // return page content as BBcode instead of HTML
+		'contextmenu'        => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'directionality'     => array('default_on' => 1, 'grouping' => 200, 'buttons' => 'ltr,rtl'),
+		'emotions'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'emotions'),
+		'example'            => array('default_on' => 0, 'grouping' => 210, 'buttons' => 'example'),
+		'fullpage'           => array('default_on' => 1, 'grouping' => 770, 'buttons' => 'fullpage'),   // show page properties and generate complete HTML page code, including headers
+		'fullscreen'         => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'fullscreen'),
+		'iespell'            => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'iespell'),
+		'inlinepopups'       => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'insertdatetime'     => array('default_on' => 1, 'grouping' => 180, 'buttons' => 'insertdate,inserttime'),
+		'layer'              => array('default_on' => 1, 'grouping' => 150, 'buttons' => 'insertlayer,moveforward,movebackward,absolute'),
+		'legacyoutput'       => array('default_on' => 0, 'grouping' =>   0, 'buttons' => ''),
+		'media'              => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'media'),
+		'nonbreaking'        => array('default_on' => 1, 'grouping' =>  65, 'buttons' => 'nonbreaking'),
+		'noneditable'        => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'pagebreak'          => array('default_on' => 1, 'grouping' =>  75, 'buttons' => 'pagebreak'),
+		'paste'              => array('default_on' => 1, 'grouping' =>  16, 'buttons' => 'selectall,pastetext,pasteword'),
+		'preview'            => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'preview'),
+		'print'              => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'print'),
+		'save'               => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'save,cancel'),
+		'searchreplace'      => array('default_on' => 1, 'grouping' =>  20, 'buttons' => 'search,replace'),
+		'spellchecker'       => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'spellchecker'),
+		'style'              => array('default_on' => 1, 'grouping' =>  51, 'buttons' => 'styleprops'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
+		'tabfocus'           => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'table'              => array('default_on' => 1, 'grouping' => 141, 'buttons' => 'table,delete_table,delete_col,delete_row,col_after,col_before,row_after,row_before,row_props,cell_props,split_cells,merge_cells'),
+		'template'           => array('default_on' => 1, 'grouping' => 180, 'buttons' => 'template'),
+		'visualchars'        => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualchars'),
+		'wordcount'          => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'xhtmlxtras'         => array('default_on' => 1, 'grouping' =>  70, 'buttons' => 'cite,q,acronym,abbr,del,ins,attribs'),
+                                                                          
+		// built-ins:                                                     
+		                                                                  
+		'.basicformat'       => array('default_on' => 1, 'grouping' =>  30, 'buttons' => 'bold,italic,underline,strikethrough'),
+		'.charmap'           => array('default_on' => 1, 'grouping' =>  61, 'buttons' => 'charmap'),
+		'.cleanup'           => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'cleanup'),
+		'.clipboard'         => array('default_on' => 1, 'grouping' =>  15, 'buttons' => 'cut,copy,paste'),
+		'.code'              => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'code'),
+		'.colorpicker'       => array('default_on' => 1, 'grouping' =>  52, 'buttons' => 'forecolor:2,forecolorpicker,backcolor:2,backcolorpicker'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
+		'.help'              => array('default_on' => 1, 'grouping' => 800, 'buttons' => 'help'),
+		'.hierarchy'         => array('default_on' => 1, 'grouping' =>  58, 'buttons' => 'outdent,indent'),
+		'.hr'                => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'hr'),
+		'.image'             => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
+		'.justify'           => array('default_on' => 1, 'grouping' =>  40, 'buttons' => 'justifyleft,justifycenter,justifyright,justifyfull'),
+		'.linkage'           => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link,unlink,anchor'),
+		'.lists'             => array('default_on' => 1, 'grouping' =>  66, 'buttons' => 'bullist:2,numlist:2'),
+		'.new'               => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'newdocument'),
+		'.quotation'         => array('default_on' => 1, 'grouping' =>  67, 'buttons' => 'blockquote'),
+		'.removeformat'      => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'removeformat'),
+		'.selectable_format' => array('default_on' => 1, 'grouping' =>  50, 'buttons' => 'styleselect:4,formatselect:4,fontselect:4,fontsizeselect:4'),
+		'.shortcuts'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'.superscript'       => array('default_on' => 1, 'grouping' =>  35, 'buttons' => 'sub,sup'),
+		'.table'             => array('default_on' => 1, 'grouping' => 140, 'buttons' => 'tablecontrols'),  // must in a separate group by its own, before the 'table' buttons; if you group them, you'll get extra empty toolbar chunks in the view :-(
+		'.undo'              => array('default_on' => 1, 'grouping' =>  14, 'buttons' => 'undo,redo'),
+		'.visualaid'         => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualaid')
+	);
 
-	$rv = array();
-	foreach ($mce_plugins as $plugin => $in_use)
+	if ($desired_plugins !== null && !is_array($desired_plugins))
 	{
-		if (!$in_use) continue;
-
-		$rv[] = $plugin;
+		$desired_plugins = ','.preg_replace('/\s+/', '', strval($desired_plugins)).',';
+		
+		if (strpos($desired_plugins, '*') !== false)
+		{
+			$desired_plugins = null;
+		}
+		else
+		{
+			// expand 'set names':
+			$desired_plugins = str_replace(',basic,', ',fullscreen,preview,searchreplace,spellchecker,style,table,visualchars,xhtmlxtras,', $desired_plugins);
+			
+			$desired_plugins = explode(',', $desired_plugins);
+		}
+	}
+		
+	$rv = array();
+	foreach ($mce_plugins as $plugin => $props)
+	{
+		if (!$props['default_on']) continue;
+	
+		if ($desired_plugins === null || in_array($plugin, $desired_plugins))
+		{
+			$rv[$plugin] = $props;
+		}
 	}
 	return $rv;
 }
@@ -3039,114 +3090,17 @@ function get_tinyMCE_plugin_list()
 
 
 
-function get_tinyMCE_button_list($plugin = null)
+
+
+/*
+filter function: retrun TRUE onlyy when a plugin name looks like it is actually a real tinyMCE plugin!
+*/
+function is_real_tinyMCE_plugin($name)
 {
-	/*
-	 * available plugins:
-	 *   advhr
-	 *   advimage
-	 *   advlink
-	 *   advlist
-	 *   autolink
-	 *   autoresize
-	 *   autosave
-	 *   bbcode
-	 *   contextmenu
-	 *   directionality
-	 *   emotions
-	 *   example
-	 *   fullpage
-	 *   fullscreen
-	 *   iespell
-	 *   inlinepopups
-	 *   insertdatetime
-	 *   layer
-	 *   legacyoutput
-	 *   lists
-	 *   media
-	 *   nonbreaking
-	 *   noneditable
-	 *   pagebreak
-	 *   paste
-	 *   preview
-	 *   print
-	 *   save
-	 *   searchreplace
-	 *   spellchecker
-	 *   style
-	 *   tabfocus
-	 *   table
-	 *   template
-	 *   visualchars
-	 *   wordcount
-	 *   xhtmlxtras
-	 */
-	static $mce_plugin_buttons = array(
-		'advhr' => 'advhr',  // search for .addButton() invocations in the plugins to dig out the button names
-		'advimage' => 'image',
-		'advlink' => 'link',
-		'advlist' => '',
-		'autolink' => '',
-		'autoresize' => '',
-		'autosave' => 'restoredraft',
-		'bbcode' => '',
-		'contextmenu' => '',
-		'directionality' => 'ltr,rtl',
-		'emotions' => 'emotions',
-		'example' => 'example',
-		'fullpage' => 'fullpage',
-		'fullscreen' => 'fullscreen',
-		'iespell' => 'iespell',
-		'inlinepopups' => '',
-		'insertdatetime' => 'insertdate,inserttime',
-		'layer' => 'insertlayer,moveforward,movebackward,absolute',
-		'legacyoutput' => '',
-		'lists' => '',
-		'media' => 'media',
-		'nonbreaking' => 'nonbreaking',
-		'noneditable' => 'noneditable',
-		'pagebreak' => 'pagebreak',
-		'paste' => 'selectall,pastetext,pasteword',
-		'preview' => 'preview',
-		'print' => 'print',
-		'save' => 'save,cancel',
-		'searchreplace' => 'search,replace',
-		'spellchecker' => 'spellchecker',
-		'style' => 'styleprops',
-		'tabfocus' => '',
-		'table' => 'table,delete_table,delete_col,delete_row,col_after,col_before,row_after,row_before,row_props,cell_props,split_cells,merge_cells',
-		'template' => 'template',
-		'visualchars' => 'visualchars',
-		'wordcount' => '',
-		'xhtmlxtras' =>'cite,acronym,abbr,del,ins,attribs',
-		'.1' => 'newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull',
-		'.2' => 'styleselect,formatselect,fontselect,fontsizeselect,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
-		'.3' => 'bullist,numlist,|,outdent,indent,|,cut,copy,paste,|,undo,redo,|,link,unlink,anchor,image,|,cleanup,shortcuts,code,help',
-		'.4' => 'sub,sup,|,blockquote,hr,removeformat,visualaid,|,charmap'
-		);
-
-	$active_plugins = null;
-	if (is_array($plugin))
-	{
-		$active_plugins = $plugin;
-	}
-	else if (!empty($plugin))
-	{
-		$active_plugins = explode(',', strval($plugin));
-	}
-	else
-	{
-		$active_plugins = get_tinyMCE_plugin_list();
-	}
-
-	$rv = array();
-	foreach ($mce_plugin_buttons as $plugin => $buttons)
-	{
-		if (!in_array($plugin, $active_plugins)) continue;
-
-		$rv[$plugin] = $buttons;
-	}
-	return $rv;
+	if (empty($name))
+		return false;
+		
+	return strpos('abcdefghijklmnopqrstuvwxyz', substr($name, 0, 1)) !== false; 
 }
 
 
@@ -3176,15 +3130,8 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 	case 0:
 		$rv = array();
 
-		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
-		if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
-		{
-			$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js';
-		}
-		else
-		{
-			$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js';
-		}
+		// pick one of these: tiny_mce_ccms.js (which will lazyload all tinyMCE parts recursively through tiny_mce_dev.js) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
+		$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js';
 		if ($with_fancyupload)
 		{
 			/* File uploader JS */
@@ -3205,68 +3152,216 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 		 * however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
 		 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
 		 */
-		$rv = "";
-		$rv .= "tinyMCEPreInit = {\n";
-		$rv .= "      suffix: '_src'\n"; /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		$rv .= "    , base: '" . $cfg['rootdir'] . "lib/includes/js/tiny_mce'\n";
-		$rv .= "    , query: 'load_callback=" . $js_load_callback . "'\n"; /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-		$rv .= "};\n";
+		$rootdir = $cfg['rootdir'];
+	
+		$rv = <<<EOT42
+		
+tinyMCEPreInit = {
+      suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
+    , base: '{$rootdir}lib/includes/js/tiny_mce'
+    , query: 'load_callback=$js_load_callback' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */ 
+};
+
+EOT42;
 		return $rv;
 
 	case 2:
-		$rv = "";
-		// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
-		$rv .= "var dimensions;\n";
-		$rv .= "var editwinwidth;\n";
+		$rootdir = $cfg['rootdir'];
+		$tinymce_language = $cfg['tinymce_language'];
+		
+		$rv = <<<EOT42
+		
+// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
+var dimensions;
+var editwinwidth;
+var editwinmaxwidth;
+var editwinmaxheight;
+
+EOT42;
+
+		$pluginarr = get_tinyMCE_plugin_list();
+		$plugs = array_keys($pluginarr);
+		$plugs = array_filter($plugs, 'is_real_tinyMCE_plugin');
+		$plugins_str = implode(',', $plugs);
+
+		// now create a list of buttons:
+		$btngrp = array();
+		$btnvirtcount = 0;
+		foreach($pluginarr as $name => $info)
+		{
+			$bs = $info['buttons'];
+			if (empty($bs)) continue;
+			
+			$grp = $info['grouping'];
+			
+			$bsa = explode(',', $bs);
+			$btnvirtcount += count($bsa);
+			foreach($bsa as $btn1)
+			{
+				$bdef = explode(':', $btn1);
+				if (count($bdef) > 1)
+				{
+					// a button which is wider than the usual ones: length is specced as number of 'regular' buttons eqv.:
+					$btnvirtcount += intval($bdef[1]) - 1; // subtract one as we counted the button already as a 'regular' one!
+				}
+				else
+				{
+					$bdef[1] = 1;
+				}
+					
+				if (!isset($btngrp[$grp]))
+				{
+					$btngrp[$grp] = array();
+				}
+				
+				// also check whether button isn't already in the group: some adv(anced) plugins override existing buttons/functions:
+				$xsist = false;
+				foreach($btngrp[$grp] as $bc)
+				{
+					if ($bc[0] == $bdef[0])
+					{
+						$xsist = true;
+						break;
+					}
+				}
+				if (!$xsist)
+				{
+					$btngrp[$grp][] = $bdef;
+				}
+			}
+		}
+		ksort($btngrp);
+
+		$rv .= "var buttondefs = [\n";
+		
+		$s = '';
+		foreach($btngrp as $group => $btnarr)
+		{
+			$rv .= $s;
+			
+			$s = "  [\n";
+			$s2 = '';
+			foreach($btnarr as $bdef)
+			{
+				$s2 .= "    ['" . $bdef[0] . "', " . $bdef[1] . "],\n";
+			}
+			$s2 = substr($s2, 0, strlen($s2) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
+			$s .= $s2 . "  ],\n";
+		}
+		$s = substr($s, 0, strlen($s) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
+		$rv .= $s . "];\n";
+		
+		$rv .= <<<EOT42
+var buttonvirtcount = $btnvirtcount;
+
+/* set up the toolbars depending on the editor width */
+function layout_the_MCE_toolbars(buttondefs, editwinwidth)
+{
+	var i;
+	var tbcount = buttondefs.length;
+	var dst = [];
+	var dstelem = '';
+	var lwleft = editwinwidth - 10; // subtract edges.
+	
+	for (i = 0; i < tbcount; i++)
+	{
+		var grpwidth = 0;
+		var j;
+		var grp = buttondefs[i];
+		var btns_in_grp = grp.length;
+		
+		for (j = 0; j < btns_in_grp; j++)
+		{
+			grpwidth += grp[j][1];
+		}
+		grpwidth *= 22; /* width per button */
+		
+		if (grpwidth + 5 > lwleft)
+		{
+			// not enough space: start a new toolbar row; push the previous toolbar first:
+			//alert('toolbar row: ' + dstelem);
+			dst.push(dstelem);
+			
+			dstelem = '';
+			lwleft = editwinwidth - 10; // subtract edges.
+		}
+		
+		if (dstelem.length > 0)
+		{
+			lwleft -= 10;
+			// add separator first!
+			dstelem += ',|,';
+		}
+		dstelem += grp[0][0];
+		for (j = 1; j < btns_in_grp; j++)
+		{
+			dstelem += ',' + grp[j][0];
+		}
+		lwleft -= grpwidth;
+	}
+	
+	// and push the final row:
+	//alert('toolbar row @ final: ' + dstelem);
+	dst.push(dstelem);
+	
+	return dst;
+}
+
+EOT42;
 
 		foreach($editarea_tags as $tag)
 		{
-			$rv .= "dimensions = window.getSize();\n";
-			$rv .= "editwinwidth = dimensions.x - 20;\n";
-			$rv .= "dimensions = \$('" . $tag . "').getSize();\n";
-			$rv .= "editwinwidth = dimensions.x;\n";
-			//$rv .= "alert('width: ' + editwinwidth + 'px');\n";
-			$rv .= "\n";
-			$rv .= "tinyMCE.init(\n";
-			$rv .= "    {\n";
-			$rv .= "        mode: 'exact',\n";
-			$rv .= "        elements: '" . $tag . "',\n";
-			$rv .= "        theme: 'advanced',\n";
-			$rv .= "        language: '" . $cfg['tinymce_language'] ."',\n";
-			$rv .= "        skin: 'o2k7',\n";
-			$rv .= "        skin_variant: 'silver',\n";
+			$rv .= <<<EOT42
+dimensions = window.getSize();
+editwinmaxwidth = dimensions.x - 20;
+editwinmaxheight = dimensions.y - 20;
+dimensions = \$('$tag').getSize();
+editwinwidth = dimensions.x;
+//alert('width: ' + editwinwidth + 'px');
+			
+tbdef = layout_the_MCE_toolbars(buttondefs, editwinwidth);
 
-			$pluginarr = get_tinyMCE_plugin_list();
-			$pstr = implode(',', $pluginarr);
+var MCEsettings_{$tag} = {
+        mode: 'exact',
+        elements: '$tag',
+        theme: 'advanced',
+        language: '$tinymce_language',
+        skin: 'o2k7',
+        skin_variant: 'silver',
+        plugins: '$plugins_str',
+        theme_advanced_toolbar_location: 'top',
 
-			$rv .= "        plugins: '" . $pstr . "',\n";
-			$rv .= "        theme_advanced_toolbar_location: 'top',\n";
+        //theme_advanced_buttons1 : dst[0],
+        //theme_advanced_buttons2 : dst[1],
+        //theme_advanced_buttons3 : dst[2],
+        //theme_advanced_buttons4 : dst[3],
 
-			$rv .= "        theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
-			$rv .= "        theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
-			$rv .= "        theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
-			$rv .= "        theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
+        theme_advanced_toolbar_align: 'left',
+        theme_advanced_statusbar_location: 'bottom',
+        dialog_type: 'modal',
+		
+        paste_auto_cleanup_on_paste: true,
+		
+        autoresize_on_init: true,
+		autoresize_max_height: editwinmaxheight,
+		
+        theme_advanced_resizing: true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+        theme_advanced_resizing_use_cookie : 1,
+        theme_advanced_resize_horizontal: false,
+        theme_advanced_resizing_min_width: 400,
+        theme_advanced_resizing_min_height: 100,
+        theme_advanced_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+        theme_advanced_resizing_max_height: 0xFFFF,
+        relative_urls: true,
+        convert_urls: false,
+        remove_script_host: true,
+        document_base_url: '$rootdir',
+		
+EOT42;
 
-			$rv .= "        theme_advanced_toolbar_align: 'left',\n";
-			$rv .= "        theme_advanced_statusbar_location: 'bottom',\n";
-			$rv .= "        dialog_type: 'modal',\n";
-			$rv .= "        paste_auto_cleanup_on_paste: true,\n";
-			$rv .= "        theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-			$rv .= "        theme_advanced_resize_horizontal : 1,\n";
-			$rv .= "        theme_advanced_resizing_use_cookie : 1,\n";
-			$rv .= "        theme_advanced_resize_horizontal: false,\n";
-			$rv .= "        theme_advanced_resizing_min_width: 400,\n";
-			$rv .= "        theme_advanced_resizing_min_height: 100,\n";
-			$rv .= "        theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-			$rv .= "        theme_advanced_resizing_max_height: 0xFFFF,\n";
-			$rv .= "        relative_urls: true,\n";
-			$rv .= "        convert_urls: false,\n";
-			$rv .= "        remove_script_host: true,\n";
-			$rv .= "        document_base_url: '" . $cfg['rootdir'] . "',\n";
+		// TODO: determine the template of the given page: fetch those CSS files.
 
-			// TODO: determine the template of the given page: fetch those CSS files.
-
-			// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
+		// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
 			$rv .= "        content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,' . $cfg['rootdir'] . 'admin/img/styles/liquid.css,' . $cfg['rootdir'] . 'admin/img/styles/layout.css' .
 										',' . $cfg['rootdir'] . 'admin/img/styles/sprite.css,' . $cfg['rootdir'] . 'admin/img/styles/last_minute_fixes.css' .
 										',' . $cfg['rootdir'] . 'admin/img/styles/ie.css?only-when=%3d%3d+IE' . "',\n";
@@ -3278,25 +3373,48 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 			$rv .= "        spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
 			if ($with_fancyupload)
 			{
-				$rv .= "        file_browser_callback: FileManager.TinyMCE(\n";
-				$rv .= "            function(type)\n";
-				$rv .= "            {\n";
-				$rv .= "                return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-				$rv .= "                    url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
-				$rv .= "                    baseURL: '" . $cfg['rootdir'] . "',\n";
-				$rv .= "                    assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
-				$rv .= "                    language: '" . $cfg['fancyupload_language'] . "',\n";
-				$rv .= "                    selectable: true,\n";
-				$rv .= "                    uploadAuthData: {\n";
-				$rv .= "                        session: 'ccms_userLevel',\n";
-				$rv .= "                        sid: '" . session_id() . "'\n";
-				$rv .= "                    }\n";
-				$rv .= "                };\n";
-				$rv .= "            }),\n";
+				$session_id = session_id();
+				$fancyupload_language = $cfg['fancyupload_language'];
+				
+				$rv .= <<<EOT42
+				
+		file_browser_callback: FileManager.TinyMCE(
+            function(type)
+            {
+                return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+                    url: '{$rootdir}lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+                    baseURL: '{$rootdir}',
+                    assetBasePath: '{$rootdir}lib/includes/js/fancyupload/Assets',
+                    language: '$fancyupload_language',
+                    selectable: true,
+                    uploadAuthData: {
+                        session: 'ccms_userLevel',
+                        sid: '$session_id'
+                    }
+                };
+            }),
+			
+EOT42;
 			}
-			//$rv .= "        height: '300px',\n";
-			$rv .= "        width: editwinwidth\n"; // default: width in pixels
-			$rv .= "    });\n";
+			$rv .= <<<EOT42
+		
+	//height: '300px',
+	width: editwinwidth   /* default: width in pixels */
+};
+
+var tbdeflen = tbdef.length;
+var tbidx;
+
+/* now set up the toolbar rows; as many as we need: */
+for (tbidx = 1; tbidx <= tbdeflen; tbidx++)
+{
+	MCEsettings_{$tag}['theme_advanced_buttons' + tbidx] = tbdef[tbidx - 1];
+}
+
+tinyMCE.init(MCEsettings_{$tag});
+
+
+EOT42;
 		}
 
 		return $rv;
@@ -3397,64 +3515,75 @@ function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code
 	}
 	if (!empty($fs))
 	{
-		$rv = "var jsLogEl = document.getElementById('jslog');\n";
-		$rv .= "var js = [\n";
-		$rv .= $fs . "\n";
-		$rv .= "    ];\n";
-		$rv .= "\n";
-		$rv .= "function jsComplete(user_obj, lazy_obj)\n";
-		$rv .= "{\n";
-		$rv .= "    var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
-		$rv .= "    \n";
-		$rv .= "    if (lazy_obj.todo_count)\n";
-		$rv .= "    {\n";
-		$rv .= "        /* nested invocation of LazyLoad added one or more sets to the load queue */\n";
-		$rv .= "        jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
-		$rv .= "        return false;\n";
-		$rv .= "    }\n";
-		$rv .= "    else\n";
-		$rv .= "    {\n";
-		$rv .= "        jslog('All JS has been loaded!');\n";
-		$rv .= "    }\n";
-		$rv .= "\n";
-		$rv .= "    // window.addEvent('domready',function()\n";
-		$rv .= "    //{\n";
-		$rv .= $driver_code . "\n";
-		$rv .= "    //});\n";
-		$rv .= "\n";
-		$rv .= "    //alert('stop_loading = ' + (1 * stop_loading));\n";
-		$rv .= "    return stop_loading;\n";
-		$rv .= "}\n";
-		$rv .= "\n";
-		$rv .= "\n";
-		$rv .= "function jslog(message) \n";
-		$rv .= "{\n";
-		$rv .= "    if (jsLogEl)\n";
-		$rv .= "    {\n";
-		$rv .= "        jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
-		$rv .= "    }\n";
-		$rv .= "}\n";
-		$rv .= "\n";
-		$rv .= "\n";
-		$rv .= "/* the magic function which will start it all, thanks to the augmented lazyload.js: */\n";
-		$rv .= "function ccms_lazyload_setup_GHO()\n";
-		$rv .= "{\n";
-		$rv .= "    jslog('loading JS (sequential calls)');\n";
-		$rv .= "\n";
-		$rv .= $starter_code . "\n";
-		$rv .= "\n";
-		$rv .= "    LazyLoad.js(js, jsComplete);\n";
-		$rv .= "}\n";
+		$rv = <<<EOT42
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+
+$fs
+
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');
+	
+	if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		return false;
 	}
 	else
 	{
-		$rv = "\n";
-		$rv .= $starter_code . "\n";
-		$rv .= "\n";
-		$rv .= "// window.addEvent('domready',function()\n"; // TODO !
-		$rv .= "//{\n";
-		$rv .= $driver_code . "\n";
-		$rv .= "//});\n";
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+
+$driver_code
+
+	//});
+
+	//alert('stop_loading = ' + (1 * stop_loading));
+	return stop_loading;
+}
+
+
+function jslog(message) 
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+$starter_code
+
+	LazyLoad.js(js, jsComplete);
+}
+EOT42;
+	}
+	else
+	{
+		$rv = <<<EOT42
+
+$starter_code
+
+// window.addEvent('domready',function()
+//{
+
+$driver_code
+
+//});
+EOT42;
 	}
 	return $rv;
 }

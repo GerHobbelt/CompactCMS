@@ -209,10 +209,29 @@ if($cfg['wysiwyg'] && $iscoding != 'Y')
 	// -------------------------------------------------
 	// Load TinyMCE (compressed for faster loading)
 	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/dummy.js?cb=exec_GHO';
 
 	$driver_code = generateJS4TinyMCEinit(2, 'content');
 
 	$starter_code = generateJS4TinyMCEinit(1, 'content');
+	
+	$starter_code .= <<<EOT42
+	
+function exec_GHO()
+{
+//alert('exec_GHO');
+
+$driver_code
+}
+window.exec_GHO = exec_GHO;
+
+EOT42;
+
+	$driver_code = <<<EOT42
+
+//alert('DOMready equivalent!');
+
+EOT42;
 }
 else
 {
