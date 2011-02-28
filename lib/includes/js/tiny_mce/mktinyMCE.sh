@@ -16,5 +16,7 @@ cp tmp/tinymce/tiny_mce_prototype_src.js .
 cp tmp/tinymce/jquery.tinymce.js .
 cp tmp/tinymce/tiny_mce_popup.js .
 
+rm -rf tmp/
+
 
 
