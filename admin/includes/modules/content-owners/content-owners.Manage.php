@@ -240,11 +240,6 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			theme : "simple",
 			skin: 'o2k7',
 			skin_variant: 'silver',
-			//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
-			//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
-			//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
-			//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
-			//theme_advanced_toolbar_location: 'top'
 			theme_simple_toolbar_location: 'top'
 		});
 EOT42;
