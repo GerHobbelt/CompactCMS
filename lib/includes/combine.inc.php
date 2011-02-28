@@ -98,7 +98,6 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
-define('COMBINER_DEV_DUMP_OUTPUT', false); // dump generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
 
 
 $optimize = array();
@@ -543,7 +542,7 @@ EOT42;
 		}
 	}
 
-	if (COMBINER_DEV_DUMP_OUTPUT && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	if ($cfg['COMBINER_DEV_DUMP_OUTPUT'] && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	{
 		$dump_filename = str2VarOrFileName($_GET['files']) . '.' . ($type == 'javascript' ? 'js' : $type);
 
