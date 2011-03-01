@@ -261,6 +261,26 @@ else
 $eaLanguage = $cfg['editarea_language'];
 $driver_code = <<<EOT42
 
+		/*
+		resize event has the problem that it is triggered continually when in IE (and tests reveal it's similar in FF3)
+		and we do NOT want to spend CPU cycles on repeated updated of the MUI window sizes all the time, so we follow the
+		advice found here:
+		
+		http://mbccs.blogspot.com/2007/11/fixing-window-resize-event-in-ie.html
+		http://mootools-users.660466.n2.nabble.com/Moo-Detecting-window-resize-td3713058.html
+		*/
+		var resizeTimeout;
+
+		var realResize = function(){
+		
+			//alert('template editor: resize event');
+		};
+
+		window.addEvent('resize', function(e){
+			\$clear(resizeTimeout);
+			resizeTimeout = realResize.delay(200, this);
+		});
+
 		// initialisation
 
 		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
@@ -273,6 +293,8 @@ $driver_code = <<<EOT42
 				id: "content",
 				start_highlight: true,
 				allow_resize: 'both',
+				//min_width: 400,
+				//min_height: 125,
 				allow_toggle: true,
 				word_wrap: true,
 				language: "$eaLanguage",
