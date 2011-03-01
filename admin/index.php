@@ -524,7 +524,29 @@ $js_files[] = '../lib/includes/js/mootools-core.js,mootools-more.js';
 /*--MOCHAUI--*/
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,Core/core.js,Core/canvas.js,Core/content.js,Core/desktop.js,Controls/column/column.js,Controls/panel/panel.js,Controls/taskbar/taskbar.js,Controls/window/window.js,Controls/window/modal.js,Core/themes.js';
+	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,' .
+
+   'Core/Core.js,' .
+   'Core/Canvas.js,' .
+   'Core/Content.js,' .
+   'Core/persist.js,' .
+   'Core/themes.js,' .
+/*
+   
+												    'Core/core.js,' .
+												    'Core/create.js,' .
+												    'Core/require.js,' .
+												    'Core/canvas.js,' .
+												    'Core/content.js,' .
+												    'Core/persist.js,' .
+												    'Core/themes.js,' .
+*/													
+												    'Controls/desktop/desktop.js,' .
+												    'Controls/panel/panel.js,' .
+												    'Controls/column/column.js,' .
+												    'Controls/taskbar/taskbar.js,' .
+												    'Controls/window/window.js,' .
+												    'Controls/window/modal.js';
 }
 else
 {
