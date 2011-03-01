@@ -407,14 +407,16 @@ if ($do_update_or_livefilter && checkAuth())
 
 				?>
 					<td class="last right-text nowrap">
-						<a href="<?php echo $module; ?>?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=edit"
-						   rel="Edit <?php echo $row->urlpage.'.html'; ?>"
-						   class="tabs sprite edit"
-						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
-						|
-						<a href="../<?php echo checkSpecialPageName($row->urlpage, SPG_GIVE_PAGE_URL) . '?preview=' . $preview_checkcode; ?>"
-							class="external"
-						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
+						<?php 
+							/* the ID attribute is used to uniquify the MUI editor window, so that multiple pages can be edited simultaneously! */
+							echo '<a href="' . $module . '?page_id=' . rm0lead($row->page_id) . '&amp;action=edit" ' .
+						          'rel="Edit ' . $row->urlpage . '.html" ' .
+								  'class="tabs sprite edit" ' .
+								  'id="E-' . $row->urlpage . '-' . rm0lead($row->page_id) . '">' . $ccms['lang']['backend']['editpage'] . '</a> ' .
+								  '| ' .
+								  '<a href="../' . checkSpecialPageName($row->urlpage, SPG_GIVE_PAGE_URL) . '?preview=' . $preview_checkcode . '" ' .
+								  'class="external">' . $ccms['lang']['backend']['previewpage'] . '</a>';
+						?>
 					</td>
 				<?php
 				}
