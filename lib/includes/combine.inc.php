@@ -1273,7 +1273,9 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 {
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
-		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element);
+		$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
+		
+		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
 	}
 
@@ -1282,7 +1284,7 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 
 
 
-function load_tinyMCE_js($type, $http_base, $base, $root, $element)
+function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 {
 	global $cfg;
 	global $do_not_load;
@@ -1299,11 +1301,28 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	$mce_basepath = merge_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
 
 	$mce_files = array();
-	$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
 
-	// Add core
-	$mce_files[] = merge_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
-	if ($suffix != '_full')
+	/*
+	To facilitate the lazyloading of tinyMCE in parts when the $suffix is set to '_dev', we do this as
+	a two-stage process: 
+	
+	the first stage if for all of 'em and loads the tinyMCE 'core' code at least, lazyloaded or flattened.
+	
+	When we're in '_dev' mode, the second stage is triggered by the first stage having added a lazyload
+	instruction for '2nd-stage.tiny_mce_ccms.js', a fake filename, which will nevertheless trigger the Combiner
+	into going here AGAIN and that time around we add the flattened set of language files and plugins.
+	
+	When we're NOT in '_dev' mode, the second stage won't happen, because the trigger isn't written into
+	the produced JS code, so we're good to go either way!
+	*/
+	$stage2 = strmatch_tail($element, "2nd-stage.tiny_mce_ccms.js");
+	
+	if (!$stage2)
+	{
+		// Add core
+		$mce_files[] = merge_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
+	}
+	else if ($suffix != '_full')
 	{
 		/*
 		_full is a prebuilt version with everything included by the ant build.

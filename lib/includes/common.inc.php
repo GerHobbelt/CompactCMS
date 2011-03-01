@@ -78,21 +78,14 @@ if (0)
 
 
 /**
- * Return TRUE when one string matches the 'tail' of the other string
+ * Return TRUE when $tail matches the 'tail' of $str
  */
-function strmatch_tail($a, $b)
+function strmatch_tail($str, $tail)
 {
-	if (strlen($a) < strlen($b))
-	{
-		$tmp = $a;
-		$a = $b;
-		$b = $tmp;
-	}
-
-	$idx = strpos($a, $b);
+	$idx = strpos($str, $tail);
 	if ($idx === false)
 		return false;
-	return ($idx + strlen($b) == strlen($a));
+	return ($idx + strlen($tail) == strlen($str));
 }
 
 
