@@ -586,8 +586,8 @@ $js_files[] = '../lib/includes/js/mootools-more.js';
 $js_files[] = '../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running';
 $js_files[] = 'install.js';
 
-$driver_code = <<<EOT
-EOT;
+$driver_code = <<<EOT42
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

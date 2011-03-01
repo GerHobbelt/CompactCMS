@@ -247,7 +247,8 @@ else
 	}
 
 	$eaLanguage = $cfg['editarea_language'];
-	$driver_code = <<<EOT
+	$driver_code = <<<EOT42
+	
 		editAreaLoader.init(
 			{
 				id: "content",
@@ -258,7 +259,8 @@ else
 				language: "$eaLanguage",
 				syntax: "html"
 			});
-EOT;
+			
+EOT42;
 	$starter_code = null;
 }
 

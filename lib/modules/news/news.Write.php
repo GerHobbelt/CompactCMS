@@ -219,7 +219,7 @@ $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.
 
 $js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent,newsTeaser'));
 
-$driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT
+$driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT42
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
@@ -231,7 +231,7 @@ $driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT
 						form.submit();
 				}
 			});
-EOT;
+EOT42;
 
 $starter_code = generateJS4TinyMCEinit(1, 'newsContent,newsTeaser');
 

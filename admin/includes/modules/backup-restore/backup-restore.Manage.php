@@ -494,7 +494,8 @@ $js_files = array(
 	);
 
 $wait4backup = $ccms['lang']['backup']['wait4backup'];
-$driver_code = <<<EOT
+$driver_code = <<<EOT42
+
 		$('create-arch').addEvent('click', function()
 			{
 				var el = $('backup-module');
@@ -509,7 +510,8 @@ $driver_code = <<<EOT
 				//alert('go! ' + el);
 				return true;
 			});
-EOT;
+			
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

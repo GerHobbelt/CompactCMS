@@ -235,7 +235,7 @@ $js_files = array();
 $js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
 $js_files[] = 'passwordcheck.js';
 
-$driver_code = <<<EOT
+$driver_code = <<<EOT42
 	if ($('userDetailForm'))
 	{
 		new FormValidator($('userDetailForm'),
@@ -272,7 +272,7 @@ $driver_code = <<<EOT
 				}
 			});
 	}
-EOT;
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

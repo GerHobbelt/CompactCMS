@@ -256,7 +256,8 @@ else
 }
 
 $eaLanguage = $cfg['editarea_language'];
-$driver_code = <<<EOT
+$driver_code = <<<EOT42
+
 		// initialisation
 
 		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
@@ -280,7 +281,8 @@ $driver_code = <<<EOT
 			alert("syntax: " + syn);
 		}
 		*/
-EOT;
+		
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>
