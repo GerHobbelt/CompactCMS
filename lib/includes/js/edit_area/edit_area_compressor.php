@@ -1,4 +1,12 @@
-<?php
+<?php #! /usr/bin/php
+//; /usr/bin/php $0 $@ ; exit 0;
+		     
+/*  ^ can't use the shebang trick here as that would produce one more line 
+    of output when this file is run from a webserver, so we take the second-best
+    approach, which is to favor the webserver and tolerate a few sh/bash error
+    reports while it'll start the PHP CLI for us after all.
+*/
+
 	/******
 	 *
 	 *	EditArea PHP compressor
@@ -36,6 +44,17 @@ running from a console or crontab:
 - $_SERVER['HTTP_HOST'] does NOT EXIST when run from the console
 - $_SERVER['QUERY_STRING'] does NOT EXIST when run from the console (it may very well be EMPTY when run by the web server!)
 - $_SERVER['REQUEST_METHOD'] does NOT EXIST when run from the console
+
+Supported arguments when run from the commandline:
+
+plugins           - generate the 'full_with_plugins' version instead of the 'full' one
+
+you can also override any of the $param[] items like so, for example:
+
+debug=0           - equals $params['debug'] = false;
+
+debug=1           - equals $params['debug'] = true;
+
 */	
 if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 	!array_key_exists('HTTP_HOST', $_SERVER) &&
@@ -43,12 +62,21 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 	!array_key_exists('REQUEST_METHOD', $_SERVER))
 {
 	// CONFIG
-	$param['cache_duration']= 3600 * 24 * 10;		// 10 days util client cache expires
-	$param['compress'] = true;						// Enable the code compression, should be activated but it can be useful to deactivate it for easier error diagnostics (true or false)
+	$param['cache_duration'] = 3600 * 24 * 10;		// 10 days util client cache expires
+	$param['compress'] = false;					// Enable the code compression, should be activated but it can be useful to deactivate it for easier error diagnostics (true or false)
 	$param['debug'] = false;						// Enable this option if you need debugging info
 	$param['use_disk_cache'] = true;				// If you enable this option gzip files will be cached on disk.
-	$param['use_gzip']= true;						// Enable gzip compression
+	$param['use_gzip']= false;						// Enable gzip compression
 	// END CONFIG
+	
+	if (empty($_GET)) $_GET = array();
+	
+	for ($i = 1; $i < $argc; $i++)
+	{
+		$arg = explode('=', $argv[$i], 2);
+		$_GET[$arg[0]] = (isset($arg[1]) ? $arg[1] : true);
+		$param[$arg[0]] = (isset($arg[1]) ? $arg[1] : true);
+	}
 	
 	$compressor = new Compressor($param);
 }
@@ -93,7 +121,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 		{
 			header("Content-type: text/javascript; charset: UTF-8");
 			header("Vary: Accept-Encoding"); // Handle proxies
-			header(sprintf("Expires: %s GMT", gmdate("D, d M Y H:i:s", time() + $this->param['cache_duration'])) );
+			header(sprintf("Expires: %s GMT", gmdate("D, d M Y H:i:s", time() + intval($this->param['cache_duration']))) );
 			if($this->use_gzip)
 				header("Content-Encoding: ".$this->gzip_enc_header);
 		}
@@ -106,8 +134,13 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			if (isset($_SERVER['HTTP_ACCEPT_ENCODING']))
 				$encodings = explode(',', strtolower(preg_replace("/\s+/", "", $_SERVER['HTTP_ACCEPT_ENCODING'])));
 			
-			// desactivate gzip for IE version < 7
-			if(preg_match("/(?:msie )([0-9.]+)/i", $_SERVER['HTTP_USER_AGENT'], $ie))
+			// deactivate gzip for IE version < 7
+			if (!isset($_SERVER['HTTP_USER_AGENT']))
+			{
+				// run from the commandline: do NOT use gzip
+				$desactivate_gzip=true;	
+			}
+			else if(preg_match("/(?:msie )([0-9.]+)/i", $_SERVER['HTTP_USER_AGENT'], $ie))
 			{
 				if($ie[1]<7)
 					$desactivate_gzip=true;	
