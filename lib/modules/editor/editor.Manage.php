@@ -201,9 +201,11 @@ function confirmation()
 
 
 <?php
-$js_files = array();
-$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
-$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
+$js_files = array(
+	$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+	$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+);
+
 if($cfg['wysiwyg'] && $iscoding != 'Y')
 {
 	// -------------------------------------------------
@@ -286,8 +288,6 @@ echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 
 
 // when we get here, an illegal command was fed to us!
-header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' )));
-//die('status=error&action-was=' . $do_action . '&check=' . (1 * checkAuth()) . '&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ));
-die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>

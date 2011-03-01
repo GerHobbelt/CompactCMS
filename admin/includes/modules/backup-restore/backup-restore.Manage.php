@@ -489,9 +489,9 @@ function confirmation()
 
 <?php
 $js_files = array(
-	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
-	'../../../../lib/includes/js/the_goto_guy.js'
-	);
+	$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+	$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+);
 
 $wait4backup = $ccms['lang']['backup']['wait4backup'];
 $driver_code = <<<EOT42

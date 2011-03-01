@@ -244,15 +244,18 @@ function confirmation()
 
 
 <?php
-$js_files = array();
-$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+$js_files = array(
+	$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+	$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+);
+
 if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 {
-	$js_files[] = '../../../../lib/includes/js/edit_area/edit_area_full.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_full.js';
 }
 else
 {
-	$js_files[] = '../../../../lib/includes/js/edit_area/edit_area_full.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_full.js';
 }
 
 $eaLanguage = $cfg['editarea_language'];

@@ -1321,8 +1321,6 @@ if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAu
 
 
 // when we get here, an illegal command was fed to us!
-header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' )));
-//die('status=error&action-was=' . $do_action . '&check=' . (1 * checkAuth()) . '&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ));
-die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>
