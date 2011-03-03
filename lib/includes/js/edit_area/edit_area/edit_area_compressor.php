@@ -457,7 +457,10 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			// load the syntaxes and languages as well:
 			if ($this->param['include_langs_and_syntaxes'])
 			{
+				// make sure the syntax and/or language files are NOT nuked in the process so act conservatively when compressing:
+				$this->compress_javascript($syntax_defs, false);
 				$this->datas.= $syntax_defs;
+				$this->compress_javascript($language_defs, false);
 				$this->datas.= $language_defs;
 			}
 			
@@ -536,7 +539,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return $val;
 		}
 		
-		private function compress_javascript(&$code)
+		private function compress_javascript(&$code, $apply_optimistic_rules = true)
 		{
 			if($this->param['compress'])
 			{
@@ -546,7 +549,10 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 				// remove line return, empty line and tabulation
 				$code= preg_replace('/(( |\t|\r)*\n( |\t)*)+/s', " ", $code);
 				// add line break before "else" otherwise navigators can't manage to parse the file
-				$code= preg_replace('/(\b(else)\b)/', "\n$1", $code);
+				if ($apply_optimistic_rules) 
+				{
+					$code= preg_replace('/(\b(else)\b)/', "\n$1", $code);
+				}
 				// remove unnecessary spaces
 				$code= preg_replace('/( |\t|\r)*(;|\{|\}|=|==|\-|\+|,|\(|\)|\|\||&\&|\:)( |\t|\r)*/', "$2", $code);
 			}
