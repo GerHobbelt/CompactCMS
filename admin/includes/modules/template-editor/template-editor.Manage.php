@@ -251,11 +251,11 @@ $js_files = array(
 
 if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
 {
-	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_full.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
 }
 else
 {
-	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_full.js';
+	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
 }
 
 $eaLanguage = $cfg['editarea_language'];

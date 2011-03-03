@@ -2319,7 +2319,7 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		$cfg['tinymce_language'] = 'en';
 	}
 
-	$editarea_langfile = BASE_PATH . '/lib/includes/js/edit_area/langs/'.$language.'.js';
+	$editarea_langfile = BASE_PATH . '/lib/includes/js/edit_area/edit_area/langs/'.$language.'.js';
 	if (is_file($editarea_langfile))
 	{
 		$cfg['editarea_language'] = $language;
