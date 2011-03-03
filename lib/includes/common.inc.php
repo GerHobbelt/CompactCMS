@@ -2953,6 +2953,66 @@ function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $
 
 
 
+/*
+Return a suitable EditArea syntax ID string for the given filename+extension 
+*/
+function cvt_extension2EAsyntax($filepath)
+{
+	$pi = pathinfo($filepath);
+	$ext = strtolower($pi['extension']);
+	switch ($ext)
+	{
+	default:
+		return ''; // unknown syntax: assume none special
+		
+	case 'htm':
+	case 'html':
+		return 'html';
+		
+	case 'css':
+	case 'js':
+	case 'php':
+	case 'sql':
+	case 'xml':
+	case 'xsl':
+	case 'c':
+	case 'cpp':
+	case 'java':
+	case 'vb':
+		return $ext;
+		
+	case 'txt':
+		if (strtolower($pi['filename']) == 'robots')
+		{
+			return 'robotstxt';
+		}
+		return '';
+
+	case 'bas':
+		return 'basic';
+		
+	case 'cf':
+		return 'coldfusion';
+		
+	case 'pas':
+		return 'pascal';
+		
+	case 'py':
+		return 'python';
+		
+	case 'pl':
+		return 'perl';
+		
+	case 'rb':
+		return 'ruby';
+		
+	case 'tsql':
+		return 'tsql';
+	}
+}
+
+
+
 
 
 /*

@@ -229,24 +229,24 @@ window.exec_GHO = exec_GHO;
 
 EOT42;
 
-	$driver_code = <<<EOT42
+			$driver_code = <<<EOT42
 
 //alert('DOMready equivalent!');
 
 EOT42;
-}
-else
-{
-	// -------------------------------------------------
-	// Alternative to tinyMCE: load Editarea for code editing
-	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
-	{
-		$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
-	}
-	else
-	{
-		$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
-	}
+		}
+		else
+		{
+			// -------------------------------------------------
+			// Alternative to tinyMCE: load Editarea for code editing
+			if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+			{
+				$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
+			}
+			else
+			{
+				$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
+			}
 
 			/*
 			be aware that the edit_area code assumes a 'onLoad' event will be triggered AFTER it is 
@@ -258,31 +258,56 @@ else
 			can be certain the edit_area code is really loaded.
 			That's what the 'loaded' check and call in the code below is for.
 			*/
-	$eaLanguage = $cfg['editarea_language'];
-	$driver_code = <<<EOT42
+			$eaLanguage = $cfg['editarea_language'];
+			$EAsyntax = cvt_extension2EAsyntax($filename); 
+			$driver_code = <<<EOT42
 
 	if (editAreaLoader.win != "loaded")
 	{
 		editAreaLoader.window_loaded();
 	}
 
+	/*
+	resize event has the problem that it is triggered continually when in IE (and tests reveal it's similar in FF3)
+	and we do NOT want to spend CPU cycles on repeated updates of the MUI window sizes all the time, so we follow the
+	advice found here:
 	
-		editAreaLoader.init(
-			{
-				id: "content",
-				is_multi_files: false,
-				allow_toggle: false,
-				word_wrap: true,
-				start_highlight: true,
-				language: "$eaLanguage",
-				syntax: "html"
-			});
-			
-EOT42;
-	$starter_code = null;
-}
+	http://mbccs.blogspot.com/2007/11/fixing-window-resize-event-in-ie.html
+	http://mootools-users.660466.n2.nabble.com/Moo-Detecting-window-resize-td3713058.html
+	*/
+	var resizeTimeout;
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+	var realResize = function(){
+	
+		//alert('editor: resize event');
+	};
+
+	window.addEvent('resize', function(e){
+		\$clear(resizeTimeout);
+		resizeTimeout = realResize.delay(200, this);
+	});
+
+	// initialisation
+
+	// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
+	editAreaLoader.init(
+		{
+			id: "content",
+			is_multi_files: false,
+			allow_toggle: false,
+			word_wrap: true,
+			start_highlight: true,
+			language: "$eaLanguage",
+			syntax: "$EAsyntax",
+			ignore_unsupported_syntax: true
+		});
+		
+EOT42;
+
+		$starter_code = null;
+	}
+
+	echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 ?>
 	</script>
 	<script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

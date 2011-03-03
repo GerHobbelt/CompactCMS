@@ -1461,6 +1461,8 @@ function load_EditArea_js($type, $http_base, $base, $root, $element, $suffix)
 	$param['debug'] = ($suffix == '_dev');			// Enable this option if you need debugging info
 	$param['use_disk_cache'] = false;				// If you enable this option gzip files will be cached on disk.
 	$param['use_gzip']= false;						// Enable gzip compression
+	$param['plugins'] = true; 						// Include plugins in the compressed/flattened JS output.
+	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
 	// END CONFIG
 	
 	$compressor = new Compressor($param);

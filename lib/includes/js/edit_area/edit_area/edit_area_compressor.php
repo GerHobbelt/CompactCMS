@@ -267,10 +267,14 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$loader= preg_replace("/(t\.sub_scripts_to_load=\s*)\[([^\]]*)\];/e"
 						, "\$this->replace_scripts('sub_script_list', '\\1', '\\2')"
 						, $loader);
-
+							     
+			// [i_a] the fix for various browsers' show issues is to flatten EVERYTHING into a single file, i.e. also the language and reg_syntax files: the load_script() and other lazyload-ing bits of code in edit_area are somehow buggy and thus circumvented.
+										     
 			// replace syntax definition names
+			$syntax_defs = '';
 			$reg_path= $this->path."reg_syntax/";
 			$a_displayName	= array();
+			$a_Name	= array();
 			if (($dir = @opendir($reg_path)) !== false)
 			{
 				while (($file = readdir($dir)) !== false)
@@ -282,12 +286,38 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 						{
 							$a_displayName[] = "'". substr( $file, 0, $pos ) ."':'". htmlspecialchars( $match[3], ENT_QUOTES, 'UTF-8') ."'";
 						}
+						if( preg_match( '@editAreaLoader\.load_syntax\[(\'|")([^\'"]+)\1\]\s*=@', $jsContent, $match ) )
+						{
+							$a_Name[] = htmlspecialchars( $match[2], ENT_QUOTES, 'UTF-8');
+						}
+						$syntax_defs .= $jsContent . "\n";
+						// and add 'marked as loaded' code to that as well:
+						$syntax_defs .= "editAreaLoader.loadedFiles[editAreaLoader.baseURL + 'reg_syntax/' + '" . $file . "'] = true;\n\n\n";
 					}
 				}
 				closedir($dir);
 			}
 			$loader	= str_replace( '/*syntax_display_name_AUTO-FILL-BY-COMPRESSOR*/', implode( ",", $a_displayName ), $loader );
+			$loader	= str_replace( '/*syntax_name_AUTO-FILL-BY-COMPRESSOR*/', implode( ",", $a_Name ), $loader );
 						
+			// collect languages
+			$language_defs = '';
+			$lang_path= $this->path."langs/";
+			if (($dir = @opendir($lang_path)) !== false)
+			{
+				while (($file = readdir($dir)) !== false)
+				{
+					if( $file !== "." && $file !== ".." && ( $pos = strpos( $file, '.js' ) ) !== false )
+					{
+						$jsContent	= $this->file_get_contents( $lang_path.$file );
+						$language_defs .= $jsContent . "\n";
+						// and add 'marked as loaded' code to that as well:
+						$language_defs .= "editAreaLoader.loadedFiles[editAreaLoader.baseURL + 'langs/' + '" . $file . "'] = true;\n\n\n";
+					}
+				}
+				closedir($dir);
+			}
+			
 			$this->datas= $loader;
 			$this->compress_javascript($this->datas);
 			
@@ -391,7 +421,11 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$this->datas.= sprintf("editAreaLoader.template= \"%s\";\n", $this->get_html_content("template.html"));
 			// load the css
 			$this->datas.= sprintf("editAreaLoader.iframe_css= \"<style>%s</style>\";\n", $this->get_css_content("edit_area.css"));
-					
+			
+			// load the syntaxes and languages as well:
+			$this->datas.= $syntax_defs;
+			$this->datas.= $language_defs;
+			
 		//	$this->datas= "function editArea(){};editArea.prototype.loader= function(){alert('bouhbouh');} var a= new editArea();a.loader();";
 					
 		}

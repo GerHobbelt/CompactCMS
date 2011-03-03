@@ -150,6 +150,8 @@ if(!$perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
 										case 'css':
 										case 'js':
 										case 'php':
+										case 'xml':
+										case 'htm':
 										case 'html':
 										case 'txt':
 											$cssfiles[$x][] = $file;
@@ -269,6 +271,7 @@ can be certain the edit_area code is really loaded.
 That's what the 'loaded' check and call in the code below is for.
 */
 $eaLanguage = $cfg['editarea_language'];
+$EAsyntax = cvt_extension2EAsyntax($temp_extension); 
 $driver_code = <<<EOT42
 
 		if (editAreaLoader.win != "loaded")
@@ -299,22 +302,22 @@ $driver_code = <<<EOT42
 		// initialisation
 
 		// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
-		var supported_syntaxes = ',' + editAreaLoader.default_settings.syntax_selection_allow + ',';
-		var desired_syntax = '$temp_extension';
-		desired_syntax = (supported_syntaxes.indexOf(',' + desired_syntax + ',') >= 0 ? desired_syntax : "");
-
-		editAreaLoader.init(
-			{
-				id: "content",
-				start_highlight: true,
-				allow_resize: 'both',
-				//min_width: 400,
-				//min_height: 125,
-				allow_toggle: true,
-				word_wrap: true,
-				language: "$eaLanguage",
-				syntax: desired_syntax
-			});
+		if (!editAreaLoader.init(
+				{
+					id: "content",
+					start_highlight: true,
+					allow_resize: 'both',
+					//min_width: 400,
+					//min_height: 125,
+					allow_toggle: true,
+					word_wrap: true,
+					language: "$eaLanguage",
+					syntax: "$EAsyntax",
+					ignore_unsupported_syntax: true
+				}))
+		{
+			alert('failed to start the EditArea JS control; error code: ' + (0 + editAreaLoader.error_code));
+		}
 		/*
 		for (syn in editAreaLoader.load_syntax)
 		{
