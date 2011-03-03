@@ -157,7 +157,7 @@ $client_browser = $client_browser->getBrowser();
 if (0)
 {
 	dump_request_to_logfile(array('client_browser' => $client_browser,
-							       'OPTIMIZE' => $optimize),
+								   'OPTIMIZE' => $optimize),
 							false);
 }
 
@@ -359,7 +359,7 @@ else
 
 	// Get contents of the files
 	$contents = '/* Browser: ' . $client_browser->Browser . ' ' . $client_browser->Version . " */\n\n";
-	
+
 	foreach($elements as $element)
 	{
 		$my_content = load_one($type, $http_base, $base, $root, $element);
@@ -493,8 +493,8 @@ else
 		{
 			$contents .= <<<EOT42
 
-			
-			
+
+
 if (typeof window.$extra_JS_callback == 'function')
 {
 	//alert('invoking $extra_JS_callback');
@@ -990,7 +990,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 	/*
 	 ASSUMPTION: make sure the @import statements are on their own lines: easier for us to process them!
-	 
+
 	 WARNING: Note that we should skip all mention of @import inside comments!
 	*/
 	$prev_content = '';
@@ -999,9 +999,9 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		// shift non-@import-ing lead off to other buffer, so we're never bothered with it again in this loop: speed!
 		$lead_in = substr($contents, 0, $idx);
 		$prev_content .= $lead_in;
-		
+
 		$contents = substr($contents, $idx);
-		
+
 		$idx = strrpos($lead_in, "/*");
 		if ($idx !== false)
 		{
@@ -1011,7 +1011,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			if ($idx === false)
 			{
 				// no, we don't. So this @import sits right smack inside a comment: skip it!
-				
+
 				// see where the honest goods continue again:
 				$idx = strpos($contents, "*/");
 				if ($idx === false)
@@ -1022,7 +1022,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 				}
 				$idx += 2;
 				$prev_content .= substr($contents, 0, $idx);
-				
+
 				$contents = substr($contents, $idx);
 				continue;
 			}
@@ -1212,10 +1212,10 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
 		}
-		else 
+		else
 		{
 			// Other browsers: must be fully CSS compliant to appreciate the styling entries: no browser-specific trickery here!
-				
+
 			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
 			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
 
@@ -1274,14 +1274,14 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
 		$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
-		
+
 		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
 	}
 	else if (strmatch_tail($element, "edit_area_ccms.js"))
 	{
 		$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
-		
+
 		$flattened_content = load_EditArea_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
 	}
@@ -1311,19 +1311,19 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 
 	/*
 	To facilitate the lazyloading of tinyMCE in parts when the $suffix is set to '_dev', we do this as
-	a two-stage process: 
-	
+	a two-stage process:
+
 	the first stage if for all of 'em and loads the tinyMCE 'core' code at least, lazyloaded or flattened.
-	
+
 	When we're in '_dev' mode, the second stage is triggered by the first stage having added a lazyload
 	instruction for '2nd-stage.tiny_mce_ccms.js', a fake filename, which will nevertheless trigger the Combiner
 	into going here AGAIN and that time around we add the flattened set of language files and plugins.
-	
+
 	When we're NOT in '_dev' mode, the second stage won't happen, because the trigger isn't written into
 	the produced JS code, so we're good to go either way!
 	*/
 	$stage2 = strmatch_tail($element, "2nd-stage.tiny_mce_ccms.js");
-	
+
 	if (!$stage2)
 	{
 		// Add core
@@ -1333,10 +1333,10 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 	{
 		/*
 		_full is a prebuilt version with everything included by the ant build.
-		
+
 		In all other cases, we need to load the language files and plugins ourselves in some way.
 		*/
-			
+
 		// Add core language(s)
 		$languages = array($cfg['tinymce_language']);
 		if ($cfg['tinymce_language'] != 'en')
@@ -1367,7 +1367,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 		{
 			if (!is_real_tinyMCE_plugin($plugin))
 				continue;
-				
+
 			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
 
 			foreach ($languages as $lang)
@@ -1454,57 +1454,57 @@ function load_EditArea_js($type, $http_base, $base, $root, $element, $suffix)
 	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element));
 
 	/*MARKER*/require_once(BASE_PATH . '/lib/includes/js/edit_area/edit_area/edit_area_compressor.php');
-	
+
 	// CONFIG
-	$param['cache_duration'] = 3600 * 24 * 10;		// 10 days util client cache expires
+	$param['cache_duration'] = 3600 * 24 * 10;      // 10 days util client cache expires
 	$param['compress'] = ($suffix == '_full' || $suffix == ''); // Enable the code compression, should be activated but it can be useful to deactivate it for easier error diagnostics (true or false)
-	$param['debug'] = ($suffix == '_dev');			// Enable this option if you need debugging info
-	$param['use_disk_cache'] = false;				// If you enable this option gzip files will be cached on disk.
-	$param['use_gzip']= false;						// Enable gzip compression
-	$param['plugins'] = true; 						// Include plugins in the compressed/flattened JS output.
-	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
-	$param['include_langs_and_syntaxes'] = true;	// Set to FALSE for backwards compatibility: do not include the language files and syntax definitions in the flattened output.
+	$param['debug'] = ($suffix == '_dev');          // Enable this option if you need debugging info
+	$param['use_disk_cache'] = false;               // If you enable this option gzip files will be cached on disk.
+	$param['use_gzip']= false;                      // Enable gzip compression
+	$param['plugins'] = true;                       // Include plugins in the compressed/flattened JS output.
+	$param['echo2stdout'] = false;                  // Output generated JS to stdout; alternative is to store it in the object for later retrieval.
+	$param['include_langs_and_syntaxes'] = true;    // Set to FALSE for backwards compatibility: do not include the language files and syntax definitions in the flattened output.
 	// END CONFIG
-	
+
 	$compressor = new Compressor($param);
-	
+
 	$my_content = $compressor->get_flattened();
-	
+
 	/*
 	WARNING:
-	
+
 	because the 'trigger' file 'edit_area_ccms.js' is located in the PARENT directory of the edit_area_loader.js,
 	the code in the latter will produce the WRONG this.baseURL value ('http://site.com/lib/includes/js/edit_area/'
 	instead of 'http://site.com/lib/includes/js/edit_area/edit_area/').
-	
-	The culprit is the set_base_url() method, which derives the baseURL from the first JavaScript <script> element 
+
+	The culprit is the set_base_url() method, which derives the baseURL from the first JavaScript <script> element
 	which contains a filepath which contains 'edit_area': hence it finds our edit_area_ccms.js load.
-	
+
 	There are several ways to solve this, but given the code of set_base_url(), we can simply predefine the 'baseURL'
 	and it will NOT look at the <script> collection at all. HOWEVER, we cannot programmatically preset 'baseURL'...
 	unless, for example, we derive our own editArea instance, hack the constructor around, and replace it, yada yada yada.
-	
+
 	Sounds like too much work where a fast hack will do the trick: bluntly replacing the line
 		t.baseURL="";
 	in here, while we're producing the (possibly minified) EA code.
-	
+
 	We can do it here (and not patch the edit_area_compressor for this) because we won't be serving pre-GZIP-ped
 	versions of this baby, EVER. If we GZIP at all, we will be doing it ourselves, AFTER we've gone through here.
-	
+
 	So in all scenarios, we're right on time right now to last-minute-patch the bugger.
 	*/
 	$my_content = preg_replace('/t\.baseURL\s*=\s*"";/', 't.baseURL="' . $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area";', $my_content);
 
 	/*
-	And because the lazyloader in edit_area itself, which is used to load any required language and/or syntax 
+	And because the lazyloader in edit_area itself, which is used to load any required language and/or syntax
 	file, is not working for us on some browsers (Safari 5.0, for example), we circumvent the issue by allowing
 	those items to be flattended into the output as well.
-	
+
 	Optimally, we'd flatten only the required-at-this-time items in there, but we don't mind about a few extra
 	lines of language def's right now; besides, we don't need to touch up the ETag/cache hash code section in
 	here when we do it this way.
 	*/
-	
+
 	return $my_content;
 }
 

@@ -221,9 +221,9 @@ class ccmsParser
 				$rv = $this->getvar($vars, $v[0]);
 				/*
 				Note: we extract the argument list as a simple, single regex since this
-				      regex only returns the last argument matching the (....)* section of
+					  regex only returns the last argument matching the (....)* section of
 					  that regex:
-					  
+
 				*/
 				$pm = preg_match('/^(\w+)(\s*\(\s*(.*)\s*\))?$/s', trim($v[1]), $fbits);
 				if (!$pm)
@@ -234,7 +234,7 @@ class ccmsParser
 				{
 					$argset = explode(',', $fbits[3]);
 					// ditch the full arguments match itself
-					array_pop($fbits); 
+					array_pop($fbits);
 					// and replace it with each of the arguments individually
 					$quote_pending = false;
 					$quoted_str = null;
@@ -255,7 +255,7 @@ class ccmsParser
 							{
 								/*
 								When not terminated, then we exploded a comma inside a delimited string: merge back together again.
-								
+
 								Of course, we don't know anymore whether it was one or two comma's, but we'll assume ',,' is not
 								gonna happen in any parameter.
 								*/
@@ -264,7 +264,7 @@ class ccmsParser
 								continue;
 							}
 							break;
-							
+
 						case "''":
 						case '""':
 							// a string, which had one comma in it at least:
@@ -282,7 +282,7 @@ class ccmsParser
 								continue;
 							}
 							break;
-							
+
 						default:
 							// maybe unquoted string?
 							$v = $this->trim_expression($v, true);
@@ -446,9 +446,9 @@ class ccmsParser
 				case 'implode':
 					/*
 					 * implode an array of text chunks, using the specified interjection string, just like PHP implode() itself.
-					 * 
-					 * Parameters: 
-					 * 
+					 *
+					 * Parameters:
+					 *
 					 *   merge string: placed between two entries in the array
 					 *
 					 *   leadin string: placed before the first entry in the array
@@ -470,7 +470,7 @@ class ccmsParser
 					{
 						$leadout = $fbits[5];
 					}
-					
+
 					return $leadin . implode($merge, $rv) . $leadout;
 				}
 			}

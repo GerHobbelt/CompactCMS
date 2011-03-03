@@ -452,7 +452,7 @@ if (0)
 	dump_request_to_logfile(array('btn_backup' => $btn_backup,
 								   'do' => $do,
 								   'btn_delete' => $btn_delete),
-						    true);
+							true);
 }
 ?>
 
@@ -510,7 +510,7 @@ $driver_code = <<<EOT42
 				//alert('go! ' + el);
 				return true;
 			});
-			
+
 EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);

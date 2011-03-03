@@ -61,7 +61,7 @@ $status_message = getGETparam4DisplayHTML('msg');
 if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
 	$qry = '';
-	if (!empty($status) || !empty($status_message)) 
+	if (!empty($status) || !empty($status_message))
 	{
 		$qry = '?status=' . rawurlencode($status) . '&msg=' . rawurlencode(!empty($status_message) ? $status_message : $ccms['lang']['system']['error_general']);
 	}
@@ -255,7 +255,7 @@ Hence we have to check whether the functions loaded there actually exist and onl
 have been loaded by the page issuing the Request.HTML action, so there's no need for panic when we are in such a situation where
 our external script load is discarded through Request.HTML + stripScripts() inside mootools.
 
-This is further complicated due to the lazy-loading process: when this page is loaded as-is, the external file will be 
+This is further complicated due to the lazy-loading process: when this page is loaded as-is, the external file will be
 parsed AFTER the code above has been executed, while, when loaded through Request.HTML, we cannot be sure the functions we need
 have been lazyloaded yet, so we must make sure we don't crash the browser by invoking functions which
 are not (yet) available when executing the code above.

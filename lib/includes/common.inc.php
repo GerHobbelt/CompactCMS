@@ -93,7 +93,7 @@ function strmatch_tail($str, $tail)
 
 
 /**
- * Return the part of the string up to (and including, depending on the $inc_last_slash boolean: default TRUE) 
+ * Return the part of the string up to (and including, depending on the $inc_last_slash boolean: default TRUE)
  * the last '/'.
  * If no slash exists in the source string, an empty string is therefore returned.
  */
@@ -157,7 +157,7 @@ function str2USASCII($src)
 
 		//$regex[0][] = '"';
 		//$regex[0][] = "'";
-		
+
 		// also check whether iconv exists AND performs correctly in transliteration:
 		$iconv_ok = false;
 		if (function_exists('iconv'))
@@ -175,9 +175,9 @@ function str2USASCII($src)
 	if ($iconv_ok)
 	{
 		/*
-		iconv may still b0rk by prematurely aborting the process. 
+		iconv may still b0rk by prematurely aborting the process.
 		We check for that by placing a recognizable tail at the
-		end of the input string: if it's not there in the output, 
+		end of the input string: if it's not there in the output,
 		we know we got b0rked after all.
 		*/
 		$rv = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $src . ' (tail)');
@@ -188,7 +188,7 @@ function str2USASCII($src)
 		}
 		// else: fall through: let the next step do the ASCIIfication.
 	}
-	
+
 	// ... even if we don't have a iconv at all or a b0rked iconv!
 	$src = str_replace($regex[0], $regex[1], $src);
 	// replace any remaining non-ASCII chars...
@@ -243,11 +243,11 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 			case ']': // would be interpreted as 'end of set'
 				$es .= '\]';
 				break;
-				
+
 			case '-': // would be interpreted as 'range from..to'
 				$es .= '\-';
 				break;
-				
+
 			default:
 				$es .= $c;
 				break;
@@ -301,10 +301,10 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	{
 		/*
 		Try to ensure -- with reasonably high probability -- that even a transformed filename remains unique.
-		
-		This is done by appending a part of the MD5 hash of the RAW, original filename to the 
+
+		This is done by appending a part of the MD5 hash of the RAW, original filename to the
 		transformed filename: where the transformation will have lost some characters (turning them
-		into underscores or removing them entirely), the extra MD5 characters will add that 
+		into underscores or removing them entirely), the extra MD5 characters will add that
 		uniqueness again.
 		*/
 		$src = str_replace('\\', '/', $src);
@@ -330,7 +330,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 			$tl = 4;
 		}
 	}
-	
+
 	/*
 	now check the length of the filename: when it is too large, we must reduce it!
 	*/
@@ -339,21 +339,21 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	{
 		$tl = 2 + intval($max_outlen / 16); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
 	}
-	
+
 	if ($tl > 0)
 	{
 		$max_outlen--; // account for the extra '-' or '.' inserted
-		
+
 		$tl = min(21, $max_outlen, $tl); // make sure we only go as far as the available range produced by the hash string
-		
+
 		// compact the hash into ~21 characters, so each char/byte has the maximum possible range --> more hash in fewer chars
 		$h = strtr(base64_encode(md5($src)), '+/=', '-__');
-	
+
 		// flexible way to pick a neat character as a separator, depending on what is allowed in the output:
 		$extra_accept_set .= '-_';
 		$markerpos = strcspn($extra_accept_set, '.-_~!,');
-		$marker = substr($extra_accept_set, $markerpos, 1); 
-		
+		$marker = substr($extra_accept_set, $markerpos, 1);
+
 		$dst = substr($dst, 0, $max_outlen - $tl) . $marker . substr($h, 0, $tl);
 	}
 
@@ -2287,9 +2287,9 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		if (substr($locale, -6) != '.UTF-8')
 		{
 			/*
-			This is required to make iconv work (instead of making it spit out '?' question 
+			This is required to make iconv work (instead of making it spit out '?' question
 			marks for anything not in the target charset). See also comments in:
-			
+
 			http://nl.php.net/manual/en/function.iconv.php
 			*/
 			$locale .= '.UTF-8';
@@ -2559,7 +2559,7 @@ function cvt_ordercode2list($ordercode)
 
 
 /**
-The various attributes which can be requested through 
+The various attributes which can be requested through
 checkSpecialPageName()
 */
 define('SPG_IS_NONREMOVABLE', 1);  // you cannot delete 'home', 'index', etc.
@@ -2578,20 +2578,20 @@ return the required attribute for it.
 function checkSpecialPageName($name, $reqd_attrib)
 {
 	global $cfg;
-	
+
 	if (empty($name) || in_array($name, array('home', 'index')))
 	{
 		$name = 'home';
 	}
-	
+
 	switch ($reqd_attrib)
 	{
 	case SPG_IS_NONREMOVABLE:
 		return in_array($name, array('403', '404', 'sitemap', 'home'));
-		
+
 	case SPG_IS_HOMEPAGE:
 		return ($name == 'home');
-		
+
 	case SPG_GIVE_PAGE_URL:
 		return ($name != 'home' ? $name . '.html' : '');
 
@@ -2605,7 +2605,7 @@ function checkSpecialPageName($name, $reqd_attrib)
 						   'class' => 'menu_item_home');
 		}
 		return null;
-					   
+
 	case SPG_GIVE_SITEMAP_SPECIAL:
 		if ($name == 'home')
 		{
@@ -2613,14 +2613,14 @@ function checkSpecialPageName($name, $reqd_attrib)
 						   'prio' => 0.80);
 		}
 		return null;
-					   
+
 	case SPG_MUST_BE_LINKED_IN_MENU:
 		if (in_array($name, array('403', '404')))
 			return false;
 		if ($name == 'home')
 			return true;
 		return null;
-		
+
 	default:
 		throw new Exception('Undefined attribute requested in checkSpecialPageName()');
 	}
@@ -2631,7 +2631,7 @@ function checkSpecialPageName($name, $reqd_attrib)
 
 
 /*
-Derived from code by phella.net: 
+Derived from code by phella.net:
 
   http://nl3.php.net/manual/en/function.var-dump.php
 */
@@ -2646,9 +2646,9 @@ function var_dump_ex($value, $level = 0)
 		$trans["\0"] = '&oplus;';
 		return strtr(htmlspecialchars($value, ENT_COMPAT, 'UTF-8'), $trans);
 	}
-	
+
 	$rv = '';
-	if ($level == 0) 
+	if ($level == 0)
 	{
 		$rv .= '<pre>';
 	}
@@ -2661,11 +2661,11 @@ function var_dump_ex($value, $level = 0)
 		$rv .= '(' . strlen($value) . ')';
 		$value = var_dump_ex($value, -1);
 		break;
-  
+
 	case 'boolean':
 		$value = ($value ? 'true' : 'false');
 		break;
-	
+
 	case 'object':
 		$props = get_class_vars(get_class($value));
 		$rv .= '(' . count($props) . ') <u>' . get_class($value) . '</u>';
@@ -2676,7 +2676,7 @@ function var_dump_ex($value, $level = 0)
 		}
 		$value = '';
 		break;
-  
+
 	case 'array':
 		$rv .= '(' . count($value) . ')';
 		foreach($value as $key => $val)
@@ -2686,12 +2686,12 @@ function var_dump_ex($value, $level = 0)
 		}
 		$value = '';
 		break;
-		
+
 	default:
 		break;
 	}
 	$rv .= ' <b>' . $value . '</b>';
-	if ($level == 0) 
+	if ($level == 0)
 	{
 		$rv .= '</pre>';
 	}
@@ -2718,9 +2718,9 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $
 	{
 		$sequence_number++;
 	}
-	
+
 	$rv = '<html><body>';
-	
+
 	if (!empty($_SESSION['dbg_last_dump']))
 	{
 		$rv .= '<p><a href="' . $_SESSION['dbg_last_dump'] . '">Go to previous dump</a></p>' ."\n";
@@ -2780,7 +2780,7 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $
 			}
 		}
 		ksort($ccms_copy);
-		
+
 		$rv .= var_dump_ex($ccms_copy);
 		$rv .= "</pre>";
 		$rv .= '<h1>$cfg</h1>';
@@ -2794,18 +2794,18 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $
 	$rv .= var_dump_ex($_SERVER);
 	$rv .= "</pre>";
 	$rv .= '</body></html>';
-	
+
 	$tstamp = date('Y-m-d.His');
-	
+
 	$fname = 'LOG-' . $tstamp . '-' . sprintf('%03u', $sequence_number) . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
 	if (isset($_SESSION))
 	{
 		$_SESSION['dbg_last_dump'] = $fname;
 	}
 	$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
-	
+
 	file_put_contents($fname, $rv);
-	
+
 	if ($dump_to_stdout_as_well)
 	{
 		$rv = preg_replace('/^.*?<body>(.+)<\/body>.*?$/sD', '\\1', $rv);
@@ -2943,7 +2943,7 @@ function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $
 {
 	global $ccms;
 	global $cfg;
-	
+
 	$filepath = str_replace('\\', '/', $filepath);
 	$pos = strpos($filepath, BASE_PATH);
 	if ($pos !== false)
@@ -2958,7 +2958,7 @@ function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $
 	{
 		$msg = $ccms['lang']['system']['error_forged'] . ' <sub>(' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')</sub>';
 	}
-	
+
 	if (!headers_sent())
 	{
 		header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($msg)));
@@ -2970,7 +2970,7 @@ function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $
 
 
 /*
-Return a suitable EditArea syntax ID string for the given filename+extension 
+Return a suitable EditArea syntax ID string for the given filename+extension
 */
 function cvt_extension2EAsyntax($filepath)
 {
@@ -2981,11 +2981,11 @@ function cvt_extension2EAsyntax($filepath)
 	{
 	default:
 		return ''; // unknown syntax: assume none special
-		
+
 	case 'htm':
 	case 'html':
 		return 'html';
-		
+
 	case 'css':
 	case 'js':
 	case 'php':
@@ -2997,7 +2997,7 @@ function cvt_extension2EAsyntax($filepath)
 	case 'java':
 	case 'vb':
 		return $ext;
-		
+
 	case 'txt':
 		if (strtolower(!empty($pi['filename']) ? $pi['filename'] : '') == 'robots')
 		{
@@ -3007,22 +3007,22 @@ function cvt_extension2EAsyntax($filepath)
 
 	case 'bas':
 		return 'basic';
-		
+
 	case 'cf':
 		return 'coldfusion';
-		
+
 	case 'pas':
 		return 'pascal';
-		
+
 	case 'py':
 		return 'python';
-		
+
 	case 'pl':
 		return 'perl';
-		
+
 	case 'rb':
 		return 'ruby';
-		
+
 	case 'tsql':
 		return 'tsql';
 	}
@@ -3035,7 +3035,7 @@ function cvt_extension2EAsyntax($filepath)
 /*
 Produce the list of tinyMCE plugins (and their properties) as an array.
 
-When the $desired_plugins argument is not NULL, it must be either a string 
+When the $desired_plugins argument is not NULL, it must be either a string
 specifying a prefined set name ('*': all; 'basic': a limited set of plugins, ...)
 or a comma-separated list of required plugins, or the argument can be an array,
 where each entry specifies a required plugin.
@@ -3082,7 +3082,7 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 	 */
 	static $mce_plugins = array(
 		// DEV NOTE: search for .addButton() invocations in the plugins to dig out the button names
-		'advhr'              => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'advhr'),  
+		'advhr'              => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'advhr'),
 		'advimage'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
 		'advlink'            => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link'),
 		'advlist'            => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
@@ -3117,9 +3117,9 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 		'visualchars'        => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualchars'),
 		'wordcount'          => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
 		'xhtmlxtras'         => array('default_on' => 1, 'grouping' =>  70, 'buttons' => 'cite,q,acronym,abbr,del,ins,attribs'),
-                                                                          
-		// built-ins:                                                     
-		                                                                  
+
+		// built-ins:
+
 		'.basicformat'       => array('default_on' => 1, 'grouping' =>  30, 'buttons' => 'bold,italic,underline,strikethrough'),
 		'.charmap'           => array('default_on' => 1, 'grouping' =>  61, 'buttons' => 'charmap'),
 		'.cleanup'           => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'cleanup'),
@@ -3147,7 +3147,7 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 	if ($desired_plugins !== null && !is_array($desired_plugins))
 	{
 		$desired_plugins = ','.preg_replace('/\s+/', '', strval($desired_plugins)).',';
-		
+
 		if (strpos($desired_plugins, '*') !== false)
 		{
 			$desired_plugins = null;
@@ -3156,16 +3156,16 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 		{
 			// expand 'set names':
 			$desired_plugins = str_replace(',basic,', ',fullscreen,preview,searchreplace,spellchecker,style,table,visualchars,xhtmlxtras,', $desired_plugins);
-			
+
 			$desired_plugins = explode(',', $desired_plugins);
 		}
 	}
-		
+
 	$rv = array();
 	foreach ($mce_plugins as $plugin => $props)
 	{
 		if (!$props['default_on']) continue;
-	
+
 		if ($desired_plugins === null || in_array($plugin, $desired_plugins))
 		{
 			$rv[$plugin] = $props;
@@ -3187,8 +3187,8 @@ function is_real_tinyMCE_plugin($name)
 {
 	if (empty($name))
 		return false;
-		
-	return strpos('abcdefghijklmnopqrstuvwxyz', substr($name, 0, 1)) !== false; 
+
+	return strpos('abcdefghijklmnopqrstuvwxyz', substr($name, 0, 1)) !== false;
 }
 
 
@@ -3243,13 +3243,13 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 		 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
 		 */
 		$rootdir = $cfg['rootdir'];
-	
+
 		$rv = <<<EOT42
-			
+
 	tinyMCEPreInit = {
 		  suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
 		, base: '{$rootdir}lib/includes/js/tiny_mce'
-		, query: 'load_callback=$js_load_callback' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */ 
+		, query: 'load_callback=$js_load_callback' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
 
 EOT42;
@@ -3258,7 +3258,7 @@ EOT42;
 	case 2:
 		$rootdir = $cfg['rootdir'];
 		$tinymce_language = $cfg['tinymce_language'];
-		
+
 		$pluginarr = get_tinyMCE_plugin_list();
 		$plugs = array_keys($pluginarr);
 		$plugs = array_filter($plugs, 'is_real_tinyMCE_plugin');
@@ -3271,9 +3271,9 @@ EOT42;
 		{
 			$bs = $info['buttons'];
 			if (empty($bs)) continue;
-			
+
 			$grp = $info['grouping'];
-			
+
 			$bsa = explode(',', $bs);
 			$btnvirtcount += count($bsa);
 			foreach($bsa as $btn1)
@@ -3288,12 +3288,12 @@ EOT42;
 				{
 					$bdef[1] = 1;
 				}
-					
+
 				if (!isset($btngrp[$grp]))
 				{
 					$btngrp[$grp] = array();
 				}
-				
+
 				// also check whether button isn't already in the group: some adv(anced) plugins override existing buttons/functions:
 				$xsist = false;
 				foreach($btngrp[$grp] as $bc)
@@ -3312,25 +3312,25 @@ EOT42;
 		}
 		ksort($btngrp);
 
-		$rv = "	var buttondefs = [\n";
-		
+		$rv = " var buttondefs = [\n";
+
 		$s = '';
 		foreach($btngrp as $group => $btnarr)
 		{
 			$rv .= $s;
-			
-			$s = "		[\n";
+
+			$s = "      [\n";
 			$s2 = '';
 			foreach($btnarr as $bdef)
 			{
-				$s2 .= "			['" . $bdef[0] . "', " . $bdef[1] . "],\n";
+				$s2 .= "            ['" . $bdef[0] . "', " . $bdef[1] . "],\n";
 			}
 			$s2 = substr($s2, 0, strlen($s2) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-			$s .= $s2 . "		],\n";
+			$s .= $s2 . "       ],\n";
 		}
 		$s = substr($s, 0, strlen($s) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-		$rv .= $s . "	];\n";
-		
+		$rv .= $s . "   ];\n";
+
 		$rv .= <<<EOT42
 	var buttonvirtcount = $btnvirtcount;
 
@@ -3339,7 +3339,7 @@ EOT42;
 	var editwinwidth;
 	var editwinmaxwidth;
 	var editwinmaxheight;
-	
+
 EOT42;
 
 		foreach($editarea_tags as $tag)
@@ -3352,44 +3352,44 @@ EOT42;
 	dimensions = \$('$tag').getSize();
 	editwinwidth = dimensions.x;
 	//alert('width: ' + editwinwidth + 'px');
-				
+
 	tbdef = layout_the_MCE_toolbars(buttondefs, editwinwidth);
 
 	var MCEsettings_{$tag} = {
-        mode: 'exact',
-        elements: '$tag',
-        theme: 'advanced',
-        language: '$tinymce_language',
-        skin: 'o2k7',
-        skin_variant: 'silver',
-        plugins: '$plugins_str',
-        theme_advanced_toolbar_location: 'top',
+		mode: 'exact',
+		elements: '$tag',
+		theme: 'advanced',
+		language: '$tinymce_language',
+		skin: 'o2k7',
+		skin_variant: 'silver',
+		plugins: '$plugins_str',
+		theme_advanced_toolbar_location: 'top',
 
-        //theme_advanced_buttons1 : dst[0],
-        //theme_advanced_buttons2 : dst[1],
-        //theme_advanced_buttons3 : dst[2],
-        //theme_advanced_buttons4 : dst[3],
+		//theme_advanced_buttons1 : dst[0],
+		//theme_advanced_buttons2 : dst[1],
+		//theme_advanced_buttons3 : dst[2],
+		//theme_advanced_buttons4 : dst[3],
 
-        theme_advanced_toolbar_align: 'left',
-        theme_advanced_statusbar_location: 'bottom',
-        dialog_type: 'modal',
-		
-        paste_auto_cleanup_on_paste: true,
-		
-        autoresize_on_init: true,
+		theme_advanced_toolbar_align: 'left',
+		theme_advanced_statusbar_location: 'bottom',
+		dialog_type: 'modal',
+
+		paste_auto_cleanup_on_paste: true,
+
+		autoresize_on_init: true,
 		autoresize_max_height: editwinmaxheight,
-		
-        theme_advanced_resizing: true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-        theme_advanced_resizing_use_cookie : 1,
-        theme_advanced_resize_horizontal: false,
-        theme_advanced_resizing_min_width: 400,
-        theme_advanced_resizing_min_height: 100,
-        theme_advanced_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-        theme_advanced_resizing_max_height: 0xFFFF,
-        relative_urls: true,
-        convert_urls: false,
-        remove_script_host: true,
-        document_base_url: '$rootdir',
+
+		theme_advanced_resizing: true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+		theme_advanced_resizing_use_cookie : 1,
+		theme_advanced_resize_horizontal: false,
+		theme_advanced_resizing_min_width: 400,
+		theme_advanced_resizing_min_height: 100,
+		theme_advanced_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+		theme_advanced_resizing_max_height: 0xFFFF,
+		relative_urls: true,
+		convert_urls: false,
+		remove_script_host: true,
+		document_base_url: '$rootdir',
 
 EOT42;
 
@@ -3409,29 +3409,29 @@ EOT42;
 			{
 				$session_id = session_id();
 				$fancyupload_language = $cfg['fancyupload_language'];
-				
+
 				$rv .= <<<EOT42
-				
+
 		file_browser_callback: FileManager.TinyMCE(
-            function(type)
-            {
-                return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-                    url: '{$rootdir}lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-                    baseURL: '{$rootdir}',
-                    assetBasePath: '{$rootdir}lib/includes/js/fancyupload/Assets',
-                    language: '$fancyupload_language',
-                    selectable: true,
-                    uploadAuthData: {
-                        session: 'ccms_userLevel',
-                        sid: '$session_id'
-                    }
-                };
-            }),
-			
+			function(type)
+			{
+				return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+					url: '{$rootdir}lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+					baseURL: '{$rootdir}',
+					assetBasePath: '{$rootdir}lib/includes/js/fancyupload/Assets',
+					language: '$fancyupload_language',
+					selectable: true,
+					uploadAuthData: {
+						session: 'ccms_userLevel',
+						sid: '$session_id'
+					}
+				};
+			}),
+
 EOT42;
 			}
 			$rv .= <<<EOT42
-			
+
 		//height: '300px',
 		width: editwinwidth   /* default: width in pixels */
 	};
@@ -3456,7 +3456,7 @@ EOT42;
 
 	case 3:
 		$rv = <<<EOT42
-		
+
 /* set up the toolbars depending on the editor width */
 function layout_the_MCE_toolbars(buttondefs, editwinwidth)
 {
@@ -3465,30 +3465,30 @@ function layout_the_MCE_toolbars(buttondefs, editwinwidth)
 	var dst = [];
 	var dstelem = '';
 	var lwleft = editwinwidth - 10; // subtract edges.
-	
+
 	for (i = 0; i < tbcount; i++)
 	{
 		var grpwidth = 0;
 		var j;
 		var grp = buttondefs[i];
 		var btns_in_grp = grp.length;
-		
+
 		for (j = 0; j < btns_in_grp; j++)
 		{
 			grpwidth += grp[j][1];
 		}
 		grpwidth *= 22; /* width per button */
-		
+
 		if (grpwidth + 5 > lwleft)
 		{
 			// not enough space: start a new toolbar row; push the previous toolbar first:
 			//alert('toolbar row: ' + dstelem);
 			dst.push(dstelem);
-			
+
 			dstelem = '';
 			lwleft = editwinwidth - 10; // subtract edges.
 		}
-		
+
 		if (dstelem.length > 0)
 		{
 			lwleft -= 10;
@@ -3502,11 +3502,11 @@ function layout_the_MCE_toolbars(buttondefs, editwinwidth)
 		}
 		lwleft -= grpwidth;
 	}
-	
+
 	// and push the final row:
 	//alert('toolbar row @ final: ' + dstelem);
 	dst.push(dstelem);
-	
+
 	return dst;
 }
 
@@ -3555,7 +3555,7 @@ $fs
 function jsComplete(user_obj, lazy_obj)
 {
 	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');
-	
+
 	if (lazy_obj.todo_count)
 	{
 		/* nested invocation of LazyLoad added one or more sets to the load queue */
@@ -3579,7 +3579,7 @@ $driver_code
 }
 
 
-function jslog(message) 
+function jslog(message)
 {
 	if (jsLogEl)
 	{

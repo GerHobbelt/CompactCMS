@@ -180,7 +180,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				{
 					echo '<p class="error">'.$ccms['lang']['system']['error_versioninfo'].'</p>';
 				}
-				
+
 				/*
 				Show possibly incoming status messages:
 				*/
@@ -543,21 +543,21 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
    'Core/persist.js,' .
    'Core/themes.js,' .
 /*
-   
-												    'Core/core.js,' .
-												    'Core/create.js,' .
-												    'Core/require.js,' .
-												    'Core/canvas.js,' .
-												    'Core/content.js,' .
-												    'Core/persist.js,' .
-												    'Core/themes.js,' .
-*/													
-												    'Controls/desktop/desktop.js,' .
-												    'Controls/panel/panel.js,' .
-												    'Controls/column/column.js,' .
-												    'Controls/taskbar/taskbar.js,' .
-												    'Controls/window/window.js,' .
-												    'Controls/window/modal.js';
+
+													'Core/core.js,' .
+													'Core/create.js,' .
+													'Core/require.js,' .
+													'Core/canvas.js,' .
+													'Core/content.js,' .
+													'Core/persist.js,' .
+													'Core/themes.js,' .
+*/
+													'Controls/desktop/desktop.js,' .
+													'Controls/panel/panel.js,' .
+													'Controls/column/column.js,' .
+													'Controls/taskbar/taskbar.js,' .
+													'Controls/window/window.js,' .
+													'Controls/window/modal.js';
 }
 else
 {

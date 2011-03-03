@@ -220,7 +220,7 @@ function confirmation()
 			$extra_functions_code = generateJS4TinyMCEinit(3, 'content');
 
 			$extra_functions_code .= <<<EOT42
-			
+
 function exec_GHO()
 {
 	//alert('exec_GHO');
@@ -251,9 +251,9 @@ EOT42;
 			}
 
 			/*
-			be aware that the edit_area code assumes a 'onLoad' event will be triggered AFTER it is 
-			loaded, which is ONLY PROBABLY TRUE when the edit_area code is loaded by <script> tags 
-			in the page header or HTML itself and NOT TRUE when edit_Area itself is loaded through 
+			be aware that the edit_area code assumes a 'onLoad' event will be triggered AFTER it is
+			loaded, which is ONLY PROBABLY TRUE when the edit_area code is loaded by <script> tags
+			in the page header or HTML itself and NOT TRUE when edit_Area itself is loaded through
 			a lazyloader, like we do.
 
 			Hence, we need to execute the edit_area onLoad event code manually at a time when we
@@ -261,7 +261,7 @@ EOT42;
 			That's what the 'loaded' check and call in the code below is for.
 			*/
 			$eaLanguage = $cfg['editarea_language'];
-			$EAsyntax = cvt_extension2EAsyntax($filename); 
+			$EAsyntax = cvt_extension2EAsyntax($filename);
 			$driver_code = <<<EOT42
 
 	if (editAreaLoader.win != "loaded")
@@ -273,14 +273,14 @@ EOT42;
 	resize event has the problem that it is triggered continually when in IE (and tests reveal it's similar in FF3)
 	and we do NOT want to spend CPU cycles on repeated updates of the MUI window sizes all the time, so we follow the
 	advice found here:
-	
+
 	http://mbccs.blogspot.com/2007/11/fixing-window-resize-event-in-ie.html
 	http://mootools-users.660466.n2.nabble.com/Moo-Detecting-window-resize-td3713058.html
 	*/
 	var resizeTimeout;
 
 	var realResize = function(){
-	
+
 		//alert('editor: resize event');
 	};
 
@@ -303,7 +303,7 @@ EOT42;
 			syntax: "$EAsyntax",
 			ignore_unsupported_syntax: true
 		});
-		
+
 EOT42;
 
 		$starter_code = null;

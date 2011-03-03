@@ -277,7 +277,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	function set_ccms_opt($item, $value, $overwrite_on_empty = false)
 	{
 		global $ccms;
-		
+
 		if (!isset($ccms[$item]))
 		{
 			$ccms[$item] = $value;
@@ -309,11 +309,11 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		$subheader = $ccms['lang']['system']['error_404header'];
 		set_ccms_opt('printable', "N");
 		set_ccms_opt('published', "Y");
-		
+
 		$bc = array();
 		$bc[] = '<a href="'.$cfg['rootdir'].'" title="'.ucfirst($cfg['sitename']).' '.$ccms['lang']['system']['home'].'">'.$ccms['lang']['system']['home'].'</a>';
 		$bc[] = $ccms['lang']['system']['error_404title'];
-		
+
 		set_ccms_opt('iscoding', "Y");
 		set_ccms_opt('rootdir', $cfg['rootdir']);
 		set_ccms_opt('urlpage', $pagereq); // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
@@ -333,7 +333,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('template', $tpl);
 
 		$content = $ccms['lang']['system']['error_404content'];
-		
+
 		switch ($rcode)
 		{
 		default:
@@ -344,12 +344,12 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			// patch the $ccms[] data for the 403 error:
 			$pagetitle = $ccms['lang']['system']['error_403title'];
 			$subheader = $ccms['lang']['system']['error_403header'];
-			
+
 			array_pop($bc);  // ditch the '404' entry and replace it with...
 			$bc[] = $ccms['lang']['system']['error_403title'];
-		
+
 			$content = $ccms['lang']['system']['error_403content'];
-			
+
 			$desc = $ccms['lang']['system']['error_403title'];
 			break;
 		}
@@ -358,14 +358,14 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('pagetitle', $pagetitle);
 		set_ccms_opt('subheader', $subheader);
 		set_ccms_opt('desc', $desc);
-		
+
 		set_ccms_opt('title', ucfirst($ccms['pagetitle']).' - '.$ccms['sitename'].' | '.$ccms['subheader']);
 
 		// even under error conditions, we need the side-effect of the content loader code: a properly initialized template!
 		$rendered_page = ccmsContent(null, 'Y', false);
 		//$content = $rendered_page['content'];
 		//$rcode = $rendered_page['responsecode'];
-		
+
 		set_ccms_opt('content', $content);
 	}
 
@@ -394,7 +394,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		$msg = explode(' ::', $ccms['lang']['hints']['published']);
 		ob_start();
 			$tpl_init_path = BASE_PATH . '/lib/templates/' . $ccms['templatedir'] . '/init.inc.php';
-			
+
 			// Parse content for active or preview mode
 			$filepath = BASE_PATH . '/content/' . $page . '.php';
 
@@ -427,13 +427,13 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			{
 				$ccms_load_failure = 404;
 			}
-			
+
 			// Make sure to load the template init code at least once, even when the content page couldn't be loaded:
 			if ($ccms_load_failure && is_file($tpl_init_path))
 			{
 				/*MARKER*/include($tpl_init_path);
 			}
-			
+
 			// All parsed function contents to $content variable
 			$content = ob_get_contents();
 		ob_end_clean();
@@ -444,8 +444,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		return $rv;
 	}
 
-	
-	
+
+
 	// collect the menu entries first so we can peruse them in the breadcrumb code below.
 	$menu_in_set = '1';
 	for($i = 2; $i <= MENU_TARGET_COUNT; $i++)
@@ -659,12 +659,12 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	 * (2) the requested page doesn't necessarily need to appear in any menu!
 	 *
 	 * - We fetch the page
-	 * - If it does not exist (or when there's no database record at all), we 
+	 * - If it does not exist (or when there's no database record at all), we
 	 *   try to fetch a suitable error page
 	 * - If that one isn't available for whatever reason, we default to a basic
 	 *   error response (the content of which depending on the situation at hand
 	 *
-	 * Hence we run up to two rounds below: one round for good pages; the second 
+	 * Hence we run up to two rounds below: one round for good pages; the second
 	 * round is for when we need to report an error (through a user-editable error page)
 	 *
 	 * NOTE: since we wish to keep as much info from the intended page as possible,
@@ -674,7 +674,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	$pagerow = null;
 	$rcode = (is_http_response_code($pagereq) ? intval($pagereq) : false);
 	//set_ccms_opt('content', '<pre>rcode = ' . $rcode . ', ' . $pagereq);
-	
+
 	for ($round = 0; $round < 2; $round++)
 	{
 		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('urlpage' => MySQL::SQLValue($dbpage, MySQL::SQLVALUE_TEXT)));
@@ -693,7 +693,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				{
 					// mix original data into the error record:
 				}
-				
+
 				// Internal reference
 				set_ccms_opt('published', $row->published);
 				set_ccms_opt('iscoding', $row->iscoding);
@@ -719,7 +719,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				set_ccms_opt('keywords', $row->keywords);
 				set_ccms_opt('title', ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader']);
 				set_ccms_opt('printable', $row->printable);
-				//set_ccms_opt('responsecode', null);			// default: 200 : OK
+				//set_ccms_opt('responsecode', null);           // default: 200 : OK
 				$m_id = intval($row->menu_id);
 				set_ccms_opt('menu_id', $m_id);
 				if ($m_id)
@@ -820,9 +820,9 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 					}
 					set_ccms_opt('responsecode', $rcode);
 					//setup_ccms_for_40x_error($rcode, $pagereq);
-					
+
 					$dbpage = $rcode;
-					
+
 					// we now know we're in a state of error handling: loop so we use the second round to fetch the error page itself.
 					continue;
 				}
@@ -845,9 +845,9 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				}
 				set_ccms_opt('page_name', $pagereq);
 				set_ccms_opt('responsecode', $rcode);
-				
+
 				$dbpage = $rcode;
-				
+
 				// loop so we use the second round to fetch the error page itself.
 			}
 		}
@@ -864,9 +864,9 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			}
 			set_ccms_opt('page_name', $pagereq);
 			set_ccms_opt('responsecode', $rcode);
-			
+
 			$dbpage = $rcode;
-			
+
 			// loop so we use the second round to fetch the error page itself.
 		}
 	} // end of 2-round loop
@@ -896,7 +896,7 @@ else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a]
 	 *
 	 * e.g. You can use this function to submit a dynamic sitemap to Google Webmaster Tools.
 	 */
-	 
+
 	$dir = $cfg['rootdir'];   // [i_a] the original substr($_SERVER[]) var would fail when called with this req URL: index.php?page=sitemap
 
 	/*

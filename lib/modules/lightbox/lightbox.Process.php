@@ -393,7 +393,7 @@ if (0)
 	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? $_FILES['Filedata']['name'] : null);
 	// make filename safe but try to keep it unique at the same time!
 	$target_filename = filterParam4Filename($target_filename, null, true);
-	
+
 	// Set file and get file extension
 	$extension = strtolower(pathinfo($target_filename, PATHINFO_EXTENSION));
 
@@ -584,10 +584,10 @@ if (0)
 
 		case 'png':
 			imagepng($tmp, $original, 9);
-			
+
 			$t = $dest . '/_thumbs/' . basename($f, pathinfo($f, PATHINFO_EXTENSION)) . '.jpg';  // could be done as pathinfo($f, PATHINFO_FILENAME), but that's for PHP 5.2+ only!
 			@unlink($t);
-			
+
 			imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
 			//imagepng($tmp_t, $thumbnail, 9);
 			break;
@@ -797,10 +797,10 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action == 'confirm_regen')
 
 						case 'png':
 							//imagepng($tmp_t, $thumbnail, 9);
-							
+
 							$t = $dest . '/_thumbs/' . basename($f, pathinfo($f, PATHINFO_EXTENSION)) . '.jpg';  // could be done as pathinfo($f, PATHINFO_FILENAME), but that's for PHP 5.2+ only!
 							@unlink($t);
-							
+
 							imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
 							break;
 

@@ -2,7 +2,7 @@
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-    
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-    
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -167,7 +167,7 @@ $ccms['lang']['menu']['4']                      = "Footer";
 $ccms['lang']['menu']['5']                      = "Extra";
 
 // Administration form related texts
-$ccms['lang']['forms']['filename']              = "File name"; 
+$ccms['lang']['forms']['filename']              = "File name";
 $ccms['lang']['forms']['pagetitle']             = "Page title";
 $ccms['lang']['forms']['subheader']             = "Subheader";
 $ccms['lang']['forms']['description']           = "Description";
@@ -288,7 +288,7 @@ $ccms['lang']['owners']['explain']              = "Here you can appoint specific
 $ccms['lang']['owners']['pages']                = "Pages";
 $ccms['lang']['owners']['users']                = "Users";
 
-// Translation assistance page 
+// Translation assistance page
 $ccms['lang']['translation']['header']          = "Translate";
 $ccms['lang']['translation']['explain']         = "Shows the translation strings.";
 
@@ -360,47 +360,47 @@ $ccms['lang']['guestbook']['host']              = "IP address";
 $ccms['lang']['guestbook']['configuration']     = "Configuration";
 
 
-      /* ### OBSOLETED ENTRIES ### */
-      /*
-         Please check the CompactCMS code to:
+	  /* ### OBSOLETED ENTRIES ### */
+	  /*
+		 Please check the CompactCMS code to:
 
-         a) make sure whether these entries are indeed obsoleted.
-            When yes, then the corresponding entry above should be
-            removed as well!
+		 a) make sure whether these entries are indeed obsoleted.
+			When yes, then the corresponding entry above should be
+			removed as well!
 
-         b) When no, i.e. the entry exists in the code, this merits
-            a bug report regarding the ./collect_lang_items.sh script.
-       
-         ----------------------------------------------------------
-	
-	$ccms['lang']['album']['nodir']                 
-	$ccms['lang']['backend']['fileexists']          
-	$ccms['lang']['backend']['startedittitle']      
-	$ccms['lang']['backend']['updatelist']          
-	$ccms['lang']['editor']['closeeditor']          
-	$ccms['lang']['guestbook']['removed']           
-	$ccms['lang']['login']['falsetries']            
-	$ccms['lang']['login']['provide']               
-	$ccms['lang']['system']['error_default']        
-	$ccms['lang']['system']['error_sitemap']        
-       
-         ----------------------------------------------------------
-	
-         ### MISSING ENTRIES ###
+		 b) When no, i.e. the entry exists in the code, this merits
+			a bug report regarding the ./collect_lang_items.sh script.
 
-         The entries below have been found to be missing from this 
-         translation file; move them from this comment section to the
-         PHP code above and assign them a suitable text.
+		 ----------------------------------------------------------
 
-         When done so, you can of course remove them from the list 
-         below.
-       
-         ----------------------------------------------------------
-      */
-	  
-       
-      /*
-         ----------------------------------------------------------
-      */
-	  
+	$ccms['lang']['album']['nodir']
+	$ccms['lang']['backend']['fileexists']
+	$ccms['lang']['backend']['startedittitle']
+	$ccms['lang']['backend']['updatelist']
+	$ccms['lang']['editor']['closeeditor']
+	$ccms['lang']['guestbook']['removed']
+	$ccms['lang']['login']['falsetries']
+	$ccms['lang']['login']['provide']
+	$ccms['lang']['system']['error_default']
+	$ccms['lang']['system']['error_sitemap']
+
+		 ----------------------------------------------------------
+
+		 ### MISSING ENTRIES ###
+
+		 The entries below have been found to be missing from this
+		 translation file; move them from this comment section to the
+		 PHP code above and assign them a suitable text.
+
+		 When done so, you can of course remove them from the list
+		 below.
+
+		 ----------------------------------------------------------
+	  */
+
+
+	  /*
+		 ----------------------------------------------------------
+	  */
+
 ?>

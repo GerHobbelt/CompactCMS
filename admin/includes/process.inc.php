@@ -175,14 +175,14 @@ if ($do_update_or_livefilter && checkAuth())
 		}
 	}
 
-	
+
 	/*
 	Required to keep the HTML output compliant: a 'id' attribute must be globally unique in the page!
 	*/
 	function mk_unique_page_id($page_id)
 	{
 		static $count;
-		
+
 		if (empty($count))
 		{
 			$count = 1;
@@ -193,7 +193,7 @@ if ($do_update_or_livefilter && checkAuth())
 		}
 		return 'pageitem' . $count . '-' . rm0lead($page_id);
 	}
-	
+
 
 	// Open recordset for sites' pages
 	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
@@ -407,10 +407,10 @@ if ($do_update_or_livefilter && checkAuth())
 
 				?>
 					<td class="last right-text nowrap">
-						<?php 
+						<?php
 							/* the ID attribute is used to uniquify the MUI editor window, so that multiple pages can be edited simultaneously! */
 							echo '<a href="' . $module . '?page_id=' . rm0lead($row->page_id) . '&amp;action=edit" ' .
-						          'rel="Edit ' . $row->urlpage . '.html" ' .
+								  'rel="Edit ' . $row->urlpage . '.html" ' .
 								  'class="tabs sprite edit" ' .
 								  'id="E-' . $row->urlpage . '-' . rm0lead($row->page_id) . '">' . $ccms['lang']['backend']['editpage'] . '</a> ' .
 								  '| ' .
@@ -819,10 +819,10 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		{ $errors[] = $ccms['lang']['system']['error_description_2']; }
 
 	if (0) // it's okay to try to create special pages, particularly when you're trying to recover manually from a completely b0rked install/upgrade!
-	{		
+	{
 		if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
-		{ 
-			$errors[] = $ccms['lang']['system']['error_reserved']; 
+		{
+			$errors[] = $ccms['lang']['system']['error_reserved'];
 		}
 	}
 
@@ -1247,7 +1247,7 @@ if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAu
 {
 	$page_idcode = explode('-', getPOSTparam4IdOrNumber('id'), 2);
 	$page_id = filterParam4Number(count($page_idcode) == 2 ? $page_idcode[1] : 0);
-	
+
 	if ($page_id > 0)
 	{
 		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)));
@@ -1255,7 +1255,7 @@ if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAu
 
 		$owner = explode('||', strval($row->user_ids));
 		$oldname = $row->urlpage;
-		
+
 		if (checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE)
 			|| (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 			|| !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))

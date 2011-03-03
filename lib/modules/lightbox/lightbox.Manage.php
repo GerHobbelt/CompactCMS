@@ -252,7 +252,7 @@ $tinyMCE_required = false;
 						foreach ($albums as $key => $value)
 						{
 							$pageName = 'light';  // TODO
-							
+
 							// Alternate rows
 							if($key % 2 != 1)
 							{
@@ -268,7 +268,7 @@ $tinyMCE_required = false;
 							?>
 								<td class="nowrap">
 									<input type="checkbox" name="albumID[<?php echo $key + 1; ?>]" value="<?php echo $value; ?>" id="newsID">
-									<?php 
+									<?php
 									echo '<a href="' . $cfg['rootdir'] . $pageName . '/' . $value . '.html?preview=' . $preview_checkcode . '" ' .
 											'title="' . $ccms['lang']['backend']['previewpage'] . '"><span class="ss_sprite_16 ss_eye">&#160;</span></a>';
 									?>
@@ -443,7 +443,7 @@ $tinyMCE_required = false;
 					{
 						$desc = trim($desc.' '.$lines[$x]); // [i_a] double invocation of htmlspecialchars, together with the form input (lightbox.Process.php)
 					}
-					
+
 					$tinyMCE_required = true;
 					?>
 					<label for="description"><?php echo $ccms['lang']['album']['description']; ?></label>
@@ -508,7 +508,7 @@ $tinyMCE_required = false;
 				 */
 				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 				echo '&SIDCHK=' . $_SESSION['fup1'];
-				
+
 				/* whitespace is important here... */ ?>&page_id=<?php echo $page_id; ?>&action=save-files" method="post" enctype="multipart/form-data" id="lightboxForm">
 
 				<label><?php echo $ccms['lang']['album']['toexisting']; ?>
@@ -523,7 +523,7 @@ $tinyMCE_required = false;
 						?>
 					</select>
 				</label>
-				
+
 				<div class="clearfix">
 					<label><?php echo $ccms['lang']['forms']['overwrite_imgs']; ?>?</label>
 					<label for="f_ovr1" class="yesno"><?php echo $ccms['lang']['backend']['yes']; ?>: </label>
@@ -531,7 +531,7 @@ $tinyMCE_required = false;
 					<label for="f_ovr2" class="yesno"><?php echo $ccms['lang']['backend']['no']; ?>: </label>
 						<input type="radio" id="f_ovr2" checked="checked" name="overwrite_existing" value="N" />
 				</div>
-				
+
 				<div id="lightbox-status">
 					<p>
 						<a id="lightbox-browse"><span class="ss_sprite_16 ss_folder_image">&#160;</span><?php echo $ccms['lang']['album']['browse']; ?></a> |
@@ -571,7 +571,7 @@ $tinyMCE_required = false;
 						</select>
 					</label>
 <?php
-/* 
+/*
 the file input element cannot be styled without a lot of hassle. The extra effort required is deemed not worth it, since the 'usual' process
 wouldn't even get here as it uses the Flash-based multifile upload feature available further above.
 
@@ -672,7 +672,7 @@ if (!$tinyMCE_required)
 	$js_files[] = $cfg['rootdir'] . 'lib/modules/lightbox/modLightbox.js';
 }
 else
-{	
+{
 	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'description', true));
 	// these must FOLLOW the tinyMCE JS list as that part will include the basics for these ones as well:
 	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,FancyUpload2.js';
