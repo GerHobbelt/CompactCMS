@@ -92,6 +92,24 @@ function strmatch_tail($str, $tail)
 
 
 
+/**
+ * Return the part of the string up to (and including, depending on the $inc_last_slash boolean: default TRUE) 
+ * the last '/'.
+ * If no slash exists in the source string, an empty string is therefore returned.
+ */
+function get_remainder_upto_slash($str, $inc_last_slash = true)
+{
+	$idx = strpos($str, '/');
+	if ($idx === false)
+		return '';
+	return substr($str, 0, $idx + ($inc_last_slash ? 1 : 0));
+}
+
+
+
+
+
+
 
 /**
  * Remove leading zeroes from the given string.

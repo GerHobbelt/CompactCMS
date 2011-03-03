@@ -148,7 +148,7 @@ $only_when_expression = trim(getGETparam4MathExpression('only-when', ''));
 
 
 
-require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
 
 $client_browser = new Browscap(BASE_PATH . '/lib/includes/cache');
 $client_browser->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
@@ -1278,6 +1278,13 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
 	}
+	else if (strmatch_tail($element, "edit_area_ccms.js"))
+	{
+		$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
+		
+		$flattened_content = load_EditArea_js($type, $http_base, $base, $root, $element, $suffix);
+		$contents .= "\n" . $flattened_content;
+	}
 
 	return $contents;
 }
@@ -1294,7 +1301,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 	/*
 	 * Make sure the tinyMCE language is set up correctly!
 	 *
-	 * If we don't this here, then $cfg['tinymce_language'] will not exist and we will croak further down below.
+	 * If we don't do this here, then $cfg['tinymce_language'] will not exist and we will croak further down below.
 	 */
 	SetUpLanguageAndLocale($cfg['language'], true);
 
@@ -1422,6 +1429,84 @@ EOT42;
 
 	return $my_content;
 }
+
+
+
+
+
+
+
+
+function load_EditArea_js($type, $http_base, $base, $root, $element, $suffix)
+{
+	global $cfg;
+	global $do_not_load;
+
+	if ($do_not_load) return ''; // return zip, nada, nothing
+
+	/*
+	 * Make sure the EditArea language is set up correctly!
+	 *
+	 * If we don't do this here, then $cfg['editarea_language'] will not exist and we will croak further down below.
+	 */
+	SetUpLanguageAndLocale($cfg['language'], true);
+
+	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element));
+
+	/*MARKER*/require_once(BASE_PATH . '/lib/includes/js/edit_area/edit_area/edit_area_compressor.php');
+	
+	// CONFIG
+	$param['cache_duration'] = 3600 * 24 * 10;		// 10 days util client cache expires
+	$param['compress'] = ($suffix == '_full' || $suffix == ''); // Enable the code compression, should be activated but it can be useful to deactivate it for easier error diagnostics (true or false)
+	$param['debug'] = ($suffix == '_dev');			// Enable this option if you need debugging info
+	$param['use_disk_cache'] = false;				// If you enable this option gzip files will be cached on disk.
+	$param['use_gzip']= false;						// Enable gzip compression
+	// END CONFIG
+	
+	$compressor = new Compressor($param);
+	
+	$my_content = $compressor->get_flattened();
+	
+	/*
+	WARNING:
+	
+	because the 'trigger' file 'edit_area_ccms.js' is located in the PARENT directory of the edit_area_loader.js,
+	the code in the latter will produce the WRONG this.baseURL value ('http://site.com/lib/includes/js/edit_area/'
+	instead of 'http://site.com/lib/includes/js/edit_area/edit_area/').
+	
+	The culprit is the set_base_url() method, which derives the baseURL from the first JavaScript <script> element 
+	which contains a filepath which contains 'edit_area': hence it finds our edit_area_ccms.js load.
+	
+	There are several ways to solve this, but given the code of set_base_url(), we can simply predefine the 'baseURL'
+	and it will NOT look at the <script> collection at all. HOWEVER, we cannot programmatically preset 'baseURL'...
+	unless, for example, we derive our own editArea instance, hack the constructor around, and replace it, yada yada yada.
+	
+	Sounds like too much work where a fast hack will do the trick: bluntly replacing the line
+		t.baseURL="";
+	in here, while we're producing the (possibly minified) EA code.
+	
+	We can do it here (and not patch the edit_area_compressor for this) because we won't be serving pre-GZIP-ped
+	versions of this baby, EVER. If we GZIP at all, we will be doing it ourselves, AFTER we've gone through here.
+	
+	So in all scenarios, we're right on time right now to last-minute-patch the bugger.
+	*/
+	$my_content = preg_replace('/t\.baseURL\s*=\s*"";/', 't.baseURL="' . $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area";', $my_content);
+
+	/*
+	And because the lazyloader in edit_area itself, which is used to load any required language and/or syntax 
+	file, is not working for us on some browsers (Safari 5.0, for example), we circumvent the issue by allowing
+	those items to be flattended into the output as well.
+	
+	Optimally, we'd flatten only the required-at-this-time items in there, but we don't mind about a few extra
+	lines of language def's right now; besides, we don't need to touch up the ETag/cache hash code section in
+	here when we do it this way.
+	*/
+	
+	return $my_content;
+}
+
+
+
 
 
 /**

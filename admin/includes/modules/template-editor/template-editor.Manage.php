@@ -263,7 +263,7 @@ $driver_code = <<<EOT42
 
 		/*
 		resize event has the problem that it is triggered continually when in IE (and tests reveal it's similar in FF3)
-		and we do NOT want to spend CPU cycles on repeated updated of the MUI window sizes all the time, so we follow the
+		and we do NOT want to spend CPU cycles on repeated updates of the MUI window sizes all the time, so we follow the
 		advice found here:
 		
 		http://mbccs.blogspot.com/2007/11/fixing-window-resize-event-in-ie.html
