@@ -223,7 +223,7 @@ function confirmation()
 			
 function exec_GHO()
 {
-//alert('exec_GHO');
+	//alert('exec_GHO');
 
 $driver_code
 }
@@ -233,7 +233,7 @@ EOT42;
 
 			$driver_code = <<<EOT42
 
-//alert('DOMready equivalent!');
+	//alert('DOMready equivalent!');
 
 EOT42;
 		}

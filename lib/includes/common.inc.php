@@ -3245,12 +3245,12 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 		$rootdir = $cfg['rootdir'];
 	
 		$rv = <<<EOT42
-		
-tinyMCEPreInit = {
-      suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
-    , base: '{$rootdir}lib/includes/js/tiny_mce'
-    , query: 'load_callback=$js_load_callback' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */ 
-};
+			
+	tinyMCEPreInit = {
+		  suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
+		, base: '{$rootdir}lib/includes/js/tiny_mce'
+		, query: 'load_callback=$js_load_callback' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */ 
+	};
 
 EOT42;
 		return $rv;
@@ -3259,16 +3259,6 @@ EOT42;
 		$rootdir = $cfg['rootdir'];
 		$tinymce_language = $cfg['tinymce_language'];
 		
-		$rv = <<<EOT42
-		
-// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
-var dimensions;
-var editwinwidth;
-var editwinmaxwidth;
-var editwinmaxheight;
-
-EOT42;
-
 		$pluginarr = get_tinyMCE_plugin_list();
 		$plugs = array_keys($pluginarr);
 		$plugs = array_filter($plugs, 'is_real_tinyMCE_plugin');
@@ -3322,43 +3312,50 @@ EOT42;
 		}
 		ksort($btngrp);
 
-		$rv .= "var buttondefs = [\n";
+		$rv = "	var buttondefs = [\n";
 		
 		$s = '';
 		foreach($btngrp as $group => $btnarr)
 		{
 			$rv .= $s;
 			
-			$s = "  [\n";
+			$s = "		[\n";
 			$s2 = '';
 			foreach($btnarr as $bdef)
 			{
-				$s2 .= "    ['" . $bdef[0] . "', " . $bdef[1] . "],\n";
+				$s2 .= "			['" . $bdef[0] . "', " . $bdef[1] . "],\n";
 			}
 			$s2 = substr($s2, 0, strlen($s2) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-			$s .= $s2 . "  ],\n";
+			$s .= $s2 . "		],\n";
 		}
 		$s = substr($s, 0, strlen($s) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-		$rv .= $s . "];\n";
+		$rv .= $s . "	];\n";
 		
 		$rv .= <<<EOT42
-var buttonvirtcount = $btnvirtcount;
+	var buttonvirtcount = $btnvirtcount;
 
+	// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
+	var dimensions;
+	var editwinwidth;
+	var editwinmaxwidth;
+	var editwinmaxheight;
+	
 EOT42;
 
 		foreach($editarea_tags as $tag)
 		{
 			$rv .= <<<EOT42
-dimensions = window.getSize();
-editwinmaxwidth = dimensions.x - 20;
-editwinmaxheight = dimensions.y - 20;
-dimensions = \$('$tag').getSize();
-editwinwidth = dimensions.x;
-//alert('width: ' + editwinwidth + 'px');
-			
-tbdef = layout_the_MCE_toolbars(buttondefs, editwinwidth);
 
-var MCEsettings_{$tag} = {
+	dimensions = window.getSize();
+	editwinmaxwidth = dimensions.x - 20;
+	editwinmaxheight = dimensions.y - 20;
+	dimensions = \$('$tag').getSize();
+	editwinwidth = dimensions.x;
+	//alert('width: ' + editwinwidth + 'px');
+				
+	tbdef = layout_the_MCE_toolbars(buttondefs, editwinwidth);
+
+	var MCEsettings_{$tag} = {
         mode: 'exact',
         elements: '$tag',
         theme: 'advanced',
@@ -3393,7 +3390,7 @@ var MCEsettings_{$tag} = {
         convert_urls: false,
         remove_script_host: true,
         document_base_url: '$rootdir',
-		
+
 EOT42;
 
 		// TODO: determine the template of the given page: fetch those CSS files.
@@ -3434,21 +3431,22 @@ EOT42;
 EOT42;
 			}
 			$rv .= <<<EOT42
-		
-	//height: '300px',
-	width: editwinwidth   /* default: width in pixels */
-};
+			
+		//height: '300px',
+		width: editwinwidth   /* default: width in pixels */
+	};
 
-var tbdeflen = tbdef.length;
-var tbidx;
+	var tbdeflen = tbdef.length;
+	var tbidx;
 
-/* now set up the toolbar rows; as many as we need: */
-for (tbidx = 1; tbidx <= tbdeflen; tbidx++)
-{
-	MCEsettings_{$tag}['theme_advanced_buttons' + tbidx] = tbdef[tbidx - 1];
-}
+	/* now set up the toolbar rows; as many as we need: */
+	for (tbidx = 1; tbidx <= tbdeflen; tbidx++)
+	{
+		MCEsettings_{$tag}['theme_advanced_buttons' + tbidx] = tbdef[tbidx - 1];
+	}
 
-tinyMCE.init(MCEsettings_{$tag});
+
+	tinyMCE.init(MCEsettings_{$tag});
 
 
 EOT42;
