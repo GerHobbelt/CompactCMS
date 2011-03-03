@@ -88,7 +88,6 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 	$param['plugins'] = true; // isset($_GET['plugins']);    Include plugins in the compressed/flattened JS output.
 	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
 	$param['include_langs_and_syntaxes'] = true;	// Set to FALSE for backwards compatibility: do not include the language files and syntax definitions in the flattened output.
-	$param['running_from_commandline'] = true;		// UNSET or FALSE when executed from a web server 
 	// END CONFIG
 	
 	for ($i = 1; $i < $argc; $i++)
@@ -96,8 +95,10 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 		$arg = explode('=', $argv[$i], 2);
 		$param[$arg[0]] = (isset($arg[1]) ? intval($arg[1]) : true);
 	}
+	$param['running_from_commandline'] = true;			// UNSET or FALSE when executed from a web server 
+	$param['verbose2stdout'] = !$param['echo2stdout'];	// UNSET or FALSE when executed from a web server 
 	
-	if (!$param['echo2stdout'] && $param['running_from_commandline']) 
+	if (!empty($param['verbose2stdout'])) 
 	{
 		echo "\nEditArea Compressor:\n";
 		echo "Settings:\n";
@@ -132,14 +133,14 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$this->path= str_replace('\\','/',dirname(__FILE__)).'/';
 			if($this->param['plugins'])
 			{
-				if (!$this->param['echo2stdout']) echo "\n\n\nGenerating output with plugins included\n";
+				if (!empty($this->param['verbose2stdout'])) echo "\n\n\nGenerating output with plugins included\n";
 				$this->load_all_plugins= true;
 				$this->full_cache_file= $this->path."edit_area_full_with_plugins.js";
 				$this->gzip_cache_file= $this->path."edit_area_full_with_plugins.gz";
 			}
 			else
 			{
-				if (!$this->param['echo2stdout']) echo "\n\n\nGenrating output WITHOUT plugins\n";
+				if (!empty($this->param['verbose2stdout'])) echo "\n\n\nGenrating output WITHOUT plugins\n";
 				$this->load_all_plugins= false;
 				$this->full_cache_file= $this->path."edit_area_full.js";
 				$this->gzip_cache_file= $this->path."edit_area_full.gz";
@@ -497,7 +498,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			// generate full js file and cache it if using disk cache
 			if($this->param['use_disk_cache'])
 			{
-				if (!$this->param['echo2stdout']) echo "written to file: " . $this->full_cache_file . "\n";
+				if (!empty($this->param['verbose2stdout'])) echo "written to file: " . $this->full_cache_file . "\n";
 				$this->file_put_contents($this->full_cache_file, $this->datas, $mtime);
 			}
 			

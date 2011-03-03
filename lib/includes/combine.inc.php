@@ -1463,6 +1463,7 @@ function load_EditArea_js($type, $http_base, $base, $root, $element, $suffix)
 	$param['use_gzip']= false;						// Enable gzip compression
 	$param['plugins'] = true; 						// Include plugins in the compressed/flattened JS output.
 	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
+	$param['include_langs_and_syntaxes'] = true;	// Set to FALSE for backwards compatibility: do not include the language files and syntax definitions in the flattened output.
 	// END CONFIG
 	
 	$compressor = new Compressor($param);
