@@ -69,6 +69,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 	$param['use_gzip']= false;						// Enable gzip compression
 	$param['plugins'] = true; // isset($_GET['plugins']);    Include plugins in the compressed/flattened JS output.
 	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
+	$param['include_langs_and_syntaxes'] = true;	// Set to FALSE for backwards compatiblity: do not include the language files and syntax definitions in the flattened output.
 	// END CONFIG
 	
 	for ($i = 1; $i < $argc; $i++)
@@ -100,7 +101,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$this->param= $param;
 			$this->script_list="";
 			$this->path= str_replace('\\','/',dirname(__FILE__)).'/';
-			if(!empty($param['plugins']))
+			if($this->param['plugins'])
 			{
 				$this->load_all_plugins= true;
 				$this->full_cache_file= $this->path."edit_area_full_with_plugins.js";
@@ -423,8 +424,11 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$this->datas.= sprintf("editAreaLoader.iframe_css= \"<style>%s</style>\";\n", $this->get_css_content("edit_area.css"));
 			
 			// load the syntaxes and languages as well:
-			$this->datas.= $syntax_defs;
-			$this->datas.= $language_defs;
+			if ($this->param['include_langs_and_syntaxes'])
+			{
+				$this->datas.= $syntax_defs;
+				$this->datas.= $language_defs;
+			}
 			
 		//	$this->datas= "function editArea(){};editArea.prototype.loader= function(){alert('bouhbouh');} var a= new editArea();a.loader();";
 					
