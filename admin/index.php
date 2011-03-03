@@ -55,7 +55,6 @@ if (!defined('BASE_PATH'))
 
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
-///*MARKER*/require_once(BASE_PATH . '/admin/includes/process.inc.php');
 
 
 
@@ -63,9 +62,13 @@ if (!defined('BASE_PATH'))
 /* make darn sure only authenticated users can get past this point in the code */
 if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
 {
-	// this situation should've caught inside process.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']);
+	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
+	die_with_forged_failure_msg(__FILE__, __LINE__); // $ccms['lang']['auth']['featnotallowed']
 }
+
+
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 
 
@@ -163,7 +166,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				else
 				{
-					$version = $ccms['lang']['backend']['outofdate']." <a href=\"http://www.compactcms.nl/changes.html\" class=\"external\" rel=\"external\">".$ccms['lang']['backend']['considerupdate']."</a>.";
+					$version = $ccms['lang']['backend']['outofdate'] . ' <a href="http://www.compactcms.nl/changes.html" class="external" rel="external">' . $ccms['lang']['backend']['considerupdate'] . '</a>.';
 				}
 
 				if(!empty($version_recent) && !empty($v) && $cfg['version'])
@@ -175,7 +178,15 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				else
 				{
-					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>';
+					echo '<p class="error">'.$ccms['lang']['system']['error_versioninfo'].'</p>';
+				}
+				
+				/*
+				Show possibly incoming status messages:
+				*/
+				if (!empty($status_message))
+				{
+					echo '<p class="' . $status . '">'.$status_message.'</p>';
 				}
 				?>
 			</div>

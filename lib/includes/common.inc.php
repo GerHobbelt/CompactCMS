@@ -2941,7 +2941,23 @@ Push a 'hack attempt!' error message to the output; when possible, redirect to t
 */
 function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $extra = null)
 {
-	$msg = $ccms['lang']['system']['error_forged'] . ' (' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')';
+	global $ccms;
+	global $cfg;
+	
+	$filepath = str_replace('\\', '/', $filepath);
+	$pos = strpos($filepath, BASE_PATH);
+	if ($pos !== false)
+	{
+		$filepath = substr($filepath, $pos + strlen(BASE_PATH) + 1);
+	}
+	if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+	{
+		$msg = $ccms['lang']['system']['error_session_expired'] . ' <sub>(' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')</sub>';
+	}
+	else
+	{
+		$msg = $ccms['lang']['system']['error_forged'] . ' <sub>(' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')</sub>';
+	}
 	
 	if (!headers_sent())
 	{

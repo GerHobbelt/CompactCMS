@@ -54,10 +54,18 @@ if (!defined('BASE_PATH'))
  * URLs and local paths in here MUST be absolute: use $cfg['rootdir'] and BASE_PATH respectively to make it so.
  */
 
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
+
 // If session already exists
 if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
-	header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
+	$qry = '';
+	if (!empty($status) || !empty($status_message)) 
+	{
+		$qry = '?status=' . rawurlencode($status) . '&msg=' . rawurlencode(!empty($status_message) ? $status_message : $ccms['lang']['system']['error_general']);
+	}
+	header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php') . $qry);
 	exit();
 }
 
@@ -73,8 +81,6 @@ if (empty($userName))
 {
 	$userName = strtolower(getGETparam4IdOrNumber('logon_user'));
 }
-$status = getGETparam4IdOrNumber('status');
-$status_message = getGETparam4DisplayHTML('msg');
 
 // Do authentication
 if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
