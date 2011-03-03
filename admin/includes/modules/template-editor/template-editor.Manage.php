@@ -66,7 +66,6 @@ $status_message = getGETparam4DisplayHTML('msg');
 $dir_temp = BASE_PATH . "/lib/templates/";
 $get_temp = getGETparam4FullFilePath('template', $template[0].'.tpl.html');
 $chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feedback on read-only on Win+UNIX: add '|| 1' here.
-$temp_extension = strtolower(substr($get_temp, strrpos($get_temp, '.') + 1));
 
 // Check for filename
 if(!empty($get_temp))
@@ -271,7 +270,7 @@ can be certain the edit_area code is really loaded.
 That's what the 'loaded' check and call in the code below is for.
 */
 $eaLanguage = $cfg['editarea_language'];
-$EAsyntax = cvt_extension2EAsyntax($temp_extension); 
+$EAsyntax = cvt_extension2EAsyntax($dir_temp.$get_temp); 
 $driver_code = <<<EOT42
 
 		if (editAreaLoader.win != "loaded")

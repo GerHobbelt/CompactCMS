@@ -2959,7 +2959,8 @@ Return a suitable EditArea syntax ID string for the given filename+extension
 function cvt_extension2EAsyntax($filepath)
 {
 	$pi = pathinfo($filepath);
-	$ext = strtolower($pi['extension']);
+	// WARNING: empty components are not included in the result array by pathinfo() !
+	$ext = strtolower(!empty($pi['extension']) ? $pi['extension'] : '');
 	switch ($ext)
 	{
 	default:
@@ -2982,7 +2983,7 @@ function cvt_extension2EAsyntax($filepath)
 		return $ext;
 		
 	case 'txt':
-		if (strtolower($pi['filename']) == 'robots')
+		if (strtolower(!empty($pi['filename']) ? $pi['filename'] : '') == 'robots')
 		{
 			return 'robotstxt';
 		}
