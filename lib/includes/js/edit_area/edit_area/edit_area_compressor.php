@@ -312,12 +312,12 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			{
 				while (($file = readdir($dir)) !== false)
 				{
-					if( $file !== "." && $file !== ".." && ( $pos = strpos( $file, '.js' ) ) !== false )
+					if( $file !== "." && $file !== ".." && substr($file, -3) == '.js' )
 					{
 						$jsContent	= $this->file_get_contents( $reg_path.$file );
 						if( preg_match( '@(\'|")DISPLAY_NAME\1\s*:\s*(\'|")(.*)\2@', $jsContent, $match ) )
 						{
-							$a_displayName[] = "'". substr( $file, 0, $pos ) ."':'". htmlspecialchars( $match[3], ENT_QUOTES, 'UTF-8') ."'";
+							$a_displayName[] = "'". substr($file, 0, strlen($file) - 3) ."':'". htmlspecialchars( $match[3], ENT_QUOTES, 'UTF-8') ."'";
 						}
 						if( preg_match( '@editAreaLoader\.load_syntax\[(\'|")([^\'"]+)\1\]\s*=@', $jsContent, $match ) )
 						{
@@ -340,7 +340,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			{
 				while (($file = readdir($dir)) !== false)
 				{
-					if( $file !== "." && $file !== ".." && ( $pos = strpos( $file, '.js' ) ) !== false )
+					if( $file !== "." && $file !== ".." && substr($file, -3) == '.js' )
 					{
 						$jsContent	= $this->file_get_contents( $lang_path.$file );
 						$language_defs .= $jsContent . "\n";
