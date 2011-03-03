@@ -5,6 +5,24 @@
     of output when this file is run from a webserver, so we take the second-best
     approach, which is to favor the webserver and tolerate a few sh/bash error
     reports while it'll start the PHP CLI for us after all.
+	
+	Execute from the commandline (bash) like this, for example:
+	
+	$ ./edit_area_compressor.php plugins=1 compress=1
+	
+	
+	Don't bother about these error reports then:
+	
+	./edit_area_compressor.php: line 1: ?php: No such file or directory
+	./edit_area_compressor.php: line 2: //: is a directory
+	PHP Deprecated:  Comments starting with '#' are deprecated in /etc/php5/cli/conf.d/idn.ini on line 1 in Unknown on line 0
+	
+	The latter shows up on Ubuntu 10.04 installs; again not to bother. The first two
+	errors are due to our hack to help bash/sh kickstart the PHP interpreter after all,
+	which is a bit convoluted as the shebang trick cannot happen for it would output 
+	the shebang line with the generated JavaScript when the script is executed by 
+	a web server. We don't that to happen, so we tolerate the error reports when running 
+	in a UNIX shell environment.
 */
 
 	/******
@@ -69,13 +87,24 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 	$param['use_gzip']= false;						// Enable gzip compression
 	$param['plugins'] = true; // isset($_GET['plugins']);    Include plugins in the compressed/flattened JS output.
 	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
-	$param['include_langs_and_syntaxes'] = true;	// Set to FALSE for backwards compatiblity: do not include the language files and syntax definitions in the flattened output.
+	$param['include_langs_and_syntaxes'] = true;	// Set to FALSE for backwards compatibility: do not include the language files and syntax definitions in the flattened output.
+	$param['running_from_commandline'] = true;		// UNSET or FALSE when executed from a web server 
 	// END CONFIG
 	
 	for ($i = 1; $i < $argc; $i++)
 	{
 		$arg = explode('=', $argv[$i], 2);
-		$param[$arg[0]] = (isset($arg[1]) ? $arg[1] : true);
+		$param[$arg[0]] = (isset($arg[1]) ? intval($arg[1]) : true);
+	}
+	
+	if (!$param['echo2stdout'] && $param['running_from_commandline']) 
+	{
+		echo "\nEditArea Compressor:\n";
+		echo "Settings:\n";
+		foreach($param as $key => $value)
+		{
+			echo sprintf("  %30s: %d\n", $key, $value);
+		}
 	}
 	
 	$compressor = new Compressor($param);
@@ -103,12 +132,14 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$this->path= str_replace('\\','/',dirname(__FILE__)).'/';
 			if($this->param['plugins'])
 			{
+				if (!$this->param['echo2stdout']) echo "\n\n\nGenerating output with plugins included\n";
 				$this->load_all_plugins= true;
 				$this->full_cache_file= $this->path."edit_area_full_with_plugins.js";
 				$this->gzip_cache_file= $this->path."edit_area_full_with_plugins.gz";
 			}
 			else
 			{
+				if (!$this->param['echo2stdout']) echo "\n\n\nGenrating output WITHOUT plugins\n";
 				$this->load_all_plugins= false;
 				$this->full_cache_file= $this->path."edit_area_full.js";
 				$this->gzip_cache_file= $this->path."edit_area_full.gz";
@@ -153,7 +184,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 		private function send_header1($headerline)
 		{
 			$this->generated_headers[] = $headerline;
-			if (!empty($this->param['echo2stdout']))
+			if ($this->param['echo2stdout'] && !headers_sent())
 			{
 				header($headerline);
 			}
@@ -206,7 +237,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 		private function check_cache()
 		{
 			// Only gzip the contents if clients and server support it
-			if ($this->param['use_disk_cache'] && file_exists($this->cache_file)) {
+			if ($this->param['use_disk_cache'] && file_exists($this->cache_file) && empty($this->param['running_from_commandline'])) {
 				// check if cache file must be updated
 				$cache_date=0;				
 				if ($dir = opendir($this->path)) {
@@ -450,22 +481,25 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 				$header.=sprintf("compression time: %s\n", $this->get_microtime()-$this->start_time); 
 				$header.=sprintf("%s\n", implode("\n", $this->infos));
 				$header.=sprintf("*/\n");
-				$this->datas= $header.$this->datas;	
+				$this->datas= $header.$this->datas;
 			}
 			$mtime= time(); // ensure that the 2 disk files will have the same update time
-			// generate gzip file and cahce it if using disk cache
+			// generate gzip file and cache it if using disk cache
 			if($this->use_gzip){
 				$this->gzip_datas= gzencode($this->datas, 9, FORCE_GZIP);
 				if($this->param['use_disk_cache'])
 					$this->file_put_contents($this->gzip_cache_file, $this->gzip_datas, $mtime);
 			}
 			
-			// generate full js file and cache it if using disk cache			
+			// generate full js file and cache it if using disk cache
 			if($this->param['use_disk_cache'])
+			{
+				if (!$this->param['echo2stdout']) echo "written to file: " . $this->full_cache_file . "\n";
 				$this->file_put_contents($this->full_cache_file, $this->datas, $mtime);
+			}
 			
 			// generate output
-			if (!empty($this->param['echo2stdout']))
+			if ($this->param['echo2stdout'])
 			{
 				if($this->use_gzip)
 					echo $this->gzip_datas;
