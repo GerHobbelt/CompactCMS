@@ -520,11 +520,13 @@ $js_files[] = 'http://translate.google.com/translate_a/element.js?cb=googleTrans
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 $js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
 
-$driver_code = generateJS4TinyMCEinit(2, 'content');
-
 $starter_code = generateJS4TinyMCEinit(1, 'content');
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+$driver_code = generateJS4TinyMCEinit(2, 'content');
+
+$extra_functions_code = generateJS4TinyMCEinit(3, 'content');
+
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

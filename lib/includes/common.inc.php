@@ -3186,6 +3186,8 @@ state == 0: the lazyload filespec
 state == 1: the PREinit code section
 
 state == 2: the init() code section
+
+state == 3: extra assistent functions section
 */
 function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true, $js_load_callback = 'jsComplete')
 {
@@ -3325,59 +3327,6 @@ EOT42;
 		$rv .= <<<EOT42
 var buttonvirtcount = $btnvirtcount;
 
-/* set up the toolbars depending on the editor width */
-function layout_the_MCE_toolbars(buttondefs, editwinwidth)
-{
-	var i;
-	var tbcount = buttondefs.length;
-	var dst = [];
-	var dstelem = '';
-	var lwleft = editwinwidth - 10; // subtract edges.
-	
-	for (i = 0; i < tbcount; i++)
-	{
-		var grpwidth = 0;
-		var j;
-		var grp = buttondefs[i];
-		var btns_in_grp = grp.length;
-		
-		for (j = 0; j < btns_in_grp; j++)
-		{
-			grpwidth += grp[j][1];
-		}
-		grpwidth *= 22; /* width per button */
-		
-		if (grpwidth + 5 > lwleft)
-		{
-			// not enough space: start a new toolbar row; push the previous toolbar first:
-			//alert('toolbar row: ' + dstelem);
-			dst.push(dstelem);
-			
-			dstelem = '';
-			lwleft = editwinwidth - 10; // subtract edges.
-		}
-		
-		if (dstelem.length > 0)
-		{
-			lwleft -= 10;
-			// add separator first!
-			dstelem += ',|,';
-		}
-		dstelem += grp[0][0];
-		for (j = 1; j < btns_in_grp; j++)
-		{
-			dstelem += ',' + grp[j][0];
-		}
-		lwleft -= grpwidth;
-	}
-	
-	// and push the final row:
-	//alert('toolbar row @ final: ' + dstelem);
-	dst.push(dstelem);
-	
-	return dst;
-}
-
 EOT42;
 
 		foreach($editarea_tags as $tag)
@@ -3490,72 +3439,65 @@ EOT42;
 
 		return $rv;
 
-		/*
-		plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,autosave",
-
-		// Theme options
-		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
-		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-		theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak,restoredraft",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-
-		// Example content CSS (should be your site CSS)
-		content_css : "css/content.css",
-
-		// Drop lists for link/image/media/template dialogs
-		template_external_list_url : "lists/template_list.js",
-		external_link_list_url : "lists/link_list.js",
-		external_image_list_url : "lists/image_list.js",
-		media_external_list_url : "lists/media_list.js",
-
-		// Style formats
-		style_formats : [
-			{title : 'Bold text', inline : 'b'},
-			{title : 'Red text', inline : 'span', styles : {color : '#ff0000'}},
-			{title : 'Red header', block : 'h1', styles : {color : '#ff0000'}},
-			{title : 'Example 1', inline : 'span', classes : 'example1'},
-			{title : 'Example 2', inline : 'span', classes : 'example2'},
-			{title : 'Table styles'},
-			{title : 'Table row 1', selector : 'tr', classes : 'tablerow1'}
-		],
-
-		// Replace values for the template plugin
-		template_replace_values : {
-			username : "Some User",
-			staffid : "991234"
+	case 3:
+		$rv = <<<EOT42
+		
+/* set up the toolbars depending on the editor width */
+function layout_the_MCE_toolbars(buttondefs, editwinwidth)
+{
+	var i;
+	var tbcount = buttondefs.length;
+	var dst = [];
+	var dstelem = '';
+	var lwleft = editwinwidth - 10; // subtract edges.
+	
+	for (i = 0; i < tbcount; i++)
+	{
+		var grpwidth = 0;
+		var j;
+		var grp = buttondefs[i];
+		var btns_in_grp = grp.length;
+		
+		for (j = 0; j < btns_in_grp; j++)
+		{
+			grpwidth += grp[j][1];
 		}
+		grpwidth *= 22; /* width per button */
+		
+		if (grpwidth + 5 > lwleft)
+		{
+			// not enough space: start a new toolbar row; push the previous toolbar first:
+			//alert('toolbar row: ' + dstelem);
+			dst.push(dstelem);
+			
+			dstelem = '';
+			lwleft = editwinwidth - 10; // subtract edges.
+		}
+		
+		if (dstelem.length > 0)
+		{
+			lwleft -= 10;
+			// add separator first!
+			dstelem += ',|,';
+		}
+		dstelem += grp[0][0];
+		for (j = 1; j < btns_in_grp; j++)
+		{
+			dstelem += ',' + grp[j][0];
+		}
+		lwleft -= grpwidth;
+	}
+	
+	// and push the final row:
+	//alert('toolbar row @ final: ' + dstelem);
+	dst.push(dstelem);
+	
+	return dst;
+}
 
 
-
-		// Patch callbacks, make them point to window.opener
-		patchCallback(settings, 'urlconverter_callback');
-		patchCallback(settings, 'insertlink_callback');
-		patchCallback(settings, 'insertimage_callback');
-		patchCallback(settings, 'setupcontent_callback');
-		patchCallback(settings, 'save_callback');
-		patchCallback(settings, 'onchange_callback');
-		patchCallback(settings, 'init_instance_callback');
-		patchCallback(settings, 'file_browser_callback');
-		patchCallback(settings, 'cleanup_callback');
-		patchCallback(settings, 'execcommand_callback');
-		patchCallback(settings, 'oninit');
-
-		// Set options
-		delete settings.id;
-		settings['mode'] = 'exact';
-		settings['elements'] = 'fullscreenarea';
-		settings['add_unload_trigger'] = false;
-		settings['ask'] = false;
-		settings['document_base_url'] = window.opener.tinyMCE.activeEditor.documentBaseURI.getURI();
-		settings['fullscreen_is_enabled'] = true;
-		settings['fullscreen_editor_id'] = oeID;
-		settings['theme_advanced_resizing'] = false;
-		settings['strict_loading_mode'] = true;
-		*/
+EOT42;
+		return $rv;
 	}
 }
 
@@ -3567,7 +3509,7 @@ EOT42;
 Generate the common JS lazyload driver block which should be included in each HTML output where
 multiple JS files need to be loaded.
 */
-function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code = null)
+function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code = null, $extra_functions_code = null)
 {
 	global $cfg;
 
@@ -3640,11 +3582,17 @@ $starter_code
 
 	LazyLoad.js(js, jsComplete);
 }
+
+$extra_functions_code
+
+
 EOT42;
 	}
 	else
 	{
 		$rv = <<<EOT42
+
+$extra_functions_code
 
 $starter_code
 

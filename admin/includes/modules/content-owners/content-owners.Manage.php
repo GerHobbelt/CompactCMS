@@ -246,12 +246,18 @@ EOT42;
 }
 
 $starter_code = null;
+$driver_code = null;
+$extra_functions_code = null;
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$starter_code = generateJS4TinyMCEinit(1, 'elm1', false);
+	$starter_code = generateJS4TinyMCEinit(1, 'elm1', $with_fancyuploader);
+
+	$driver_code = generateJS4TinyMCEinit(2, 'elm1', $with_fancyuploader);
+
+	$extra_functions_code = generateJS4TinyMCEinit(3, 'elm1', $with_fancyuploader);
 }
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

@@ -219,6 +219,8 @@ $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.
 
 $js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent,newsTeaser'));
 
+$starter_code = generateJS4TinyMCEinit(1, 'newsContent,newsTeaser');
+
 $driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT42
 
 		/* Check form and post */
@@ -233,9 +235,9 @@ $driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT42
 			});
 EOT42;
 
-$starter_code = generateJS4TinyMCEinit(1, 'newsContent,newsTeaser');
+$extra_functions_code = generateJS4TinyMCEinit(3, 'newsContent,newsTeaser');
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

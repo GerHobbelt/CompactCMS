@@ -143,17 +143,17 @@ if (0) // TODO?
 	<head>
 		<title>CompactCMS - <?php echo $ccms['lang']['editor']['editorfor'].' '.$name; ?></title>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<?php
-	// Load TinyMCE (compressed for faster loading)
-	if($cfg['wysiwyg'] && $iscoding != 'Y')
-	{
-	?>
-		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
-	<?php
-	}
-	// else : load Editarea for code editing
-	?>
+		<?php
+		// Load TinyMCE (compressed for faster loading)
+		if($cfg['wysiwyg'] && $iscoding != 'Y')
+		{
+		?>
+			<!-- File uploader styles -->
+			<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+		<?php
+		}
+		// else : load Editarea for code editing
+		?>
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
 	<![endif]-->
@@ -201,24 +201,26 @@ function confirmation()
 
 
 <?php
-$js_files = array(
-	$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
-	$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
-);
+		$js_files = array(
+			$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+			$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+		);
 
-if($cfg['wysiwyg'] && $iscoding != 'Y')
-{
-	// -------------------------------------------------
-	// Load TinyMCE (compressed for faster loading)
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
-	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/dummy.js?cb=exec_GHO';
+		if($cfg['wysiwyg'] && $iscoding != 'Y')
+		{
+			// -------------------------------------------------
+			// Load TinyMCE (compressed for faster loading)
+			$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
+			$js_files[] = $cfg['rootdir'] . 'lib/includes/js/dummy.js?cb=exec_GHO';
 
-	$driver_code = generateJS4TinyMCEinit(2, 'content');
+			$starter_code = generateJS4TinyMCEinit(1, 'content');
 
-	$starter_code = generateJS4TinyMCEinit(1, 'content');
-	
-	$starter_code .= <<<EOT42
-	
+			$driver_code = generateJS4TinyMCEinit(2, 'content');
+
+			$extra_functions_code = generateJS4TinyMCEinit(3, 'content');
+
+			$extra_functions_code .= <<<EOT42
+			
 function exec_GHO()
 {
 //alert('exec_GHO');
@@ -305,9 +307,10 @@ EOT42;
 EOT42;
 
 		$starter_code = null;
+		$extra_functions_code = null;
 	}
 
-	echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+	echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 	</script>
 	<script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
