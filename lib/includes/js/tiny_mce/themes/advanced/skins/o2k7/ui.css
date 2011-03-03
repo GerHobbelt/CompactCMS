@@ -66,7 +66,7 @@
 .o2k7Skin select.mceListBox {font-family:Tahoma,Verdana,Arial,Helvetica; font-size:12px; border:1px solid #b3c7e1; background:#FFF;}
 
 /* SplitButton */
-.o2k7Skin .mceSplitButton, .o2k7Skin .mceSplitButton a, .o2k7Skin .mceSplitButton span {display:block; height:22px}
+.o2k7Skin .mceSplitButton, .o2k7Skin .mceSplitButton a, .o2k7Skin .mceSplitButton span {display:block; height:22px; direction:ltr}
 .o2k7Skin .mceSplitButton {background:url(img/button_bg.png)}
 .o2k7Skin .mceSplitButton a.mceAction {width:22px}
 .o2k7Skin .mceSplitButton span.mceAction {width:22px; background-image:url(../../img/icons.gif)}
@@ -212,9 +212,9 @@
 .o2k7Skin span.mce_acronym {background-position:-880px -20px}
 .o2k7Skin span.mce_attribs {background-position:-900px -20px}
 .o2k7Skin span.mce_cite {background-position:-920px -20px}
+.o2k7Skin span.mce_q {background-position:-40px -40px} 
 .o2k7Skin span.mce_del {background-position:-940px -20px}
 .o2k7Skin span.mce_ins {background-position:-960px -20px}
 .o2k7Skin span.mce_pagebreak {background-position:0 -40px}
 .o2k7Skin span.mce_restoredraft {background-position:-20px -40px}
-.o2k7Skin span.mce_q {background-position:-40px -40px} 
 .o2k7Skin span.mce_spellchecker {background-position:-540px -20px}
