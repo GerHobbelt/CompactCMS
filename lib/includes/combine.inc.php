@@ -1305,7 +1305,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 	 */
 	SetUpLanguageAndLocale($cfg['language'], true);
 
-	$mce_basepath = merge_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
+	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element));
 
 	$mce_files = array();
 
