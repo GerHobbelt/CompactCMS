@@ -213,3 +213,20 @@ html
 	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should!
 }
 */
+
+
+
+/*
+left-align the texts in tinyMCE and its preview, despite the 'body { text-align: center; }' in src/ie.css, 
+which exists for other reasons!
+*/
+body#content /* preview window */
+{ 
+	text-align: left; 
+}
+body#tinymce /* editor window */
+{ 
+	text-align: left; 
+}
+
+
