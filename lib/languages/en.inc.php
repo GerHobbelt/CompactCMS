@@ -360,47 +360,48 @@ $ccms['lang']['guestbook']['host']              = "IP address";
 $ccms['lang']['guestbook']['configuration']     = "Configuration";
 
 
-	  /* ### OBSOLETED ENTRIES ### */
-	  /*
-		 Please check the CompactCMS code to:
+      /* ### OBSOLETED ENTRIES ### */
+      /*
+         Please check the CompactCMS code to:
 
-		 a) make sure whether these entries are indeed obsoleted.
-			When yes, then the corresponding entry above should be
-			removed as well!
+         a) make sure whether these entries are indeed obsoleted.
+            When yes, then the corresponding entry above should be
+            removed as well!
 
-		 b) When no, i.e. the entry exists in the code, this merits
-			a bug report regarding the ./collect_lang_items.sh script.
+         b) When no, i.e. the entry exists in the code, this merits
+            a bug report regarding the ./collect_lang_items.sh script.
+       
+         ----------------------------------------------------------
+	
+	$ccms['lang']['album']['nodir']                 
+	$ccms['lang']['backend']['fileexists']          
+	$ccms['lang']['backend']['file_renamed_from_to'] 
+	$ccms['lang']['backend']['startedittitle']      
+	$ccms['lang']['backend']['updatelist']          
+	$ccms['lang']['editor']['closeeditor']          
+	$ccms['lang']['guestbook']['removed']           
+	$ccms['lang']['login']['falsetries']            
+	$ccms['lang']['login']['provide']               
+	$ccms['lang']['system']['error_default']        
+	$ccms['lang']['system']['error_sitemap']        
+       
+         ----------------------------------------------------------
+	
+         ### MISSING ENTRIES ###
 
-		 ----------------------------------------------------------
+         The entries below have been found to be missing from this 
+         translation file; move them from this comment section to the
+         PHP code above and assign them a suitable text.
 
-	$ccms['lang']['album']['nodir']
-	$ccms['lang']['backend']['fileexists']
-	$ccms['lang']['backend']['startedittitle']
-	$ccms['lang']['backend']['updatelist']
-	$ccms['lang']['editor']['closeeditor']
-	$ccms['lang']['guestbook']['removed']
-	$ccms['lang']['login']['falsetries']
-	$ccms['lang']['login']['provide']
-	$ccms['lang']['system']['error_default']
-	$ccms['lang']['system']['error_sitemap']
-
-		 ----------------------------------------------------------
-
-		 ### MISSING ENTRIES ###
-
-		 The entries below have been found to be missing from this
-		 translation file; move them from this comment section to the
-		 PHP code above and assign them a suitable text.
-
-		 When done so, you can of course remove them from the list
-		 below.
-
-		 ----------------------------------------------------------
-	  */
-
-
-	  /*
-		 ----------------------------------------------------------
-	  */
-
+         When done so, you can of course remove them from the list 
+         below.
+       
+         ----------------------------------------------------------
+      */
+	  
+       
+      /*
+         ----------------------------------------------------------
+      */
+	  
 ?>

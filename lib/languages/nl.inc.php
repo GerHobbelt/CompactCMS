@@ -40,7 +40,6 @@ $ccms['lang']['system']['error_dirwrite'] = "Geen schrijfrechten tot deze map";
 $ccms['lang']['system']['error_chmod'] = "Het huidige bestand kon niet aangepast worden. Controleer de schrijfrechten op de bestanden in de /content map (666).";
 $ccms['lang']['system']['error_value'] = "Fout: waarde onjuist";
 $ccms['lang']['system']['error_default'] = "De standaardpagina kan niet verwijderd worden.";
-$ccms['lang']['system']['error_forged'] = "Waarde is verstoord";
 $ccms['lang']['system']['error_filedots'] = "De bestandsnaam kan geen punten bevatten, bijv. '.html'.";
 $ccms['lang']['system']['error_filesize'] = "De bestandsnaam moet minimaal 3 karakters lang zijn.";
 $ccms['lang']['system']['error_filesize_2'] = "De bestandsnaam dient ten hoogste 50 tekens lang te zijn.";
@@ -383,6 +382,7 @@ $ccms['lang']['guestbook']['configuration'] = "Configuratie";
       */
 	  
 $ccms['lang']['album']['assigned_page']         = "Assigned to page";
+$ccms['lang']['backend']['rename_file']         = "Rename file";
 $ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
 $ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
 $ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
@@ -393,6 +393,10 @@ $ccms['lang']['permitem']['managePageCoding']    = "From what user level on can 
 $ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
 $ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
 $ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
+$ccms['lang']['system']['error_forged']         = "You attempted to access site areas for which you are not authorized";
+$ccms['lang']['system']['error_rename']         = "Failed to rename the file";
+$ccms['lang']['system']['error_rename_target_exists'] = "Cannot rename the file as a file with the new name already exists";
+$ccms['lang']['system']['error_session_expired'] = "Your session has expired or you are not logged in";
 $ccms['lang']['system']['home']                 = "Home";
        
       /*

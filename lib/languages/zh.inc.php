@@ -368,6 +368,7 @@ $ccms['lang']['album']['assigned_page']         = "Assigned to page";
 $ccms['lang']['backend']['floatingtitle']       = "Other";
 $ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
 $ccms['lang']['backend']['reload_admin_screen'] = "Refresh the admininistration screen";
+$ccms['lang']['backend']['rename_file']         = "Rename file";
 $ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned new (renumbered) menu positions";
 $ccms['lang']['backend']['warning']             = "Warning";
 $ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
@@ -391,7 +392,10 @@ $ccms['lang']['permitem']['managePageEditing']  = "From what user level on can u
 $ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
 $ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
 $ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
-$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database.";
+$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database";
+$ccms['lang']['system']['error_rename']         = "Failed to rename the file";
+$ccms['lang']['system']['error_rename_target_exists'] = "Cannot rename the file as a file with the new name already exists";
+$ccms['lang']['system']['error_session_expired'] = "Your session has expired or you are not logged in";
 $ccms['lang']['system']['home']                 = "Home";
        
       /*
