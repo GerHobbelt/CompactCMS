@@ -19,6 +19,14 @@ show('00099');                   // int: 0 (invalid octal number!)
 show('"00099"');                   // int: 0 (invalid octal number!)
 show('intval("00099")');         // int: 99
 show('intval(\'00099\')');         // int: 99
+
+echo 'dirname("") = "' . dirname('') . '"' . "\n";
+echo 'dirname("/") = "' . dirname('/') . '"' . "\n";
+echo 'dirname("y/") = "' . dirname('y/') . '"' . "\n";
+echo 'dirname("/x") = "' . dirname('/x') . '"' . "\n";
+echo 'dirname("x/y") = "' . dirname('x/y') . '"' . "\n";
+echo 'dirname("/x/y") = "' . dirname('/x/y') . '"' . "\n";
+echo 'dirname("/x/y/") = "' . dirname('/x/y/') . '"' . "\n";
 ?>
 
 For more information on this conversion, see the Unix manual page for strtod(3).
