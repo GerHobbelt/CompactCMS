@@ -67,14 +67,13 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 	$param['debug'] = false;						// Enable this option if you need debugging info
 	$param['use_disk_cache'] = true;				// If you enable this option gzip files will be cached on disk.
 	$param['use_gzip']= false;						// Enable gzip compression
+	$param['plugins'] = true; // isset($_GET['plugins']);    Include plugins in the compressed/flattened JS output.
+	$param['echo2stdout'] = false;					// Output generated JS to stdout; alternative is to store it in the object for later retrieval.
 	// END CONFIG
-	
-	if (empty($_GET)) $_GET = array();
 	
 	for ($i = 1; $i < $argc; $i++)
 	{
 		$arg = explode('=', $argv[$i], 2);
-		$_GET[$arg[0]] = (isset($arg[1]) ? $arg[1] : true);
 		$param[$arg[0]] = (isset($arg[1]) ? $arg[1] : true);
 	}
 	
@@ -92,12 +91,16 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 		
 		function __construct($param)
 		{
+			$this->datas = false;
+			$this->gzip_datas = false;
+			$this->generated_headers = array();
+			
 			$this->start_time= $this->get_microtime();
 			$this->file_loaded_size=0;
 			$this->param= $param;
 			$this->script_list="";
-			$this->path= dirname(__FILE__)."/";
-			if(isset($_GET['plugins']))
+			$this->path= str_replace('\\','/',dirname(__FILE__)).'/';
+			if(!empty($param['plugins']))
 			{
 				$this->load_all_plugins= true;
 				$this->full_cache_file= $this->path."edit_area_full_with_plugins.js";
@@ -116,23 +119,65 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$this->load_files();
 			$this->send_datas();
 		}
+
 		
-		function send_headers()
+		/**
+		 * Return the HTTP headers associated with the compressed/flattened output file as an array of header lines.
+		 */
+		public function get_headers()
 		{
-			header("Content-type: text/javascript; charset: UTF-8");
-			header("Vary: Accept-Encoding"); // Handle proxies
-			header(sprintf("Expires: %s GMT", gmdate("D, d M Y H:i:s", time() + intval($this->param['cache_duration']))) );
-			if($this->use_gzip)
-				header("Content-Encoding: ".$this->gzip_enc_header);
+			return $this->generated_headers;
 		}
 		
-		function check_gzip_use()
+		/**
+		 * Return the generated flattened JavaScript as a string.
+		 *
+		 * Return FALSE on error.
+		 */
+		public function get_flattened()
+		{
+			return $this->datas;
+		}
+		
+		/**
+		 * Return the generated flattened and GZIPped JavaScript (as output by gzencode()).
+		 *
+		 * Return FALSE on error or when GZIPped JavaScript has not been generated.
+		 */
+		public function get_flattened_gzipped()
+		{
+			return $this->gzip_datas;
+		}
+		
+		private function send_header1($headerline)
+		{
+			$this->generated_headers[] = $headerline;
+			if (!empty($this->param['echo2stdout']))
+			{
+				header($headerline);
+			}
+		}
+		
+		private function send_headers()
+		{
+			$this->send_header1("Content-type: text/javascript; charset: UTF-8");
+			$this->send_header1("Vary: Accept-Encoding"); // Handle proxies
+			$this->send_header1(sprintf("Expires: %s GMT", gmdate("D, d M Y H:i:s", time() + intval($this->param['cache_duration']))) );
+			if($this->use_gzip)
+			{
+				$this->send_header1("Content-Encoding: ".$this->gzip_enc_header);
+			}
+		}
+		
+		private function check_gzip_use()
 		{
 			$encodings = array();
 			$desactivate_gzip=false;
 					
 			if (isset($_SERVER['HTTP_ACCEPT_ENCODING']))
+			{
 				$encodings = explode(',', strtolower(preg_replace("/\s+/", "", $_SERVER['HTTP_ACCEPT_ENCODING'])));
+			}
 			
 			// deactivate gzip for IE version < 7
 			if (!isset($_SERVER['HTTP_USER_AGENT']))
@@ -157,10 +202,10 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			}
 		}
 		
-		function check_cache()
+		private function check_cache()
 		{
 			// Only gzip the contents if clients and server support it
-			if (file_exists($this->cache_file)) {
+			if ($this->param['use_disk_cache'] && file_exists($this->cache_file)) {
 				// check if cache file must be updated
 				$cache_date=0;				
 				if ($dir = opendir($this->path)) {
@@ -179,7 +224,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 							if ($file !== "." && $file !== "..")
 							{
 								if(is_dir($plug_path.$file) && file_exists($plug_path.$file."/".$file.".js"))
-									$cache_date= max($cache_date, filemtime("plugins/".$file."/".$file.".js"));
+									$cache_date= max($cache_date, filemtime($plug_path.$file."/".$file.".js")); // fix for: http://sourceforge.net/tracker/?func=detail&aid=2932086&group_id=164008&atid=829999
 							}
 						}
 						closedir($dir);
@@ -210,7 +255,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return false;
 		}
 		
-		function load_files()
+		private function load_files()
 		{
 			$loader= $this->get_content("edit_area_loader.js")."\n";
 			
@@ -223,7 +268,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 						, "\$this->replace_scripts('sub_script_list', '\\1', '\\2')"
 						, $loader);
 
-			// replace languages names
+			// replace syntax definition names
 			$reg_path= $this->path."reg_syntax/";
 			$a_displayName	= array();
 			if (($dir = @opendir($reg_path)) !== false)
@@ -258,9 +303,12 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			//$this->datas= preg_replace('/(( |\t|\r)*\n( |\t)*)+/s', "", $this->datas);
 			
 			// improved compression step 1/2	
-			$this->datas= preg_replace(array("/(\b)EditAreaLoader(\b)/", "/(\b)editAreaLoader(\b)/", "/(\b)editAreas(\b)/"), array("EAL", "eAL", "eAs"), $this->datas);
-			//$this->datas= str_replace(array("EditAreaLoader", "editAreaLoader", "editAreas"), array("EAL", "eAL", "eAs"), $this->datas);
-			$this->datas.= "var editAreaLoader= eAL;var editAreas=eAs;EditAreaLoader=EAL;";
+			if($this->param['compress'])
+			{
+				$this->datas= preg_replace(array("/(\b)EditAreaLoader(\b)/", "/(\b)editAreaLoader(\b)/", "/(\b)editAreas(\b)/"), array("EAL", "eAL", "eAs"), $this->datas);
+				//$this->datas= str_replace(array("EditAreaLoader", "editAreaLoader", "editAreas"), array("EAL", "eAL", "eAs"), $this->datas);
+				$this->datas.= "var editAreaLoader= eAL;var editAreas=eAs;EditAreaLoader=EAL;";
+			}
 		
 			// load sub scripts
 			$sub_scripts="";
@@ -291,10 +339,12 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 				$sub_scripts.= $this->get_javascript_content($value);
 			}
 			// improved compression step 2/2	
-			$sub_scripts= preg_replace(array("/(\b)editAreaLoader(\b)/", "/(\b)editAreas(\b)/", "/(\b)editArea(\b)/", "/(\b)EditArea(\b)/"), array("eAL", "eAs", "eA", "EA"), $sub_scripts);
-		//	$sub_scripts= str_replace(array("editAreaLoader", "editAreas", "editArea", "EditArea"), array("eAL", "eAs", "eA", "EA"), $sub_scripts);
-			$sub_scripts.= "var editArea= eA;EditArea=EA;";
-			
+			if($this->param['compress'])
+			{
+				$sub_scripts= preg_replace(array("/(\b)editAreaLoader(\b)/", "/(\b)editAreas(\b)/", "/(\b)editArea(\b)/", "/(\b)EditArea(\b)/"), array("eAL", "eAs", "eA", "EA"), $sub_scripts);
+			//	$sub_scripts= str_replace(array("editAreaLoader", "editAreas", "editArea", "EditArea"), array("eAL", "eAs", "eA", "EA"), $sub_scripts);
+				$sub_scripts.= "var editArea= eA;EditArea=EA;";
+			}
 			
 			// add the scripts
 		//	$this->datas.= sprintf("editAreaLoader.iframe_script= \"<script type='text/javascript'>%s</script>\";\n", $sub_scripts);
@@ -346,7 +396,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 					
 		}
 		
-		function send_datas()
+		private function send_datas()
 		{
 			if($this->param['debug']){
 				$header=sprintf("/* USE PHP COMPRESSION\n");
@@ -377,16 +427,18 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 				$this->file_put_contents($this->full_cache_file, $this->datas, $mtime);
 			
 			// generate output
-			if($this->use_gzip)
-				echo $this->gzip_datas;
-			else
-				echo $this->datas;
+			if (!empty($this->param['echo2stdout']))
+			{
+				if($this->use_gzip)
+					echo $this->gzip_datas;
+				else
+					echo $this->datas;
+			}
 				
 //			die;
 		}
-				
 		
-		function get_content($end_uri)
+		private function get_content($end_uri)
 		{
 			$end_uri=preg_replace("/\.\./", "", $end_uri); // Remove any .. (security)
 			$file= $this->path.$end_uri;
@@ -403,7 +455,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			}
 		}
 		
-		function get_javascript_content($end_uri)
+		private function get_javascript_content($end_uri)
 		{
 			$val=$this->get_content($end_uri);
 	
@@ -412,7 +464,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return $val;
 		}
 		
-		function compress_javascript(&$code)
+		private function compress_javascript(&$code)
 		{
 			if($this->param['compress'])
 			{
@@ -428,7 +480,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			}
 		}
 		
-		function get_css_content($end_uri){
+		private function get_css_content($end_uri){
 			$code=$this->get_content($end_uri);
 			// remove comments
 			$code= preg_replace("/(?:\/\*(?:.|\n|\r|\t)*?(?:\*\/|$))/s", "", $code);
@@ -441,7 +493,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return $code;
 		}
 		
-		function get_html_content($end_uri){
+		private function get_html_content($end_uri){
 			$code=$this->get_content($end_uri);
 			//$code= preg_replace('/(\"(?:\\\"|[^\"])*(?:\"|$))|' . "(\'(?:\\\'|[^\'])*(?:\'|$))|(?:\/\/(?:.|\r|\t)*?(\n|$))|(?:\/\*(?:.|\n|\r|\t)*?(?:\*\/|$))/s", "$1$2$3", $code);
 			$code= preg_replace('/(( |\t|\r)*\n( |\t)*)+/s', " ", $code);
@@ -449,7 +501,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return $code;
 		}
 		
-		function prepare_string_for_quotes(&$str){
+		private function prepare_string_for_quotes(&$str){
 			// prepare the code to be putted into quotes 
 			/*$pattern= array("/(\\\\)?\"/", '/\\\n/'	, '/\\\r/'	, "/(\r?\n)/");
 			$replace= array('$1$1\\"', '\\\\\\n', '\\\\\\r'	, '\\\n"$1+"');*/
@@ -461,14 +513,14 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			$str= preg_replace($pattern, $replace, $str);
 		}
 		
-		function replace_scripts($var, $param1, $param2)
+		private function replace_scripts($var, $param1, $param2)
 		{
 			$this->$var=stripslashes($param2);
 	        return $param1."[];";
 		}
 
 		/* for php version that have not thoses functions */
-		function file_get_contents($file)
+		private function file_get_contents($file)
 		{
 			$fd = fopen($file, 'rb');
 			$content = fread($fd, filesize($file));
@@ -477,7 +529,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return $content;				
 		}
 		
-		function file_put_contents($file, &$content, $mtime=-1)
+		private function file_put_contents($file, &$content, $mtime=-1)
 		{
 			if($mtime==-1)
 				$mtime=time();
@@ -491,7 +543,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 			return false;
 		}
 		
-		function get_microtime()
+		private function get_microtime()
 		{
 		   list($usec, $sec) = explode(" ", microtime());
 		   return ((float)$usec + (float)$sec);
