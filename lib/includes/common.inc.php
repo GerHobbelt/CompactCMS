@@ -3445,6 +3445,8 @@ EOT42;
 		MCEsettings_{$tag}['theme_advanced_buttons' + tbidx] = tbdef[tbidx - 1];
 	}
 
+	tinyMCE.dom.Event.domLoaded = 42;
+	tinyMCE.domLoaded = 666;
 
 	tinyMCE.init(MCEsettings_{$tag});
 

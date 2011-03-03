@@ -227,7 +227,6 @@ function exec_GHO()
 
 $driver_code
 }
-window.exec_GHO = exec_GHO;
 
 EOT42;
 
