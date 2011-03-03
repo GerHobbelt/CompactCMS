@@ -248,8 +248,24 @@ else
 		$js_files[] = $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area_ccms.js';
 	}
 
+			/*
+			be aware that the edit_area code assumes a 'onLoad' event will be triggered AFTER it is 
+			loaded, which is ONLY PROBABLY TRUE when the edit_area code is loaded by <script> tags 
+			in the page header or HTML itself and NOT TRUE when edit_Area itself is loaded through 
+			a lazyloader, like we do.
+
+			Hence, we need to execute the edit_area onLoad event code manually at a time when we
+			can be certain the edit_area code is really loaded.
+			That's what the 'loaded' check and call in the code below is for.
+			*/
 	$eaLanguage = $cfg['editarea_language'];
 	$driver_code = <<<EOT42
+
+	if (editAreaLoader.win != "loaded")
+	{
+		editAreaLoader.window_loaded();
+	}
+
 	
 		editAreaLoader.init(
 			{
