@@ -1273,14 +1273,14 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 {
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
-		$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
+		$suffix = '_src'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
 
 		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
 	}
 	else if (strmatch_tail($element, "edit_area_ccms.js"))
 	{
-		$suffix = '_dev'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
+		$suffix = '_src'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
 
 		$flattened_content = load_EditArea_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
