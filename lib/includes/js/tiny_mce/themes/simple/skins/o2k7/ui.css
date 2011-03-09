@@ -1,5 +1,6 @@
 /* Reset */
-.o2k7SimpleSkin table, .o2k7SimpleSkin tbody, .o2k7SimpleSkin a, .o2k7SimpleSkin img, .o2k7SimpleSkin tr, .o2k7SimpleSkin div, .o2k7SimpleSkin td, .o2k7SimpleSkin iframe, .o2k7SimpleSkin span, .o2k7SimpleSkin * {border:0; margin:0; padding:0; background:transparent; white-space:nowrap; text-decoration:none; font-weight:normal; cursor:default; color:#000}
+/*	white-space: normal; -- [i_a] make sure Chrome doesn't put all toolbars on a single line when the width really is not sufficient for that */
+.o2k7SimpleSkin table, .o2k7SimpleSkin tbody, .o2k7SimpleSkin a, .o2k7SimpleSkin img, .o2k7SimpleSkin tr, .o2k7SimpleSkin div, .o2k7SimpleSkin td, .o2k7SimpleSkin iframe, .o2k7SimpleSkin span, .o2k7SimpleSkin * {border:0; margin:0; padding:0; background:transparent; white-space: normal; text-decoration:none; font-weight:normal; cursor:default; color:#000}
 
 /* Containers */
 .o2k7SimpleSkin {position:relative}

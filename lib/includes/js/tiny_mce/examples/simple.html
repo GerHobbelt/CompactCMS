@@ -4,7 +4,7 @@
 <title>Simple theme example</title>
 
 <!-- TinyMCE -->
-<script type="text/javascript" src="../jscripts/tiny_mce/tiny_mce_dev.js"></script>
+<script type="text/javascript" src="../tiny_mce_dev.js"></script>
 <script type="text/javascript">
 	tinyMCE.init({
 		mode : "textareas",
@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<form method="post" action="http://tinymce.moxiecode.com/dump.php?example=true">
+<form method="post" action="./dump.php?example=true">
 	<h3>Simple theme example</h3>
 
 	<p>
@@ -25,7 +25,7 @@
 	</p>
 
 	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
-	<textarea id="elm1" name="elm1" rows="15" cols="80" style="width: 80%">
+	<textarea id="simple_elm1" name="simple_elm1" rows="15" cols="80" style="width: 80%">
 		&lt;p&gt;
 			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
 		&lt;/p&gt;

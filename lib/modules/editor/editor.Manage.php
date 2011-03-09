@@ -137,11 +137,18 @@ if (0) // TODO?
 
 		// Get keywords for current file
 		$keywords = $row->keywords;
+
+		
+		$textarea_id = str2variablename('page_' . $page_id);
+		
+		// blow away the resize cookie: expire it 10 hours ago
+		setcookie ('TinyMCE_' . $textarea_id . '_size', '', time() - 36000);
+		
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 	<head>
-		<title>CompactCMS - <?php echo $ccms['lang']['editor']['editorfor'].' '.$name; ?></title>
+		<title>CompactCMS - <?php echo $ccms['lang']['editor']['editorfor'] . ' ' . $name; ?></title>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 		<?php
 		// Load TinyMCE (compressed for faster loading)
@@ -162,11 +169,11 @@ if (0) // TODO?
 
 	<body>
 	<div class="module" id="edit-page">
-		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
+		<h2><?php echo $ccms['lang']['backend']['editpage']. ' ' . $name . '<em>.html</em>'; ?></h2>
 		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
 
 		<form action="editor.Process.php?page_id=<?php echo rm0lead($row->page_id); ?>&action=save-changes" method="post" name="save">
-			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
+			<textarea id="<?php echo $textarea_id; ?>" name="content" style="width: 100%"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
 			<!--<br/>-->
 			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
 			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
@@ -211,14 +218,15 @@ function confirmation()
 		{
 			// -------------------------------------------------
 			// Load TinyMCE (compressed for faster loading)
-			$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
+			
+			$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, $textarea_id));
 			$js_files[] = $cfg['rootdir'] . 'lib/includes/js/dummy.js?cb=exec_GHO';
 
-			$starter_code = generateJS4TinyMCEinit(1, 'content');
+			$starter_code = generateJS4TinyMCEinit(1, $textarea_id);
 
-			$driver_code = generateJS4TinyMCEinit(2, 'content');
+			$driver_code = generateJS4TinyMCEinit(2, $textarea_id);
 
-			$extra_functions_code = generateJS4TinyMCEinit(3, 'content');
+			$extra_functions_code = generateJS4TinyMCEinit(3, $textarea_id);
 
 			$extra_functions_code .= <<<EOT42
 
@@ -294,13 +302,13 @@ EOT42;
 	// make sure we only specify a /supported/ syntax; if we spec something else, edit_area will NOT show up!
 	editAreaLoader.init(
 		{
-			id: "content",
+			id: "{$textarea_id}",
 			is_multi_files: false,
 			allow_toggle: false,
 			word_wrap: true,
 			start_highlight: true,
-			language: "$eaLanguage",
-			syntax: "$EAsyntax",
+			language: "{$eaLanguage}",
+			syntax: "{$EAsyntax}",
 			ignore_unsupported_syntax: true
 		});
 

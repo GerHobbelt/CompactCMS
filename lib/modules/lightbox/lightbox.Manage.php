@@ -195,6 +195,7 @@ $preview_checkcode = GenerateNewPreviewCode($page_id);
 
 
 $tinyMCE_required = false;
+$textarea4descr_id = str2variablename('lightbox_' . $page_id . (!empty($album) ? '_' . $album : ''));
 
 
 ?>
@@ -446,8 +447,8 @@ $tinyMCE_required = false;
 
 					$tinyMCE_required = true;
 					?>
-					<label for="description"><?php echo $ccms['lang']['album']['description']; ?></label>
-					<textarea name="description" rows="3" cols="40" id="description"><?php echo $desc; ?></textarea>
+					<label for="<?php echo $textarea4descr_id; ?>"><?php echo $ccms['lang']['album']['description']; ?></label>
+					<textarea name="description" rows="6" cols="40" style="width: 100%" id="<?php echo $textarea4descr_id; ?>"><?php echo $desc; ?></textarea>
 					<input type="hidden" name="album" value="<?php echo $album; ?>" id="album-cfg" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
@@ -674,33 +675,20 @@ if (!$tinyMCE_required)
 }
 else
 {
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'description', true));
+	$mce_options = array($textarea4descr_id => array(
+			'theme' => 'simple'
+			));
+			
+	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, $textarea4descr_id, $mce_options));
 	// these must FOLLOW the tinyMCE JS list as that part will include the basics for these ones as well:
 	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/FancyUpload2.js';
 	$js_files[] = $cfg['rootdir'] . 'lib/modules/lightbox/modLightbox.js';
 
-	$driver_code = <<<EOT42
-		tinyMCE.init({
-			mode : "exact",
-			elements : "description",
-			//theme : "advanced",
-			theme : "simple",
-			skin: 'o2k7',
-			skin_variant: 'silver',
-			//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
-			//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
-			//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
-			//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
-			//theme_advanced_toolbar_location: 'top'
-			theme_simple_toolbar_location: 'top'
-		});
-EOT42;
+	$starter_code = generateJS4TinyMCEinit(1, $textarea4descr_id, $mce_options);
 
-	$starter_code = generateJS4TinyMCEinit(1, 'description', true);
+	$driver_code = generateJS4TinyMCEinit(2, $textarea4descr_id, $mce_options);
 
-	$driver_code = generateJS4TinyMCEinit(2, 'description', true);
-
-	$extra_functions_code = generateJS4TinyMCEinit(3, 'description', true);
+	$extra_functions_code = generateJS4TinyMCEinit(3, $textarea4descr_id, $mce_options);
 }
 
 

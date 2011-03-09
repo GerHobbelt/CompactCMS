@@ -80,6 +80,8 @@ if($newsID && $page_id)
 	if (!$news) $db->Kill();
 }
 
+$textarea4teaser_id = str2variablename('newstease_' . $page_id . (!empty($newsID) ? '_' . $newsID : ''));
+$textarea4article_id = str2variablename('newsarticle_' . $page_id . (!empty($newsID) ? '_' . $newsID : ''));
 
 
 ?>
@@ -152,13 +154,13 @@ if($newsID && $page_id)
 					</tr>
 				</table>
 			</div>
-				<label class="clear" for="newsTeaser"><?php echo $ccms['lang']['news']['teaser']; ?></label>
-				<textarea name="newsTeaser" id="newsTeaser" class="minLength:3 text span-25" rows="4" cols="40"><?php
+				<label class="clear" for="<?php echo $textarea4teaser_id; ?>"><?php echo $ccms['lang']['news']['teaser']; ?></label>
+				<textarea name="newsTeaser" id="<?php echo $textarea4teaser_id; ?>" class="minLength:3 text" rows="4" cols="40" style="width: 100%"><?php
 					echo (isset($news) ? $news->newsTeaser : null);
 				?></textarea>
 
-				<label for="newsContent"><?php echo $ccms['lang']['news']['contents']; ?></label>
-				<textarea name="newsContent" id="newsContent" class="text span-25" rows="8" cols="40"><?php
+				<label for="<?php echo $textarea4article_id; ?>"><?php echo $ccms['lang']['news']['contents']; ?></label>
+				<textarea name="newsContent" id="<?php echo $textarea4article_id; ?>" class="text" rows="8" cols="40" style="width: 100%"><?php
 					echo (isset($news) ? $news->newsContent : null);
 				?></textarea>
 				<hr class="space"/>
@@ -218,11 +220,14 @@ $js_files = array();
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 
-$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent,newsTeaser'));
+$mce_options = array($textarea4teaser_id => array(
+		'theme' => 'simple'
+		));
+$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options));
 
-$starter_code = generateJS4TinyMCEinit(1, 'newsContent,newsTeaser');
+$starter_code = generateJS4TinyMCEinit(1, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
 
-$driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT42
+$driver_code = generateJS4TinyMCEinit(2, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options) . <<<EOT42
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
@@ -236,7 +241,7 @@ $driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT42
 			});
 EOT42;
 
-$extra_functions_code = generateJS4TinyMCEinit(3, 'newsContent,newsTeaser');
+$extra_functions_code = generateJS4TinyMCEinit(3, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
 
 echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>

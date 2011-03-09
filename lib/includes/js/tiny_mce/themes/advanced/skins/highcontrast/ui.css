@@ -12,7 +12,17 @@
 
 /* Layout */
 .highcontrastSkin table.mceLayout {border: 1px solid;}
-.highcontrastSkin .mceIframeContainer {border-top:1px solid; border-bottom:1px solid}
+.highcontrastSkin .mceIframeContainer 
+{
+	border-top:1px solid; 
+	border-bottom:1px solid;
+	height: 99%;  /* [i_a] always have this TD fill up the height of the editor table. This will provide the space for the iframe, which we fill in there @ 100% */
+}
+.mceIframeContainer iframe
+{
+	width: 100%;
+	height: 100%;  /* [i_a] always have this fill the <TD> completely */
+}
 .highcontrastSkin .mceStatusbar a:hover {text-decoration:underline}
 .highcontrastSkin .mceStatusbar {display:block; line-height:1.5em; overflow:visible;}
 .highcontrastSkin .mceStatusbar div {float:left}

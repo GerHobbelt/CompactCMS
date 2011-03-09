@@ -1388,7 +1388,7 @@ tinyMCE.init({
       // Register example button
       ed.addButton('example', {
          title : 'example.desc',
-         image : '../jscripts/tiny_mce/plugins/example/img/example.gif',
+         image : '../plugins/example/img/example.gif',
          onclick : function() {
             ed.windowManager.alert('Hello world!! Selection: ' + ed.selection.getContent({format : 'text'}));
          }
