@@ -189,18 +189,6 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</textarea>
 
 	<hr class="clear" />
-
-	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
-	<textarea id="elm1" name="elm1" rows="15" cols="80" class="span-25">
-		&lt;p&gt;
-			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
-		&lt;/p&gt;
-		&lt;p&gt;
-		Nam nisi elit, cursus in rhoncus sit amet, pulvinar laoreet leo. Nam sed lectus quam, ut sagittis tellus. Quisque dignissim mauris a augue rutrum tempor. Donec vitae purus nec massa vestibulum ornare sit amet id tellus. Nunc quam mauris, fermentum nec lacinia eget, sollicitudin nec ante. Aliquam molestie volutpat dapibus. Nunc interdum viverra sodales. Morbi laoreet pulvinar gravida. Quisque ut turpis sagittis nunc accumsan vehicula. Duis elementum congue ultrices. Cras faucibus feugiat arcu quis lacinia. In hac habitasse platea dictumst. Pellentesque fermentum magna sit amet tellus varius ullamcorper. Vestibulum at urna augue, eget varius neque. Fusce facilisis venenatis dapibus. Integer non sem at arcu euismod tempor nec sed nisl. Morbi ultricies, mauris ut ultricies adipiscing, felis odio condimentum massa, et luctus est nunc nec eros.
-		&lt;/p&gt;
-	</textarea>
-
-	<hr class="clear" />
 <?php
 }
 ?>
@@ -222,40 +210,11 @@ function confirmation()
 $js_files = array();
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-	$with_fancyuploader = false;
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'elm1', $with_fancyuploader));
-}
-$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
 
 $driver_code = null;
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-	$driver_code = <<<EOT42
-		tinyMCE.init({
-			mode : "exact",
-			elements : "elm1",
-			//theme : "advanced",
-			theme : "simple",
-			skin: 'o2k7',
-			skin_variant: 'silver',
-			theme_simple_toolbar_location: 'top'
-		});
-EOT42;
-}
-
 $starter_code = null;
 $driver_code = null;
 $extra_functions_code = null;
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-	$starter_code = generateJS4TinyMCEinit(1, 'elm1', $with_fancyuploader);
-
-	$driver_code = generateJS4TinyMCEinit(2, 'elm1', $with_fancyuploader);
-
-	$extra_functions_code = generateJS4TinyMCEinit(3, 'elm1', $with_fancyuploader);
-}
 
 echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
