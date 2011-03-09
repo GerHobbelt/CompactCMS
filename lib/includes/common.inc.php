@@ -3497,7 +3497,7 @@ EOT42;
             function(type)
             {
                 return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-                    url: '{$rootdir}lib/includes/js/mootools-filemanager/ccms/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+                    url: '{$rootdir}lib/includes/js/mootools-filemanager/ccms/manager.php',
                     baseURL: '{$rootdir}',
                     assetBasePath: '{$rootdir}lib/includes/js/mootools-filemanager/Assets',
                     language: '{$MT_FileManager_language}',
@@ -3511,6 +3511,9 @@ EOT42;
                     hideOverlay: false,
                     uploadAuthData: {
                         session: '{$session_id}'
+                    },
+                    propagateData: {
+                        type: type // =='image', ...
                     }
                 };
             }),
