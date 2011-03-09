@@ -357,9 +357,36 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
     return $path . $dst . $ext;
 }
 
-/*
- * moved here from tiny_mce_gzip.php; augmented to accept '.', NOT accepting '_' as it's a wildcard in SQL
+
+
+
+
+/**
+ * Convert any input to a viable variable name, usable in PHP and JavaScript.
+ *
+ * @return (string) the generated variable name, or FALSE when the input cannot be converted to a legal variable name.
  */
+function str2variablename($str)
+{
+    if (empty($str) || !is_string($str)) return false;
+
+    // underscore is not part of the regex set as ANY sequence of multiple underscores should be converted to a single one.
+    // Yep, this is a matter of taste...
+    $dst = preg_replace('/[^A-Za-z0-9]+/', '_', $str);
+    // does the string start with a digit?
+    if (ord($dst[0]) <= 39)
+    {
+        $dst = 'X' . $dst;
+    }
+    return $dst;
+}
+
+
+
+
+
+
+
 
 /**
  * Return the value of a $_GET[] entry (or $def if the entity doesn't exist), stripped of
@@ -1158,24 +1185,7 @@ function filterParam4MathExpression($value, $def = null)
 
 
 
-/*
-    public static function pagetitle($data, $options = array()){
-        static $regex;
-        if (!$regex){
-            $regex = array(
-                explode(' ', 'Æ æ Œ œ ß Ü ü Ö ö Ä ä À Á Â Ã Ä Å &#260; &#258; Ç &#262; &#268; &#270; &#272; Ð È É Ê Ë &#280; &#282; &#286; Ì Í Î Ï &#304; &#321; &#317; &#313; Ñ &#323; &#327; Ò Ó Ô Õ Ö Ø &#336; &#340; &#344; Š &#346; &#350; &#356; &#354; Ù Ú Û Ü &#366; &#368; Ý Ž &#377; &#379; à á â ã ä å &#261; &#259; ç &#263; &#269; &#271; &#273; è é ê ë &#281; &#283; &#287; ì í î ï &#305; &#322; &#318; &#314; ñ &#324; &#328; ð ò ó ô õ ö ø &#337; &#341; &#345; &#347; š &#351; &#357; &#355; ù ú û ü &#367; &#369; ý ÿ ž &#378; &#380;'),
-                explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
-            );
 
-            $regex[0][] = '"';
-            $regex[0][] = "'";
-        }
-
-        $data = trim(substr(preg_replace('/(?:[^A-z0-9]|_|\^)+/i', '_', str_replace($regex[0], $regex[1], $data)), 0, 64), '_');
-        return !empty($options) ? self::checkTitle($data, $options) : $data;
-    }
-
-*/
 
 
 
@@ -1971,10 +1981,10 @@ if (!function_exists('fnmatch'))
 /**#@+
  * Extra GLOB constant for safe_glob()
  */
-define('GLOB_NODIR',256);
-define('GLOB_PATH',512);
-define('GLOB_NODOTS',1024);
-define('GLOB_RECURSE',2048);
+if (!defined('GLOB_NODIR'))       define('GLOB_NODIR',256);
+if (!defined('GLOB_PATH'))        define('GLOB_PATH',512);
+if (!defined('GLOB_NODOTS'))      define('GLOB_NODOTS',1024);
+if (!defined('GLOB_RECURSE'))     define('GLOB_RECURSE',2048);
 /**#@-*/
 
 /**
@@ -3110,7 +3120,7 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
         'spellchecker'       => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'spellchecker'),
         'style'              => array('default_on' => 1, 'grouping' =>  51, 'buttons' => 'styleprops'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
         'tabfocus'           => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
-        'table'              => array('default_on' => 1, 'grouping' => 141, 'buttons' => 'table,delete_table,delete_col,delete_row,col_after,col_before,row_after,row_before,row_props,cell_props,split_cells,merge_cells'),
+        'table'              => array('default_on' => 1, 'grouping' => 141, 'buttons' => 'table,delete_table,delete_col,delete_row,col_before,col_after,row_before,row_after,row_props,cell_props,split_cells,merge_cells'),
         'template'           => array('default_on' => 1, 'grouping' => 180, 'buttons' => 'template'),
         'visualchars'        => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualchars'),
         'wordcount'          => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
@@ -3187,7 +3197,7 @@ function is_real_tinyMCE_plugin($name)
     if (empty($name))
         return false;
 
-    return strpos('abcdefghijklmnopqrstuvwxyz', substr($name, 0, 1)) !== false;
+    return strpos('abcdefghijklmnopqrstuvwxyz', $name[0]) !== false;
 }
 
 
@@ -3204,12 +3214,71 @@ state == 1: the PREinit code section
 state == 2: the init() code section
 
 state == 3: extra assistent functions section
+
+----------------------------------------------
+
+A lesson learned the HARD way: when looking at the MCE demos you'll note those buggers autoresize when the window
+size changes (due to resizeTo() being called from the MCE-registered resize event).
+
+Two things you should ALSO note:
+
+- when you configure a width & height, the autoresizing, i.e. following the resizing of the underlying textarea,
+  IS GONE. Down the toilet.
+
+  We do NOT WANT THAT!
+
+- when the user jiggles the resize triangle in the lower right croner, the autoresizing is disabled from that point
+  onwards as well.
+
+  The resizing gets stored in a cookie (TinyMCE_<textarea_id>_size:(ch,cw values) and when you reload
+  and the cookie is there, no autoresize/follow anyhow as TinyMCE will (due to 'theme_advanced_resizing_use_cookie = true')
+  restore the cookie-stored dimensions and keep it that way until you resize again using that resize triangle in
+  the lower right corner again!
+
+
+The autoresize being gone, even after reload, is due to the cookie existing AND containing those cw and ch values.
+
+
+Lesson:
+
+- the TinyMCE textarea ID should therefore be unique per editor instance, so that resize actions in one don't 'show up'
+  in the behaviour of other TinyMCE editors in the site.
+
+- If you want TinyMCE to recall such dimensioning PER DOCUMENT, you'd better make sure each document gets its own
+  <textarwa> ID!
+
+- Do NOT SPECIFY WIDTH AND HEIGHT when instantiating a TinyMCE object!
+
+- the <textarea> itself MUST have a 'style="width: 100%"' or similar percentage-based setting. Putting this in a CSS file
+  and a class is NOT going to work! If you want TinyMCE to resize along with window size changes, you've got to do it
+  this way!
+
+
+---------------------------------------------------------------------
+
+@param string $editarea_tags       is a comma-separated set of textarea tags.
+
+                                   WARNING: each tag must also be suitable as a variable name for use JavaScript!
+                                            Hence tags MUST only contain alphanumerics and underscores and MUST START with
+                                            an alpha character ([A-Za-z]).
 */
-function generateJS4tinyMCEinit($state, $editarea_tags, $with_MT_FileManager = true, $js_load_callback = 'jsComplete')
+function generateJS4tinyMCEinit($state, $editarea_tags, $options = null, $with_MT_FileManager = true, $js_load_callback = 'jsComplete')
 {
     global $cfg;
 
     $editarea_tags = explode(',', $editarea_tags);
+    if (!is_array($options))
+    {
+        $options = array();
+    }
+    foreach ($editarea_tags as $tag)
+    {
+        $options[$tag] = array_merge(array(
+                'theme' => 'advanced',
+                'skin' => 'o2k7',
+                'skin_variant' => 'silver'
+            ), ((isset($options[$tag]) && is_array($options[$tag])) ? $options[$tag] : array()));
+    }
 
     switch ($state)
     {
@@ -3257,7 +3326,7 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_MT_FileManager = t
     tinyMCEPreInit = {
           suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
         , base: '{$rootdir}lib/includes/js/tiny_mce'
-        , query: 'load_callback=$js_load_callback' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+        , query: 'load_callback={$js_load_callback}' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
     };
 
 EOT42;
@@ -3320,24 +3389,24 @@ EOT42;
         }
         ksort($btngrp);
 
-        $rv = " var buttondefs = [\n";
+        $rv = "    var buttondefs = [\n";
 
         $s = '';
         foreach($btngrp as $group => $btnarr)
         {
             $rv .= $s;
 
-            $s = "      [\n";
+            $s = "        [\n";
             $s2 = '';
             foreach($btnarr as $bdef)
             {
                 $s2 .= "            ['" . $bdef[0] . "', " . $bdef[1] . "],\n";
             }
             $s2 = substr($s2, 0, strlen($s2) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-            $s .= $s2 . "       ],\n";
+            $s .= $s2 . "        ],\n";
         }
         $s = substr($s, 0, strlen($s) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-        $rv .= $s . "   ];\n";
+        $rv .= $s . "    ];\n";
 
         $rv .= <<<EOT42
     var buttonvirtcount = $btnvirtcount;
@@ -3352,34 +3421,35 @@ EOT42;
 
         foreach($editarea_tags as $tag)
         {
+            $theme = $options[$tag]['theme'];
+            $skin = $options[$tag]['skin'];
+            $skin_variant = $options[$tag]['skin_variant'];
+
             $rv .= <<<EOT42
 
     dimensions = window.getSize();
     editwinmaxwidth = dimensions.x - 20;
-    editwinmaxheight = dimensions.y - 20;
-    dimensions = \$('$tag').getSize();
+    editwinmaxheight = dimensions.y - 80;
+    dimensions = \$('{$tag}').getSize();
     editwinwidth = dimensions.x;
-    //alert('width: ' + editwinwidth + 'px');
+    if (console && console.log) console.log('width: ' + editwinwidth + 'px');
 
-    tbdef = layout_the_MCE_toolbars(buttondefs, editwinwidth);
+    // tbdef = layout_the_MCE_toolbars(buttondefs, (editwinwidth < 362 ? editwinwidth : 362));
+    // bigger toolbar chunks are bad because you are limiting the shrinking capability of the editor window...
+    tbdef = layout_the_MCE_toolbars(buttondefs, 362);
 
     var MCEsettings_{$tag} = {
         mode: 'exact',
-        elements: '$tag',
-        theme: 'advanced',
-        language: '$tinymce_language',
-        skin: 'o2k7',
-        skin_variant: 'silver',
-        plugins: '$plugins_str',
-        theme_advanced_toolbar_location: 'top',
+        elements: '{$tag}',
+        theme: '{$theme}',
+        language: '{$tinymce_language}',
+        skin: '{$skin}',
+        skin_variant: '{$skin_variant}',
+        plugins: '{$plugins_str}',
+        theme_{$theme}_toolbar_location: 'top',
 
-        //theme_advanced_buttons1 : dst[0],
-        //theme_advanced_buttons2 : dst[1],
-        //theme_advanced_buttons3 : dst[2],
-        //theme_advanced_buttons4 : dst[3],
-
-        theme_advanced_toolbar_align: 'left',
-        theme_advanced_statusbar_location: 'bottom',
+        theme_{$theme}_toolbar_align: 'left',
+        theme_{$theme}_statusbar_location: 'bottom',
         dialog_type: 'modal',
 
         paste_auto_cleanup_on_paste: true,
@@ -3387,17 +3457,19 @@ EOT42;
         autoresize_on_init: true,
         autoresize_max_height: editwinmaxheight,
 
-        theme_advanced_resizing: true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-        theme_advanced_resizing_use_cookie : 1,
-        theme_advanced_resize_horizontal: false,
-        theme_advanced_resizing_min_width: 400,
-        theme_advanced_resizing_min_height: 100,
-        theme_advanced_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-        theme_advanced_resizing_max_height: 0xFFFF,
+        autosave_ask_before_unload: false,    // don't bug the user when he's aborting his edit
+
+        theme_{$theme}_resizing: true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+        theme_{$theme}_resizing_use_cookie : 1,
+        theme_{$theme}_resize_horizontal: true,
+        theme_{$theme}_resizing_min_width: 362,  /* turns out the widest toolbar block of ours is 362px wide */
+        theme_{$theme}_resizing_min_height: 100,
+        theme_{$theme}_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+        theme_{$theme}_resizing_max_height: 0xFFFF,
         relative_urls: true,
         convert_urls: false,
         remove_script_host: true,
-        document_base_url: '$rootdir',
+        document_base_url: '{$rootdir}',
 
 EOT42;
 
@@ -3438,7 +3510,7 @@ EOT42;
                     hideClose: false,
                     hideOverlay: false,
                     uploadAuthData: {
-                        session: '$session_id'
+                        session: '{$session_id}'
                     }
                 };
             }),
@@ -3448,7 +3520,9 @@ EOT42;
             $rv .= <<<EOT42
 
         //height: '300px',
-        width: editwinwidth   /* default: width in pixels */
+        //width: editwinwidth   /* default: width in pixels */
+
+        buggeraboo_sentinel: 1
     };
 
     var tbdeflen = tbdef.length;
@@ -3457,7 +3531,7 @@ EOT42;
     /* now set up the toolbar rows; as many as we need: */
     for (tbidx = 1; tbidx <= tbdeflen; tbidx++)
     {
-        MCEsettings_{$tag}['theme_advanced_buttons' + tbidx] = tbdef[tbidx - 1];
+        MCEsettings_{$tag}['theme_{$theme}_buttons' + tbidx] = tbdef[tbidx - 1];
     }
 
     if (!tinyMCE.dom.Event.domLoaded) tinyMCE.dom.Event.domLoaded = 42;
@@ -3477,11 +3551,14 @@ EOT42;
 /* set up the toolbars depending on the editor width */
 function layout_the_MCE_toolbars(buttondefs, editwinwidth)
 {
+    if (console && console.log) console.log('layout_the_MCE_toolbars: ' + editwinwidth + 'px');
+
     var i;
     var tbcount = buttondefs.length;
     var dst = [];
     var dstelem = '';
     var lwleft = editwinwidth - 10; // subtract edges.
+    var max_singlegrp_width = 0;
 
     for (i = 0; i < tbcount; i++)
     {
@@ -3495,6 +3572,8 @@ function layout_the_MCE_toolbars(buttondefs, editwinwidth)
             grpwidth += grp[j][1];
         }
         grpwidth *= 22; /* width per button */
+        if (grpwidth > max_singlegrp_width)
+            max_singlegrp_width = grpwidth;
 
         if (grpwidth + 5 > lwleft)
         {
@@ -3524,7 +3603,9 @@ function layout_the_MCE_toolbars(buttondefs, editwinwidth)
     //alert('toolbar row @ final: ' + dstelem);
     dst.push(dstelem);
 
-    return dst;
+    // now if we find that the minimum toolbar block width is larger than the originally specified width, we can be sure
+    // we can't get any less wide than that, so we recalc the toolbar layout with that new width:
+    return (max_singlegrp_width > editwinwidth - 10 ? layout_the_MCE_toolbars(buttondefs, max_singlegrp_width + 10) : dst);
 }
 
 
@@ -3565,7 +3646,7 @@ function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code
 var jsLogEl = document.getElementById('jslog');
 var js = [
 
-$fs
+{$fs}
 
     ];
 
@@ -3587,7 +3668,7 @@ function jsComplete(user_obj, lazy_obj)
     // window.addEvent('domready',function()
     //{
 
-$driver_code
+{$driver_code}
 
     //});
 
@@ -3610,12 +3691,12 @@ function ccms_lazyload_setup_GHO()
 {
     jslog('loading JS (sequential calls)');
 
-$starter_code
+{$starter_code}
 
     LazyLoad.js(js, jsComplete);
 }
 
-$extra_functions_code
+{$extra_functions_code}
 
 
 EOT42;
@@ -3624,14 +3705,14 @@ EOT42;
     {
         $rv = <<<EOT42
 
-$extra_functions_code
+{$extra_functions_code}
 
-$starter_code
+{$starter_code}
 
 // window.addEvent('domready',function()
 //{
 
-$driver_code
+{$driver_code}
 
 //});
 EOT42;
