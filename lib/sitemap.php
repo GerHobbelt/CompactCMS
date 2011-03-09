@@ -43,6 +43,10 @@ if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 
+
+
+
+
 function check_session_sidpatch_and_start()
 {
 	global $cfg, $ccms;
