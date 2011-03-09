@@ -155,7 +155,6 @@ function str2USASCII($src)
             explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
         );
 
-
         // also check whether iconv exists AND performs correctly in transliteration:
         $iconv_ok = false;
         if (function_exists('iconv'))
@@ -182,7 +181,7 @@ function str2USASCII($src)
         if (substr($rv, -7) == ' (tail)')
         {
             // strip off the telltale:
-            $src = substr($rv, strlen($rv) - 6);
+            $src = substr($rv, strlen($rv) - 7);
         }
         // else: fall through: let the next step do the ASCIIfication.
     }
