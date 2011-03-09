@@ -50,7 +50,7 @@ if (!defined('BASE_PATH'))
 
 
 
-if (empty($cfg['fancyupload_language']) || empty($cfg['tinymce_language']))
+if (empty($cfg['MT_FileManager_language']) || empty($cfg['tinymce_language']))
 {
 	die("INTERNAL LANGUAGE INIT ERROR!");
 }
@@ -92,7 +92,8 @@ if($newsID && $page_id)
 	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 
 	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/js/milkbox/css/milkbox.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/Css/FileManager.css,Additions.css" />
 
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />

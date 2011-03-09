@@ -1285,9 +1285,67 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 		$flattened_content = load_EditArea_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
 	}
+	else if ($element == 'Source/FileManager.js')
+	{
+		// a flattened set of mootools_manager JavaScript: clean up potentially offending lazyload code as we have loaded the whole shebang
+		$contents = fixup_MT_FileManagerJS($contents, $type, $http_base, $base, $root, $element);
+	}
 
 	return $contents;
 }
+
+
+
+
+/*
+As we produce a flattened JS file for multiple mootools_FileManager JS files, any path based lazyloading activity in there
+will calculate the WRONG relative-to-absolute path as we mix files from various directories into another.
+
+The way out is do all the lazyloadiung ourselves (we do that laready!) and have such offending bits of JavaScript
+forcibly REMOVED from the original. We do this on the fly, right here.
+
+This code is used to fixup FileManager.js itself.
+*/
+function fixup_MT_FileManagerJS($contents, $type, $http_base, $base, $root, $element)
+{
+	/*
+	 * The offending bit we're looking for is this:
+	 * 
+	 * 	// ->> load DEPENDENCIES
+	 * 	var __DIR__ = (function() {
+	 * 		var scripts = document.getElementsByTagName('script');
+	 * 		var script = scripts[scripts.length - 1].src;
+	 * 		var host = window.location.href.replace(window.location.pathname+window.location.hash,'');
+	 * 		return script.substring(0, script.lastIndexOf('/')).replace(host,'') + '/';
+	 * 	})();
+	 * 	Asset.javascript(__DIR__+'../Assets/js/milkbox/milkbox.js');
+	 * 	Asset.css(__DIR__+'../Assets/js/milkbox/css/milkbox.css');
+	 * 	Asset.css(__DIR__+'../Assets/Css/FileManager.css');
+	 * 	Asset.css(__DIR__+'../Assets/Css/Additions.css');
+	 * 	Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
+	 */
+	$pos1 = strpos($contents, 'var __DIR__' );
+	if ($pos1 === false)
+	{
+		send_response_status_header(500);
+		die("\n" . get_response_code_string(500) . " - Combiner: mootools FileManager JS code is invalid; cannot clean. Abortus Provocatus. Contact your medic for meds.\n");
+	}
+	$s1 = substr($contents, 0, $pos1);
+	$contents = substr($contents, $pos1);
+
+	$pos2 = strpos($contents, 'jsGET.js');
+	$pos3 = strpos($contents, 'bind(this)', $pos2);
+	$pos4 = strpos($contents, ';', $pos3);
+	if ($pos2 === false || $pos3 === false || $pos4 === false)
+	{
+		send_response_status_header(500);
+		die("\n" . get_response_code_string(500) . " - Combiner: mootools FileManager JS code is invalid; cannot clean. Abortus Provocatus. Contact your medic for meds.\n");
+	}
+	$contents = substr($contents, $pos4 + 1);
+	
+	return $s1 . "\n\n/* **** ASSET LAZYLOAD ACTIVITY CLEANED OUT BY THE CompactCMS Combiner ****/\n\n" . $contents;
+}	
+
 
 
 

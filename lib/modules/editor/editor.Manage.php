@@ -149,7 +149,8 @@ if (0) // TODO?
 		{
 		?>
 			<!-- File uploader styles -->
-			<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+			<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/js/milkbox/css/milkbox.css" />
+			<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/Css/FileManager.css,Additions.css" />
 		<?php
 		}
 		// else : load Editarea for code editing

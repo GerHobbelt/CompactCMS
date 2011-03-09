@@ -141,7 +141,7 @@ function rm0lead($str)
  * Use this function for filtering any input which doesn't need the full UTF8 range. Most useful as a preprocessor for further
  * security-oriented input filters.
  *
- * Code ripped from function pagetitle($data, $options = array()) in the 'fancyupload' PHP module.
+ * Code ripped from function pagetitle($data, $options = array()) in the 'mootools-filemanager::Assets/Connector/FileManager' PHP module.
  */
 function str2USASCII($src)
 {
@@ -155,8 +155,6 @@ function str2USASCII($src)
 			explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
 		);
 
-		//$regex[0][] = '"';
-		//$regex[0][] = "'";
 
 		// also check whether iconv exists AND performs correctly in transliteration:
 		$iconv_ok = false;
@@ -2347,15 +2345,15 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		$cfg['editarea_language'] = 'en';
 	}
 
-	$fancyupload_langfile = BASE_PATH . '/lib/includes/js/fancyupload/Language/Language.'.$language.'.js';
-	if (is_file($fancyupload_langfile))
-	{
-		$cfg['fancyupload_language'] = $language;
-	}
-	else
-	{
-		$cfg['fancyupload_language'] = 'en';
-	}
+    $MT_FileManager_langfile = BASE_PATH . '/lib/includes/js/mootools-filemanager/Language/Language.'.$language.'.js';
+    if (is_file($MT_FileManager_langfile))
+    {
+        $cfg['MT_FileManager_language'] = $language;
+    }
+    else
+    {
+        $cfg['MT_FileManager_language'] = 'en';
+    }
 
 	$cfg['language'] = $language;
 	$cfg['locale'] = $locale;
@@ -3224,15 +3222,24 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_MT_FileManager = t
 		$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js';
 		if ($with_MT_FileManager)
 		{
-			/* File uploader JS */
-			$ls = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/dummy.js,Source/FileManager.js,';
-			if ($cfg['fancyupload_language'] != 'en')
-			{
-				$ls .= 'Language/Language.en.js,';
-			}
-			$ls .= 'Language/Language.' . $cfg['fancyupload_language'] . '.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
+            /* File uploader JS */
+            $ls = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/dummy.js,Source/FileManager.js,';
+            if ($cfg['MT_FileManager_language'] != 'en')
+            {
+                $ls .= 'Language/Language.en.js,';
+            }
+            $ls .= 'Language/Language.' . $cfg['MT_FileManager_language'] . '.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
+			
+			// and make sure these are added BEFORE this series of scripts (the Combiner will filter out those lines from FileManager.js to prevent clashes):
+			//
+			//Asset.javascript(__DIR__+'../Assets/js/milkbox/milkbox.js');
+			//Asset.css(__DIR__+'../Assets/js/milkbox/css/milkbox.css');
+			//Asset.css(__DIR__+'../Assets/Css/FileManager.css');
+			//Asset.css(__DIR__+'../Assets/Css/Additions.css');
+			//Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
+            $rv[] = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/Assets/js/milkbox/milkbox.js,Assets/js/jsGET.js';
 
-			$rv[] = $ls;
+            $rv[] = $ls;
 		}
 		return $rv;
 
@@ -3408,7 +3415,7 @@ EOT42;
 			if ($with_MT_FileManager)
 			{
 				$session_id = session_id();
-				$fancyupload_language = $cfg['fancyupload_language'];
+                $MT_FileManager_language = $cfg['MT_FileManager_language'];
 
 				$rv .= <<<EOT42
 
@@ -3420,7 +3427,7 @@ EOT42;
 					url: '{$rootdir}lib/includes/js/mootools-filemanager/ccms/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
 					baseURL: '{$rootdir}',
 					assetBasePath: '{$rootdir}lib/includes/js/mootools-filemanager/Assets',
-					language: '$fancyupload_language',
+                    language: '{$MT_FileManager_language}',
 					selectable: true,
 					destroy: true,
 					upload: true,

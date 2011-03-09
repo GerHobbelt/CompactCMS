@@ -300,7 +300,7 @@ USE_JS_DEVELOPMENT_SOURCES =&gt; boolean <strong>true</strong>
 HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION =&gt; boolean <strong>true</strong>
 tinymce_language =&gt; string(2) <strong>en</strong>
 editarea_language =&gt; string(2) <strong>en</strong>
-fancyupload_language =&gt; string(2) <strong>en</strong>
+MT_FileManager_language =&gt; string(2) <strong>en</strong>
 language =&gt; string(2) <strong>en</strong>
 locale =&gt; string(9) <strong>eng.UTF-8</strong> </pre>
 <p>... and then there's the language subarray...</p>

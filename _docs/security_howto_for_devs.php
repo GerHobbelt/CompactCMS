@@ -142,3 +142,4 @@ if($do=="delete" &amp;&amp; <span class="light_up_editing">!empty($btn_delete)</
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
+
