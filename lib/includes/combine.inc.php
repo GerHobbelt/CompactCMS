@@ -204,7 +204,7 @@ $elements = explode(',', getGETparam4CommaSeppedFullFilePaths('files'));
 if (substr($base, 0, strlen(BASE_PATH)) != BASE_PATH)
 {
 	send_response_status_header(403); // Illegal Access
-	die();
+	die("\n" . get_response_code_string(403) . " - Combiner: illegal base path: type='$type'\n");
 }
 
 
@@ -223,7 +223,7 @@ foreach($elements as $element)
 		($type == 'css' && substr($path, -4) != '.css'))
 	{
 		send_response_status_header(403); // Forbidden
-		die();
+		die("\n" . get_response_code_string(403) . " - Combiner: illegal type request or file/path does not exist: type='$type', element='$element'\n");
 	}
 
 	/*
@@ -234,12 +234,12 @@ foreach($elements as $element)
 	if (substr($path, 0, strlen($root)) != $root)
 	{
 		send_response_status_header(403); // Illegal Access
-		die();
+		die("\n" . get_response_code_string(403) . " - Combiner: accessing out of bounds path: type='$type', element='$element'\n");
 	}
 	if (!file_exists($path))
 	{
 		send_response_status_header(404); // Not Found
-		die();
+		die("\n" . get_response_code_string(404) . " - Combiner: file does not exist: type='$type', element='$element'\n");
 	}
 
 	$lastmodified = max($lastmodified, filemtime($path));
@@ -1408,7 +1408,7 @@ EOT42;
 			else
 			{
 				send_response_status_header(404); // Not Found
-				die();
+				die("\n" . get_response_code_string(404) . " - Combiner: could not load data from file: type='$type', element='$element'\n");
 			}
 		}
 		else
@@ -1546,12 +1546,13 @@ function load_one($type, $http_base, $base, $root, $element)
 	}
 	else
 	{
-		die("<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root));
+		send_response_status_header(404); // Not Found
+		die("\n" . get_response_code_string(404) . " - Combiner: not a legal path: $type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root));
 	}
 	if ($my_content === false)
 	{
 		send_response_status_header(404); // Not Found
-		die();
+		die("\n" . get_response_code_string(404) . " - Combiner: failed to load data from file: type='$type', element='$element'\n");
 	}
 
 	switch ($type)
