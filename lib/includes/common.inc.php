@@ -2569,7 +2569,7 @@ define('SPG_GIVE_SITEMAP_SPECIAL', 7); // if the page needs special treatment wh
 
 
 /**
-Check a given page name to see whether it's one of the special ones (ome, index, 404, ...) and
+Check a given page name to see whether it's one of the special ones (home, index, 404, ...) and
 return the required attribute for it.
 */
 function checkSpecialPageName($name, $reqd_attrib)
@@ -3090,7 +3090,8 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
         'directionality'     => array('default_on' => 1, 'grouping' => 200, 'buttons' => 'ltr,rtl'),
         'emotions'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'emotions'),
         'example'            => array('default_on' => 0, 'grouping' => 210, 'buttons' => 'example'),
-        'fullpage'           => array('default_on' => 1, 'grouping' => 770, 'buttons' => 'fullpage'),   // show page properties and generate complete HTML page code, including headers
+        'fullpage'           => array('default_on' => 0, 'grouping' => 770, 'buttons' => 'fullpage'),   // show page properties and generate complete HTML page code, including headers; do not use as we don't use the generated <head> section anyhow
+        // TODO/IDEA: ^^^^ use 'fullpage' module to have page title, etc. in there, editable n all, but then we need generate that from the beginning then!
         'fullscreen'         => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'fullscreen'),
         'iespell'            => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'iespell'),
         'inlinepopups'       => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
@@ -3136,7 +3137,8 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
         '.selectable_format' => array('default_on' => 1, 'grouping' =>  50, 'buttons' => 'styleselect:4,formatselect:4,fontselect:4,fontsizeselect:4'),
         '.shortcuts'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
         '.superscript'       => array('default_on' => 1, 'grouping' =>  35, 'buttons' => 'sub,sup'),
-        '.table'             => array('default_on' => 1, 'grouping' => 140, 'buttons' => 'tablecontrols'),  // must in a separate group by its own, before the 'table' buttons; if you group them, you'll get extra empty toolbar chunks in the view :-(
+        '.table'             => array('default_on' => 0, 'grouping' => 140, 'buttons' => 'tablecontrols:13'),  // must be in a separate group by its own, before the 'table' buttons; if you group them, you'll get extra empty toolbar chunks in the view :-(
+        // ^^ this is disabled due this being a tinyMCE 2.x backwards compat item clashing with 'table' above: == ["table","|","row_props","cell_props","|","row_before","row_after","delete_row","|","col_before","col_after","delete_col","|","split_cells","merge_cells"]
         '.undo'              => array('default_on' => 1, 'grouping' =>  14, 'buttons' => 'undo,redo'),
         '.visualaid'         => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualaid')
     );
