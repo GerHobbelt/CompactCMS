@@ -3206,7 +3206,7 @@ state == 2: the init() code section
 
 state == 3: extra assistent functions section
 */
-function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true, $js_load_callback = 'jsComplete')
+function generateJS4tinyMCEinit($state, $editarea_tags, $with_MT_FileManager = true, $js_load_callback = 'jsComplete')
 {
 	global $cfg;
 
@@ -3222,15 +3222,15 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 
 		// pick one of these: tiny_mce_ccms.js (which will lazyload all tinyMCE parts recursively through tiny_mce_dev.js) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
 		$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js';
-		if ($with_fancyupload)
+		if ($with_MT_FileManager)
 		{
 			/* File uploader JS */
-			$ls = $cfg['rootdir'] . 'lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,';
+			$ls = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/dummy.js,Source/FileManager.js,';
 			if ($cfg['fancyupload_language'] != 'en')
 			{
 				$ls .= 'Language/Language.en.js,';
 			}
-			$ls .= 'Language/Language.' . $cfg['fancyupload_language'] . '.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
+			$ls .= 'Language/Language.' . $cfg['fancyupload_language'] . '.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
 
 			$rv[] = $ls;
 		}
@@ -3405,25 +3405,32 @@ EOT42;
 				$rv .= "        extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
 			}
 			$rv .= "        spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
-			if ($with_fancyupload)
+			if ($with_MT_FileManager)
 			{
 				$session_id = session_id();
 				$fancyupload_language = $cfg['fancyupload_language'];
 
 				$rv .= <<<EOT42
 
+		/* Here goes the Magic */
 		file_browser_callback: FileManager.TinyMCE(
 			function(type)
 			{
 				return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url: '{$rootdir}lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
+					url: '{$rootdir}lib/includes/js/mootools-filemanager/ccms/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
 					baseURL: '{$rootdir}',
-					assetBasePath: '{$rootdir}lib/includes/js/fancyupload/Assets',
+					assetBasePath: '{$rootdir}lib/includes/js/mootools-filemanager/Assets',
 					language: '$fancyupload_language',
 					selectable: true,
+					destroy: true,
+					upload: true,
+					rename: true,
+					download: true,
+					createFolders: true,
+					hideClose: false,
+					hideOverlay: false,
 					uploadAuthData: {
-						session: 'ccms_userLevel',
-						sid: '$session_id'
+						session: '$session_id'
 					}
 				};
 			}),
@@ -3445,8 +3452,8 @@ EOT42;
 		MCEsettings_{$tag}['theme_advanced_buttons' + tbidx] = tbdef[tbidx - 1];
 	}
 
-	tinyMCE.dom.Event.domLoaded = 42;
-	tinyMCE.domLoaded = 666;
+	if (!tinyMCE.dom.Event.domLoaded) tinyMCE.dom.Event.domLoaded = 42;
+	if (!tinyMCE.domLoaded) tinyMCE.domLoaded = 666;
 
 	tinyMCE.init(MCEsettings_{$tag});
 
