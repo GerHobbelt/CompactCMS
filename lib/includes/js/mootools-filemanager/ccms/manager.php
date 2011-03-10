@@ -46,7 +46,7 @@ if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT',
 // Define default location
 if (!defined('BASE_PATH'))
 {
-	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+	$base = str_replace('\\','/',dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))));
 	define('BASE_PATH', $base);
 }
 
@@ -58,7 +58,7 @@ if (!defined('BASE_PATH'))
 
 //error_reporting(E_ALL | E_STRICT);
 
-/*MARKER*/require_once(BASE_PATH . '/lib/includes/js/mootools-manager/Assets/Connector/FileManager.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/js/mootools-filemanager/Assets/Connector/FileManager.php');
 
 
 define('DEVELOPMENT', 01);   // set to 01 / 1 to enable logging of each incoming event request.
