@@ -3307,7 +3307,8 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $options = null, $with_M
             //Asset.css(__DIR__+'../Assets/Css/FileManager.css');
             //Asset.css(__DIR__+'../Assets/Css/Additions.css');
             //Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
-            $rv[] = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/Assets/js/milkbox/milkbox.js,Assets/js/jsGET.js';
+            $rv[] = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/Assets/js/jsGET.js';
+            $rv[] = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/Assets/js/milkbox/milkbox.js';
 
             $rv[] = $ls;
         }
@@ -3513,7 +3514,7 @@ EOT42;
                         session: '{$session_id}'
                     },
                     propagateData: {
-                        type: type // =='image', ...
+                        editor_req_type: type // =='image', ...
                     }
                 };
             }),

@@ -306,6 +306,26 @@ if (01) // debugging
 }
 
 
+
+// the reason why TinyMCE invoked us (IFF it was TinyMCE!)
+$req_type = getGETparam4IdOrNumber('editor_req_type');
+
+/*
+An alternative to handle the 'type' parameter passed by TinyMCE to the FileManager frontend, is to convert it in the frontend and then set the 'filter' FM option.
+*/
+$filter_expression = null;
+switch ($req_type)
+{
+case 'image':
+	$filter_expression = 'image/';
+	break;
+	
+case 'media':
+	$filter_expression = 'video/';
+	break;
+}
+
+
 $browser = new FileManager(array(
 	'directory' => BASE_PATH . '/media/',                // relative paths: are relative to the URI request script path, i.e. dirname(__FILE__)
 	'thumbnailPath' => $cfg['rootdir'] . '/media/Thumbnails/',
@@ -317,7 +337,7 @@ $browser = new FileManager(array(
 	//'create' => false,
 	//'move' => false,
 	//'download' => false,
-	//'filter' => 'image/',
+	'filter' => $filter_expression,
 	'allowExtChange' => true,                  // allow file name extensions to be changed; the default however is: NO (FALSE)
 	'UploadIsAuthorized_cb' => 'FM_IsAuthorized',
 	'DownloadIsAuthorized_cb' => 'FM_IsAuthorized',
@@ -330,7 +350,7 @@ $browser = new FileManager(array(
 
 
 // log request data:
-FM_vardumper($browser, 'init' . (!empty($_GET['event']) ? '-' . $_GET['event'] : null));
+FM_vardumper($browser, 'init' . getGETparam4IdOrNumber('event'));
 
 
 
