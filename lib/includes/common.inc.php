@@ -3433,7 +3433,7 @@ EOT42;
     editwinmaxheight = dimensions.y - 80;
     dimensions = \$('{$tag}').getSize();
     editwinwidth = dimensions.x;
-    if (console && console.log) console.log('width: ' + editwinwidth + 'px');
+    if (typeof console !== 'undefined' && console.log) console.log('width: ' + editwinwidth + 'px');
 
     // tbdef = layout_the_MCE_toolbars(buttondefs, (editwinwidth < 362 ? editwinwidth : 362));
     // bigger toolbar chunks are bad because you are limiting the shrinking capability of the editor window...
@@ -3467,8 +3467,8 @@ EOT42;
         theme_{$theme}_resizing_min_height: 100,
         theme_{$theme}_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
         theme_{$theme}_resizing_max_height: 0xFFFF,
-        relative_urls: true,
-        convert_urls: false,
+        relative_urls: false,
+        convert_urls: true,
         remove_script_host: true,
         document_base_url: '{$rootdir}',
 
@@ -3555,7 +3555,7 @@ EOT42;
 /* set up the toolbars depending on the editor width */
 function layout_the_MCE_toolbars(buttondefs, editwinwidth)
 {
-    if (console && console.log) console.log('layout_the_MCE_toolbars: ' + editwinwidth + 'px');
+    if (typeof console !== 'undefined' && console.log) console.log('layout_the_MCE_toolbars: ' + editwinwidth + 'px');
 
     var i;
     var tbcount = buttondefs.length;
