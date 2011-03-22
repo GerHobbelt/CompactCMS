@@ -3398,6 +3398,16 @@ tinyMCE.activeEditor.setContent(tinyMCE.activeEditor.getContent() + 'Some new co
 // Restore the selection bookmark
 tinyMCE.activeEditor.selection.moveToBookmark(bm);</example>
           </method>
+          <method name="moveAfterNode" summary="Moves the selection to be collapsed immediately after the node.">
+            <description>Moves the selection to be collapsed immediately after the node.
+</description>
+            <param name="node" type="Element">
+              <description>HTML DOM element to position caret after.</description>
+            </param>
+            <return type="Element">
+              <description>the same element as the one that got passed in.</description>
+            </return>
+          </method>
           <method name="select" summary="Selects the specified element.">
             <description>Selects the specified element. This will place the start and end of the selection range around the element.
 </description>
