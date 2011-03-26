@@ -47,7 +47,7 @@ if(empty($_GET['do']))
 	{
 		$params = session_get_cookie_params();
 		setcookie(session_name(), '', time() - 42000,
-			(!empty($params["ccms_userID"]) ? $params["ccms_userID"] : ''), 
+			(!empty($params["path"]) ? $params["path"] : ''), 
 			(!empty($params["domain"]) ? $params["domain"] : ''),
 			(!empty($params["secure"]) ? $params["secure"] : ''),
 			(!empty($params["httponly"]) ? $params["httponly"] : '')
