@@ -102,7 +102,10 @@ check_session_sidpatch_and_start();
 
 
 // Check first whether installation directory exists
-if(is_dir('./_install/') && is_file('./_install/index.php') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+$cfg['install_dir_exists'] = (is_dir(BASE_PATH . '/_install/') && is_file(BASE_PATH . '/_install/index.php'));
+$cfg['install_dir_override'] = ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] || is_file(BASE_PATH . '/_install/install_check_override.txt'));
+
+if ($cfg['install_dir_exists'] && !$cfg['install_dir_override'])
 {
 	header('Location: ' . makeAbsoluteURI('./_install/index.php'));
 	exit();
