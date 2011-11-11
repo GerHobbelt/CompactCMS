@@ -196,7 +196,7 @@ if($do == 'backup' && !empty($btn_backup))
 	 * These files will be picked up by the installer/wizard to perform an
 	 * automated upgrade when the admin so desires.
 	 *
-	 * Note the comment in /_install/inde.php: the SQL DUMP must be the
+	 * Note the comment in /_install/index.php: the SQL DUMP must be the
 	 * VERY LAST FILE WRITTEN during the backup action (as we depend on
 	 * its 'last modified' timestamp to be the latest thing in the
 	 * content/media zone!
