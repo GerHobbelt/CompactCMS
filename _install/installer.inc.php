@@ -607,7 +607,7 @@ if($nextstep == 'final' && checkAuth())
 
 		if ($err == 0 && $do_upgrade)
 		{
-			$err = perform_upgrade(&$db, &$log, &$errors, &$sqldump);
+			$err = perform_upgrade($db, $log, $errors, $sqldump);
 		}
 		
 		if ($err == 0)
