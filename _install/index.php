@@ -38,11 +38,38 @@ if (!defined('BASE_PATH'))
 	define('BASE_PATH', $base);
 }
 
+$dbg_msgs = array();
+if (!function_exists('string_var_dump')) {
+	function string_var_dump($variable) {
+		if (version_compare(PHP_VERSION, '4.3.0', '>=')) {
+			return print_r($variable, true);
+		}
+		ob_start();
+		var_dump($variable);
+		$dumpedvariable = ob_get_contents();
+		ob_end_clean();
+		return $dumpedvariable;
+	}
+}
+
 if(empty($_GET['do'])) 
 { 
+	$dbg_msgs[] = "-- session ID [do] = " . session_id();
+	foreach ($_COOKIE as $name => $value) 
+	{
+		$name = htmlspecialchars($name);
+		$value = htmlspecialchars($value);
+		$dbg_msgs[] = "--- cookie = " . $name . " => " . $value;
+	}
+	unset($_COOKIE[session_name()]);
+	$dbg_msgs[] = string_var_dump(headers_list());
+	$dbg_msgs[] = "*** destroy session";
+	
 	// destroy the session if it existed before: start a new session
 	session_start();
+	$dbg_msgs[] = "-- session ID = " . session_id();
 	session_unset();
+	$dbg_msgs[] = "-- session ID = " . session_id();
 	if (ini_get("session.use_cookies")) 
 	{
 		$params = session_get_cookie_params();
@@ -53,11 +80,35 @@ if(empty($_GET['do']))
 			(!empty($params["httponly"]) ? $params["httponly"] : '')
 		);
 	}
+	$dbg_msgs[] = "-- session ID = " . session_id();
 	session_destroy();
+	$dbg_msgs[] = "-- session ID = " . session_id();
 	session_regenerate_id();
+	$dbg_msgs[] = "-- session ID = " . session_id();
+	
+	foreach ($_COOKIE as $name => $value) 
+	{
+		$name = htmlspecialchars($name);
+		$value = htmlspecialchars($value);
+		$dbg_msgs[] = "--- cookie = " . $name . " => " . $value;
+	}
 }
 // Start the current session
-session_start();
+$dbg_msgs[] = "-- session ID = " . session_id();
+$dbg_msgs[] = string_var_dump(headers_list());
+$dbg_msgs[] = "*** session start";
+$rv = session_start();
+$dbg_msgs[] = "-- session ID = " . session_id();
+$dbg_msgs[] = string_var_dump(headers_list());
+$dbg_msgs[] = "*** session started: " . $rv;
+
+    if (is_array($_SESSION) && empty($_SESSION['id'])
+        && empty($_SESSION['authcheck']))
+    {
+        //session_start();
+    }
+
+
 
 // Load installer-specific configuration bits
 /*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
@@ -85,13 +136,15 @@ if (!isset($cfg))
 $do	= getGETparam4IdOrNumber('do');
 
 // If no step, set session hash
-if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
+if (empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
 {
+	$dbg_msgs[] = "set auth safety";
+	
 	// Setting safety variables
 	SetAuthSafety();
 } 
 
-$do_ftp_chmod = ($do == 'ftp' && CheckAuth());
+$do_ftp_chmod = ($do == 'ftp' && checkAuth());
 
 
 
@@ -324,11 +377,24 @@ session_write_close();
 	</head>
 <body>
 
+<?php
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+?>
 <pre>
 <?php
-var_dump(headers_list());
+		var_dump(headers_list());
+		
+		foreach ($dbg_msgs as $index => $line)
+		{
+			printf("%s\n", $line);
+		}
 ?>
 </pre>
+<?php
+	}
+	//exit();
+?>
 
 <noscript class="noscript" id="noscript">
 	<h1>Your browser does not support JavaScript</h1>

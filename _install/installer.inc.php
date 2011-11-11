@@ -71,7 +71,7 @@ $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variab
  **/
 
 // Step two
-if($nextstep == '2' && CheckAuth())
+if($nextstep == '2' && checkAuth())
 {
 	//
 	// Installation actions
@@ -201,7 +201,7 @@ if ($nextstep == 'mkNewAuthCode')
 }
 
 // Step three
-if($nextstep == '3' && CheckAuth()) 
+if($nextstep == '3' && checkAuth()) 
 {
 	//
 	// Installation actions
@@ -251,7 +251,7 @@ if($nextstep == '3' && CheckAuth())
 } // Close step three
 
 // Step four
-if($nextstep == '4' && CheckAuth())
+if($nextstep == '4' && checkAuth())
 {
 	//
 	// Installation actions
@@ -433,7 +433,7 @@ if($nextstep == '4' && CheckAuth())
  **/
 
 // Final step
-if($nextstep == 'final' && CheckAuth())
+if($nextstep == 'final' && checkAuth())
 {
 	//
 	// Installation actions
@@ -553,7 +553,8 @@ if($nextstep == 'final' && CheckAuth())
 		$sql = preg_replace('/compactcms/', $_SESSION['variables']['db_name'], $sql);
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
 		$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
-		$sql = str_replace("\r\n", "\n", $sql);
+		// trim trailing whitespace for SQL command lines, so that the explode() below will work without a hitch:
+		$sql = preg_replace('/;[ \t\r]+\n/', ";\n", $sql);
 
 		// Execute per sql piece: 
 		$currently_in_sqltextdata = false;

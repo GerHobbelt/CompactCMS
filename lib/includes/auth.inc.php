@@ -58,7 +58,7 @@ $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
 // If session already exists
-if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
+if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && checkAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
 	$qry = '';
 	if (!empty($status) || !empty($status_message))
@@ -87,7 +87,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	/*
 	 * This code does NOT require that the submitted data (user+pass) originates from the
-	 * web form below and was entered in the same session (as we don't have the CheckAuth()
+	 * web form below and was entered in the same session (as we don't have the checkAuth()
 	 * condition checked in the if(...) above).
 	 *
 	 * This is intentional: users may store the login credentials in any form and still log
