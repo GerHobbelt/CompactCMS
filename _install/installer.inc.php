@@ -85,10 +85,12 @@ if($nextstep == '2' && checkAuth())
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$rootdir,$sitename,$language);
 
-	echo 'WRITE_CFG_FILES_TO_DISK: ' . (1*WRITE_CFG_FILES_TO_DISK) . '<br>';
-	echo 'EXECUTE_QUERIES: ' . (1*EXECUTE_QUERIES) . '<br>';
-	echo 'DUMP_QUERIES_N_STUFF_IN_DEVMODE: ' . (1*DUMP_QUERIES_N_STUFF_IN_DEVMODE) . '<br>';
-
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		echo 'WRITE_CFG_FILES_TO_DISK: ' . (1*WRITE_CFG_FILES_TO_DISK) . '<br>';
+		echo 'EXECUTE_QUERIES: ' . (1*EXECUTE_QUERIES) . '<br>';
+		echo 'DUMP_QUERIES_N_STUFF_IN_DEVMODE: ' . (1*DUMP_QUERIES_N_STUFF_IN_DEVMODE) . '<br>';
+	}
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
 		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password
