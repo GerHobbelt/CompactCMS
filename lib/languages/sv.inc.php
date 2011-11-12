@@ -367,6 +367,7 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "Din kommentar har avvi
 	  
 $ccms['lang']['album']['assigned_page']         = "Assigned to page";
 $ccms['lang']['backend']['floatingtitle']       = "Other";
+$ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
 $ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
 $ccms['lang']['backend']['reload_admin_screen'] = "Refresh the admininistration screen";
 $ccms['lang']['backend']['rename_file']         = "Rename file";

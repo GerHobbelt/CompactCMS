@@ -375,6 +375,7 @@ $ccms['lang']['guestbook']['configuration']     = "Configuration";
          ----------------------------------------------------------
 	
 	$ccms['lang']['album']['nodir']                 
+	$ccms['lang']['backend']['file_renamed_from_to'] 
 	$ccms['lang']['backend']['fileexists']          
 	$ccms['lang']['backend']['startedittitle']      
 	$ccms['lang']['backend']['updatelist']          

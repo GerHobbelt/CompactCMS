@@ -382,6 +382,7 @@ $ccms['lang']['guestbook']['configuration'] = "Configuratie";
       */
 	  
 $ccms['lang']['album']['assigned_page']         = "Assigned to page";
+$ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
 $ccms['lang']['backend']['rename_file']         = "Rename file";
 $ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
 $ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
