@@ -134,7 +134,7 @@ blueprint CSS calls this 'last':
 	margin-right: 0;
 }
 */
-#createnew, #menudepth, #load_notice
+#createnew, #menudepth, #load_notice, #install_dir_notice
 {
 	/* margin-top: 10px; */
 }
@@ -147,6 +147,19 @@ blueprint CSS calls this 'last':
 override the green colors of the (#desktop fieldset)
 */
 #desktop #load_notice fieldset
+{
+	border-color: #f00;
+	background-color: #fdd;
+}
+
+#install_dir_notice #notice_wrapper
+{
+	padding-top: 10px;
+}
+/*
+override the green colors of the (#desktop fieldset)
+*/
+#desktop #install_dir_notice fieldset
 {
 	border-color: #f00;
 	background-color: #fdd;
@@ -689,6 +702,15 @@ div.tip-text {
 	border-radius: 10px;
 	padding:10px;
 }
+#install-dir-warning-wrapper
+{
+	/* width:750px;  -- use the blueprint CSS containers! */
+	background-color: #FDD;
+	border: 10px solid #F00;
+	border-radius: 10px;
+	padding: 10px;
+	margin-bottom: 10px;
+}
 #install-wrapper
 {
 	/* width:750px;  -- use the blueprint CSS containers! */
@@ -706,7 +728,7 @@ div.tip-text {
 	display: block;
 	margin-top:10px;
 }
-#login-wrapper h2, #install-wrapper h2
+#login-wrapper h2, #install-dir-warning-wrapper h2, #install-wrapper h2
 {
 	font-size:1.2em;
 	border-bottom:solid 1px #90D244;

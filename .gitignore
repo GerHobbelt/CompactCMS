@@ -12,4 +12,5 @@ lib/includes/mootools-more/Specs/*
 media/*
 content/doc-bits/*
 
+_install/install_check_override.txt
 

@@ -60,7 +60,7 @@ if (!defined('BASE_PATH'))
 
 
 /* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
 {
 	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
 	die_with_forged_failure_msg(__FILE__, __LINE__); // $ccms['lang']['auth']['featnotallowed']
@@ -253,6 +253,23 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</fieldset>
 	</div>
 
+	<?php
+	// yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):
+	if ($cfg['install_dir_exists'])
+	{
+	?>
+	<div id="install_dir_notice" class="span-25 last clear">
+	<fieldset>
+		<legend><a rel="notice_wrapper"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['warning']; ?></a></legend>
+		<div id="notice_wrapper">
+			<p class="center-text"><?php echo $ccms['lang']['backend']['install_dir_exists']; ?></p>
+		</div>
+	</fieldset>
+	</div>
+	<?php
+	}
+	?>
+	
 	<div id="createnew" class="span-9 clear">
 	<?php
 

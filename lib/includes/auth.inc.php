@@ -58,7 +58,7 @@ $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
 // If session already exists
-if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
+if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && checkAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
 	$qry = '';
 	if (!empty($status) || !empty($status_message))
@@ -70,7 +70,7 @@ if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && Che
 }
 
 // Check for ./install directory
-if(is_dir(BASE_PATH . '_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+if ($cfg['install_dir_exists'] && !$cfg['install_dir_override'])
 {
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
@@ -87,7 +87,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	/*
 	 * This code does NOT require that the submitted data (user+pass) originates from the
-	 * web form below and was entered in the same session (as we don't have the CheckAuth()
+	 * web form below and was entered in the same session (as we don't have the checkAuth()
 	 * condition checked in the if(...) above).
 	 *
 	 * This is intentional: users may store the login credentials in any form and still log
@@ -217,6 +217,22 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 		?>
 	</div>
 </div>
+
+<?php
+// yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):
+printf("<p>install_dir = %s, base path = %s, isdir = %d, isfile = %d", 1 * $cfg['install_dir_exists'], BASE_PATH, is_dir(BASE_PATH . '/_install/'), is_file(BASE_PATH . '/_install/index.php'));
+if ($cfg['install_dir_exists'])
+{
+?>
+<div id="install-dir-warning-wrapper" class="container-18">
+	<div class="center-text warning">
+		<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['warning']; ?></h2>
+		<p class="center-text"><?php echo $ccms['lang']['backend']['install_dir_exists']; ?></p>
+	</div>
+</div>
+<?php
+}
+?>
 
 <div id="login-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">

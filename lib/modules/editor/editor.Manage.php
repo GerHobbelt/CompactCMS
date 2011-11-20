@@ -62,7 +62,7 @@ class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -
 
 
 /* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
 {
 	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
 	die_with_forged_failure_msg(__FILE__, __LINE__); // $ccms['lang']['auth']['featnotallowed']

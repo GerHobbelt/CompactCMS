@@ -40,6 +40,8 @@ if (!defined('BASE_PATH'))
 
 if(empty($_GET['do'])) 
 { 
+	unset($_COOKIE[session_name()]);
+	
 	// destroy the session if it existed before: start a new session
 	session_start();
 	session_unset();
@@ -57,7 +59,12 @@ if(empty($_GET['do']))
 	session_regenerate_id();
 }
 // Start the current session
-session_start();
+$rv = session_start();
+if ($rv != 1)
+{
+	echo "<p>Fatal error: failed to init session.</p>";
+	exit();
+}
 
 // Load installer-specific configuration bits
 /*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
@@ -85,13 +92,13 @@ if (!isset($cfg))
 $do	= getGETparam4IdOrNumber('do');
 
 // If no step, set session hash
-if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
+if (empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
 {
 	// Setting safety variables
 	SetAuthSafety();
 } 
 
-$do_ftp_chmod = ($do == 'ftp' && CheckAuth());
+$do_ftp_chmod = ($do == 'ftp' && checkAuth());
 
 
 
@@ -324,11 +331,18 @@ session_write_close();
 	</head>
 <body>
 
+<?php
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+?>
 <pre>
 <?php
-var_dump(headers_list());
+		var_dump(headers_list());
 ?>
 </pre>
+<?php
+	}
+?>
 
 <noscript class="noscript" id="noscript">
 	<h1>Your browser does not support JavaScript</h1>

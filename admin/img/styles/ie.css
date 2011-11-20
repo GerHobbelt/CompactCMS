@@ -94,6 +94,12 @@ legend     /* IE8 */
 	background-color: #fdd;
 }
 
+#desktop #install_dir_notice fieldset
+{
+	background-image: url('../admin_panel_bg_red.gif');
+	background-color: #fdd;
+}
+
 
 /*
 Only IE7 shows a horizontal scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.

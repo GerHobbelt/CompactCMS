@@ -2838,6 +2838,8 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $
  */
 function checkAuth()
 {
+	global $cfg;
+	
     /*
      * The remaining MD5 call in here is NOT for security but to keep session storage tiny: the collected data
      * is packed in a fixed, limited number of characters. Meanwhile, MD5 is still quite good enough to hash this
@@ -2851,6 +2853,29 @@ function checkAuth()
     {
         return true;
     }
+	
+	if (0 && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		foreach ($_SESSION as $name => $value) 
+		{
+			$name = htmlspecialchars($name);
+			$value = htmlspecialchars($value);
+			printf("<p>session[%s] = [%s]</p>", $name, $value);
+		}
+		foreach ($_COOKIE as $name => $value) 
+		{
+			$name = htmlspecialchars($name);
+			$value = htmlspecialchars($value);
+			printf("<p>cookie[%s] = [%s]</p>", $name, $value);
+		}
+		printf("<p>host::address::agent/host_md5 = [%s]/[%s], session = %d, canarycage = [%s], sessionID = [%s], authcheck = [%s]</p>",
+				$_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] . '::' . $_SERVER['HTTP_USER_AGENT'],
+				$currenthost,
+				is_array($_SESSION),
+				$canarycage, 
+				((is_array($_SESSION) && !empty($_SESSION['id'])) ? $_SESSION['id'] : '---'),
+				((is_array($_SESSION) && !empty($_SESSION['authcheck'])) ? $_SESSION['authcheck'] : '---'));
+	}
     return false;
 }
 
@@ -2957,7 +2982,7 @@ function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $
     {
         $filepath = substr($filepath, $pos + strlen(BASE_PATH) + 1);
     }
-    if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+    if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
     {
         $msg = $ccms['lang']['system']['error_session_expired'] . ' <sub>(' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')</sub>';
     }
