@@ -62,10 +62,10 @@ class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -
 
 
 /* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
 {
 	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']);
+	die_with_forged_failure_msg(__FILE__, __LINE__); // $ccms['lang']['auth']['featnotallowed']
 }
 
 
@@ -176,6 +176,25 @@ if ($do_update_or_livefilter && checkAuth())
 	}
 
 
+	/*
+	Required to keep the HTML output compliant: a 'id' attribute must be globally unique in the page!
+	*/
+	function mk_unique_page_id($page_id)
+	{
+		static $count;
+
+		if (empty($count))
+		{
+			$count = 1;
+		}
+		else
+		{
+			$count++;
+		}
+		return 'pageitem' . $count . '-' . rm0lead($page_id);
+	}
+
+
 	// Open recordset for sites' pages
 	$rows = $db->SelectObjects($cfg['db_prefix'].'pages', $page_selectquery_restriction, null, cvt_ordercode2list($dynlist_sortorder));
 	if ($rows === false) $db->Kill();
@@ -187,9 +206,9 @@ if ($do_update_or_livefilter && checkAuth())
 		<table id="table_manage" cellspacing="0" cellpadding="0">
 			<tr>
 				<th class="span-1a">&#160;</th>
-				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
-				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help2" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-3a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_name', $ccms['lang']['forms']['filename']); echo $ccms['lang']['forms']['filename']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['filename'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-4a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_title', $ccms['lang']['forms']['pagetitle']);  echo $ccms['lang']['forms']['pagetitle']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['pagetitle'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
+				<th class="span-6a nowrap"><?php gen_span4pagelist_filterheader('filter_pages_subheader', $ccms['lang']['forms']['subheader']); echo $ccms['lang']['forms']['subheader']; ?><span class="ss_sprite_16 ss_help" title="<?php echo $ccms['lang']['hints']['subheader'] . ' ' . $ccms['lang']['hints']['filter']; ?>">&#160;</span></th>
 				<th class="span-2a nowrap center-text">
 					<?php
 					if($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']))
@@ -235,16 +254,10 @@ if ($do_update_or_livefilter && checkAuth())
 			if((empty($row->user_ids) && $perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel'])) || in_array($_SESSION['ccms_userID'], $owner) || $perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 			{
 				// Determine file specific variables
-				if($row->module == 'editor')
-				{
-					$module = './includes/process.inc.php';
-				}
-				else
-				{
-					$module = '../lib/modules/'.$row->module.'/'.$row->module.'.Manage.php';
-				}
+				$module = '../lib/modules/'.$row->module.'/'.$row->module.'.Manage.php';
 
 				$editing_mode = $perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']);
+				$renaming_mode = false;
 
 				// Define $isEven for alternate table coloring
 				if($i % 2 != 1)
@@ -272,14 +285,27 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				<td class="leftpad-2">
 				<?php
-				if($row->urlpage == 'home' || (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel'])))
+				if (checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE))
 				{
 				?>
-					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed']; ?>">&#160;</span>
+					<span class="ss_sprite_16 ss_bullet_red" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . ucfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+				<?php
+				}
+				else if (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+				{
+				?>
+					<span class="ss_sprite_16 ss_bullet_orange" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . ucfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
+				<?php
+				}
+				else if (!$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+				{
+				?>
+					<span class="ss_sprite_16 ss_bullet_yellow" title="<?php echo $ccms['lang']['auth']['featnotallowed'] . ' : ' . ucfirst($ccms['lang']['backend']['delete']); ?>">&#160;</span>
 				<?php
 				}
 				else
 				{
+					$renaming_mode = true;
 				?>
 					<input type="checkbox" id="page_id_<?php echo $i;?>" name="page_id[]" value="<?php echo $_SESSION['rc1'].$_SESSION['rc2'].'-'.rm0lead($row->page_id); ?>" />
 				<?php
@@ -287,13 +313,21 @@ if ($do_update_or_livefilter && checkAuth())
 				?>
 				</td>
 				<td>
-					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage,0,25); ?></abbr></em></label>
+					<?php
+					if ($renaming_mode)
+					{
+						?>
+						<span class="ss_sprite_16 ss_pencil_go liverename" title="<?php echo $ccms['lang']['backend']['rename_file']; ?>" rel="<?php echo $row->urlpage; ?>" id="<?php echo mk_unique_page_id($row->page_id); ?>" >&#160;</span>
+						<?php
+					}
+					?>
+					<label for="page_id_<?php echo $i;?>"><em><abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage, 0, 25); ?></abbr></em></label>
 				</td>
 				<td>
-					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
+					<span id="<?php echo mk_unique_page_id($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="pagetitle"><?php echo $row->pagetitle; ?></span>
 				</td>
 				<td>
-					<span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="subheader"><?php echo $row->subheader; ?></span>
+					<span id="<?php echo mk_unique_page_id($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="subheader"><?php echo $row->subheader; ?></span>
 				</td>
 				<td class="center-text">
 					<?php
@@ -373,15 +407,16 @@ if ($do_update_or_livefilter && checkAuth())
 
 				?>
 					<td class="last right-text nowrap">
-						<a id="<?php echo $row->urlpage; ?>"
-							href="<?php echo $module; ?>?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=edit"
-							rel="Edit <?php echo $row->urlpage.'.html'; ?>"
-							class="tabs sprite edit"
-						><?php echo $ccms['lang']['backend']['editpage']; ?></a>
-						|
-						<a href="../<?php echo ($row->urlpage != 'home' ? $row->urlpage . '.html' : '') . '?preview=' . $preview_checkcode; ?>"
-							class="external"
-						><?php echo $ccms['lang']['backend']['previewpage']; ?></a>
+						<?php
+							/* the ID attribute is used to uniquify the MUI editor window, so that multiple pages can be edited simultaneously! */
+							echo '<a href="' . $module . '?page_id=' . rm0lead($row->page_id) . '&amp;action=edit" ' .
+								  'rel="Edit ' . $row->urlpage . '.html" ' .
+								  'class="tabs sprite edit" ' .
+								  'id="E-' . $row->urlpage . '-' . rm0lead($row->page_id) . '">' . $ccms['lang']['backend']['editpage'] . '</a> ' .
+								  '| ' .
+								  '<a href="../' . checkSpecialPageName($row->urlpage, SPG_GIVE_PAGE_URL) . '?preview=' . $preview_checkcode . '" ' .
+								  'class="external">' . $ccms['lang']['backend']['previewpage'] . '</a>';
+						?>
 					</td>
 				<?php
 				}
@@ -429,18 +464,22 @@ if ($do_update_or_livefilter && checkAuth())
 					$description = ucfirst($description);
 				}
 				?>
-				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo rm0lead($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
+				<td colspan="5"><strong><?php echo $ccms['lang']['forms']['description']; ?></strong>: <span id="<?php echo mk_unique_page_id($row->page_id); ?>" class="<?php echo ($editing_mode ? 'sprite-hover liveedit' : ''); ?>" rel="description"><?php echo $description; ?></span></td>
 				<td colspan="2" class="right-text" style="padding-right:5px;">
 					<?php
-					if($row->module == 'editor' && !empty($row->toplevel) && !empty($row->menu_id))
+					if($row->module == 'editor')
 					{
-					?>
-						<em><?php echo $ccms['lang']['backend']['inmenu']; ?>:</em>
-							<?php echo '<strong>' . strtolower($ccms['lang']['menu'][$row->menu_id]) . '</strong> | <em>' . $ccms['lang']['backend']['item'] . ' </em> <strong>' . $row->toplevel . ':' . $row->sublevel . '</strong>';
-						?>
-					<?php
+						if(!empty($row->toplevel) && !empty($row->menu_id))
+						{
+							echo '<em>' . $ccms['lang']['backend']['inmenu'] . ':</em> ';
+							echo '<strong>' . strtolower($ccms['lang']['menu'][$row->menu_id]) . '</strong> | <em>' . $ccms['lang']['backend']['item'] . ' </em> <strong>' . $row->toplevel . ':' . $row->sublevel . '</strong>';
+						}
+						else
+						{
+							echo '<em>'.$ccms['lang']['backend']['notinmenu'].'</em>';
+						}
 					}
-					elseif($row->module != 'editor')
+					else //if($row->module != 'editor')
 					{
 						// TODO: add a module/plugin hook to provide the proper icon/formatting for the module name:
 						$modID = '<span class="ss_sprite_16 ss_information">&#160;</span><strong>' . ucfirst($row->module) . '</strong></span>';
@@ -464,10 +503,6 @@ if ($do_update_or_livefilter && checkAuth())
 							break;
 						}
 						echo $modID . ' '.strtolower($ccms['lang']['forms']['module']);
-					}
-					else
-					{
-						echo '<em>'.$ccms['lang']['backend']['notinmenu'].'</em>';
 					}
 					?>
 				</td>
@@ -604,10 +639,10 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 					</td>
 					<td class="center-text" id="td-islink-<?php echo $pageIdAsStr; ?>">
 						<?php
-						if($row->urlpage == 'home')
+						if(($cv = checkSpecialPageName($row->urlpage, SPG_MUST_BE_LINKED_IN_MENU)) !== null)
 						{
 						?>
-							<input type="checkbox" checked="checked" disabled="disabled" />
+							<input type="checkbox" <?php echo ($cv ? 'checked="checked"' : ''); ?> disabled="disabled" />
 						<?php
 						}
 						else
@@ -619,7 +654,7 @@ if($do_action == 'renderlist' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAut
 						?>
 					</td>
 					<td class="last">
-						<?php echo $row->urlpage; ?><em>(.html)</em>
+						<abbr title="<?php echo $row->urlpage; ?>.html"><?php echo substr($row->urlpage, 0, 25); ?></abbr>
 						<input type="hidden" name="page_id[<?php echo $pageIdAsStr; ?>]" value="<?php echo $pageIdAsStr; ?>" id="page_id"/>
 					</td>
 				</tr>
@@ -739,9 +774,8 @@ if($do_action == 'reordermenu' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
  */
 if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 {
-	// Remove all system friendly characters
-	$post_urlpage = getPOSTparam4Filename('urlpage');
-	// $post_urlpage = strtolower(str_replace(' ','-',$post_urlpage));   -- superfluous, is already done as part of the filtering inside getPOSTparam4Filename()
+	// Remove all system friendly characters; map index and home, etc. to their default names so we don't get duplicates for special pages
+	$post_urlpage = checkSpecialPageName(getPOSTparam4Filename('urlpage'), SPG_GIVE_PAGENAME);
 
 	// Check for non-empty module variable
 	$post_module = strtolower(getPOSTparam4Filename('module', 'editor'));
@@ -783,8 +817,14 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		{ $errors[] = $ccms['lang']['system']['error_subtitle_2']; }
 	if (strlen($description) > 250)
 		{ $errors[] = $ccms['lang']['system']['error_description_2']; }
-	if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
-		{ $errors[] = $ccms['lang']['system']['error_reserved']; }
+
+	if (0) // it's okay to try to create special pages, particularly when you're trying to recover manually from a completely b0rked install/upgrade!
+	{
+		if (in_array($post_urlpage, array('403', '404', 'sitemap', 'home', 'index')))
+		{
+			$errors[] = $ccms['lang']['system']['error_reserved'];
+		}
+	}
 
 	$file_freshly_created = false;
 
@@ -900,6 +940,8 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	exit();
 }
 
+
+
 /**
  *
  * Process the request for page deletion
@@ -909,56 +951,63 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 {
 	if(!empty($_POST['page_id']))
 	{
-		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['statusdelete'].'</p>';
-
-		// Loop through all submitted page ids
-		foreach ($_POST['page_id'] as $index)
+		if($perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 		{
-			$value = explode('-', $index);
-			$page_id = filterParam4Number($value[1]);
-			if($page_id != 0 && $value[0] == $_SESSION['rc1'] . $_SESSION['rc2'])   // [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
+			echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['statusdelete'].'</p>';
+
+			// Loop through all submitted page ids
+			foreach ($_POST['page_id'] as $index)
 			{
-				// Select file name and module with given page_id
-				$pagerow = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)), array('urlpage', 'module'));
-				if (!$pagerow) $db->Kill();
-				$correct_filename = $pagerow['urlpage'];
-				$module = $pagerow['module'];
-
-				// Delete details from the database
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['page_id'] = MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER);
-				$result = $db->DeleteRows($cfg['db_prefix'].'pages', $values);
-
-				// Delete linked rows from module tables
-				if($module != 'editor')
+				$value = explode('-', $index, 2);
+				$page_id = filterParam4Number($value[1]);
+				if($page_id != 0 && $value[0] == $_SESSION['rc1'] . $_SESSION['rc2'])   // [i_a] complete validation check: test both rc1 and rc2 in the explode+if()
 				{
-					$filter = array(); // [i_a] make sure $filter is an empty array to start with here
-					$filter['pageID'] = MySQL::SQLValue($correct_filename,MySQL::SQLVALUE_TEXT);
-					$delmod = $db->DeleteRows($cfg['db_prefix'].'mod'.$module, $filter);
-					$delcfg = $db->DeleteRows($cfg['db_prefix'].'cfg'.$module, $filter);
-				}
+					// Select file name and module with given page_id
+					$pagerow = $db->SelectSingleRowArray($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)), array('urlpage', 'module'));
+					if (!$pagerow) $db->Kill();
+					$correct_filename = $pagerow['urlpage'];
+					$module = $pagerow['module'];
 
-				if ($result)
-				{
-					// Delete the actual file
-					if(@unlink('../../content/'.$correct_filename.'.php'))
+					// Delete details from the database
+					$values = array(); // [i_a] make sure $values is an empty array to start with here
+					$values['page_id'] = MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER);
+					$result = $db->DeleteRows($cfg['db_prefix'].'pages', $values);
+
+					// Delete linked rows from module tables
+					if($module != 'editor')
 					{
-						echo '<p>- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'</p>';
+						$filter = array(); // [i_a] make sure $filter is an empty array to start with here
+						$filter['pageID'] = MySQL::SQLValue($correct_filename, MySQL::SQLVALUE_TEXT);
+						$delmod = $db->DeleteRows($cfg['db_prefix'].'mod'.$module, $filter);
+						$delcfg = $db->DeleteRows($cfg['db_prefix'].'cfg'.$module, $filter);
+					}
+
+					if ($result)
+					{
+						// Delete the actual file
+						if(@unlink('../../content/'.$correct_filename.'.php'))
+						{
+							echo '<p>- '.ucfirst($correct_filename).' '.$ccms['lang']['backend']['statusremoved'].'</p>';
+						}
+						else
+						{
+							die($ccms['lang']['system']['error_delete']);
+						}
 					}
 					else
 					{
-						die($ccms['lang']['system']['error_delete']);
+						die($db->Error($ccms['lang']['system']['error_general']));
 					}
 				}
 				else
 				{
-					die($db->Error($ccms['lang']['system']['error_general']));
+					die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 				}
 			}
-			else
-			{
-				die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
-			}
+		}
+		else
+		{
+			die($ccms['lang']['auth']['featnotallowed']);
 		}
 	}
 	else
@@ -967,6 +1016,9 @@ if($target_form == 'delete' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	}
 	exit();
 }
+
+
+
 
 /**
  *
@@ -1026,7 +1078,9 @@ if($target_form == 'menuorder' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkA
 	exit();
 }
 
- /**
+
+
+/**
  *
  * Set actual hyperlink behind menu item to true/false
  *
@@ -1063,6 +1117,9 @@ if($do_action == 'islink' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth()
 	}
 	exit();
 }
+
+
+
 
 /**
  *
@@ -1141,19 +1198,28 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		}
 
 		// Continue with content update
-		$page_id = getPOSTparam4Number('id');
+		$page_idcode = explode('-', getPOSTparam4IdOrNumber('id'), 2);
+		$page_id = filterParam4Number(count($page_idcode) == 2 ? $page_idcode[1] : 0);
+
 		$dest    = getGETparam4IdOrNumber('part');
 
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
-
-		if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+		if ($page_id > 0 && !empty($dest))
 		{
-			$db->Kill();
+			$values = array(); // [i_a] make sure $values is an empty array to start with here
+			$values[$dest] = MySQL::SQLValue($content,MySQL::SQLVALUE_TEXT);
+
+			if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+			{
+				$db->Kill();
+			}
+			else
+			{
+				echo $content;
+			}
 		}
 		else
 		{
-			echo $content;
+			die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ', ' . getGETparam4IdOrNumber('id') . ')' );
 		}
 	}
 	else
@@ -1163,517 +1229,82 @@ if($do_action == 'liveedit' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 	exit();
 }
 
+
+
+
+
+
+
+
 /**
  *
- * Save the edited template and check for authority
+ * Change the page/file name inline.
+ *
+ * To make it a proper transaction, first try to change the filename, and only if that succeeds edit the database record.
  *
  */
-if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
+if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
 {
-	FbX::SetFeedbackLocation('./modules/template-editor/backend.php');
-	try
+	$page_idcode = explode('-', getPOSTparam4IdOrNumber('id'), 2);
+	$page_id = filterParam4Number(count($page_idcode) == 2 ? $page_idcode[1] : 0);
+
+	if ($page_id > 0)
 	{
-		// Only if current user has the rights
-		if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))
+		$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)));
+		if (!$row) $db->Kill();
+
+		$owner = explode('||', strval($row->user_ids));
+		$oldname = $row->urlpage;
+
+		if (checkSpecialPageName($row->urlpage, SPG_IS_NONREMOVABLE)
+			|| (in_array($row->urlpage, $cfg['restrict']) && !in_array($_SESSION['ccms_userID'], $owner) && !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
+			|| !$perm->is_level_okay('managePages', $_SESSION['ccms_userLevel']))
 		{
-			$filenoext  = getGETparam4FullFilePath('template');
-			$filename   = BASE_PATH . '/lib/templates/' . $filenoext;
-
-			$content    = getPOSTparam4RAWCONTENT('content'); // RAW CONTENT: the template may contain ANYTHING.
-
-			if (is_writable_ex($filename))
-			{
-				if (!$handle = fopen($filename, 'w'))  throw new FbX($ccms['lang']['system']['error_openfile'].' ('.$filename.').');
-				if (fwrite($handle, $content) === FALSE)
-				{
-					fclose($handle);
-					throw new FbX($ccms['lang']['system']['error_write'].' ('.$filename.').');
-				}
-				// Do on success
-				fclose($handle);
-				header('Location: ' . makeAbsoluteURI('./modules/template-editor/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved']).'&template='.$filenoext));
-				exit();
-			}
-			else
-			{
-				throw new FbX($ccms['lang']['system']['error_chmod']);
-			}
+			die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ); // feature not allowed, really...
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed']);
-		}
-	}
-	catch (CcmsAjaxFbException $e)
-	{
-		$e->croak();
-	}
-}
-
-/**
- *
- * Create a new user as posted by an authorized user
- *
- */
-if($do_action == 'add-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
-{
-	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
-	try
-	{
-		// Only if current user has the rights
-		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']))
-		{
-			//$i=count(array_filter($_POST));
-			//if($i <= 6) error
-
-			if (empty($_POST['userPass']))
+			$newname = getPOSTparam4Filename('newname');
+			if(empty($newname) || strlen($newname) < 3 || strlen($newname) > 240)
 			{
-				throw new FbX($ccms['lang']['system']['error_tooshort']);
-			}
-			$userName = strtolower(getPOSTparam4IdOrNumber('user'));
-			$userPass = md5($_POST['userPass'].$cfg['authcode']);
-			$userFirst = getPOSTparam4HumanName('userFirstname');
-			$userLast = getPOSTparam4HumanName('userLastname');
-			$userEmail = getPOSTparam4Email('userEmail');
-			$userActive = getPOSTparam4boolean('userActive');
-			$userLevel = getPOSTparam4Number('userLevel');
-			if (empty($userName) || empty($userFirst) || empty($userLast) || empty($userEmail) || !$userLevel)
-			{
-				throw new FbX($ccms['lang']['system']['error_tooshort']);
+				die($ccms['lang']['system']['error_value']);
 			}
 
-			// Set variables
-			$values = array(); // [i_a] make sure $values is an empty array to start with here
-			$values['userName']     = MySQL::SQLValue($userName,MySQL::SQLVALUE_TEXT);
-			$values['userPass']     = MySQL::SQLValue($userPass,MySQL::SQLVALUE_TEXT);
-			$values['userFirst']    = MySQL::SQLValue($userFirstname,MySQL::SQLVALUE_TEXT);
-			$values['userLast']     = MySQL::SQLValue($userLastname,MySQL::SQLVALUE_TEXT);
-			$values['userEmail']    = MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
-			$values['userActive']   = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
-			$values['userLevel']    = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-			// TODO: userToken is currently UNUSED. -- should be used to augment the $cfg['authcode'] where applicable
-			$values['userToken']    = MySQL::SQLValue(mt_rand('123456789','987654321'),MySQL::SQLVALUE_NUMBER);
-
-			// Execute the insert
-			$result = $db->InsertRow($cfg['db_prefix'].'users', $values);
-
-			// Check for errors
-			if($result)
+			$old_filepath = BASE_PATH . '/content/' . $oldname . '.php';
+			$new_filepath = BASE_PATH . '/content/' . $newname . '.php';
+			if ($old_filepath == $new_filepath)
 			{
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-				exit();
+				// no actual rename happening...
+				die($ccms['lang']['backend']['success']);
 			}
-			else
-			{
-				throw new FbX($db->MyDyingMessage());
-			}
-		}
-		else
-		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed']);
-		}
-	}
-	catch (CcmsAjaxFbException $e)
-	{
-		$e->croak();
-	}
-}
-
-/**
- *
- * Edit user details as posted by an authorized user
- *
- */
-if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
-{
-	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
-	try
-	{
-		$userID = getPOSTparam4Number('userID');
-		$userFirst = getPOSTparam4HumanName('first');
-		$userLast = getPOSTparam4HumanName('last');
-		$userEmail = getPOSTparam4Email('email');
-
-		// Only if current user has the rights
-		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) || $_SESSION['ccms_userID'] == $userID)
-		{
-			// Check length of values
-			if(strlen($userFirst)>2&&strlen($userLast)>2&&strlen($userEmail)>6)
-			{
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['userFirst']= MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);
-				$values['userLast'] = MySQL::SQLValue($userLast,MySQL::SQLVALUE_TEXT);
-				$values['userEmail']= MySQL::SQLValue($userEmail,MySQL::SQLVALUE_TEXT);
-
-				if ($db->UpdateRow($cfg['db_prefix'].'users', $values, array("userID" => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER))))
-				{
-					if($userID==$_SESSION['ccms_userID'])
-					{
-						$_SESSION['ccms_userFirst'] = $userFirst; // getPOSTparam4HumanName already does the htmlentities() encoding, so we're safe to use & display these values as they are now.
-						$_SESSION['ccms_userLast']  = $userLast;
-					}
-
-					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-					exit();
-				}
-				else
-				{
-					throw new FbX($db->MyDyingMessage());
-				}
-			}
-			else
-			{
-				throw new FbX($ccms['lang']['system']['error_tooshort']);
-			}
-		}
-		else
-		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed']);
-		}
-	}
-	catch (CcmsAjaxFbException $e)
-	{
-		$e->croak();
-	}
-}
-
-/**
- *
- * Edit users' password as posted by an authorized user
- *
- */
-
-if($do_action == 'edit-user-password' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
-{
-	$userID = getPOSTparam4Number('userID');
-
-	FbX::SetFeedbackLocation('./modules/user-management/user.Edit.php', 'userID='.$userID);
-	try
-	{
-		// Only if current user has the rights
-		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) || $_SESSION['ccms_userID'] == $userID)
-		{
-			if (empty($_POST['userPass']) || empty($_POST['cpass']))
-			{
-				throw new FbX($ccms['lang']['system']['error_passshort']);
-			}
-
-			$passphrase_len = strlen($_POST['userPass']);
-
-			if($passphrase_len > 6 && md5($_POST['userPass']) === md5($_POST['cpass']))
-			{
-				$userPassHash = md5($_POST['userPass'].$cfg['authcode']);
-
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['userPass'] = MySQL::SQLValue($userPassHash,MySQL::SQLVALUE_TEXT);
-
-				if ($db->UpdateRow($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER))))
-				{
-					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-					exit();
-				}
-				else
-				{
-					throw new FbX($db->MyDyingMessage());
-				}
-			}
-			elseif($passphrase_len <= 6)
-			{
-				throw new FbX($ccms['lang']['system']['error_passshort']);
-			}
-			else
-			{
-				throw new FbX($ccms['lang']['system']['error_passnequal']);
-			}
-		}
-		else
-		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed']);
-		}
-	}
-	catch (CcmsAjaxFbException $e)
-	{
-		$e->croak();
-	}
-}
-
-/**
- *
- * Edit user level as posted by an authorized user
- *
- */
-
-if($do_action == 'edit-user-level' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
-{
-	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
-	try
-	{
-		// Only if current user has the rights
-		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']))
-		{
-			$userID = getPOSTparam4Number('userID');
-			$userActive = getPOSTparam4boolean('userActive');
-			$userLevel = getPOSTparam4Number('userLevel');
-			if ($userLevel > 0)
-			{
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['userLevel'] = MySQL::SQLValue($userLevel,MySQL::SQLVALUE_NUMBER);
-				$values['userActive'] = MySQL::SQLValue($userActive,MySQL::SQLVALUE_BOOLEAN);
-
-				if ($db->UpdateRow($cfg['db_prefix'].'users', $values, array('userID' => MySQL::SQLValue($userID,MySQL::SQLVALUE_NUMBER))))
-				{
-					if($userID==$_SESSION['ccms_userID'])
-					{
-						$_SESSION['ccms_userLevel'] = $userLevel;
-					}
-
-					header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
-					exit();
-				}
-				else
-				{
-					throw new FbX($db->MyDyingMessage());
-				}
-			}
-			else
-			{
-				throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
-			}
-		}
-		else
-		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed']);
-		}
-	}
-	catch (CcmsAjaxFbException $e)
-	{
-		$e->croak();
-	}
-}
-
-/**
- *
- * Delete a user as posted by an authorized user
- *
- */
-if($do_action == 'delete-user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
-{
-	FbX::SetFeedbackLocation('./modules/user-management/backend.php');
-	try
-	{
-		// Only if current user has the rights
-		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']))
-		{
-			$total = (isset($_POST['userID']) ? count($_POST['userID']) : 0);
-
-			if($total==0)
-			{
-				throw new FbX($ccms['lang']['system']['error_selection']);
-			}
-
-			// Delete details from the database
-			$i=0;
-			foreach ($_POST['userID'] as $user_num)
-			{
-				$user_num = filterParam4Number($user_num);
-
-				$values = array(); // [i_a] make sure $values is an empty array to start with here
-				$values['userID'] = MySQL::SQLValue($user_num, MySQL::SQLVALUE_NUMBER);
-				$result = $db->DeleteRows($cfg['db_prefix'].'users', $values);
-				$i++;
-			}
-			// Check for errors
-			if($result && $i == $total)
-			{
-				header('Location: ' . makeAbsoluteURI('./modules/user-management/backend.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
-				exit();
-			}
-			else
-			{
-				throw new FbX($db->MyDyingMessage());
-			}
-		}
-		else
-		{
-			throw new FbX($ccms['lang']['auth']['featnotallowed']);
-		}
-	}
-	catch (CcmsAjaxFbException $e)
-	{
-		$e->croak();
-	}
-}
-
-/**
- *
- * Generate the WYSIWYG or code editor for editing purposes (prev. editor.php)
- *
- */
-if($do_action == 'edit' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth())   // action=edit
-{
-	// Set the necessary variables
-	$page_id = getGETparam4Filename('page_id');
-	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
-	if (!$row) $db->Kill();
-
-	$owner = explode('||', strval($row->user_ids));
-
-	if ($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']) &&
-		($row->iscoding != 'Y' || $perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) && // deny editing of code pages unless the user has PageCoding permissions
-		 (!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner))) // only the OWNER is ALWAYS allowed editing access for a restricted page! (unless the owner doesn't have code edit perms and it's a code page)
-	{
-		$iscoding = $row->iscoding;
-		$active = $row->published;
-		$name = $row->urlpage;
-		$filename = BASE_PATH . '/content/'.$name.'.php';
-
-if (0) // TODO?
-{
-		// Check for editor.css in template directory
-		$template = $row->variant;
-}
-
-		// Check for filename
-		if(!empty($filename))
-		{
-			$handle = @fopen($filename, 'r');
-			if ($handle)
-			{
-				// PHP5+ Feature
-				$contents = stream_get_contents($handle);
-				if (0)
-				{
-					// PHP4 Compatibility
-					$flen = filesize($filename);
-					if ($flen > 0)
-					{
-						$contents = fread($handle, $flen);
-					}
-				}
-				fclose($handle);
-				$contents = str_replace('<br />', '<br>', $contents);
-			}
-			else
+			else if (!file_exists($old_filepath))
 			{
 				die($ccms['lang']['system']['error_deleted']);
 			}
-		}
-
-		// Get keywords for current file
-		$keywords = $row->keywords;
-	?>
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
-	<head>
-		<title>CompactCMS - <?php echo $ccms['lang']['editor']['editorfor']." ".$name; ?></title>
-		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<?php
-	// Load TinyMCE (compressed for faster loading)
-	if($cfg['wysiwyg'] && $iscoding != 'Y')
-	{
-	?>
-		<!-- File uploader styles -->
-		<link rel="stylesheet" media="all" type="text/css" href="../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
-	<?php
-	}
-	// else : load Editarea for code editing
-	?>
-	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../img/styles/ie.css" />
-	<![endif]-->
-	</head>
-
-	<body>
-	<div class="module" id="edit-page">
-		<h2><?php echo $ccms['lang']['backend']['editpage']." $name<em>.html</em>"; ?></h2>
-		<p><?php echo $ccms['lang']['editor']['instruction']; ?></p>
-
-		<form action="./process.inc.php?page_id=<?php echo rm0lead($row->page_id); ?>&amp;action=save-changes" method="post" name="save">
-			<textarea id="content" name="content"><?php echo htmlspecialchars(trim($contents), ENT_COMPAT, 'UTF-8'); ?></textarea>
-			<!--<br/>-->
-			<label for="keywords"><?php echo $ccms['lang']['editor']['keywords']; ?></label>
-			<input type="input" class="text span-25" maxlength="250" name="keywords" value="<?php echo $keywords; ?>" id="keywords">
-			<div class="right">
-				<button type="submit" name="do" id="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['editor']['savebtn']; ?></button>
-				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
-			</div>
-		</form>
-
-<?php
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
-	</textarea>
-<?php
-}
-?>
-
-	</div>
-	<script type="text/javascript">
-function confirmation()
-{
-	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
-	if(answer)
-	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $name; ?>_ccms');
-	}
-	return false;
-}
-
-
-
-
-<?php
-$js_files = array();
-$js_files[] = '../../lib/includes/js/the_goto_guy.js';
-$js_files[] = '../../lib/includes/js/mootools-core.js,mootools-more.js';
-if($cfg['wysiwyg'] && $iscoding != 'Y')
-{
-	// -------------------------------------------------
-	// Load TinyMCE (compressed for faster loading)
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
-
-	$driver_code = generateJS4TinyMCEinit(2, 'content');
-
-	$starter_code = generateJS4TinyMCEinit(1, 'content');
-}
-else
-{
-	// -------------------------------------------------
-	// Alternative to tinyMCE: load Editarea for code editing
-	if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
-	{
-		$js_files[] = '../../lib/includes/js/edit_area/edit_area_full.js';
-	}
-	else
-	{
-		$js_files[] = '../../lib/includes/js/edit_area/edit_area_full.js';
-	}
-
-	$eaLanguage = $cfg['editarea_language'];
-	$driver_code = <<<EOT
-		editAreaLoader.init(
+			else if (file_exists($new_filepath))
 			{
-				id: "content",
-				is_multi_files: false,
-				allow_toggle: false,
-				word_wrap: true,
-				start_highlight: true,
-				language: "$eaLanguage",
-				syntax: "html"
-			});
-EOT;
-	$starter_code = null;
-}
+				die($ccms['lang']['system']['error_rename_target_exists']);
+			}
+			else if (!rename($old_filepath, $new_filepath))
+			{
+				die($ccms['lang']['system']['error_rename']);
+			}
+			else
+			{
+				// successfully renamed the file; now adjust the database record accordingly!
+				$values = array();
+				$values['urlpage'] = MySQL::SQLValue($newname,MySQL::SQLVALUE_TEXT);
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
-?>
-	</script>
-	<script type="text/javascript" src="../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
-	</body>
-	</html>
-<?php
+				if (!$db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER))))
+				{
+					$db->Kill();
+				}
+				else
+				{
+					printf($ccms['lang']['backend']['file_renamed_from_to'], $oldname, $newname);
+				}
+			}
+		}
 	}
 	else
 	{
@@ -1682,144 +1313,16 @@ echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
 	exit();
 }
 
- /**
- *
- * Processing save page (prev. handler.inc.php)
- *
- */
-if($do_action == 'save-changes' && checkAuth())
-{
-	$page_id = getGETparam4Filename('page_id');
-	$row = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
-	if (!$row) $db->Kill();
-
-	$owner = explode('||', strval($row->user_ids));
-
-	if ($perm->is_level_okay('managePageEditing', $_SESSION['ccms_userLevel']) &&
-		($row->iscoding != 'Y' || $perm->is_level_okay('managePageCoding', $_SESSION['ccms_userLevel'])) && // deny editing of code pages unless the user has PageCoding permissions
-		 (!in_array($row->urlpage, $cfg['restrict']) || in_array($_SESSION['ccms_userID'], $owner))) // only the OWNER is ALWAYS allowed editing access for a restricted page! (unless the owner doesn't have code edit perms and it's a code page)
-	{
-		$active = $row->published;
-		$name = $row->urlpage;
-		if ($row->iscoding == 'Y')
-		{
-			// code pages: only for users with elevated rights, so we're okay with less filtering (none at all, in this case!)
-			$type = 'code';
-			$content = getPOSTparam4RAWCONTENT('content'); // accept ANYTHING: it's code, so can carry anything, including javascript and PHP code chunks!
-		}
-		else
-		{
-			$type = 'text';
-			$content = getPOSTparam4RAWHTML('content'); // [i_a] must be RAW HTML, no htmlspecialchars(). Filtering required if malicious input risk expected.
-		}
-		$filename = BASE_PATH . '/content/'.$name.'.php';
-		$keywords = getPOSTparam4DisplayHTML('keywords');
 
 
-		if (is_writable_ex($filename))
-		{
-			if (!$handle = fopen($filename, 'w'))
-			{
-				die('[ERR105] '.$ccms['lang']['system']['error_openfile'].' ('.$filename.').');
-			}
-			if (fwrite($handle, $content) === FALSE)
-			{
-				die('[ERR106] '.$ccms['lang']['system']['error_write'].' ('.$filename.').');
-			}
-			fclose($handle);
-		}
-		else
-		{
-			die($ccms['lang']['system']['error_chmod']);
-		}
 
-		// Save keywords to database
-		$values = array(); // [i_a] make sure $values is an empty array to start with here
-		$values['keywords'] = MySQL::SQLValue($keywords,MySQL::SQLVALUE_TEXT);
 
-		if ($db->UpdateRow($cfg['db_prefix'].'pages', $values, array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER))))
-		{
-?>
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
-	<head>
-		<title>CompactCMS <?php echo $ccms['lang']['backend']['administration']; ?></title>
-		<link rel="stylesheet" type="text/css" href="../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	</head>
 
-	<body>
-		<div id="handler-wrapper" class="module">
 
-			<?php
-			if($active != 'Y')
-			{
-			?>
-				<p class="notice"><?php $msg = explode('::', $ccms['lang']['hints']['published']); echo $msg[0].': <strong>'.strtolower($ccms['lang']['backend']['disabled']).'</strong>'; ?></p>
-			<?php
-			}
-			?>
-			<p class="success"><?php echo $ccms['lang']['editor']['savesuccess']; ?><em><?php echo $name; ?>.html</em>.</p>
-			<hr/>
-			<?php
-			if($type == 'code')
-			{
-			?>
-				<p><pre><?php echo htmlentities(file_get_contents($filename)); ?></pre></p>
-			<?php
-			}
-			else /* if($type == 'text') */
-			{
-			?>
-				<p><?php echo file_get_contents($filename); ?></p>
-			<?php
-			}
-
-			$preview_checkcode = GenerateNewPreviewCode($page_id, null);
-			?>
-			<hr/>
-			<p>
-				<a href="../../<?php echo $name; ?>.html?preview=<?php echo $preview_checkcode; ?>" class="external" target="_blank"><?php echo $ccms['lang']['editor']['preview']; ?></a>
-			</p>
-			<div class="right">
-				<a class="button" href="process.inc.php?page_id=<?php echo $page_id; ?>&amp;action=edit"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['editor']['backeditor']; ?></a>
-				<a class="button" href="../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['closewindow']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['closewindow']; ?></a>
-			</div>
-		</div>
-	<script type="text/javascript" src="../../lib/includes/js/the_goto_guy.js" charset="utf-8"></script>
-	<script type="text/javascript" charset="utf-8">
-function confirmation()
-{
-	//var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
-	var answer = true;
-	if(answer)
-	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $name; ?>_ccms');
-	}
-	return false;
-}
-	</script>
-	</body>
-	</html>
-	<?php
-		}
-		else
-		{
-			$db->Kill();
-		}
-	}
-	else
-	{
-		die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
-	}
-
-	exit();
-}
 
 
 
 // when we get here, an illegal command was fed to us!
-header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' )));
-//die('status=error&action-was=' . $do_action . '&check=' . (1 * checkAuth()) . '&msg='.rawurlencode($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' ));
-die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>

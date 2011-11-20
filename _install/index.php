@@ -40,6 +40,8 @@ if (!defined('BASE_PATH'))
 
 if(empty($_GET['do'])) 
 { 
+	unset($_COOKIE[session_name()]);
+	
 	// destroy the session if it existed before: start a new session
 	session_start();
 	session_unset();
@@ -47,7 +49,7 @@ if(empty($_GET['do']))
 	{
 		$params = session_get_cookie_params();
 		setcookie(session_name(), '', time() - 42000,
-			(!empty($params["ccms_userID"]) ? $params["ccms_userID"] : ''), 
+			(!empty($params["path"]) ? $params["path"] : ''), 
 			(!empty($params["domain"]) ? $params["domain"] : ''),
 			(!empty($params["secure"]) ? $params["secure"] : ''),
 			(!empty($params["httponly"]) ? $params["httponly"] : '')
@@ -57,7 +59,12 @@ if(empty($_GET['do']))
 	session_regenerate_id();
 }
 // Start the current session
-session_start();
+$rv = session_start();
+if ($rv != 1)
+{
+	echo "<p>Fatal error: failed to init session.</p>";
+	exit();
+}
 
 // Load installer-specific configuration bits
 /*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
@@ -85,13 +92,13 @@ if (!isset($cfg))
 $do	= getGETparam4IdOrNumber('do');
 
 // If no step, set session hash
-if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
+if (empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
 {
 	// Setting safety variables
 	SetAuthSafety();
 } 
 
-$do_ftp_chmod = ($do == md5('ftp') && CheckAuth());
+$do_ftp_chmod = ($do == 'ftp' && checkAuth());
 
 
 
@@ -305,6 +312,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 
 
 
+session_write_close(); 
+
 
 
 ?>
@@ -321,6 +330,19 @@ if (empty($_SESSION['variables']['do_upgrade']))
 		<![endif]-->
 	</head>
 <body>
+
+<?php
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+?>
+<pre>
+<?php
+		var_dump(headers_list());
+?>
+</pre>
+<?php
+	}
+?>
 
 <noscript class="noscript" id="noscript">
 	<h1>Your browser does not support JavaScript</h1>
@@ -516,7 +538,7 @@ if ($die_on_old_hacks)
 						}
 						?>   	
 					</select>
-					<input type="hidden" name="do" value="<?php echo md5('2'); ?>" id="do" />
+					<input type="hidden" name="do" value="<?php echo '2'; ?>" id="do" />
 				<?php 
 				} 
 				// Populate optional FTP form
@@ -538,7 +560,7 @@ if ($die_on_old_hacks)
 					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
 					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
 					
-					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
+					<input type="hidden" name="do" value="<?php echo 'final'; ?>" id="do" />
 				<?php 
 				} 
 				?>
@@ -578,8 +600,8 @@ $js_files[] = '../lib/includes/js/mootools-more.js';
 $js_files[] = '../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running';
 $js_files[] = 'install.js';
 
-$driver_code = <<<EOT
-EOT;
+$driver_code = <<<EOT42
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

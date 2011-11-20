@@ -72,7 +72,7 @@ define('USE_HONEYTRAP_AGAINST_SPAM', true);
  */
 if (empty($_SESSION))
 {
-	session_start();
+	if (!session_start()) die('session_start() failed');
 }
 
 
@@ -451,7 +451,7 @@ else if (!empty($success))
 			<label for="message">Message content</label>
 		</td>
 		<td>
-			<textarea name="message" id="message" class="minLength:10" rows="8" cols="40"><?php echo /* htmlentities( */ $message /* , ENT_NOQUOTES, 'UTF-8') */ ; ?></textarea>
+			<textarea name="message" id="message" class="minLength:10" rows="8" cols="40" style="width: 100%"><?php echo /* htmlentities( */ $message /* , ENT_NOQUOTES, 'UTF-8') */ ; ?></textarea>
 		</td>
 		</tr>
 <?php

@@ -1,6 +1,6 @@
 <?php
 /* ************************************************************
-Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
+Copyright (C) 2008 - 2011 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
 
 This file is part of CompactCMS.
@@ -68,16 +68,17 @@ $cfg['db_prefix']   = 'ccms_';      // MySQL setting - the table prefix.
 // Restrict for editing with the editor. Use the filenames without extension.
 $cfg['restrict']    = array();      // restrictions will apply to all pages listed in this array, e.g. array("foo","bar") will deny editing access to the pages called 'foo' and 'bar' (a.k.a. foo.html & bar.html). Note that only the OWNER(S) of such pages will be allowed editing access!
 
-$cfg['default_template'] = 'reckoning'; // pick your default template, e.g. 'ccms', which will be used for pages when the template info is inconclusive, i.e. for HTTP error 404 and 403 pages.
-$cfg['enable_gravatar'] = false;   // set to 'false' if you don't want to show 'gravatars' in your comment pages for each commenter.
+$cfg['default_template'] = 'ccms';  // pick your default template, e.g. 'ccms', which will be used for pages when the template info is inconclusive, i.e. for HTTP error 404 and 403 pages.
+$cfg['enable_gravatar'] = false;    // set to 'false' if you don't want to show 'gravatars' in your comment pages for each commenter.
 
 $cfg['admin_page_dynlist_order'] = 'FTS0';    // default sort order for the page list in the admin screen: F=file name, T=title, S=subtitle, D=description, A=active/published, P=printable, C=coding, H=[hyper]link, I=menu ID, 1=toplevel, 2=sublevel, L=template, M=module (plugin), 0 = page_id
-$cfg['verify_alert'] = '';      // whether you want to see 'are you sure' dialogs pooping up for: 'X': close window (and discard edits which have not yet been saved), 'D': delete selected items
+$cfg['verify_alert'] = '';          // whether you want to see 'are you sure' dialogs pooping up for: 'X': close window (and discard edits which have not yet been saved), 'D': delete selected items
 
 
-$cfg['IN_DEVELOPMENT_ENVIRONMENT'] = true; // set to FALSE for any release install (where you are not developing on a local & very safe machine)
+$cfg['IN_DEVELOPMENT_ENVIRONMENT'] = false; // set to FALSE for any release install (where you are not developing on a local & very safe machine)
 $cfg['USE_JS_DEVELOPMENT_SOURCES'] = true; // set to FALSE when the pre-flattened, possibly pre-minified JavaScript sources should be used. This also means fewer individual JS files will be fetched from the server.
 $cfg['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION'] = true; // set to FALSE when your httpd doesn't have gzip/deflate compression enabled, e.g. through mod_deflate configuration for your vhost */
+$cfg['COMBINER_DEV_DUMP_OUTPUT'] = false; // dump combiner.inc.php-generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
 
 
 ?>

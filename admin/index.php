@@ -55,17 +55,20 @@ if (!defined('BASE_PATH'))
 
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
-///*MARKER*/require_once(BASE_PATH . '/admin/includes/process.inc.php');
 
 
 
 
 /* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
 {
-	// this situation should've caught inside process.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']);
+	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
+	die_with_forged_failure_msg(__FILE__, __LINE__); // $ccms['lang']['auth']['featnotallowed']
 }
+
+
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 
 
@@ -88,13 +91,13 @@ if ($db->ErrorNumber())
 	<title>CompactCMS Administration</title>
 	<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 	<link rel="icon" type="image/ico" href="../media/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="img/styles/base.css,layout.css,editor.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/base.css,layout.css,editor.css,sprite.css" />
 <!--
 	<link rel="stylesheet" type="text/css" href="../lib/includes/js/mochaui/Source/Themes/default/css/Window.css,Taskbar.css"/>
 -->
-	<link rel="stylesheet" type="text/css" href="img/styles/last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
 	<![endif]-->
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
@@ -163,7 +166,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				else
 				{
-					$version = $ccms['lang']['backend']['outofdate']." <a href=\"http://www.compactcms.nl/changes.html\" class=\"external\" rel=\"external\">".$ccms['lang']['backend']['considerupdate']."</a>.";
+					$version = $ccms['lang']['backend']['outofdate'] . ' <a href="http://www.compactcms.nl/changes.html" class="external" rel="external">' . $ccms['lang']['backend']['considerupdate'] . '</a>.';
 				}
 
 				if(!empty($version_recent) && !empty($v) && $cfg['version'])
@@ -175,7 +178,15 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				else
 				{
-					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>';
+					echo '<p class="error">'.$ccms['lang']['system']['error_versioninfo'].'</p>';
+				}
+
+				/*
+				Show possibly incoming status messages:
+				*/
+				if (!empty($status_message))
+				{
+					echo '<p class="' . $status . '">'.$status_message.'</p>';
 				}
 				?>
 			</div>
@@ -202,19 +213,19 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 					if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
 					{
 					?>
-						<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
+						<li><a id="sys-tmp" href="./includes/modules/template-editor/template-editor.Manage.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
 					<?php
 					}
 					// if($perm->get('manageUsers') > 0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
 					{
 					?>
-						<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
+						<li><a id="sys-usr" href="./includes/modules/user-management/user-management.Manage.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
 					<?php
 					}
 					if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
 					{
 					?>
-						<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
+						<li><a id="sys-bck" href="./includes/modules/backup-restore/backup-restore.Manage.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
 					<?php
 					}
 					if($perm->is_level_okay('manageModTranslate', $_SESSION['ccms_userLevel']) && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
@@ -242,6 +253,23 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</fieldset>
 	</div>
 
+	<?php
+	// yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):
+	if ($cfg['install_dir_exists'])
+	{
+	?>
+	<div id="install_dir_notice" class="span-25 last clear">
+	<fieldset>
+		<legend><a rel="notice_wrapper"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['warning']; ?></a></legend>
+		<div id="notice_wrapper">
+			<p class="center-text"><?php echo $ccms['lang']['backend']['install_dir_exists']; ?></p>
+		</div>
+	</fieldset>
+	</div>
+	<?php
+	}
+	?>
+	
 	<div id="createnew" class="span-9 clear">
 	<?php
 
@@ -524,7 +552,29 @@ $js_files[] = '../lib/includes/js/mootools-core.js,mootools-more.js';
 /*--MOCHAUI--*/
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,Core/Core.js,Core/Canvas.js,Core/Content.js,Core/Desktop.js,Controls/column/Column.js,Controls/panel/Panel.js,Controls/taskbar/Taskbar.js,Controls/window/Window.js,Controls/window/Modal.js,Core/Themes.js';
+	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,' .
+
+   'Core/Core.js,' .
+   'Core/Canvas.js,' .
+   'Core/Content.js,' .
+   'Core/persist.js,' .
+   'Core/themes.js,' .
+/*
+
+													'Core/core.js,' .
+													'Core/create.js,' .
+													'Core/require.js,' .
+													'Core/canvas.js,' .
+													'Core/content.js,' .
+													'Core/persist.js,' .
+													'Core/themes.js,' .
+*/
+													'Controls/desktop/desktop.js,' .
+													'Controls/panel/panel.js,' .
+													'Controls/column/column.js,' .
+													'Controls/taskbar/taskbar.js,' .
+													'Controls/window/window.js,' .
+													'Controls/window/modal.js';
 }
 else
 {

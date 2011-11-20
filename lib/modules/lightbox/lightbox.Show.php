@@ -51,7 +51,7 @@ function fileList($d)
 		{
 			if(is_file($d.'/'.$f))
 			{
-				$ext = strtolower(substr($f, strrpos($f, '.') + 1));
+				$ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
 				if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif")
 				{
 					$l[] = $f;
@@ -267,7 +267,7 @@ elseif($singleShow)
 	$lines = @file($album_path.'/'.$album.'/info.txt');
 	for ($x = 1; $x < count($lines); $x++)
 	{
-		$desc = trim($desc.' '.$lines[$x]); // [i_a] double invocation of htmlspecialchars, together with the form input (lightbox.Process.php)
+		$desc .= ' ' . $lines[$x];
 	}
 
 	echo '<h3>'.$ccms['lang']['album']['album'].' '.ucfirst($album)."</h3>\n";
@@ -286,10 +286,9 @@ elseif($singleShow)
 		$ccms['previewcode'] = $preview_checkcode;
 
 		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
-		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a></span>';
-		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
+		$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$ccms['page_name'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a>';
 
-		$ccms['urlpage']   .= '/' . $album;
+		$ccms['urlpage']   = $ccms['page_name'] . '/' . $album;
 		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['album']['album'].' '.ucfirst($album);
 		//$ccms['subheader']  = $row->subheader;
 		$ccms['desc']       = $desc;
@@ -297,7 +296,7 @@ elseif($singleShow)
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 	}
 
-	echo '<p>' . $desc . "</p>\n";
+	echo '<div class="lightbox-description">' . $desc . "</div>\n";
 
 	// Get the images in an album
 	$images = fileList($album_path.'/'.$album);

@@ -26,6 +26,8 @@ You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 ************************************************************ */
 
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/htmLawed/htmLawed.php');
+
 class ccmsParser
 {
 	// Do NOT call variables from the outside ! (Use the public methods instead.)
@@ -219,22 +221,74 @@ class ccmsParser
 				$rv = $this->getvar($vars, $v[0]);
 				/*
 				Note: we extract the argument list as a simple, single regex since this
-				      regex only returns the last argument matching the (....)* section of
+					  regex only returns the last argument matching the (....)* section of
 					  that regex:
-					  
+
 				*/
 				$pm = preg_match('/^(\w+)(\s*\(\s*(.*)\s*\))?$/s', trim($v[1]), $fbits);
 				if (!$pm)
-					return 'regex match failure for "' . $v[1] . '"';
+				{
+					throw new Exception('regex match failure for "' . $v[1] . '"');
+				}
 				if (count($fbits) > 3)
 				{
 					$argset = explode(',', $fbits[3]);
 					// ditch the full arguments match itself
-					array_pop($fbits); 
+					array_pop($fbits);
 					// and replace it with each of the arguments individually
+					$quote_pending = false;
+					$quoted_str = null;
 					foreach ($argset as $v)
 					{
-						$fbits[] = trim($v);
+						$vt = trim($v);
+						$c = substr($vt, 0, 1);
+						switch ($quote_pending ? $quote_pending . $quote_pending : $c)
+						{
+						case "'":
+						case '"':
+							// starting quote: remove quotes around text
+							if (substr($vt, -1) == $c)
+							{
+								$v = substr($vt, 1, strlen($vt) - 2);
+							}
+							else
+							{
+								/*
+								When not terminated, then we exploded a comma inside a delimited string: merge back together again.
+
+								Of course, we don't know anymore whether it was one or two comma's, but we'll assume ',,' is not
+								gonna happen in any parameter.
+								*/
+								$quote_pending = $c;
+								$quoted_str = substr($v, strpos($v, $c));
+								continue;
+							}
+							break;
+
+						case "''":
+						case '""':
+							// a string, which had one comma in it at least:
+							if (substr($vt, -1) == $c)
+							{
+								// we reached the end!
+								$quoted_str .= ',' . substr($v, 0, strrpos($v, $c));
+								$v = $quoted_str;
+								$quoted_str = null;
+							}
+							else
+							{
+								// a piece in the middle; multiple comma's in here apparently
+								$quoted_str .= ',' . $v;
+								continue;
+							}
+							break;
+
+						default:
+							// maybe unquoted string?
+							$v = $this->trim_expression($v, true);
+							break;
+						}
+						$fbits[] = $v;
 					}
 					// now arguments start at index [3] ...
 				}
@@ -249,8 +303,13 @@ class ccmsParser
 
 				case 'protect4attr':
 					/* make data suitable for an attribute value: strip tags and encode quotes! */
-					$rv = strip_tags($rv);
-					$rv = preg_replace('/\s+/', ' ', $rv);
+					$config = array(
+								'safe' => 1,
+								'elements' => '-*',
+								'keep_bad' => 6
+								);
+					$rv = htmLawed($rv, $config);
+					$rv = trim(preg_replace('/\s+/', ' ', $rv));
 					if (count($fbits) > 3)
 					{
 						// reduce the data string to a maximum length; clip at the last whitespace when this is required.
@@ -292,7 +351,7 @@ class ccmsParser
 					$merge = false;
 					if (count($fbits) > 3)
 					{
-						$merge = (strcasecmp(trim($fbits[3]), 'combine') == 0);
+						$merge = ($fbits[3] == 'combine');
 					}
 
 					asort($rv); // sort on /value/: lowest number has priority
@@ -344,7 +403,7 @@ class ccmsParser
 					$merge = false;
 					if (count($fbits) > 3)
 					{
-						$merge = (strcasecmp(trim($fbits[3]), 'combine') == 0);
+						$merge = ($fbits[3] == 'combine');
 					}
 
 					asort($rv); // sort on /value/: lowest number has priority
@@ -386,15 +445,20 @@ class ccmsParser
 
 				case 'implode':
 					/*
-					  implode an array of text chunks, using the specified interjection string, just like PHP implode() itself:
+					 * implode an array of text chunks, using the specified interjection string, just like PHP implode() itself.
+					 *
+					 * Parameters:
+					 *
+					 *   merge string: placed between two entries in the array
+					 *
+					 *   leadin string: placed before the first entry in the array
+					 *
+					 *   leadout string: placed after the last entry in the array
 					 */
 					$merge = "\n\n";
 					if (count($fbits) > 3)
 					{
-						if (!empty($fbits[3]))
-						{
-							$merge = $fbits[3];
-						}
+						$merge = $fbits[3];
 					}
 					$leadin = '';
 					if (count($fbits) > 4)
@@ -406,7 +470,7 @@ class ccmsParser
 					{
 						$leadout = $fbits[5];
 					}
-					
+
 					return $leadin . implode($merge, $rv) . $leadout;
 				}
 			}

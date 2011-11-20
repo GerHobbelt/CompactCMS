@@ -40,14 +40,14 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 - (%keywords%)      | Keywords (tags) for the current page as specified per file
 - (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
 - (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
-    
+
 >> Menu items
 - (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
 - (%leftmenu%)      | ''
 - (%rightmenu%)     | ''
 - (%footermenu%)    | ''
 - (%extramenu%)     | ''
-    
+
 >> Content tag
 - (%content%)       | The content from the current file that is being requested
 
@@ -57,37 +57,37 @@ See below for a simple example that uses all of the tags listed above.
 /* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
 if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
+//global $cfg, $ccms; // also available: $template_instance;
 
-global $db,$cfg,$ccms;
+
+
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%language%}">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{%language%}">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Print: {%title%}</title>
-	<meta name="description" content="[PRINT FRIENDLY] {%sitename!protect4attr%} | {%desc!protect4attr%}" />
-	<meta name="keywords" content="{%keywords!protect4attr%}" />
-	<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/base.css,layout.css,printing.css,last_minute_fixes.css" />
-	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="{%rootdir%}lib/templates/ccms/ie.css" />
-	<![endif]-->
-	<link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="[PRINT FRIENDLY] {%sitename!protect4attr%} | {%desc!protect4attr%}" />
+<meta name="keywords" content="{%keywords!protect4attr%}" />
+<title>Print: {%title!protect4attr%}</title>
+{%CSS.required_files!css_files(combine)%}
+{%CSS.inline!implode('', '<style type="text/css">', '</style>')%}
+<link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
 <body>
-
 <div class="container-25">
-	<div id="header" class="span-25">
+	<div id="header" class="span-25 last">
 		<div><h1><span>{%sitename%} {%pagetitle%}</span></h1></div>
 	</div>
 
 	<h2>{%subheader%}</h2>
 
-	<div id="content" class="span-25">
+	<div id="content" class="span-25 last">
 		<div id="printable" style="text-align: right;">
 			<span id="pageref"><a href="{%rootdir%}{%urlpage%}.html{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}">{%lang:system:tooriginal%}</a></span>
 		</div>
-		
+
 		{%content%}
 	</div>
 </div>
@@ -110,13 +110,17 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 <?php
 }
 ?>
-<script type="text/javascript">
-<?php
-$js_files = array();
-$js_files[] = '{%rootdir%}lib/includes/js/mootools-core.js,mootools-more.js';
 
-$driver_code = <<<EOT
-EOT;
+<script type="text/javascript" charset="utf-8">
+<?php
+
+$js_files = <<<EOT42
+{%JS.required_files!js_files(combine)%}
+EOT42;
+
+$driver_code = <<<EOT42
+{%JS.done!implode("\n\n")%}
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

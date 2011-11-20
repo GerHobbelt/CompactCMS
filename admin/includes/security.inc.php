@@ -58,30 +58,30 @@ ini_set('allow_url_fopen', 'Off');
 ini_set('allow_url_include', 'Off');
 
 // Set appropriate auth.inc.php file location
-$loc = $cfg['rootdir'] . "lib/includes/auth.inc.php";
+$loc = $cfg['rootdir'] . 'lib/includes/auth.inc.php';
 
 // Check whether current user has running session
-if(empty($_SESSION['ccms_userID']) && $cfg['protect']==true)
+if(empty($_SESSION['ccms_userID']) && $cfg['protect'])
 {
 	header('Location: ' . makeAbsoluteURI($loc));
 	exit();
 }
 
 // Do log-out (kill sessions) and redirect
-if($do == "logout")
+if($do == 'logout')
 {
 	// Unset all of the session variables.
 	$_SESSION = array();
 
 	// Destroy session
-	if (ini_get("session.use_cookies"))
+	if (ini_get('session.use_cookies'))
 	{
 		$params = session_get_cookie_params();
-		if (!empty($params["ccms_userID"]))
+		if (!empty($params['ccms_userID']))
 		{
 			setcookie(session_name(), '', time() - 42000,
-				$params["ccms_userID"], $params["domain"],
-				$params["secure"], $params["httponly"]
+				$params['path'], $params['domain'],
+				$params['secure'], $params['httponly']
 			);
 		}
 	}

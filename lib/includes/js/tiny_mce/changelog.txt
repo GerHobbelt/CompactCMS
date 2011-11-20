@@ -1,4 +1,44 @@
-Version 3.4b3 (2011-01-xx)
+Version 3.4.1 (2011-xx-x)
+	Fixed bug where selection locations on undo/redo didn't work correctly on specific contents.
+	Fixed bug where an exception would be trown on IE when loading TinyMCE inside an iframe.
+	Fixed bug where some ascii numeric entities wasn't properly decoded.
+	Fixed bug where some non western language codes wasn't properly decoded/encoded.
+	Fixed bug where undo levels wasn't created when deleting contents on IE.
+	Fixed bug where the initial undo levels bookmark wasn't updated correctly.
+	Fixed bug where search/replace wouldn't be scoped to editor instances on IE8.
+	Fixed bug where IE9 would produce two br elements after block elements when pasting.
+Version 3.4 (2011-03-10)
+	Added accessibility example with various accessibility options contributed by Ephox.
+	Fixed bug where attributes wasn't properly handled in the xhtmlxtras plugin.
+	Fixed bug where the image.htm had some strange td artifacts probably due to auto merging.
+	Fixed bug where the ToolbarGroup had an missing reference to this in it's destroy method.
+	Fixed bug with the resizeBy function in the advanced theme where it was scaled by the wrong parent.
+	Fixed bug where an exception would be thrown by the element if the page was served in xhtml mode.
+	Fixed bug where mceInsertContent would throw an exception when page was served in xhtml mode.
+	Fixed bug where you couldn't select a forground/background color when page was served in xhtml mode.
+	Fixed bug where the editor would scroll to the toolbar when clicked due to a call to focus in ListBox.
+	Fixed bug where pages with rtl dir wouldn't render split buttons correctly when using the o2k7 theme.
+	Fixed bug where anchor elements with names wasn't properly collapsed as they where in 3.3.x.
+	Fixed bug where WebKit wouldn't properly handle image selection if it was done left to right.
+	Fixed bug where the formatter would align images when the selection range was collapsed.
+	Fixed bug where the image button would be active when the selection range was collapsed.
+	Fixed bug where the element_format option wasn't used by the new (X)HTML serializer logic.
+	Fixed bug where the table cell/row dialogs would produce empty attributes.
+	Fixed bug where the tfoot wouldn't be added to the top of the table.
+	Fixed bug where the formatter would merge siblings with white space between them.
+	Fixed bug where pasting headers and paragraphs would produce an extra paragraph.
+	Fixed bug where the ColorSplitButton would throw an exception if you clicked out side a color.
+	Fixed bug where IE9 wouldn't properly produce new paragraphs on enter if the current paragraph had formatting.
+	Fixed bug where multiple BR elements at end of block elements where removed.
+	Fixed bug where fullscreen plugin wouldn't correctly display the edit area on IE6 for long pages.
+	Fixed bug where paste plugin wouldn't properly encode raw entities when pasting in plain text mode.
+	Fixed bug where the search/replace plugin wouldn't work correctly on IE 9.
+	Fixed so the drop menus doesn't get an outline border visible when focused, patch contributed by Ephox.
+	Fixed so the values entered in the color picker are forced to hex values.
+	Removed dialog workaround for IE 9 beta since the RC is now out and people should upgrade.
+	Removed obsolete calls in various plugins to the mceBeginUndoLevel command.
+Version 3.4b3 (2011-02-10)
+	Added WAI-ARIA support for the main UI and dialogs this feature was contributed by Ephox.
 	Added iframe support to media plugin in order to handle the new YouTube HTML5 video formats.
 	Fixed bug where anchors would wrap the text contents after it due to a bug in the DomParser logic.
 	Fixed bug where the selected state wouldn't be removed on ListBox controls when a menu item was selected.
@@ -17,7 +57,20 @@ Version 3.4b3 (2011-01-xx)
 	Fixed bug where mceInsertContent command wouldn't apply visual aids on tables and similar elements.
 	Fixed bug where empty block elements would get double br bogus elements in them.
 	Fixed bug where the color menu wouldn't apply the color correctly on IE when the viewport was to small.
+	Fixed bug where right clicking out side the body element of the editor iframe would prevent paste from working on IE.
+	Fixed bug where the onContextMenu event wouldn't fire correctly on IE if you clicked out side the body element.
+	Fixed bug where the onContextMenu event wouldn't fire correctly on modern Opera versions that now support it by default.
+	Fixed bug where legacy content wasn't converted correctly when inserted using mceInsertContent or through the source dialog.
+	Fixed bug where resizing images or tables wouldn't update the style attribute correctly or leave data-mce prefixed attributes.
+	Fixed bug where adding links wouldn't work correctly when using TinyMCE jQuery version with jQuery 1.5.
+	Fixed bug where single quotes inside param elements wasn't treated correctly by the media plugin.
+	Fixed bug where pasting plain text in WebKit wouldn't work correctly. It will now auto detect the WebKit bug and use plain text mode.
+	Fixed bug where the DomParser would fail to move out invalid elements within invalid elements on complex contents.
+	Fixed bug where paste as plain text would not decode html entities properly.
+	Fixed bug where large paragraphs would cause incorrect scrolling behavior if you would split them using enter.
+	Fixed bug where the SaxParser wouldn't properly parse some specific short ended elements.
 	Fixed so mceReplaceContent supports caret position and makes sure that the contents inserted gets validated.
+	Fixed so unnecessary traling br elements in blocks gets removed on Gecko/WebKit when using mceInsertContent command.
 	Moved some plugin css contents into the skin content css files to reduce the number of http requests.
 	Moved some plugin specific images into the theme img directory since they can then be shared.
 Version 3.4b2 (2011-01-13)

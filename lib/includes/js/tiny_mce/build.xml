@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="TinyMCE" default="build" basedir=".">
 	<!-- Path properties -->
-	<property description="Classes directory" name="classes_dir" value="classes" />
-	<property description="Build directory" name="build_dir" value="." />
+	<property description="Classes directory" name="classes_dir" value="jscripts/tiny_mce/classes" />
+	<property description="Build directory" name="build_dir" value="jscripts/tiny_mce" />
 	<property description="Temp directory" name="temp_dir" value="tmp" />
 
 	<!-- Allow any user specific values to override the defaults -->
@@ -31,15 +31,15 @@
 		</delete>
 
 		<moxiedoc outdir="docs/api" templatedir="tools/templates" msintellisense="docs/api/tinymce.vsdoc.js" eventclass="tinymce.util.Dispatcher" title="TinyMCE API">
-			<fileset dir="classes">
+			<fileset dir="jscripts/tiny_mce/classes">
 				<include name="**/*.js" /> 
 			</fileset>
 
-			<fileset dir="themes">
+			<fileset dir="jscripts/tiny_mce/themes">
 				<include name="**/editor_template_src.js" /> 
 			</fileset>
 
-			<fileset dir="plugins">
+			<fileset dir="jscripts/tiny_mce/plugins">
 				<include name="**/editor_plugin_src.js" /> 
 			</fileset>
 		</moxiedoc>
@@ -91,6 +91,7 @@
 			<fileset dir="${classes_dir}" includes="dom/RangeUtils.js" />
 
 			<!-- tinymce.ui.* -->
+			<fileset dir="${classes_dir}" includes="ui/KeyboardNavigation.js" />
 			<fileset dir="${classes_dir}" includes="ui/Control.js" />
 			<fileset dir="${classes_dir}" includes="ui/Container.js" />
 			<fileset dir="${classes_dir}" includes="ui/Separator.js" />
@@ -103,6 +104,7 @@
 			<fileset dir="${classes_dir}" includes="ui/MenuButton.js" />
 			<fileset dir="${classes_dir}" includes="ui/SplitButton.js" />
 			<fileset dir="${classes_dir}" includes="ui/ColorSplitButton.js" />
+			<fileset dir="${classes_dir}" includes="ui/ToolbarGroup.js" />
 			<fileset dir="${classes_dir}" includes="ui/Toolbar.js" />
 
 			<!-- tinymce.* -->
@@ -211,12 +213,12 @@
 			<substitution expression="${version.major}" />
 
 			<fileset dir="${temp_dir}/tinymce">
-				<include name="tiny_mce.js" />
-				<include name="tiny_mce_src.js" />
-				<include name="tiny_mce_jquery.js" />
-				<include name="tiny_mce_jquery_src.js" />
-				<include name="tiny_mce_prototype.js" />
-				<include name="tiny_mce_prototype_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_jquery.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_jquery_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_prototype.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_prototype_src.js" />
 			</fileset>
 		</replaceregexp>
 
@@ -226,12 +228,12 @@
 			<substitution expression="${version.minor}" />
 
 			<fileset dir="${temp_dir}/tinymce">
-				<include name="tiny_mce.js" />
-				<include name="tiny_mce_src.js" />
-				<include name="tiny_mce_jquery.js" />
-				<include name="tiny_mce_jquery_src.js" />
-				<include name="tiny_mce_prototype.js" />
-				<include name="tiny_mce_prototype_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_jquery.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_jquery_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_prototype.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_prototype_src.js" />
 			</fileset>
 		</replaceregexp>
 
@@ -241,12 +243,12 @@
 			<substitution expression="${release_date}" />
 
 			<fileset dir="${temp_dir}/tinymce">
-				<include name="tiny_mce.js" />
-				<include name="tiny_mce_src.js" />
-				<include name="tiny_mce_jquery.js" />
-				<include name="tiny_mce_jquery_src.js" />
-				<include name="tiny_mce_prototype.js" />
-				<include name="tiny_mce_prototype_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_jquery.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_jquery_src.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_prototype.js" />
+				<include name="jscripts/tiny_mce/tiny_mce_prototype_src.js" />
 			</fileset>
 		</replaceregexp>
 
@@ -294,13 +296,13 @@
 				<include name="tinymce/examples/**" />
 				<include name="tinymce/changelog.txt" />
 				<exclude name="tinymce/examples/full_jquery.html" />
-				<exclude name="tinymce/classes/**" />
-				<exclude name="tinymce/jquery.tinymce.js" />
-				<exclude name="tinymce/tiny_mce_dev.js" />
-				<exclude name="tinymce/tiny_mce_jquery.js" />
-				<exclude name="tinymce/tiny_mce_jquery_src.js" />
-				<exclude name="tinymce/tiny_mce_prototype.js" />
-				<exclude name="tinymce/tiny_mce_prototype_src.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/classes/**" />
+				<exclude name="tinymce/jscripts/tiny_mce/jquery.tinymce.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_dev.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_jquery.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_jquery_src.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_prototype.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_prototype_src.js" />
 			</fileset>
 		</zip>
 
@@ -309,22 +311,22 @@
 		<zip destfile="${temp_dir}/tinymce_${file_version}_jquery.zip" excludes="**/classes">
 			<fileset dir="${temp_dir}">
 				<include name="tinymce/jscripts/**" />
-				<include name="tinymce/examples/**" />
 				<include name="tinymce/changelog.txt" />
 				<exclude name="tinymce/examples/**" />
-				<exclude name="tinymce/classes/**" />
-				<exclude name="tinymce/tiny_mce.js" /> 
-				<exclude name="tinymce/tiny_mce_src.js" />
-				<exclude name="tinymce/tiny_mce_dev.js" />
-				<exclude name="tinymce/tiny_mce_jquery.js" />
-				<exclude name="tinymce/tiny_mce_jquery_src.js" />
-				<exclude name="tinymce/tiny_mce_prototype.js" />
-				<exclude name="tinymce/tiny_mce_prototype_src.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/classes/**" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce.js" /> 
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_src.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_dev.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_jquery.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_jquery_src.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_prototype.js" />
+				<exclude name="tinymce/jscripts/tiny_mce/tiny_mce_prototype_src.js" />
 			</fileset>
 
+			<zipfileset dir="${temp_dir}" includes="tinymce/examples/css/content.css" fullpath="tinymce/examples/css/content.css"/>
 			<zipfileset dir="${temp_dir}" includes="tinymce/examples/full_jquery.html" fullpath="tinymce/examples/index.html"/>
-			<zipfileset dir="${temp_dir}" includes="tinymce/tiny_mce_jquery.js" fullpath="tinymce/tiny_mce.js"/>
-			<zipfileset dir="${temp_dir}" includes="tinymce/tiny_mce_jquery_src.js" fullpath="tinymce/tiny_mce_src.js"/>
+			<zipfileset dir="${temp_dir}" includes="tinymce/jscripts/tiny_mce/tiny_mce_jquery.js" fullpath="tinymce/jscripts/tiny_mce/tiny_mce.js"/>
+			<zipfileset dir="${temp_dir}" includes="tinymce/jscripts/tiny_mce/tiny_mce_jquery_src.js" fullpath="tinymce/jscripts/tiny_mce/tiny_mce_src.js"/>
 		</zip>
 
 		<!-- Remove copyright headers for commerical version -->

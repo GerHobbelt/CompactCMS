@@ -10,6 +10,12 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 // make sure these are generated before anything else:
 tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/templates/ccms/base.css');
 tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/templates/ccms/layout.css');
+
+if ($ccms['printing'] == 'Y')
+{
+	tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/templates/ccms/printing.css');
+}
+
 tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/templates/ccms/sprite.css');
 tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/templates/ccms/last_minute_fixes.css');
 // IE only:

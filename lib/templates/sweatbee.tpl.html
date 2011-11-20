@@ -47,14 +47,12 @@ Modified   : For CompactCMS.nl 1.4.0+
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{%language%}">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
-	<meta name="keywords" content="{%keywords!protect4attr%}" />
-	<title>{%title%}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
+<meta name="keywords" content="{%keywords!protect4attr%}" />
+<title>{%title!protect4attr%}</title>
 {%CSS.required_files!css_files(combine)%}
-<?php
-//  <link href="{%rootdir%}lib/templates/sweatbee/style.css" rel="stylesheet" type="text/css" media="screen" />
-?>
+{%CSS.inline!implode('', '<style type="text/css">', '</style>')%}
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 <body>

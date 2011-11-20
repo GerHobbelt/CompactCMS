@@ -152,7 +152,7 @@ if (!$is_printing)
 			<label for="email"><?php echo $ccms['lang']['guestbook']['email']; ?>*</label><input type="text" name="email" id="email" value="" class="text required validate-email" /><br/>
 			<label for="website"><?php echo $ccms['lang']['guestbook']['website']; ?></label><input type="text" name="website" id="website" value="" class="text validate-url" /><br/>
 			<label for="comment"><?php echo $ccms['lang']['guestbook']['comments']; ?>*</label>
-			<textarea name="comment" id="comment" class="text minLength:10" style="height:80px;"></textarea><br/>
+			<textarea name="comment" id="comment" class="text minLength:10" style="height:80px; width: 100%;"></textarea><br/>
 			<label for="rating"><?php echo $ccms['lang']['guestbook']['rating']; ?></label>
 			<select name="rating" id="rating" size="1">
 				<option value="1">1 *</option>

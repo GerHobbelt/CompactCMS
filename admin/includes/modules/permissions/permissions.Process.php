@@ -112,6 +112,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 
 
 // when we get here, an illegal command was fed to us!
-die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>

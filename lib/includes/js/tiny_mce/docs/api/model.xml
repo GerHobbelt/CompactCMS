@@ -1388,7 +1388,7 @@ tinyMCE.init({
       // Register example button
       ed.addButton('example', {
          title : 'example.desc',
-         image : '../jscripts/tiny_mce/plugins/example/img/example.gif',
+         image : '../plugins/example/img/example.gif',
          onclick : function() {
             ed.windowManager.alert('Hello world!! Selection: ' + ed.selection.getContent({format : 'text'}));
          }
@@ -3335,10 +3335,10 @@ alert(tinyMCE.activeEditor.selection.getContent({format : 'text'}));</example>
 with the contents passed in to this function. If there is no selection the contents will be inserted
 where the caret is placed in the editor/page.
 </description>
-            <param name="h" type="String">
+            <param name="content" type="String">
               <description>HTML contents to set could also be other formats depending on settings.</description>
             </param>
-            <param name="s" type="Object">
+            <param name="args" type="Object">
               <description>Optional settings object with for example data format.</description>
             </param>
             <example>// Inserts some HTML contents at the current selection
@@ -3397,6 +3397,16 @@ tinyMCE.activeEditor.setContent(tinyMCE.activeEditor.getContent() + 'Some new co
 
 // Restore the selection bookmark
 tinyMCE.activeEditor.selection.moveToBookmark(bm);</example>
+          </method>
+          <method name="moveAfterNode" summary="Moves the selection to be collapsed immediately after the node.">
+            <description>Moves the selection to be collapsed immediately after the node.
+</description>
+            <param name="node" type="Element">
+              <description>HTML DOM element to position caret after.</description>
+            </param>
+            <return type="Element">
+              <description>the same element as the one that got passed in.</description>
+            </return>
           </method>
           <method name="select" summary="Selects the specified element.">
             <description>Selects the specified element. This will place the start and end of the selection range around the element.
@@ -3981,11 +3991,26 @@ there should only be one id per document.
               <description>Name/value lookup map for block elements.</description>
             </return>
           </method>
-          <method name="getEmptyElements" summary="Returns a map with empty elements.">
-            <description>Returns a map with empty elements.
+          <method name="getShortEndedElements" summary="Returns a map with short ended elements such as BR or IMG.">
+            <description>Returns a map with short ended elements such as BR or IMG.
 </description>
             <return type="Object">
-              <description>Name/value lookup map for empty elements.</description>
+              <description>Name/value lookup map for short ended elements.</description>
+            </return>
+          </method>
+          <method name="getSelfClosingElements" summary="Returns a map with self closing tags such as .">
+            <description>Returns a map with self closing tags such as &lt;li&gt;.
+</description>
+            <return type="Object">
+              <description>Name/value lookup map for self closing tags elements.</description>
+            </return>
+          </method>
+          <method name="getNonEmptyElements" summary="Returns a map with elements that should be treated as contents regardless if it has text content in them or not such as ...">
+            <description>Returns a map with elements that should be treated as contents regardless if it has text
+content in them or not such as TD, VIDEO or IMG.
+</description>
+            <return type="Object">
+              <description>Name/value lookup map for non empty elements.</description>
             </return>
           </method>
           <method name="getWhiteSpaceElements" summary="Returns a map with elements where white space is to be preserved like PRE or SCRIPT.">
@@ -4237,6 +4262,9 @@ that is styled to look like a button or icon.
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
             </param>
+            <param name="ed" type="Editor">
+              <description>Optional the editor instance this button is for.</description>
+            </param>
           </method>
           <method name="renderHTML" summary="Renders the button as a HTML string.">
             <description>Renders the button as a HTML string. This method is much faster than using the DOM and when
@@ -4279,6 +4307,9 @@ when you press the open menu.
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
             </param>
+            <param name="ed" type="Editor">
+              <description>The editor instance this button is for.</description>
+            </param>
           </method>
           <property name="settings" summary="Settings object." type="Object">
             <description>Settings object.
@@ -4315,6 +4346,13 @@ doesn't close them menu if it was a event inside the menu.
           </method>
           <method name="setColor" summary="Sets the current color for the control and hides the menu if it should be visible.">
             <description>Sets the current color for the control and hides the menu if it should be visible.
+</description>
+            <param name="c" type="String">
+              <description>Color code value in hex for example: #FF00FF</description>
+            </param>
+          </method>
+          <method name="displayColor" summary="Change the currently selected color for the control.">
+            <description>Change the currently selected color for the control.
 </description>
             <param name="c" type="String">
               <description>Color code value in hex for example: #FF00FF</description>
@@ -4500,49 +4538,6 @@ events tied to it will also be removed.
         <description>This class is used to create drop menus, a drop menu can be a
 context menu, or a menu for a list box or a menu bar.
 </description>
-        <example>// Adds a menu to the currently active editor instance
-var dm = tinyMCE.activeEditor.controlManager.createDropMenu('somemenu');
-
-// Add some menu items
-dm.add({title : 'Menu 1', onclick : function() {
-    alert('Item 1 was clicked.');
-}});
-
-dm.add({title : 'Menu 2', onclick : function() {
-    alert('Item 2 was clicked.');
-}});
-
-// Adds a submenu
-var sub1 = dm.addMenu({title : 'Menu 3'});
-sub1.add({title : 'Menu 1.1', onclick : function() {
-    alert('Item 1.1 was clicked.');
-}});
-
-// Adds a horizontal separator
-sub1.addSeparator();
-
-sub1.add({title : 'Menu 1.2', onclick : function() {
-    alert('Item 1.2 was clicked.');
-}});
-
-// Adds a submenu to the submenu
-var sub2 = sub1.addMenu({title : 'Menu 1.3'});
-
-// Adds items to the sub sub menu
-sub2.add({title : 'Menu 1.3.1', onclick : function() {
-    alert('Item 1.3.1 was clicked.');
-}});
-
-sub2.add({title : 'Menu 1.3.2', onclick : function() {
-    alert('Item 1.3.2 was clicked.');
-}});
-
-dm.add({title : 'Menu 4', onclick : function() {
-    alert('Item 3 was clicked.');
-}});
-
-// Display the menu at position 100, 100
-dm.showMenu(100, 100);</example>
         <members>
           <method constructor="true" name="DropMenu" summary="Constructs a new drop menu control instance.">
             <description>Constructs a new drop menu control instance.
@@ -4647,6 +4642,27 @@ dm.showMenu(100, 100);</example>
           <class-ref class="tinymce.ui.Control"/>
         </super-classes>
       </class>
+      <class fullname="tinymce.ui.KeyboardNavigation" name="KeyboardNavigation" summary="This class provides basic keyboard navigation using the arrow keys to children of a component.">
+        <description>This class provides basic keyboard navigation using the arrow keys to children of a component.
+For example, this class handles moving between the buttons on the toolbars.
+</description>
+        <members>
+          <method constructor="true" name="KeyboardNavigation" summary="Create a new KeyboardNavigation instance to handle the focus for a specific element.">
+            <description>Create a new KeyboardNavigation instance to handle the focus for a specific element.
+</description>
+            <param name="settings" type="Object">
+              <description>the settings object to define how keyboard navigation works.</description>
+            </param>
+            <param name="dom" type="DOMUtils">
+              <description>the DOMUtils instance to use.</description>
+            </param>
+          </method>
+          <method name="destroy" summary="Destroys the KeyboardNavigation and unbinds any focus/blur event handles it might have added.">
+            <description>Destroys the KeyboardNavigation and unbinds any focus/blur event handles it might have added.
+</description>
+          </method>
+        </members>
+      </class>
       <class extends="tinymce.ui.Control" fullname="tinymce.ui.ListBox" name="ListBox" summary="This class is used to create list boxes/select list.">
         <description>This class is used to create list boxes/select list. This one will generate
 a non native control. This one has the benefits of having visual items added.
@@ -4694,6 +4710,9 @@ tinyMCE.init({
             </param>
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
+            </param>
+            <param name="ed" type="Editor">
+              <description>Optional the editor instance this button is for.</description>
             </param>
           </method>
           <property name="items" summary="Array of ListBox items." type="Array">
@@ -4950,6 +4969,9 @@ tinymce.create('tinymce.plugins.ExamplePlugin', {
             </param>
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
+            </param>
+            <param name="ed" type="Editor">
+              <description>Optional the editor instance this button is for.</description>
             </param>
           </method>
           <event name="onRenderMenu" summary="Fires when the menu is rendered.">
@@ -5224,6 +5246,9 @@ tinymce.create('tinymce.plugins.ExamplePlugin', {
             <param name="s" type="Object">
               <description>Optional name/value settings object.</description>
             </param>
+            <param name="ed" type="Editor">
+              <description>Optional the editor instance this button is for.</description>
+            </param>
           </method>
           <method name="renderHTML" summary="Renders the split button as a HTML string.">
             <description>Renders the split button as a HTML string. This method is much faster than using the DOM and when
@@ -5260,6 +5285,36 @@ rendered so that events can be added.
           <method name="renderHTML" summary="Renders the toolbar as a HTML string.">
             <description>Renders the toolbar as a HTML string. This method is much faster than using the DOM and when
 creating a whole toolbar with buttons it does make a lot of difference.
+</description>
+            <return type="String">
+              <description>HTML for the toolbar control.</description>
+            </return>
+          </method>
+          <property inherited-from="tinymce.ui.Container" name="controls"/>
+          <method inherited-from="tinymce.ui.Container" name="add"/>
+          <method inherited-from="tinymce.ui.Container" name="get"/>
+          <method inherited-from="tinymce.ui.Control" name="setDisabled"/>
+          <method inherited-from="tinymce.ui.Control" name="isDisabled"/>
+          <method inherited-from="tinymce.ui.Control" name="setActive"/>
+          <method inherited-from="tinymce.ui.Control" name="isActive"/>
+          <method inherited-from="tinymce.ui.Control" name="setState"/>
+          <method inherited-from="tinymce.ui.Control" name="isRendered"/>
+          <method inherited-from="tinymce.ui.Control" name="renderTo"/>
+          <method inherited-from="tinymce.ui.Control" name="postRender"/>
+          <method inherited-from="tinymce.ui.Control" name="remove"/>
+          <method inherited-from="tinymce.ui.Control" name="destroy"/>
+        </members>
+        <super-classes>
+          <class-ref class="tinymce.ui.Container"/>
+          <class-ref class="tinymce.ui.Control"/>
+        </super-classes>
+      </class>
+      <class extends="tinymce.ui.Container" fullname="tinymce.ui.ToolbarGroup" name="ToolbarGroup" summary="This class is used to group a set of toolbars together and control the keyboard navigation and focus.">
+        <description>This class is used to group a set of toolbars together and control the keyboard navigation and focus.
+</description>
+        <members>
+          <method name="renderHTML" summary="Renders the toolbar group as a HTML string.">
+            <description>Renders the toolbar group as a HTML string.
 </description>
             <return type="String">
               <description>HTML for the toolbar control.</description>

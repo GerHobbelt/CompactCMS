@@ -80,9 +80,9 @@ if (!is_array($users)) $db->Kill();
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Page-owners</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
 	<![endif]-->
 </head>
 <body>
@@ -189,18 +189,6 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</textarea>
 
 	<hr class="clear" />
-
-	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
-	<textarea id="elm1" name="elm1" rows="15" cols="80" class="span-25">
-		&lt;p&gt;
-			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
-		&lt;/p&gt;
-		&lt;p&gt;
-		Nam nisi elit, cursus in rhoncus sit amet, pulvinar laoreet leo. Nam sed lectus quam, ut sagittis tellus. Quisque dignissim mauris a augue rutrum tempor. Donec vitae purus nec massa vestibulum ornare sit amet id tellus. Nunc quam mauris, fermentum nec lacinia eget, sollicitudin nec ante. Aliquam molestie volutpat dapibus. Nunc interdum viverra sodales. Morbi laoreet pulvinar gravida. Quisque ut turpis sagittis nunc accumsan vehicula. Duis elementum congue ultrices. Cras faucibus feugiat arcu quis lacinia. In hac habitasse platea dictumst. Pellentesque fermentum magna sit amet tellus varius ullamcorper. Vestibulum at urna augue, eget varius neque. Fusce facilisis venenatis dapibus. Integer non sem at arcu euismod tempor nec sed nisl. Morbi ultricies, mauris ut ultricies adipiscing, felis odio condimentum massa, et luctus est nunc nec eros.
-		&lt;/p&gt;
-	</textarea>
-
-	<hr class="clear" />
 <?php
 }
 ?>
@@ -220,43 +208,15 @@ function confirmation()
 
 <?php
 $js_files = array();
-$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
-$js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-	$with_fancyuploader = false;
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, "elm1", $with_fancyuploader));
-}
-$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 
 $driver_code = null;
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-	$driver_code = <<<EOT
-		tinyMCE.init({
-			mode : "exact",
-			elements : "elm1",
-			//theme : "advanced",
-			theme : "simple",
-			skin: 'o2k7',
-			skin_variant: 'silver',
-			//theme_advanced_buttons1 : 'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
-			//theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
-			//theme_advanced_buttons3 : 'removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,advhr',
-			//theme_advanced_buttons4 : 'cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',
-			//theme_advanced_toolbar_location: 'top'
-			theme_simple_toolbar_location: 'top'
-		});
-EOT;
-}
-
 $starter_code = null;
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-	$starter_code = generateJS4TinyMCEinit(1, "elm1", false);
-}
+$driver_code = null;
+$extra_functions_code = null;
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

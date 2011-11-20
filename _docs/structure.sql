@@ -3,7 +3,7 @@
 -- Created for CompactCMS (www.compactcms.nl)
 --
 -- Host: localhost
--- Generated: Feb 6, 2011 at 19:14
+-- Generated: Feb 25, 2011 at 19:22
 -- MySQL version: 5.1.41
 -- PHP version: 5.3.1
 --
@@ -51,6 +51,10 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgcomment` (
 --
 
 TRUNCATE TABLE `ccms_cfgcomment`;
+
+-- table `ccms_cfgcomment` has 0 records.
+--
+
 
 
 -- --------------------------------------------------------
@@ -117,6 +121,10 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgnews` (
 
 TRUNCATE TABLE `ccms_cfgnews`;
 
+-- table `ccms_cfgnews` has 0 records.
+--
+
+
 
 -- --------------------------------------------------------
 
@@ -139,20 +147,22 @@ CREATE TABLE IF NOT EXISTS `ccms_cfgpermissions` (
 TRUNCATE TABLE `ccms_cfgpermissions`;
 
 INSERT INTO `ccms_cfgpermissions` (`name`, `value`, `display_order`) VALUES
-('manageModTranslate', 0, '100.10'),
-('manageOwners', 0, '10.10'),
-('managePages', 0, '10.00'),
-('manageMenu', 0, '3.00'),
-('manageTemplate', 0, '2.00'),
-('manageModules', 0, '100.00'),
-('managePageActivation', 2, '10.60'),
-('managePageCoding', 2, '10.70'),
-('manageModBackup', 0, '100.10'),
-('manageModNews', 0, '100.40'),
-('manageModLightbox', 0, '100.30'),
-('manageModComment', 0, '100.20'),
-('manageUsers', 0, '1.00'),
-('managePageEditing', 2, '10.50');
+('manageModTranslate', '0', '100.10'),
+('manageOwners', '4', '10.10'),
+('managePages', '2', '10.00'),
+('manageMenu', '2', '3.00'),
+('manageTemplate', '3', '2.00'),
+('manageModules', '4', '100.00'),
+('managePageActivation', '2', '10.60'),
+('managePageCoding', '2', '10.70'),
+('manageModBackup', '3', '100.10'),
+('manageModNews', '2', '100.40'),
+('manageModLightbox', '2', '100.30'),
+('manageModComment', '2', '100.20'),
+('manageUsers', '4', '1.00'),
+('managePageEditing', '2', '10.50');
+
+
 
 -- --------------------------------------------------------
 
@@ -214,6 +224,10 @@ CREATE TABLE IF NOT EXISTS `ccms_modcomment` (
 
 TRUNCATE TABLE `ccms_modcomment`;
 
+-- table `ccms_modcomment` has 0 records.
+--
+
+
 
 -- --------------------------------------------------------
 
@@ -261,6 +275,7 @@ CREATE TABLE IF NOT EXISTS `ccms_modmixer` (
   `user_id` int(5) DEFAULT NULL COMMENT 'user for which this mix applies',
   `page_id` int(5) NOT NULL COMMENT 'reference to the MixIn page itself',
   `mixin_page_id` int(5) NOT NULL COMMENT 'reference to the page which will be placed at this location/position',
+  `args_passing` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'which arguments to be passed to the subpage, and as which parameters?',
   `location` smallint(5) NOT NULL DEFAULT '0' COMMENT '0: main section; 1..N: menu structure; 100: head; 200: header; 1000: footer',
   `position` smallint(5) NOT NULL DEFAULT '0' COMMENT 'order = 0: main/center stage; -1000..-1: before; 1..1000: after',
   `published` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'is this part included in the generated page?',
@@ -308,6 +323,9 @@ CREATE TABLE IF NOT EXISTS `ccms_modnews` (
 
 TRUNCATE TABLE `ccms_modnews`;
 
+-- table `ccms_modnews` has 0 records.
+--
+
 
 
 -- --------------------------------------------------------
@@ -323,12 +341,12 @@ CREATE TABLE IF NOT EXISTS `ccms_modules` (
   `modTitle` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Friendly name',
   `modLocation` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'where you''ld find the plugin sources for management & display (use % as a marker where the mode (''Manage'', ''Show'') should be inserted into the specified path)',
   `modVersion` decimal(5,2) NOT NULL,
-  `modPermissionName` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'the permission name used in the admin permissions management screen to configure which users have what permissions',
+  `modPermissionName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'the permission name used in the admin permissions management screen to configure which users have what permissions',
   `hasPageMaker` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'If module may act as a page content generator',
   `hasAdminSection` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'if module requires a link to access it from the admin screen',
   `modActive` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`modID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the installed modules, their version and activation state' AUTO_INCREMENT=11 ;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the installed modules, their version and activation state';
 
 --
 -- Dumping data for table `ccms_modules`
@@ -337,16 +355,18 @@ CREATE TABLE IF NOT EXISTS `ccms_modules` (
 TRUNCATE TABLE `ccms_modules`;
 
 INSERT INTO `ccms_modules` (`modID`, `modName`, `modTitle`, `modLocation`, `modVersion`, `modPermissionName`, `hasPageMaker`, `hasAdminSection`, `modActive`) VALUES
-(1, 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', 1, 0, 1),
-(2, 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', 1, 0, 1),
-(4, 'mixer', 'Layout Mixer', './lib/modules/mixer/mixer.%.php', '1.00', 'manageModMixer', 1, 0, 1),
-(3, 'comment', 'Comments', './lib/modules/comment/comment.%.php', '1.20', 'manageModComment', 1, 0, 1),
-(5, 'acl', 'Access Control', './lib/modules/acl/acl.%.php', '1.00', 'manageModACL', 0, 1, 1),
-(6, 'template-editor', 'Template Editor', './admin/modules/template-editor/tpedt.%.php', '1.00', 'manageTemplateEditor', 0, 1, 1),
-(7, 'user-management', 'User Management', './admin/modules/user-management/usrmgr.%.php', '1.00', 'manageUsers', 0, 1, 1),
-(8, 'backup-restore', 'Backup / Restore', './admin/modules/backup-restore/backup.%.php', '1.00', 'manageBackups', 0, 1, 1),
-(9, 'content-owners', 'Content Ownership', './admin/modules/content-owners/owners.%.php', '1.00', 'manageContentOwners', 0, 1, 1),
-(10, 'translation', 'Translation Assistant', './admin/modules/translation/translation.%.php', '0.10', 'manageTranslations', 0, 1, 1);
+('1', 'news', 'News', './lib/modules/news/news.%.php', '1.10', 'manageModNews', '1', '0', '1'),
+('2', 'lightbox', 'Lightbox', './lib/modules/lightbox/lightbox.%.php', '1.10', 'manageModLightbox', '1', '0', '1'),
+('4', 'mixer', 'Layout Mixer', './lib/modules/mixer/mixer.%.php', '1.00', 'manageModMixer', '1', '0', '0'),
+('3', 'comment', 'Comments', './lib/modules/comment/comment.%.php', '1.20', 'manageModComment', '1', '0', '1'),
+('5', 'acl', 'Access Control', './lib/modules/acl/acl.%.php', '1.00', 'manageModACL', '0', '1', '0'),
+('6', 'template-editor', 'Template Editor', './admin/modules/template-editor/tpedt.%.php', '1.00', 'manageTemplateEditor', '0', '1', '1'),
+('7', 'user-management', 'User Management', './admin/modules/user-management/usrmgr.%.php', '1.00', 'manageUsers', '0', '1', '1'),
+('8', 'backup-restore', 'Backup / Restore', './admin/modules/backup-restore/backup.%.php', '1.00', 'manageBackups', '0', '1', '1'),
+('9', 'content-owners', 'Content Ownership', './admin/modules/content-owners/owners.%.php', '1.00', 'manageContentOwners', '0', '1', '1'),
+('10', 'translation', 'Translation Assistant', './admin/modules/translation/translation.%.php', '0.10', 'manageTranslations', '0', '1', '1'),
+('11', 'editor', 'HTML/PHP Editor', './lib/modules/editor/editor.%.php', '1.10', NULL, '1', '0', '1'),
+('12', 'permissions', 'CCMS Permissions', './admin/modules/permissions/permissions.%.php', '1.00', NULL, '0', '1', '1');
 
 
 
@@ -390,6 +410,8 @@ INSERT INTO `ccms_pages` (`page_id`, `user_ids`, `urlpage`, `module`, `toplevel`
 (00001, '0', 'home', 'editor', 1, 0, 1, 'ccms', 'Home', 'The CompactCMS demo homepage', 'The CompactCMS demo homepage', 'compactcms, light-weight cms', 'home.php', 'Y', 'Y', 'N', 'Y'),
 (00002, '0', 'contact', 'editor', 2, 0, 1, 'sweatbee', 'Contact form', 'A basic contact form using Ajax', 'This is an example of a basic contact form based using Ajax', 'compactcms, light-weight cms', 'contact.php', 'Y', 'Y', 'Y', 'Y');
 
+
+
 -- --------------------------------------------------------
 
 --
@@ -412,7 +434,7 @@ CREATE TABLE IF NOT EXISTS `ccms_users` (
   `userTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`),
   UNIQUE KEY `userName` (`userName`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table with users for CompactCMS administration' AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Table with users for CompactCMS administration';
 
 --
 -- Dumping data for table `ccms_users`
@@ -424,10 +446,4 @@ INSERT INTO `ccms_users` (`userID`, `userName`, `userPass`, `userFirst`, `userLa
 (00001, 'admin', '52dcb810931e20f7aa2f49b3510d3805', 'Xander', 'G.', 'xander@compactcms.nl', 1, 4, '5168774687486', '2010-08-30 06:44:57', '2010-08-30 06:44:57', '2010-08-30 08:44:57');
 
 
-
-
-
-
-
--- --------------------------------------------------------
 

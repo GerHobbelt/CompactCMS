@@ -85,7 +85,7 @@ function createCounter(writer) {
 }
 
 test('Parse elements', function() {
-	expect(42);
+	expect(44);
 
 	var counter = createCounter(writer);
 	var parser = new tinymce.html.SaxParser(counter, schema);
@@ -233,6 +233,13 @@ test('Parse elements', function() {
 	parser.parse('<p>a</p><p /><p>b</p>');
 	equals(writer.getContent(), '<p>a</p><p></p><p>b</p>', 'Parse invalid closed element.');
 	deepEqual(counter.counts, {text: 2, start: 3, end: 3}, 'Parse invalid closed element counts.');
+
+	var counter = createCounter(writer);
+	var parser = new tinymce.html.SaxParser(counter, schema);
+	writer.reset();
+	parser.parse('<br><br /><br/>');
+	equals(writer.getContent(), '<br /><br /><br />', 'Parse short ended elements.');
+	deepEqual(counter.counts, {start: 3}, 'Parse short ended elements counts.');
 });
 
 test('Parse style elements', function() {
@@ -455,6 +462,17 @@ test('Parse (validate)', function() {
 	parser.parse('<invalid1>123<invalid2 />456<span title="title" invalid3="value">789</span>012</invalid1>');
 	equals(writer.getContent(), '123456<span title="title">789</span>012', 'Parse invalid elements and attributes.');
 	deepEqual(counter.counts, {start:1, end:1, text:4}, 'Parse invalid elements and attributes counts.');
+});
+
+test('Self closing', function() {
+	expect(1);
+
+	var counter = createCounter(writer);
+	counter.validate = true;
+	var parser = new tinymce.html.SaxParser(counter, schema);
+	writer.reset();
+	parser.parse('<ul><li>1<li><b>2</b><li><em><b>3</b></em></ul>');
+	equals(writer.getContent(), '<ul><li>1</li><li><b>2</b></li><li><em><b>3</b></em></li></ul>', 'Parse list with self closing items.');
 });
 </script>
 </head>

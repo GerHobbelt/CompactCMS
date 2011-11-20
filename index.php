@@ -46,11 +46,11 @@ if (!defined('BASE_PATH'))
 
 
 // Set friendly menu names
-$ccms['mainmenu']	= (isset($ccms['structure1']) ? $ccms['structure1'] : null);
-$ccms['leftmenu']	= (isset($ccms['structure2']) ? $ccms['structure2'] : null);
-$ccms['rightmenu']	= (isset($ccms['structure3']) ? $ccms['structure3'] : null);
-$ccms['footermenu']	= (isset($ccms['structure4']) ? $ccms['structure4'] : null);
-$ccms['extramenu']	= (isset($ccms['structure5']) ? $ccms['structure5'] : null);
+$ccms['mainmenu']   = (isset($ccms['structure1']) ? $ccms['structure1'] : null);
+$ccms['leftmenu']   = (isset($ccms['structure2']) ? $ccms['structure2'] : null);
+$ccms['rightmenu']  = (isset($ccms['structure3']) ? $ccms['structure3'] : null);
+$ccms['footermenu'] = (isset($ccms['structure4']) ? $ccms['structure4'] : null);
+$ccms['extramenu']  = (isset($ccms['structure5']) ? $ccms['structure5'] : null);
 
 
 // Initialize ccmsParser class
@@ -59,7 +59,7 @@ ccmsParser::setTemplateAndEchoPHP(BASE_PATH . '/lib/templates/'.$ccms['template'
 
 if (0)
 {
-	dump_request_to_logfile(null, true);
+	dump_request_to_logfile(null, true, true, true);
 }
 
 ?>
