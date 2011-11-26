@@ -293,7 +293,7 @@ EOT42;
 	};
 
 	window.addEvent('resize', function(e){
-		\$clear(resizeTimeout);
+		clearTimeout(resizeTimeout);
 		resizeTimeout = realResize.delay(200, this);
 	});
 
