@@ -127,20 +127,19 @@ find ../ -type f -a \( -name '*.htm*' -o -name '*.inc' -o -name '*.php' \) -a ! 
 #       commands for the template engine itself.
 find ../lib/templates -type f -a ! -name '*.jpg' -a ! -name '*.png' -a ! -name '*.gif' \
 		-a ! -path '*.bak' -a ! -path '*~' -print0 \
-	| xargs -0 grep -e "\{%lang\:" \
+	| xargs -0 grep -e "{%lang\:" \
 	| sed -e "s/{%/\n\$ccms\['/g" -e "s/\:\([a-z]\)/'\]\['\\1/g" -e "s/\(%}\|!\)/'\]\n/g" \
 	| sed -e "s/^\(\.\.\/[.a-zA-Z0-9_/-]\+\:\).*$/\\1/g" \
 	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(\.\./[.a-zA-Z0-9_/-]\+\:\)$" \
 	| gawk -- ' /:/ { path=$0; next; } /./ { printf("%s\t%s\n", path, $0); }' \
 	| sort | uniq | tee -a ccms_lang_entries_log.txt \
-	>> ccms_lang_entries.$$.txt.tmp
+	>> ccms_lang_template_entries.$$.txt.tmp
 
-	
-# marge both and turn them into one	
+# merge both and turn them into one	
 #
 # Note: all valid language entries have the format $ccms[1][2][3], filter out 
 #       any with fewer indices:
-cat ccms_lang_entries.$$.txt.tmp \
+cat ccms_lang_entries.$$.txt.tmp ccms_lang_template_entries.$$.txt.tmp \
 	| sed -e 's/^.*:\t//' \
 	| grep -e "\$ccms\['lang'\]\['.\+'\]\['.\+'\]$" \
 	| sort | uniq \
@@ -275,6 +274,7 @@ rm lang_diff.$$.tmp
 rm lang_list.$$.tmp
 rm lang.$$.php.tmp
 rm ccms_lang_entries.$$.txt.tmp
+rm ccms_lang_template_entries.$$.txt.tmp
 rm ccms_lang_entries.txt
 # keep the ccms_lang_entries_log.txt
 #rm ccms_lang_entries_log.txt
