@@ -35,7 +35,11 @@ input[type="text"], input[type="password"]
   background-color:#fff;
   border:1px solid #bbb;
 }
-/* [i_a] separated so IE6 accepts these: simplified ie.css as we override these in base.css and would otherwise have to re-override. What a hassle that'ld be. >:-( */
+/* 
+  [i_a] 
+  separated so IE6 accepts these: simplified ie.css as we override these in base.css 
+  and would otherwise have to re-override. What a hassle that'ld be. >:-( 
+*/
 input.text, input.title,
 textarea {
   background-color:#fff;
