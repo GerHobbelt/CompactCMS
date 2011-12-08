@@ -1564,7 +1564,7 @@ function path_remove_dot_segments($path)
  */
 function makeAbsoluteURI($path)
 {
-	$reqpage = filterParam4FullFilePath($_SERVER["PHP_SELF"]);
+	$reqpage = filterParam4FullFilePath($_SERVER['PHP_SELF']);
 
 	$page = array();
 	if (strpos($path, '://'))
@@ -3355,7 +3355,7 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 
 
 /*
-filter function: retrun TRUE onlyy when a plugin name looks like it is actually a real tinyMCE plugin!
+filter function: return TRUE only when a plugin name looks like it is actually a real tinyMCE plugin!
 */
 function is_real_tinyMCE_plugin($name)
 {
