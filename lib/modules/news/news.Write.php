@@ -220,14 +220,26 @@ $js_files = array();
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 
-$mce_options = array($textarea4teaser_id => array(
-		'theme' => 'simple'
-		));
-$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options));
+$mce_options = array(
+	// [0] carries the generic settings:
+	array(
+		$textarea4teaser_id => array(
+			'theme' => 'simple'
+			)
+		)
+	);
+		
+$MCEcodegen = new tinyMCEcodeGen($textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
 
-$starter_code = generateJS4TinyMCEinit(1, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
+$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 
-$driver_code = generateJS4TinyMCEinit(2, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options) . <<<EOT42
+$starter_code = $MCEcodegen->genStarterCode();
+
+$driver_code = $MCEcodegen->genDriverCode();
+
+$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
+
+$driver_code .= <<<EOT42
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
@@ -240,8 +252,6 @@ $driver_code = generateJS4TinyMCEinit(2, $textarea4teaser_id . ',' . $textarea4a
 				}
 			});
 EOT42;
-
-$extra_functions_code = generateJS4TinyMCEinit(3, $textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
 
 echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>

@@ -948,7 +948,7 @@ class ccmsParser
 	 */
 	public function parseAndSave($file)
 	{
-		$outf = fopen($file, "w");
+		$outf = fopen($file, 'w');
 		if ($outf)
 		{
 			$content = $this->parseAndReturn();

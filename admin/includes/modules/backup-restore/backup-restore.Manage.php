@@ -173,7 +173,7 @@ if($do == 'backup' && !empty($btn_backup))
 	}
 
 	$fileName = $configBackupDir.$backupName;
-	$fd = @fopen($fileName, "wb");
+	$fd = @fopen($fileName, 'wb');
 	if (!$fd)
 	{
 		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $fileName;
@@ -213,7 +213,7 @@ if($do == 'backup' && !empty($btn_backup))
 		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $cfgfile;
 	}
 	$cfgfile = BASE_PATH . '/media/files/ccms-restore/config.inc.php';
-	$fd = @fopen($cfgfile, "wb");
+	$fd = @fopen($cfgfile, 'w');
 	if (!$fd)
 	{
 		$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $cfgfile;
@@ -231,7 +231,7 @@ if($do == 'backup' && !empty($btn_backup))
 	if ($sqldump !== false)
 	{
 		$sqldumpfile = BASE_PATH . '/media/files/ccms-restore/compactcms-sqldump.sql';
-		$fd = @fopen($sqldumpfile, "wb");
+		$fd = @fopen($sqldumpfile, 'w');
 		if (!$fd)
 		{
 			$error[] = $ccms['lang']['system']['error_openfile'] . ": " . $sqldumpfile;

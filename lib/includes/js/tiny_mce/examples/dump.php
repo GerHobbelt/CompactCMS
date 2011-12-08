@@ -64,7 +64,8 @@ function MCE_vardumper($mgr = null, $action = null, $info = null, $filenamebase 
 		if (!$count) $count = 1; else $count++;
 		$dst = ((!empty($filenamebase) ? $filenamebase . '.' : '') . date('Ymd-His') . '.' . fmod(microtime(true), 1) . '-' . $action . '-' . $count . '.log');
 		$dst = preg_replace('/[^A-Za-z0-9-_.]+/', '_', $dst);    // make suitable for filesystem
-		return html_entity_decode(strip_tags($dump), ENT_NOQUOTES, 'UTF-8');
+		return $dump;
+		//return html_entity_decode(strip_tags($dump), ENT_NOQUOTES, 'UTF-8');
 	}
 	return '';
 }
@@ -77,9 +78,27 @@ $dump = MCE_vardumper();
 ?>
 <html>
 <body>
+	<h1>CONTENT:</h1>
+<?php
+	if (!empty($_POST))
+	{
+		foreach($_POST as $key => $value)
+		{
+			if (strpos($key, 'elm') !== false)
+			{
+				echo "<h2>Editor: $key</h2>\n";
+				echo $value;
+				echo "\n<hr>\n";
+			}
+		}
+	}
+?>
 	<h1>DUMP:</h1>
 	<pre style="white-space: pre-wrap;" >
-<?php echo htmlentities($dump, ENT_NOQUOTES, 'UTF-8'); ?>
+<?php 
+//echo htmlentities($dump, ENT_NOQUOTES, 'UTF-8'); 
+echo $dump; 
+?>
 	</pre>
 </body>
 </html>

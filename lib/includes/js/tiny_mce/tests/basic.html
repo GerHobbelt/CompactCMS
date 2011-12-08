@@ -7,7 +7,7 @@
 <script type="text/javascript" src="qunit/qunit.js"></script>
 <script type="text/javascript" src="qunit/runner.js"></script>
 <script type="text/javascript" src="js/utils.js"></script>
-<script type="text/javascript" src="../jscripts/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="js/tiny_mce_loader.js"></script>
 <script>
 var editor;
 
@@ -275,10 +275,10 @@ test('commands - insertHR', function() {
 	equals(editor.getContent(), '<p>test</p>\n<hr />\n<p>123</p>');
 	// Check the selection is after the HR
 	rng = editor.selection.getRng(true);
-	equals(rng.startContainer, tinymce.isIE ? editor.dom.select('p')[1].firstChild : editor.dom.select('p')[1], 'Selection start container');
-	equals(rng.startOffset, 0, 'Selection start offset');
-	equals(rng.endContainer, tinymce.isIE ? editor.dom.select('p')[1].firstChild : editor.dom.select('p')[1], 'Selection end container');
-	equals(rng.endOffset, 0, 'Selection end offset');
+	equals(rng.startContainer, editor.dom.select('p')[0].firstChild, 'Selection start container');
+	equals(rng.startOffset, 4, 'Selection start offset');
+	equals(rng.endContainer, editor.dom.select('p')[0].firstChild, 'Selection end container');
+	equals(rng.endOffset, 4, 'Selection end offset');
 });
 
 test('commands - indentOutdent', function() {
@@ -454,6 +454,31 @@ test('WebKit Serialization range bug', function() {
 
 		equals(editor.getContent(), '<p>123</p>\n<table>\n<tbody>\n<tr>\n<td>X</td>\n</tr>\n</tbody>\n</table>\n<p>456</p>');
 	}
+});
+
+test('setContent', function() {
+	var count;
+
+	expect(4);
+
+	function callback(ed, args) {
+		args.content = args.content.replace(/test/, 'X');
+		count++;
+	};
+
+	editor.onSetContent.add(callback);
+	editor.onBeforeSetContent.add(callback);
+	count = 0;
+	editor.setContent('<p>test</p>');
+	equals(editor.getContent(), "<p>X</p>");
+	equals(count, 2);
+	editor.onSetContent.remove(callback);
+	editor.onBeforeSetContent.remove(callback);
+
+	count = 0;
+	editor.setContent('<p>test</p>');
+	equals(editor.getContent(), "<p>test</p>");
+	equals(count, 0);
 });
 
 tinyMCE.init({

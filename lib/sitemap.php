@@ -47,6 +47,59 @@ if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
 
 
 
+/**
+Regenerates a properly secured session CHECK CODE: it immediately replaces the old one, so anyone
+checking against this item is rejected, unless they pass in this latest CHECK CODE.
+
+To prevent session replay issue hijacking, the CHECK ID is constructed from both 'secret' and
+time-dependent data. Since we should not leak the 'secret data', it is double-hashed before 
+ending up in the CHECK CODE.
+*/
+function generate_session_sidpatch()
+{
+	global $cfg, $ccms;
+
+	$secret = md5($cfg['authcode'] . 'SIDcheck');
+	$time_dep_data = md5($secret.mt_rand().time().mt_rand());
+	
+	// make sure we use a unique (with high probability) tag name for inclusion in form submits or URL query sections:
+	$getid = 'S'.substr($time_dep_data, 0, 8);
+	$sesid = session_id();
+	$sesname = session_name();
+	// the SWF.Upload / FancyUpload FLASH components do pass along the cookies, but as extra URL query entities:
+	if (!empty($_GET[$getid]))
+	{
+		$sesid = preg_replace('/[^A-Za-z0-9]/', 'X', $_GET[$getid]);
+
+		/*
+		 * Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
+		 *
+		 * however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
+		 */
+		session_id($sesid);
+		if (!session_start()) die('session_start(SIDPATCH) failed');
+		//session_write_close();
+		if (!empty($_GET['SIDCHK']) && !empty($_SESSION['fup1']) && $_SESSION['fup1'] == $_GET['SIDCHK'])
+		{
+			//echo " :: legal session ID forced! \n";
+			//session_id($sesid);
+		}
+		else
+		{
+			//echo " :: illegal session override! IGNORED! \n";
+
+			// do NOT nuke the session; this might have been a interloper trying a DoS attack... let it all run its natural course.
+			$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+
+			die_and_goto_url(null, $ccms['lang']['auth']['featnotallowed']); // default URL: login!
+		}
+	}
+	else
+	{
+		if (!session_start()) die('session_start(SIDCHECK_ALT) failed');
+	}
+}
+
 function check_session_sidpatch_and_start()
 {
 	global $cfg, $ccms;
@@ -892,6 +945,12 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	if (is_http_response_code($ccms['responsecode']))
 	{
 		send_response_status_header($ccms['responsecode']);
+	}
+	
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		dump_request_to_logfile(array('invocation_mode' => get_interpreter_invocation_mode()),
+								true, true, true);
 	}
 }
 else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a] if() removed so the GET URL index.php?page=sitemap doesn't slip through the cracks.

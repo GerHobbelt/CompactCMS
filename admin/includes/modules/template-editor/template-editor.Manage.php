@@ -70,9 +70,9 @@ $chstatus = is_writable_ex($dir_temp.$get_temp); // @dev: to test the error feed
 // Check for filename
 if(!empty($get_temp))
 {
-	if(@fopen($dir_temp.$get_temp, "r"))
+	if(@fopen($dir_temp.$get_temp, 'r'))
 	{
-		$handle = fopen($dir_temp.$get_temp, "r");
+		$handle = fopen($dir_temp.$get_temp, 'r');
 		// PHP5+ Feature
 		$contents = stream_get_contents($handle);
 		if (0)

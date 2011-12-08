@@ -6,7 +6,7 @@
 <script type="text/javascript" src="qunit/qunit.js"></script>
 <script type="text/javascript" src="qunit/runner.js"></script>
 <script type="text/javascript" src="js/utils.js"></script>
-<script type="text/javascript" src="../jscripts/tiny_mce/tiny_mce_dev.js"></script>
+<script type="text/javascript" src="js/tiny_mce_loader.js"></script>
 <script type="text/javascript" src="js/dsl/dsl.js"></script>
 <script type="text/javascript" src="js/dsl/states.js"></script>
 <script type="text/javascript" src="js/lists/actions.js"></script>
@@ -258,7 +258,7 @@ asyncTest('Expanded Selection, Paragraph Types - Unordered List Action', functio
 	ApplyingUL.to(MultipleBlockWithBrSelection).gives('<ul>\n<li>Item1</li>\n<li>Item2</li>\n<li>Item3</li>\n</ul>');
 	ApplyingUL.to(MultipleBlockWithBrPartialSelection).gives('<ul>\n<li>Item1</li>\n<li>Item2</li>\n<li>Item3</li>\n</ul>\n<div>Item4</div>');
 	ApplyingUL.to(MultipleBlockWithBrPartialSelectionAtEnd).gives('\n<div>Item1</div>\n<ul>\n<li>Item2</li>\n<li>Item3</li>\n<li>Item4</li>\n</ul>');
-	ApplyingUL.to(ThreeBoldDivsWithBrSelection).gives('<ul><li><strong>One</strong></li><li><strong>Two</strong></li><li><strong>Three</strong></li></ul>');
+	ApplyingUL.to(ThreeBoldDivsWithBrSelection).gives('<ul><li><strong>One</strong></li>\n<li><strong>Two</strong></li>\n<li><strong>Three</strong></li></ul>');
 
 	// TODO: Divs with BRs and Paragraphs.
 	// TODO: Divs with BRs in paragraphs?  Divs with a mix of BRs and paragraph child.
@@ -269,7 +269,7 @@ asyncTest('Expanded Selection, Paragraph Types - Unordered List Action', functio
 	ApplyingUL.to(BlockToParagraphSelection).gives('<ul>\n<li>This is a test</li>\n<li>Second paragraph</li>\n</ul>');
 	ApplyingUL.to(MultipleParagraphAndHeadingSelection).gives('<ul>\n<li>This is a test</li>\n<li>\n<h1>Second paragraph</h1>\n</li>\n<li>Third paragraph</li>\n</ul>');
 
-	ApplyingUL.to(TextWithBrsInFormattingInDiv).gives('<div><strong>Before</strong><ul><li>Item1</li><li>Item2</li><li>Item3</li></ul></div>');
+	ApplyingUL.to(TextWithBrsInFormattingInDiv).gives('<div><strong>Before</strong><ul><li>Item1</li>\n<li>Item2</li>\n<li>Item3</li></ul></div>');
 	queue.done();
 });
 
@@ -300,6 +300,10 @@ tinyMCE.init({
 	apply_source_formatting : 0,
 	init_instance_callback : function(ed) {
 		editor = ed;
+
+		ed.onNodeChange.addToTop(function() {
+			return false;
+		});
 	}
 });
 

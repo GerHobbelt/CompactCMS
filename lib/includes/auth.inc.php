@@ -207,16 +207,20 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 	</head>
 <body>
 
+<?php
+if(!empty($status_message))
+{
+?>
 <div id="logon-error-report-wrapper" class="container-18">
 	<div class="center-text <?php echo $status; ?>">
 		<?php
-		if(!empty($status_message))
-		{
-			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
-		}
+		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
 		?>
 	</div>
 </div>
+<?php
+}
+?>
 
 <?php
 // yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):

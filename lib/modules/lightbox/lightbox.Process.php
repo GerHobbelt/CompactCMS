@@ -103,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 					$dest = BASE_PATH.'/media/albums/'.$album_name;
 					if(!is_dir($dest))
 					{
-						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w"))
+						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', 'w'))
 						{
 							header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
 							exit();
@@ -348,18 +348,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && ($do_action == 'save-files' || $do_ac
 	$error      = false;
 	$error_code = 0;
 
-	if (!checkAuth() || ($do_action == 'save-files' && (empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])))
-	{
-if (0)
-{
-		dump_request_to_logfile();
-}
-		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-
-		$error = $ccms['lang']['auth']['featnotallowed'];
-		$error_code = 403;
-	}
-
 	if (empty($error))
 	{
 		/*
@@ -372,8 +360,6 @@ if (0)
 		 *
 		 *          Alas.
 		 */
-		//$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-
 		$dest = BASE_PATH.'/media/albums/'.$album_name;
 		if(!is_dir($dest))
 		{

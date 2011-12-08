@@ -87,7 +87,7 @@ if ($db->ErrorNumber())
 <html id="admin_index_page" xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>CompactCMS Administration</title>
 	<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 	<link rel="icon" type="image/ico" href="../media/favicon.ico" />
