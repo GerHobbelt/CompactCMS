@@ -78,6 +78,20 @@ $status_message = getGETparam4DisplayHTML('msg');
 
 function load_lang_file($language)
 {
+	/*
+	We collect hand-checked translation strings by loading the language file 
+	itself, then discard the babelfish-produced translations.
+	
+	(Rather, the automated translations originate from the google 
+	 translation service, rather than babelfish, but alas. You get the point.)
+
+	Since we are within function scope, the global $ccms[] is not accessible 
+	from here, which is actually GOOD, because we trick the loading by 
+	eval()ing the selected language file and then return the LOCAL $ccms[] 
+	array as a result, thus staying completely independent of the global 
+	$ccms[] and its language strings!
+	*/
+
 	$ccms = array();
 	$lang_file = BASE_PATH . '/lib/languages/' . $language . '.inc.php';
 	if (is_file($lang_file))
@@ -95,33 +109,29 @@ function load_lang_file($language)
 function collect_translations($language)
 {
 	/*
-	We collect all translation strings by first loading the default (English) and then the language file itself.
+	We collect all translation strings by first loading the default (English) 
+	and then the language file itself.
 
-	This way, we'll be sure to have all language strings (as the English one is assumed to be complete at all
-	times) while any gaps in the language X file are filled by those English ones.
-
-	Since we are within function scope, the global $ccms[] is not accessible from here, which is actually GOOD.
-
-	Because we trick the loading by include()ing both the english and the selected language file and then
-	return the LOCAL $ccms[] array as a result, thus staying completely independent of the global $ccms[] and
-	its language strings!
+	This way, we'll be sure to have all language strings (as the English one 
+	is assumed to be complete at all times) while any gaps in the language X 
+	file are filled by those English ones.
 	*/
 
-		// English indexes are our 'master base':
-	$ccms = load_lang_file('en');
+	// English indexes are our 'master base':
+	$lang_entries = load_lang_file('en');
 
 	$i18n = load_lang_file($language);
 	// now ONLY override entries which EXIST in 'en'; anything else is superfluous/outdated in the language file anyway and will corrupt our index-counting later on
 	foreach($i18n as $key => $value)
 	{
-		if (!empty($value) && array_key_exists($key, $ccms))
+		if (!empty($value) && array_key_exists($key, $lang_entries))
 		{
 			// override value now!
-			$ccms[$key] = $value;
+			$lang_entries[$key] = $value;
 		}
 	}
 
-	return $ccms;
+	return $lang_entries;
 }
 
 
@@ -423,7 +433,7 @@ if ($do == 'update')
 <div class="module" id="translation-assist">
 	<?php
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4)
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
 	?>
 	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
@@ -450,7 +460,7 @@ if ($do == 'update')
 	<?php
 
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4)
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
 	?>
 		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
