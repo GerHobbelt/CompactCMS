@@ -607,7 +607,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				$sub_done = false;
 
 				// Start this menu root item: UL
-				$ccms[$current_structure] = '<ul>';
+				$menu_id = 'menu_list_id_' . $current_menuID . '_' . $top_idx;
+				$ccms[$current_structure] = '<ul id="' . $menu_id . '">';
 
 				// prevent loading the next record on the next round through the loop:
 				$dummy_top_written = true;
@@ -644,7 +645,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				}
 				else
 				{
-					$ccms[$current_structure] .= "\n<ul class=\"sublevel\">\n";
+					$menu_id = 'menu_list_id_' . $current_menuID . '_' . $top_idx;
+					$ccms[$current_structure] .= "\n<ul class=\"sublevel\" id=\"" . $menu_id . "\">\n";
 				}
 				$sub_idx++;
 				$sub_done = true;
@@ -705,25 +707,52 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			$current_link_classes = trim($current_class . ' ' . $menu_item_class);
 			if (!empty($current_link_classes))
 			{
-				$current_link_classes = 'class="' . $current_link_classes . '"';
+				$current_link_classes = 'class="' . $current_link_classes . '" ';
 			}
-			$menu_item_text = '<a '.$current_link_classes.' href="'.$current_link.'" title="'.$link_title.'">'.$link_text.'</a>'.$current_extra;
+			// no HTML tags allowed in the 'title' attribute!
+			$menu_item_text = '<a '.$current_link_classes.'href="'.$current_link.'" title="'.strip_tags($link_title).'">'.$link_text.'</a>'.$current_extra;
 
-			$menu_top_class = 'menu_item' . ($top_idx % 2);
-			$menu_sub_class = 'menu_item' . ($sub_idx % 2);
+			/*
+			most flexible approach to custom-render particular [series of] menu items:
+			when you wish to detect _series_ of menu entries, you can XML-parse the generated
+			UL/LI-based structure and extract the UL and LI ID's to, for example, produce 
+			odd/even classes in the regenerated structure.
+			
+			Of course, this is assumed to happen in your template's init.inc.php, maybe using
+			simplexml_load_string() (http://nl3.php.net/manual/en/function.simplexml-load-string.php)
+			et al.
+			
+			See the ccms default template for a (contrived) example.
+			*/
+			$menu_item_id = 'menu_item_id_' . $current_menuID . '_' . $top_idx . '_' . $sub_idx;
 
 			if ($dummy_top_written)
 			{
 				$menu_item_text = '<span ' . $current_link_classes . '>-</span>';
-				$ccms[$current_structure] .= '<li class="' . trim( /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
+				$menu_item_classes = trim( /* $current_class . ' ' . */ $menu_item_class);
+				if (!empty($menu_item_classes))
+				{
+					$menu_item_classes = 'class="' . $menu_item_classes . '" ';
+				}
+				$ccms[$current_structure] .= '<li ' . $menu_item_classes . 'id="' . $menu_item_id . '">' . $menu_item_text;
 			}
 			else if ($row['sublevel'] != 0)
 			{
-				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
+				$menu_item_classes = trim($current_class . ' ' . $menu_item_class);
+				if (!empty($menu_item_classes))
+				{
+					$menu_item_classes = 'class="' . $menu_item_classes . '" ';
+				}
+				$ccms[$current_structure] .= '<li ' . $menu_item_classes . 'id="' . $menu_item_id . '">' . $menu_item_text;
 			}
 			else
 			{
-				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
+				$menu_item_classes = trim($current_class . ' ' . $menu_item_class);
+				if (!empty($menu_item_classes))
+				{
+					$menu_item_classes = 'class="' . $menu_item_classes . '" ';
+				}
+				$ccms[$current_structure] .= '<li ' . $menu_item_classes . 'id="' . $menu_item_id . '">' . $menu_item_text;
 			}
 		}
 
