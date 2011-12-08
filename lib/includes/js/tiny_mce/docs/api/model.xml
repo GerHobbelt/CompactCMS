@@ -1240,7 +1240,7 @@ This method will setup the iframe and create the theme and plugin instances.
 tinyMCE.activeEditor.theme.someMethod();</example>
         </property>
         <property name="controlManager" summary="Control manager instance for the editor." type="tinymce.ControlManager">
-          <description>Control manager instance for the editor. Will enables you to create new UI elements and change their states etc.
+          <description>Control manager instance for the editor. Will enable you to create new UI elements and change their states etc.
 </description>
           <example>// Disables the bold button
 tinyMCE.activeEditor.controlManager.setDisabled('bold', true);</example>
@@ -1388,7 +1388,7 @@ tinyMCE.init({
       // Register example button
       ed.addButton('example', {
          title : 'example.desc',
-         image : '../plugins/example/img/example.gif',
+         image : '../jscripts/tiny_mce/plugins/example/img/example.gif',
          onclick : function() {
             ed.windowManager.alert('Hello world!! Selection: ' + ed.selection.getContent({format : 'text'}));
          }
@@ -1968,6 +1968,11 @@ default formatting logic for execCommand due to it's inconsistant and buggy beha
             <description>The old level object containing a bookmark and contents.</description>
           </param>
         </event>
+        <method name="beforeChange" summary="Stores away a bookmark to be used when performing an undo action so that the selection is before the change has been mad...">
+          <description>Stores away a bookmark to be used when performing an undo action so that the selection is before
+the change has been made.
+</description>
+        </method>
         <method name="add" summary="Adds a new undo level/snapshot to the undo list.">
           <description>Adds a new undo level/snapshot to the undo list.
 </description>
@@ -2268,6 +2273,36 @@ If the function then returns true indicating that it has found what it was looki
             </param>
             <return type="Element">
               <description>Element matching the specified id or null if it wasn't found.</description>
+            </return>
+          </method>
+          <method name="getNext" summary="Returns the next node that matches selector or function">
+            <description>Returns the next node that matches selector or function
+</description>
+            <param name="node" type="Node">
+              <description>Node to find siblings from.</description>
+            </param>
+            <param name="selector">
+              <type fullname="String"/>
+              <type fullname="function"/>
+              <description>Selector CSS expression or function.</description>
+            </param>
+            <return type="Node">
+              <description>Next node item matching the selector or null if it wasn't found.</description>
+            </return>
+          </method>
+          <method name="getPrev" summary="Returns the previous node that matches selector or function">
+            <description>Returns the previous node that matches selector or function
+</description>
+            <param name="node" type="Node">
+              <description>Node to find siblings from.</description>
+            </param>
+            <param name="selector">
+              <type fullname="String"/>
+              <type fullname="function"/>
+              <description>Selector CSS expression or function.</description>
+            </param>
+            <return type="Node">
+              <description>Previous node item matching the selector or null if it wasn't found.</description>
             </return>
           </method>
           <method name="select" summary="Selects specific elements by a CSS level 3 pattern.">
@@ -3397,16 +3432,6 @@ tinyMCE.activeEditor.setContent(tinyMCE.activeEditor.getContent() + 'Some new co
 
 // Restore the selection bookmark
 tinyMCE.activeEditor.selection.moveToBookmark(bm);</example>
-          </method>
-          <method name="moveAfterNode" summary="Moves the selection to be collapsed immediately after the node.">
-            <description>Moves the selection to be collapsed immediately after the node.
-</description>
-            <param name="node" type="Element">
-              <description>HTML DOM element to position caret after.</description>
-            </param>
-            <return type="Element">
-              <description>the same element as the one that got passed in.</description>
-            </return>
           </method>
           <method name="select" summary="Selects the specified element.">
             <description>Selects the specified element. This will place the start and end of the selection range around the element.

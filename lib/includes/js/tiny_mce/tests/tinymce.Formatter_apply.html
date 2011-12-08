@@ -7,7 +7,7 @@
 <script type="text/javascript" src="qunit/qunit.js"></script>
 <script type="text/javascript" src="qunit/runner.js"></script>
 <script type="text/javascript" src="js/utils.js"></script>
-<script type="text/javascript" src="../jscripts/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="js/tiny_mce_loader.js"></script>
 <script>
 var editor;
 
@@ -23,7 +23,7 @@ function getContent() {
 test('apply (inline)', function() {
 	var rng, format;
 
-	expect(43);
+	expect(45);
 
 	// Toggle OFF - Inline element on selected text
 	editor.formatter.register('format', {inline : 'b', toggle: false});
@@ -699,10 +699,10 @@ test('apply (mixed inline/selector)', function() {
 	equals(getContent(), '<div class="a b c" style="color: #ff0000;" title="test">text</div>', 'Apply format on single element that matches a selector');
 });
 
-test('Bold and italics is applied to text that is not highlighted', function() {
+test('Formatter - Bold and italics is applied to text that is not highlighted', function() {
 	var rng;
 
-	expect(1);
+	//expect(1);
 
 	editor.setContent('<p><span style="font-family: Arial;"><strong>test1 test2</strong> test3 test4 test5 test6</span></p>');
 	rng = editor.dom.createRng();
@@ -776,7 +776,7 @@ test('Colored elements in a paragraph', function() {
 	rng.setEnd(editor.dom.select('span')[4].lastChild, 5);
 	editor.selection.setRng(rng);
 	editor.formatter.apply('format');
-	equals(editor.getContent(), '<p><span style="text-decoration: underline;"><span style="font-family: \'arial black\',\'avant garde\';"><em><strong>This is some <span style="color: #ff0000; text-decoration: underline;">example</span></strong></em> text</span></span></p><p><span style="text-decoration: underline;"><span style="font-family: \'arial black\',\'avant garde\';"><em><strong>This is some <span style="color: #ff0000; text-decoration: underline;">example</span></strong></em> text</span></span></p><p><span style="text-decoration: underline;"><span style="font-family: \'arial black\', \'avant garde\';"><em><strong>This is some <span style="color: #ff0000; text-decoration: underline;">example</span></strong></em> text</span></span></p>', 'Colored elements should be underlined when selection is across multiple paragraphs');
+	equals(editor.getContent(), '<p><span style="text-decoration: underline;"><span style="font-family: \'arial black\',\'avant garde\';"><em><strong>This is some <span style="color: #ff0000; text-decoration: underline;">example</span></strong></em> text</span></span></p>\n<p><span style="text-decoration: underline;"><span style="font-family: \'arial black\',\'avant garde\';"><em><strong>This is some <span style="color: #ff0000; text-decoration: underline;">example</span></strong></em> text</span></span></p>\n<p><span style="text-decoration: underline;"><span style="font-family: \'arial black\', \'avant garde\';"><em><strong>This is some <span style="color: #ff0000; text-decoration: underline;">example</span></strong></em> text</span></span></p>', 'Colored elements should be underlined when selection is across multiple paragraphs');
 
 	editor.formatter.register('format', {inline: 'span', exact: true, styles : {'color' : '#ff0000'}});
 	editor.setContent('<p><span style="text-decoration: underline;">This is some text.</span></p>');

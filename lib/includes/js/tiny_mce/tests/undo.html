@@ -6,7 +6,7 @@
 <script type="text/javascript" src="qunit/qunit.js"></script>
 <script type="text/javascript" src="qunit/runner.js"></script>
 <script type="text/javascript" src="js/utils.js"></script>
-<script type="text/javascript" src="../jscripts/tiny_mce/tiny_mce_dev.js"></script>
+<script type="text/javascript" src="js/tiny_mce_loader.js"></script>
 <script>
 QUnit.config.autostart = false;
 
@@ -22,6 +22,7 @@ function assertUndoEnabledWhenTyping(c, expectedContent) {
 	editor.setContent('<p>Content</p>');
 
 	editor.undoManager.clear();
+	editor.undoManager.add();
 	editor.execCommand('mceRepaint');
 	setSelection('p', 4);
 	ok(!isUndoEnabled(), 'Undo starts disabled.');
@@ -38,7 +39,7 @@ asyncTest('Undo added when typing character', function() {
 });
 
 asyncTest('Undo added when typing enter', function() {
-	assertUndoEnabledWhenTyping('\n', '<p>Cont</p>\n<p>ent</p>');
+	assertUndoEnabledWhenTyping('\n', '<p>Cont</p><p>ent</p>');
 });
 
 asyncTest('Forward delete triggers undo in IE', function() {

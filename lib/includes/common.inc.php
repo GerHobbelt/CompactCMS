@@ -2333,18 +2333,18 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 
 	// core language
 	$mce_langfile = array();
-	$mce_langfile[] = BASE_PATH . '/lib/includes/js/tiny_mce/langs/'.$language.'.js';
+	$mce_langfile[] = BASE_PATH . '/lib/includes/js/tiny_mce/jscripts/tiny_mce/langs/'.$language.'.js';
 	if (0)
 	{
 		// themes language
-		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/jscripts/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
 			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
 		}
 		// plugins language
-		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/jscripts/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
@@ -3258,6 +3258,7 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 		'advimage'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
 		'advlink'            => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link'),
 		'advlist'            => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'autolink'           => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // ephox addition
 		'autoresize'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // scale editor height to actual content
 		'autosave'           => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'restoredraft'),
 		'bbcode'             => array('default_on' => 0, 'grouping' =>   0, 'buttons' => ''),           // return page content as BBcode instead of HTML
@@ -3273,6 +3274,7 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 		'insertdatetime'     => array('default_on' => 1, 'grouping' => 180, 'buttons' => 'insertdate,inserttime'),
 		'layer'              => array('default_on' => 1, 'grouping' => 150, 'buttons' => 'insertlayer,moveforward,movebackward,absolute'),
 		'legacyoutput'       => array('default_on' => 0, 'grouping' =>   0, 'buttons' => ''),
+		'lists'              => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // ephox addition
 		'media'              => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'media'),
 		'nonbreaking'        => array('default_on' => 1, 'grouping' =>  65, 'buttons' => 'nonbreaking'),
 		'noneditable'        => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
@@ -3298,21 +3300,21 @@ function get_tinyMCE_plugin_list($desired_plugins = null)
 		'.cleanup'           => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'cleanup'),
 		'.clipboard'         => array('default_on' => 1, 'grouping' =>  15, 'buttons' => 'cut,copy,paste'),
 		'.code'              => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'code'),
-		'.colorpicker'       => array('default_on' => 1, 'grouping' =>  52, 'buttons' => 'forecolor:2,forecolorpicker,backcolor:2,backcolorpicker'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
+		'.colorpicker'       => array('default_on' => 1, 'grouping' =>  52, 'buttons' => 'forecolor:44,forecolorpicker,backcolor:44,backcolorpicker'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
 		'.help'              => array('default_on' => 1, 'grouping' => 800, 'buttons' => 'help'),
 		'.hierarchy'         => array('default_on' => 1, 'grouping' =>  58, 'buttons' => 'outdent,indent'),
 		'.hr'                => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'hr'),
 		'.image'             => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
 		'.justify'           => array('default_on' => 1, 'grouping' =>  40, 'buttons' => 'justifyleft,justifycenter,justifyright,justifyfull'),
 		'.linkage'           => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link,unlink,anchor'),
-		'.lists'             => array('default_on' => 1, 'grouping' =>  66, 'buttons' => 'bullist:2,numlist:2'),
+		'.lists'             => array('default_on' => 1, 'grouping' =>  66, 'buttons' => 'bullist:44,numlist:44'),
 		'.new'               => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'newdocument'),
 		'.quotation'         => array('default_on' => 1, 'grouping' =>  67, 'buttons' => 'blockquote'),
 		'.removeformat'      => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'removeformat'),
-		'.selectable_format' => array('default_on' => 1, 'grouping' =>  50, 'buttons' => 'styleselect:4,formatselect:4,fontselect:4,fontsizeselect:4'),
+		'.selectable_format' => array('default_on' => 1, 'grouping' =>  50, 'buttons' => 'styleselect:88,formatselect:88,fontselect:88,fontsizeselect:88'),
 		'.shortcuts'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
 		'.superscript'       => array('default_on' => 1, 'grouping' =>  35, 'buttons' => 'sub,sup'),
-		'.table'             => array('default_on' => 0, 'grouping' => 140, 'buttons' => 'tablecontrols:13'),  // must be in a separate group by its own, before the 'table' buttons; if you group them, you'll get extra empty toolbar chunks in the view :-(
+		'.table'             => array('default_on' => 0, 'grouping' => 140, 'buttons' => 'tablecontrols:282'),  // must be in a separate group by its own, before the 'table' buttons; if you group them, you'll get extra empty toolbar chunks in the view :-(
 		// ^^ this is disabled due this being a tinyMCE 2.x backwards compat item clashing with 'table' above: == ["table","|","row_props","cell_props","|","row_before","row_after","delete_row","|","col_before","col_after","delete_col","|","split_cells","merge_cells"]
 		'.undo'              => array('default_on' => 1, 'grouping' =>  14, 'buttons' => 'undo,redo'),
 		'.visualaid'         => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualaid')
