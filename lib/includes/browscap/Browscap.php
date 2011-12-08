@@ -135,6 +135,18 @@ class Browscap
 	public $silent          = false;
 
 	/**
+	 * Flag to enable/disable individual (very high-speed) UA caching.
+	 * When > 0, the settings fo each UA will be cached individually, reducing memory 
+	 * consumption and loading time of the 'overall' cache file. Generally, a site is
+	 * visited by a large number of people using few browsers, and the total number of
+	 * different UAs visiting is quite manageable. Here we can set up whether any, all 
+	 * or only 'ubiquitous' UAs get their info cached in fast-access, small, cache files.
+	 *
+	 * @var int
+	 */
+	public $smart_cache     = 1;
+
+	/**
 	 * Where to store the cached PHP arrays.
 	 *
 	 * @var string
@@ -217,7 +229,46 @@ class Browscap
 	 */
 	public function getBrowser($user_agent = null, $return_array = false)
 	{
-		// Load the cache at the first request
+		// Automatically detect the useragent
+		if (!isset($user_agent)) {
+			if (isset($_SERVER['HTTP_USER_AGENT'])) {
+				$user_agent = $_SERVER['HTTP_USER_AGENT'];
+			} else {
+				$user_agent = '';
+			}
+		}
+		
+		// see if we might have a fast/tiny cache entry for this one:
+		$array = false;
+		if ($this->smart_cache > 0)
+		{
+			$ua_hash = md5($user_agent);
+			// make sure we do not load the cache directory to subpar performance: cache the UAs in a subdir tree (1 level depth):
+			$ua_cache_subdir = 'UAC/' . substr($ua_hash, 0, 2);
+			// file subpath length: 64 chars
+			$ua_cache_filename = substr(preg_replace('/[^A-Za-z0-9.-]+/', '_', $user_agent), 0, 27) . '.' . substr($ua_hash, 2);
+			
+			$ua_cache_file = $this->cacheDir . $ua_cache_subdir . '/' . $ua_cache_filename;
+			if (file_exists($ua_cache_file))
+			{
+				$data = file_get_contents($ua_cache_file);
+				if ($data !== false)
+				{
+					$data = @unserialize($data);
+				}
+				// when the file is damaged, nuke it so it can be recreated properly: 
+				if (!is_array($data))
+				{
+					$this->_destroy_UA_cachefiles($ua_cache_subdir, $ua_cache_filename);
+				}
+				else
+				{
+					$array = $data;
+				}
+			}
+		}
+
+		// Load the cache at the first request, when necessary
 		if (!$this->_cacheLoaded) {
 			$cache_file = $this->cacheDir . $this->cacheFilename;
 			$ini_file   = $this->cacheDir . $this->iniFilename;
@@ -238,7 +289,7 @@ class Browscap
 						// Adjust the filemtime to the $errorInterval
 						touch($ini_file, time() - $this->updateInterval + $this->errorInterval);
 					} else if ($this->silent) {
-						// Return an array if silent mode is active and the ini db doesn't exsist
+						// Return an array if silent mode is active and the ini db doesn't exist
 						return array();
 					}
 
@@ -251,49 +302,56 @@ class Browscap
 			$this->_loadCache($cache_file);
 		}
 
-		// Automatically detect the useragent
-		if (!isset($user_agent)) {
-			if (isset($_SERVER['HTTP_USER_AGENT'])) {
-				$user_agent = $_SERVER['HTTP_USER_AGENT'];
-			} else {
-				$user_agent = '';
+		// collect the browser data if 'smart/fast caching' hasn't delivered
+		if ($array === false)
+		{
+			$browser = array();
+			foreach ($this->_patterns as $key => $pattern) {
+				if (preg_match($pattern . 'i', $user_agent)) {
+					$browser = array(
+						$user_agent, // Original useragent
+						trim(strtolower($pattern), self::REGEX_DELIMITER),
+						$this->_userAgents[$key]
+					);
+
+					$browser = $value = $browser + $this->_browsers[$key];
+
+					while (array_key_exists(3, $value) && $value[3]) {
+						$value      =   $this->_browsers[$value[3]];
+						$browser    +=  $value;
+					}
+
+					if (!empty($browser[3])) {
+						$browser[3] = $this->_userAgents[$browser[3]];
+					}
+
+					break;
+				}
 			}
-		}
 
-		$browser = array();
-		foreach ($this->_patterns as $key => $pattern) {
-			if (preg_match($pattern . 'i', $user_agent)) {
-				$browser = array(
-					$user_agent, // Original useragent
-					trim(strtolower($pattern), self::REGEX_DELIMITER),
-					$this->_userAgents[$key]
-				);
-
-				$browser = $value = $browser + $this->_browsers[$key];
-
-				while (array_key_exists(3, $value) && $value[3]) {
-					$value      =   $this->_browsers[$value[3]];
-					$browser    +=  $value;
+			// Add the keys for each property
+			$array = array();
+			foreach ($browser as $key => $value) {
+				if ($value === 'true') {
+					$value = true;
+				} else if ($value === 'false') {
+					$value = false;
 				}
 
-				if (!empty($browser[3])) {
-					$browser[3] = $this->_userAgents[$browser[3]];
+				$array[$this->_properties[$key]] = $value;
+			}
+			
+			// see if we should update the 'fast cache' as well
+			if ($ua_cache_file !== false)
+			{
+				@mkdir($this->cacheDir . $ua_cache_subdir, 0775, true);
+				
+				$data = serialize($array);
+				if (false === file_put_contents($ua_cache_file, $data))
+				{
+					$this->_destroy_UA_cachefiles($ua_cache_subdir, $ua_cache_filename);
 				}
-
-				break;
 			}
-		}
-
-		// Add the keys for each property
-		$array = array();
-		foreach ($browser as $key => $value) {
-			if ($value === 'true') {
-				$value = true;
-			} else if ($value === 'false') {
-				$value = false;
-			}
-
-			$array[$this->_properties[$key]] = $value;
 		}
 
 		return $return_array ? $array : (object) $array;
@@ -306,6 +364,9 @@ class Browscap
 	 */
 	public function updateCache()
 	{
+		// blow away any possibly existing 'smart cache' files too:
+		$this->_destroy_UA_cachefiles();
+
 		$ini_path           = $this->cacheDir . $this->iniFilename;
 		$cache_path         = $this->cacheDir . $this->cacheFilename;
 
@@ -380,6 +441,54 @@ class Browscap
 
 		// Save and return
 		return (bool) file_put_contents($cache_path, $cache, LOCK_EX);
+	}
+
+	/**
+	 * Destroys one or all 'smart cache' files
+	 */
+	private function _destroy_UA_cachefiles($subdir = null, $filename = null)
+	{
+		if (!empty($filename))
+		{
+			@unlink($this->cacheDir . $subdir . '/' . $filename);
+		
+			// as we use a 1 level subdir tree, see if we can/should delete the related subdir as well:
+			@rmdir($this->cacheDir . $subdir);
+		}
+		else
+		{
+			// we KNOW we're caching files in a 'UAC/xx/' subdirectory tree; blow away those 'xx' subdirs and the 'UAC' base dir as well
+			$parent = dirname($this->cacheDir . 'UAC');
+			$dh = opendir($parent);
+			while ($fn = readdir($dh)) 
+			{
+				if ($fn == '.' || $fn == '..') 
+					continue;
+					
+                $path = $this->cacheDir . 'UAC/' . $fn;
+               
+                if (is_dir($path)) 
+				{
+					$sdh = opendir($path);
+					while ($sfn = readdir($sdh)) 
+					{
+						if ($sfn == '.' || $sfn == '..') 
+							continue;
+							
+						$spath = $path . '/' . $sfn;
+						@unlink($spath);
+					}
+					closedir($sdh);
+					@rmdir($path);
+                }
+				else
+				{
+					@unlink($path);
+				}
+            }
+			closedir($dh);
+			@rmdir($this->cacheDir . 'UAC');
+        }
 	}
 
 	/**
