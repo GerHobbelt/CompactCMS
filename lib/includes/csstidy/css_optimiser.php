@@ -408,7 +408,7 @@ else {
 					exit;
 				}
 			}
-            $handle = fopen('temp/'.$filename.'.css','wb');
+            $handle = fopen('temp/'.$filename.'.css','w');
             if($handle) {
                 if(fwrite($handle,$css->print->plain()))
                 {

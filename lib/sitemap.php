@@ -893,6 +893,12 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	{
 		send_response_status_header($ccms['responsecode']);
 	}
+	
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		dump_request_to_logfile(array('invocation_mode' => get_interpreter_invocation_mode()),
+								true, true, true);
+	}
 }
 else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a] if() removed so the GET URL index.php?page=sitemap doesn't slip through the cracks.
 {
