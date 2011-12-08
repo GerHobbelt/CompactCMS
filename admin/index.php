@@ -581,6 +581,7 @@ else
 	$js_files[] = '../lib/includes/js/mochaUI.js';
 }
 /* $js_files[] = '../lib/includes/js/mochaui/Source/Utility/window-from-html.js'; */
+$js_files[] = '../lib/includes/js/Fx.CmsAdminSlide.js';
 $js_files[] = '../lib/includes/js/common.js';
 
 $driver_code = 'lazyloading_commonJS_done("' . $cfg['rootdir'] . '");';
