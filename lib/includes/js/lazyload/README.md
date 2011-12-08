@@ -1,23 +1,25 @@
 LazyLoad
 ========
 
-LazyLoad is a tiny (only 998 bytes minified and gzipped), dependency-free
-JavaScript library that makes it super easy to load external JavaScript and CSS
-files on demand. It's ideal for quickly and unobtrusively loading large external
-scripts and stylesheets either lazily after the rest of the page has finished
-loading or on demand as needed.
+LazyLoad is a tiny (only 918 bytes minified and gzipped), dependency-free
+JavaScript utility that makes it super easy to load external JavaScript and CSS
+files on demand.
 
-In addition to CSS support, this version of LazyLoad also adds support for
-parallel loading of multiple resources in browsers that support it. To load
-multiple resources in parallel, simply pass an array of URLs in a single
-LazyLoad call.
+Whenever possible, LazyLoad will automatically load resources in parallel while
+ensuring execution order when you specify an array of URLs to load. In browsers
+that don't preserve the execution order of asynchronously-loaded scripts,
+LazyLoad will safely load the scripts sequentially.
+
+Use LazyLoad when you need a small, fast, safe dynamic JS or CSS loader, but
+don't need the overhead of dependency management or other extra functionality
+that larger script loaders provide.
 
 Downloads
 ---------
 
-  * [lazyload.js](http://pieisgood.org/files/lazyload-2.0.0/lazyload.js) (full source)
-  * [lazyload-min.js](http://pieisgood.org/files/lazyload-2.0.0/lazyload-min.js) (minified source)
-  * Archive: [tgz](http://github.com/rgrove/lazyload/tarball/release-2.0.0) | [zip](http://github.com/rgrove/lazyload/zipball/release-2.0.0)
+  * [lazyload.js](https://github.com/rgrove/lazyload/raw/release-2.0.1/lazyload.js) (full source)
+  * [lazyload-min.js](https://github.com/rgrove/lazyload/raw/release-2.0.1/lazyload-min.js) (minified source)
+  * Archive: [tgz](https://github.com/rgrove/lazyload/tarball/release-2.0.1) | [zip](https://github.com/rgrove/lazyload/zipball/release-2.0.1)
 
 Usage
 -----
@@ -70,39 +72,25 @@ ensure that scripts are always executed in the correct order, LazyLoad will load
 all scripts sequentially in browsers other than Firefox and Opera. Hopefully
 other browsers will improve their parallel script loading behavior soon.
 
-Sadly, Firefox doesn't provide any indication when a CSS file has finished
-loading. In Firefox, CSS load callbacks will execute after a short delay, but
-there's no way to automatically guarantee that the CSS has finished loading
-before the callback is executed. Luckily, there's a fairly painless
-[manual workaround](http://wonko.com/post/how-to-prevent-yui-get-race-conditions)
-that you can use to detect when CSS has finished loading, but it's not possible
-for LazyLoad to do it for you.
-
 License
 -------
 
-Copyright (c) 2010 Ryan Grove (ryan@wonko.com).
+Copyright (c) 2011 Ryan Grove (ryan@wonko.com).
 All rights reserved.
  
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
- 
-  * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  * Neither the name of this project nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
- 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the 'Software'), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
