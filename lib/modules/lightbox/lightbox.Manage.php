@@ -675,20 +675,27 @@ if (!$tinyMCE_required)
 }
 else
 {
-	$mce_options = array($textarea4descr_id => array(
-			'theme' => 'simple'
-			));
+	$mce_options = array(
+		// [0] carries the generic settings:
+		array(
+			$textarea4descr_id => array(
+				'theme' => 'simple'
+				)
+			)
+		);
 			
-	$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, $textarea4descr_id, $mce_options));
+	$MCEcodegen = new tinyMCEcodeGen($textarea4descr_id, $mce_options);
+
+	$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 	// these must FOLLOW the tinyMCE JS list as that part will include the basics for these ones as well:
 	$js_files[] = $cfg['rootdir'] . 'lib/includes/js/fancyupload/FancyUpload2.js';
 	$js_files[] = $cfg['rootdir'] . 'lib/modules/lightbox/modLightbox.js';
 
-	$starter_code = generateJS4TinyMCEinit(1, $textarea4descr_id, $mce_options);
+	$starter_code = $MCEcodegen->genStarterCode();
 
-	$driver_code = generateJS4TinyMCEinit(2, $textarea4descr_id, $mce_options);
+	$driver_code = $MCEcodegen->genDriverCode();
 
-	$extra_functions_code = generateJS4TinyMCEinit(3, $textarea4descr_id, $mce_options);
+	$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
 }
 
 

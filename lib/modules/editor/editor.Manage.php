@@ -219,14 +219,16 @@ function confirmation()
 			// -------------------------------------------------
 			// Load TinyMCE (compressed for faster loading)
 			
-			$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, $textarea_id));
+			$MCEcodegen = new tinyMCEcodeGen($textarea_id, array(array('FileManager' => array())));
+
+			$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 			$js_files[] = $cfg['rootdir'] . 'lib/includes/js/dummy.js?cb=exec_GHO';
 
-			$starter_code = generateJS4TinyMCEinit(1, $textarea_id);
+			$starter_code = $MCEcodegen->genStarterCode();
 
-			$driver_code = generateJS4TinyMCEinit(2, $textarea_id);
+			$driver_code = $MCEcodegen->genDriverCode();
 
-			$extra_functions_code = generateJS4TinyMCEinit(3, $textarea_id);
+			$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
 
 			$extra_functions_code .= <<<EOT42
 

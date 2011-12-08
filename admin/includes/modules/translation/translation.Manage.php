@@ -414,6 +414,16 @@ if ($do == 'update')
 	}
 }
 
+
+
+
+$MCEcodegen = new tinyMCEcodeGen('translation_manager_content', array(array('FileManager' => array())));
+
+$css_files = array('all' => array());
+$css_files['all'][] = $cfg['rootdir'] . 'admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css';
+$css_files = array_merge($css_files, $MCEcodegen->get_CSSheaderfiles());
+$css_files['all:IE'][] = $cfg['rootdir'] . 'admin/img/styles/ie.css';
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -421,13 +431,9 @@ if ($do == 'update')
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Translation module</title>
-	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../../lib/includes/js/mootools-filemanager/Assets/js/milkbox/css/milkbox.css" />
-	<link rel="stylesheet" media="all" type="text/css" href="../../../../lib/includes/js/mootools-filemanager/Assets/Css/FileManager.css,Additions.css" />
-	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
-	<![endif]-->
+	<?php
+	echo generateCSSheadSection($css_files);
+	?>
 </head>
 <body>
 <div class="module" id="translation-assist">
@@ -525,17 +531,18 @@ function googleTranslateElementInit()
 
 
 <?php
+
 $js_files = array();
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
 $js_files[] = 'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
 $js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
-$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'translation_manager_content'));
+$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 
-$starter_code = generateJS4TinyMCEinit(1, 'translation_manager_content');
+$starter_code = $MCEcodegen->genStarterCode();
 
-$driver_code = generateJS4TinyMCEinit(2, 'translation_manager_content');
+$driver_code = $MCEcodegen->genDriverCode();
 
-$extra_functions_code = generateJS4TinyMCEinit(3, 'translation_manager_content');
+$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
 
 echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>

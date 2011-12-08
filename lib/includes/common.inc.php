@@ -3427,361 +3427,490 @@ Lesson:
 											Hence tags MUST only contain alphanumerics and underscores and MUST START with
 											an alpha character ([A-Za-z]).
 */
-function generateJS4tinyMCEinit($state, $editarea_tags, $options = null, $with_MT_FileManager = true, $js_load_callback = 'jsComplete')
+class tinyMCEcodeGen
 {
-	global $cfg;
+	protected $rootdir;
+	protected $MCE_language;
+	protected $FM_language;
+	protected $options;
+	protected $js_load_callback;
 
-	$editarea_tags = explode(',', $editarea_tags);
-	if (!is_array($options))
+
+	public function __construct($textarea_ids, $usr_options = null, $js_load_callback = 'jsComplete')
 	{
+		global $cfg;
+
+		$this->rootdir = $cfg['rootdir'];
+		$this->MCE_language = $cfg['tinymce_language'];
+		$this->FM_language = $cfg['MT_FileManager_language'];
+
+		$this->js_load_callback = $js_load_callback;
+
+		// split the ID set and create a full MCE options array for each of 'em, keeping track of generic and specific user options
+		$editarea_tags = explode(',', $textarea_ids);
 		$options = array();
-	}
-	foreach ($editarea_tags as $tag)
-	{
-		$options[$tag] = array_merge(array(
-				'theme' => 'advanced',
-				'skin' => 'o2k7',
-				'skin_variant' => 'silver'
-			), ((isset($options[$tag]) && is_array($options[$tag])) ? $options[$tag] : array()));
+
+		$generic_user_opts = ((isset($usr_options[0]) && is_array($usr_options[0])) ? $usr_options[0] : array());
+		foreach ($editarea_tags as $tag)
+		{
+			$user_opts = ((isset($usr_options[$tag]) && is_array($usr_options[$tag])) ? $usr_options[$tag] : array());
+			$options[$tag] = array_merge(array(
+					'theme' => 'advanced',
+				), $generic_user_opts, $user_opts);
+
+			// do this defaulting in two steps: some of the item names are dependent on the actual theme picked for this tinyMCE instance:
+			$theme = $options[$tag]['theme'];
+
+			if($cfg['iframe'])
+			{
+				$iframe_def_options = array(
+					'extended_valid_elements' => 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]'
+				);
+			}
+			else
+			{
+				$iframe_def_options = array();
+			}
+
+			$options[$tag] = array_merge(array(
+					'skin' => 'o2k7',
+					'skin_variant' => 'silver',
+
+					'mode' => 'exact',
+					'elements' => $tag,
+					'language' => $this->MCE_language,
+					'dialog_type' => 'modal',
+
+					'paste_auto_cleanup_on_paste' => true,
+
+					'autoresize_on_init' => true,
+
+					'autosave_ask_before_unload' => false,    // don't bug the user when he's aborting his edit
+
+					'relative_urls' => false,
+					'convert_urls' => true,
+					'remove_script_host' => true,
+					'document_base_url' => $this->rootdir,
+
+					// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
+					'content_css' => $this->rootdir . 'admin/img/styles/base.css,' . $this->rootdir . 'admin/img/styles/liquid.css,' . $this->rootdir . 'admin/img/styles/layout.css' .
+										',' . $this->rootdir . 'admin/img/styles/sprite.css,' . $this->rootdir . 'admin/img/styles/last_minute_fixes.css' .
+										',' . $this->rootdir . 'admin/img/styles/ie.css?only-when=%3d%3d+IE',
+
+					'spellchecker_languages' => '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
+
+					"theme_{$theme}_toolbar_location" => 'top',
+					"theme_{$theme}_toolbar_align" => 'left',
+					"theme_{$theme}_statusbar_location" => 'bottom',
+
+					"theme_{$theme}_resizing" => true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+					"theme_{$theme}_resizing_use_cookie" => 1,
+					"theme_{$theme}_resize_horizontal" => true,
+					"theme_{$theme}_resizing_min_width" => 362,  /* turns out the widest toolbar block of ours is 362px wide */
+					"theme_{$theme}_resizing_min_height" => 100,
+					"theme_{$theme}_resizing_max_width" => null, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+					"theme_{$theme}_resizing_max_height" => 0xFFFF
+
+					//height: '300px',
+					//width: editWinWidth   /* default: width in pixels */
+
+				), $iframe_def_options, $options[$tag]);
+
+
+
+
+
+			// make sure, when the FileManager is required, that it's options are set up as well:
+			if (isset($options[$tag]['FileManager']))
+			{
+				$session_id = session_id();
+				if (!empty($session_id))
+				{
+					$sid_def_options = array(
+						'uploadAuthData' => array(
+							'session' => $session_id
+						)
+					);
+				}
+				else
+				{
+					$sid_def_options = array();
+				}
+				$fm_user_opts = (is_array($options[$tag]['FileManager']) ? $options[$tag]['FileManager'] : array());
+
+				$options[$tag]['FileManager'] = array_merge(array(
+						'url' => $this->rootdir . 'lib/includes/js/mootools-filemanager/ccms/manager.php',
+						'baseURL' => $this->rootdir,
+						'assetBasePath' => $this->rootdir . 'lib/includes/js/mootools-filemanager/Assets',
+						'language' => $this->FM_language,
+						'selectable' => true,
+						'destroy' => true,
+						'upload' => true,
+						'rename' => true,
+						'download' => true,
+						'createFolders' => true,
+						'hideClose' => false,
+						'hideOverlay' => false,
+						'uploadAuthData' => array(),
+						'propagateData' => array(
+							'editor_req_type' => null // =='image', ...
+						)
+					), $sid_def_options, $fm_user_opts);
+			}
+			else
+			{
+				unset($options[$tag]['FileManager']);
+			}
+
+
+
+			$pluginarr = get_tinyMCE_plugin_list((!empty($options[$tag]['plugins']) ? $options[$tag]['plugins'] : null));
+			$plugs = array_keys($pluginarr);
+			$plugs = array_filter($plugs, 'is_real_tinyMCE_plugin');
+			$options[$tag]['plugins'] = implode(',', $plugs);
+			dump_request_to_logfile(array('pluginarr' => $pluginarr));
+
+			/*
+			now create a list of buttons:
+
+			we've moved the construction of the toolbars to the backend as we've found that using many small toolbars helps when the editor is resizing:
+			wider (larger) toolbars block the editor from shrinking.
+
+			The 'grouping' setting instructs us which tools should sit on the same toolbar.
+			*/
+
+			$btngrp = array();
+			$btnset = array();
+			foreach($pluginarr as $name => $info)
+			{
+				$bs = $info['buttons'];
+				if (empty($bs)) continue;
+
+				$grp = $info['grouping'];
+
+				$bsa = explode(',', $bs);
+				foreach($bsa as $btn1)
+				{
+					$bdef = explode(':', $btn1);
+					if (count($bdef) > 1)
+					{
+						// a button which is wider than the usual ones: length is specced as number of 'regular' buttons eqv.:
+						$bdef[1] = intval($bdef[1]);
+					}
+					else
+					{
+						$bdef[1] = ($bdef[0] == '|' ? 10 : 22); /* [px] width per button */
+					}
+
+					if (!isset($btngrp[$grp]))
+					{
+						$btngrp[$grp] = array();
+					}
+
+					// also check whether button isn't already in the group/toolbar-set: some adv(anced) plugins override existing buttons/functions:
+					$xsist = array_key_exists($bdef[0], $btnset);
+					if (!$xsist)
+					{
+						$btngrp[$grp][] = $bdef;
+						$btnset[$bdef[0]] = true;
+					}
+				}
+			}
+			ksort($btngrp);
+			dump_request_to_logfile(array('pluginarr' => $pluginarr, 'btngrp' => $btngrp));
+
+			// bigger toolbar chunks are bad because you are limiting the shrinking capability of the editor window...
+			$tbdef = $this->generateToolbarLayout($btngrp, 100);
+			dump_request_to_logfile(array('pluginarr' => $pluginarr, 'btngrp' => $btngrp, 'tbdef' => $tbdef));
+
+			for ($i = count($tbdef); $i > 0; $i--)
+			{
+				$options[$tag]["theme_{$theme}_buttons" . $i] = $tbdef[$i - 1];
+			}
+			// and make sure we blow away any inadvertedly user defined toolbars:
+			for ($i = count($tbdef) + 1; isset($options[$tag]["theme_{$theme}_buttons" . $i]); $i++)
+			{
+				unset($options[$tag]["theme_{$theme}_buttons" . $i]);
+			}
+		}
+
+		$this->options = $options;
 	}
 
-	switch ($state)
-	{
-	default:
-		return false;
 
-	case 0:
+
+
+	protected function generateToolbarLayout($btngrp, $editWinWidth)
+	{
+		$lwleft = $editWinWidth - 10; // subtract edges.
+		$max_singlegrp_width = 0;
+
+		$tbcoll = array();
+		$tb = array();
+		foreach($btngrp as $group => $btnarr)
+		{
+			$grpwidth = 0;
+			$tb1 = array();
+			foreach($btnarr as $btn)
+			{
+				$grpwidth += $btn[1];
+				$tb1[] = $btn[0];
+			}
+			if ($grpwidth > $max_singlegrp_width)
+				$max_singlegrp_width = $grpwidth;
+
+			if ($grpwidth + 5 > $lwleft)
+			{
+				// not enough space: start a new toolbar row; push the previous toolbar first:
+				$tbcoll[] = implode(',', $tb);
+
+				$tb = array();
+				$lwleft = $editWinWidth - 10; // subtract edges.
+			}
+
+			if (count($tb) > 0)
+			{
+				$lwleft -= 10;
+				// add separator first!
+				$tb[] = '|';
+			}
+			$tb = array_merge($tb, $tb1);
+
+			$lwleft -= $grpwidth;
+		}
+		// and push the final row:
+		if (count($tb) > 0)
+		{
+			$tbcoll[] = implode(',', $tb);
+		}
+
+		// now if we find that the minimum toolbar block width is larger than the originally specified width, we can be sure
+		// we can't get any less wide than that, so we recalc the toolbar layout with that new width:
+		//return ($max_singlegrp_width > $editWinWidth - 10 ? $this->generateToolbarLayout($btngrp, $max_singlegrp_width + 10) : $tbcoll);
+		//
+		// EDIT: it's nicer to have some small toolbars as well, as the wrapping on shrinking the editor will look slightly better that way.
+		return $tbcoll;
+	}
+
+
+	protected function cvt_opt2JS(&$lineterm, $member, $value, $JS_expression = null)
+	{
+		if ($JS_expression !== null)
+		{
+			$rv = $lineterm . $member . ': ' . $JS_expression;
+		}
+		else if (is_string($value))
+		{
+			$value = addcslashes($value, "\0..\37\"");
+			$rv = $lineterm . $member . ': "' . $value . '"';
+		}
+		else if (is_bool($value))
+		{
+			$rv = $lineterm . $member . ': ' . ($value ? 'true' : 'false');
+		}
+		else if (is_scalar($value))
+		{
+			$rv = $lineterm . $member . ': ' . $value;
+		}
+		else
+		{
+			return '';
+		}
+		$lineterm = ",\n";
+		return $rv;
+	}
+
+
+
+	public function getCSSheaderfiles()
+	{
+		$rv = array('all' => array());
+
+		foreach ($this->options as $tag => $options)
+		{
+			if (!empty($options['FileManager']))
+			{
+				$csspath = $this->rootdir . 'lib/includes/js/mootools-filemanager/dummy.css' .
+								',Assets/js/milkbox/css/milkbox.css' .
+								',Assets/Css/FileManager.css' .
+								',Assets/Css/Additions.css';
+
+				$rv['all'][] = $csspath;
+				break;  // once is enough...
+			}
+		}
+
+		return $rv;
+	}
+
+
+
+
+	public function get_JSheaderfiles()
+	{
 		$rv = array();
 
 		// pick one of these: tiny_mce_ccms.js (which will lazyload all tinyMCE parts recursively through tiny_mce_dev.js) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
-		$rv[] = $cfg['rootdir'] . 'lib/includes/js/tiny_mce/tiny_mce_ccms.js';
-		if ($with_MT_FileManager)
+		$rv[] = $this->rootdir . 'lib/includes/js/tiny_mce/jscripts/tiny_mce/tiny_mce_ccms.js';
+		foreach ($this->options as $tag => $options)
 		{
-			/* File uploader JS */
-			$ls = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/dummy.js,Source/FileManager.js,';
-			if ($cfg['MT_FileManager_language'] != 'en')
+			if (!empty($options['FileManager']))
 			{
-				$ls .= 'Language/Language.en.js,';
+				/* File uploader JS */
+				$ls = $this->rootdir . 'lib/includes/js/mootools-filemanager/dummy.js,Source/FileManager.js,';
+				if ($this->FM_language != 'en')
+				{
+					$ls .= 'Language/Language.en.js,';
+				}
+				$ls .= 'Language/Language.' . $this->FM_language . '.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
+
+				// and make sure these are added BEFORE this series of scripts (the Combiner will filter out those lines from FileManager.js to prevent clashes):
+				//
+				//Asset.javascript(__DIR__+'../Assets/js/milkbox/milkbox.js');
+				//Asset.css(__DIR__+'../Assets/js/milkbox/css/milkbox.css');
+				//Asset.css(__DIR__+'../Assets/Css/FileManager.css');
+				//Asset.css(__DIR__+'../Assets/Css/Additions.css');
+				//Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
+				$rv[] = $this->rootdir . 'lib/includes/js/mootools-filemanager/Assets/js/jsGET.js';
+				$rv[] = $this->rootdir . 'lib/includes/js/mootools-filemanager/Assets/js/milkbox/milkbox.js';
+
+				$rv[] = $ls;
+				break; // once is enough...
 			}
-			$ls .= 'Language/Language.' . $cfg['MT_FileManager_language'] . '.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
-
-			// and make sure these are added BEFORE this series of scripts (the Combiner will filter out those lines from FileManager.js to prevent clashes):
-			//
-			//Asset.javascript(__DIR__+'../Assets/js/milkbox/milkbox.js');
-			//Asset.css(__DIR__+'../Assets/js/milkbox/css/milkbox.css');
-			//Asset.css(__DIR__+'../Assets/Css/FileManager.css');
-			//Asset.css(__DIR__+'../Assets/Css/Additions.css');
-			//Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
-			$rv[] = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/Assets/js/jsGET.js';
-			$rv[] = $cfg['rootdir'] . 'lib/includes/js/mootools-filemanager/Assets/js/milkbox/milkbox.js';
-
-			$rv[] = $ls;
 		}
 		return $rv;
+	}
 
-	case 1:
+
+
+
+	public function genStarterCode()
+	{
 		/*
 		 * when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
 		 * however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
 		 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
 		 */
-		$rootdir = $cfg['rootdir'];
+		$rootdir = $this->rootdir;
+		$callback = $this->js_load_callback;
 
 		$rv = <<<EOT42
 
 	tinyMCEPreInit = {
 		  suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
-		, base: '{$rootdir}lib/includes/js/tiny_mce'
-		, query: 'load_callback={$js_load_callback}' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+		, base: '{$rootdir}lib/includes/js/tiny_mce/jscripts/tiny_mce'
+		, query: 'load_callback={$callback}' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
 	};
 
 EOT42;
 		return $rv;
+	}
 
-	case 2:
-		$rootdir = $cfg['rootdir'];
-		$tinymce_language = $cfg['tinymce_language'];
 
-		$pluginarr = get_tinyMCE_plugin_list();
-		$plugs = array_keys($pluginarr);
-		$plugs = array_filter($plugs, 'is_real_tinyMCE_plugin');
-		$plugins_str = implode(',', $plugs);
 
-		// now create a list of buttons:
-		$btngrp = array();
-		$btnvirtcount = 0;
-		foreach($pluginarr as $name => $info)
-		{
-			$bs = $info['buttons'];
-			if (empty($bs)) continue;
 
-			$grp = $info['grouping'];
-
-			$bsa = explode(',', $bs);
-			$btnvirtcount += count($bsa);
-			foreach($bsa as $btn1)
-			{
-				$bdef = explode(':', $btn1);
-				if (count($bdef) > 1)
-				{
-					// a button which is wider than the usual ones: length is specced as number of 'regular' buttons eqv.:
-					$btnvirtcount += intval($bdef[1]) - 1; // subtract one as we counted the button already as a 'regular' one!
-				}
-				else
-				{
-					$bdef[1] = 1;
-				}
-
-				if (!isset($btngrp[$grp]))
-				{
-					$btngrp[$grp] = array();
-				}
-
-				// also check whether button isn't already in the group: some adv(anced) plugins override existing buttons/functions:
-				$xsist = false;
-				foreach($btngrp[$grp] as $bc)
-				{
-					if ($bc[0] == $bdef[0])
-					{
-						$xsist = true;
-						break;
-					}
-				}
-				if (!$xsist)
-				{
-					$btngrp[$grp][] = $bdef;
-				}
-			}
-		}
-		ksort($btngrp);
-
-		$rv = "    var buttondefs = [\n";
-
-		$s = '';
-		foreach($btngrp as $group => $btnarr)
-		{
-			$rv .= $s;
-
-			$s = "        [\n";
-			$s2 = '';
-			foreach($btnarr as $bdef)
-			{
-				$s2 .= "            ['" . $bdef[0] . "', " . $bdef[1] . "],\n";
-			}
-			$s2 = substr($s2, 0, strlen($s2) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-			$s .= $s2 . "        ],\n";
-		}
-		$s = substr($s, 0, strlen($s) - 2) . "\n"; // strip off the last comma: some JS engines/browsers don't like dangling commas!
-		$rv .= $s . "    ];\n";
-
-		$rv .= <<<EOT42
-	var buttonvirtcount = $btnvirtcount;
+	public function genDriverCode()
+	{
+		$rv = <<<EOT42
 
 	// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
 	var dimensions;
-	var editwinwidth;
+	var editWinWidth;
 	var editwinmaxwidth;
 	var editwinmaxheight;
 
+	if (!tinyMCE.dom.Event.domLoaded) tinyMCE.dom.Event.domLoaded = 42;
+	if (!tinyMCE.domLoaded) tinyMCE.domLoaded = 666;
+
+
 EOT42;
 
-		foreach($editarea_tags as $tag)
+		foreach ($this->options as $tag => $options)
 		{
-			$theme = $options[$tag]['theme'];
-			$skin = $options[$tag]['skin'];
-			$skin_variant = $options[$tag]['skin_variant'];
-
 			$rv .= <<<EOT42
 
 	dimensions = window.getSize();
 	editwinmaxwidth = dimensions.x - 20;
 	editwinmaxheight = dimensions.y - 80;
 	dimensions = \$('{$tag}').getSize();
-	editwinwidth = dimensions.x;
-	if (typeof console !== 'undefined' && console.log) console.log('width: ' + editwinwidth + 'px');
-
-	// tbdef = layout_the_MCE_toolbars(buttondefs, (editwinwidth < 362 ? editwinwidth : 362));
-	// bigger toolbar chunks are bad because you are limiting the shrinking capability of the editor window...
-	tbdef = layout_the_MCE_toolbars(buttondefs, 362);
+	editWinWidth = dimensions.x;
+	//if (typeof console !== 'undefined' && console.log) console.log('width: ' + editWinWidth + 'px');
 
 	var MCEsettings_{$tag} = {
-		mode: 'exact',
-		elements: '{$tag}',
-		theme: '{$theme}',
-		language: '{$tinymce_language}',
-		skin: '{$skin}',
-		skin_variant: '{$skin_variant}',
-		plugins: '{$plugins_str}',
-		theme_{$theme}_toolbar_location: 'top',
-
-		theme_{$theme}_toolbar_align: 'left',
-		theme_{$theme}_statusbar_location: 'bottom',
-		dialog_type: 'modal',
-
-		paste_auto_cleanup_on_paste: true,
-
-		autoresize_on_init: true,
-		autoresize_max_height: editwinmaxheight,
-
-		autosave_ask_before_unload: false,    // don't bug the user when he's aborting his edit
-
-		theme_{$theme}_resizing: true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-		theme_{$theme}_resizing_use_cookie : 1,
-		theme_{$theme}_resize_horizontal: true,
-		theme_{$theme}_resizing_min_width: 362,  /* turns out the widest toolbar block of ours is 362px wide */
-		theme_{$theme}_resizing_min_height: 100,
-		theme_{$theme}_resizing_max_width: editwinwidth, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-		theme_{$theme}_resizing_max_height: 0xFFFF,
-		relative_urls: false,
-		convert_urls: true,
-		remove_script_host: true,
-		document_base_url: '{$rootdir}',
 
 EOT42;
 
-		// TODO: determine the template of the given page: fetch those CSS files.
+			$theme = $options['theme'];
+			$theme_tag1 = "theme_{$theme}_resizing_max_width";
 
-		// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
-			$rv .= "        content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,' . $cfg['rootdir'] . 'admin/img/styles/liquid.css,' . $cfg['rootdir'] . 'admin/img/styles/layout.css' .
-										',' . $cfg['rootdir'] . 'admin/img/styles/sprite.css,' . $cfg['rootdir'] . 'admin/img/styles/last_minute_fixes.css' .
-										',' . $cfg['rootdir'] . 'admin/img/styles/ie.css?only-when=%3d%3d+IE' . "',\n";
-
-			if($cfg['iframe'])
+			$lineterm = '';
+			foreach($options as $member => $value)
 			{
-				$rv .= "        extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
+				/* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+				if ($member == $theme_tag1 && $value === null)
+				{
+					$rv .= $this->cvt_opt2JS($lineterm, $member, null, 'editWinWidth');
+				}
+				else
+				{
+					$rv .= $this->cvt_opt2JS($lineterm, $member, $value);
+				}
 			}
-			$rv .= "        spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
-			if ($with_MT_FileManager)
-			{
-				$session_id = session_id();
-				$MT_FileManager_language = $cfg['MT_FileManager_language'];
 
-				$rv .= <<<EOT42
+
+			if (!empty($options['FileManager']))
+			{
+				$rv .= $lineterm . <<<EOT42
 
 		/* Here goes the Magic */
 		file_browser_callback: FileManager.TinyMCE(
 			function(type)
 			{
 				return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url: '{$rootdir}lib/includes/js/mootools-filemanager/ccms/manager.php',
-					baseURL: '{$rootdir}',
-					assetBasePath: '{$rootdir}lib/includes/js/mootools-filemanager/Assets',
-					language: '{$MT_FileManager_language}',
-					selectable: true,
-					destroy: true,
-					upload: true,
-					rename: true,
-					download: true,
-					createFolders: true,
-					hideClose: false,
-					hideOverlay: false,
-					uploadAuthData: {
-						session: '{$session_id}'
-					},
-					propagateData: {
-						editor_req_type: type // =='image', ...
+
+EOT42;
+
+				$lineterm = '';
+				foreach($options['FileManager'] as $member => $value)
+				{
+					if ($member == 'editor_req_type' && $value === null)
+					{
+						$rv .= $this->cvt_opt2JS($lineterm, $member, null, 'type');  // =='image', ...
 					}
+					else
+					{
+						$rv .= $this->cvt_opt2JS($lineterm, $member, $value);
+					}
+				}
+
+				$rv .= <<<EOT42
+
 				};
-			}),
+			})
 
 EOT42;
 			}
 			$rv .= <<<EOT42
 
-		//height: '300px',
-		//width: editwinwidth   /* default: width in pixels */
-
-		buggeraboo_sentinel: 1
 	};
-
-	var tbdeflen = tbdef.length;
-	var tbidx;
-
-	/* now set up the toolbar rows; as many as we need: */
-	for (tbidx = 1; tbidx <= tbdeflen; tbidx++)
-	{
-		MCEsettings_{$tag}['theme_{$theme}_buttons' + tbidx] = tbdef[tbidx - 1];
-	}
-
-	if (!tinyMCE.dom.Event.domLoaded) tinyMCE.dom.Event.domLoaded = 42;
-	if (!tinyMCE.domLoaded) tinyMCE.domLoaded = 666;
 
 	tinyMCE.init(MCEsettings_{$tag});
 
-
 EOT42;
 		}
 
 		return $rv;
+	}
 
-	case 3:
-		$rv = <<<EOT42
 
-/* set up the toolbars depending on the editor width */
-function layout_the_MCE_toolbars(buttondefs, editwinwidth)
-{
-	if (typeof console !== 'undefined' && console.log) console.log('layout_the_MCE_toolbars: ' + editwinwidth + 'px');
 
-	var i;
-	var tbcount = buttondefs.length;
-	var dst = [];
-	var dstelem = '';
-	var lwleft = editwinwidth - 10; // subtract edges.
-	var max_singlegrp_width = 0;
-
-	for (i = 0; i < tbcount; i++)
+	public function genExtraFunctionsCode()
 	{
-		var grpwidth = 0;
-		var j;
-		var grp = buttondefs[i];
-		var btns_in_grp = grp.length;
-
-		for (j = 0; j < btns_in_grp; j++)
-		{
-			grpwidth += grp[j][1];
-		}
-		grpwidth *= 22; /* width per button */
-		if (grpwidth > max_singlegrp_width)
-			max_singlegrp_width = grpwidth;
-
-		if (grpwidth + 5 > lwleft)
-		{
-			// not enough space: start a new toolbar row; push the previous toolbar first:
-			//alert('toolbar row: ' + dstelem);
-			dst.push(dstelem);
-
-			dstelem = '';
-			lwleft = editwinwidth - 10; // subtract edges.
-		}
-
-		if (dstelem.length > 0)
-		{
-			lwleft -= 10;
-			// add separator first!
-			dstelem += ',|,';
-		}
-		dstelem += grp[0][0];
-		for (j = 1; j < btns_in_grp; j++)
-		{
-			dstelem += ',' + grp[j][0];
-		}
-		lwleft -= grpwidth;
-	}
-
-	// and push the final row:
-	//alert('toolbar row @ final: ' + dstelem);
-	dst.push(dstelem);
-
-	// now if we find that the minimum toolbar block width is larger than the originally specified width, we can be sure
-	// we can't get any less wide than that, so we recalc the toolbar layout with that new width:
-	return (max_singlegrp_width > editwinwidth - 10 ? layout_the_MCE_toolbars(buttondefs, max_singlegrp_width + 10) : dst);
-}
-
-
-EOT42;
-		return $rv;
+		return '';
 	}
 }
+
+
 
 
 
@@ -3826,7 +3955,17 @@ function jsComplete(user_obj, lazy_obj)
 	if (lazy_obj.todo_count)
 	{
 		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
+		var next_one;
+		
+		if (lazy_obj.pending_set.js.urls.length > 0)
+		{
+			next_one = lazy_obj.pending_set.js.urls[0];
+		}
+		else 
+		{
+			next_one = lazy_obj.load_queue['js'][0].urls[0];
+		}
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ next_one);
 		return false;
 	}
 	else
@@ -3889,6 +4028,40 @@ EOT42;
 	return $rv;
 }
 
+
+
+function generateCSSheadSection($files)
+{
+	$rv = '';
+
+	foreach($files as $media => $file)
+	{
+		$md = explode(':', $media);
+		$media_str = $md[0];
+		if ($media_str != 'all')
+			$media_str = ' media="' . $media_str . '"';
+		else
+			$media_str = '';
+
+		if (!empty($md[1]))
+		{
+			$IE_cond = array(
+					'\n<!--[if ' . $md[1] . "]>\n",
+					"\n<![endif]-->\n"
+				);
+		}
+		else
+		{
+			$IE_cond = '';
+		}
+
+		$rv .= $IE_cond[0] .
+				'  <link rel="stylesheet" type="text/css" ' . $media_str . ' href="' . $file . '" />' .
+			   $IE_cond[1];
+	}
+
+	return $rv;
+}
 
 
 
