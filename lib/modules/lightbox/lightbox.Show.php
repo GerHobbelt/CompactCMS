@@ -289,6 +289,7 @@ elseif($singleShow)
 		$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$ccms['page_name'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a>';
 
 		$ccms['urlpage']   = $ccms['page_name'] . '/' . $album;
+		$ccms['complete_page_url'] = $ccms['urlpage'] . '.html';
 		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['album']['album'].' '.ucfirst($album);
 		//$ccms['subheader']  = $row->subheader;
 		$ccms['desc']       = $desc;

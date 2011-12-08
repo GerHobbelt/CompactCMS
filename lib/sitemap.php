@@ -352,10 +352,31 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 	function setup_ccms_for_40x_error($rcode, $pagereq)
 	{
-		global $cfg, $ccms;
+		global $cfg, $ccms, $_SERVER;
 
 		// ERROR 403/404; if not 403, then we default to 404
 		// Or if DB query returns zero, show error 404: file does not exist
+		
+		// support custom Apache ErrorDocument rewrites, which use SERVER['REDIRECT_URL'], etc.:
+		$content = "";
+		$complete_pageurl = $pagereq . ".html";
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+		{
+			$content .= sprintf("<p>resp code: %d, req: %s, redir url: %s</p>", $rcode, $pagereq, !empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : '---');
+		}
+		if (is_http_response_code($pagereq) && !empty($_SERVER['REDIRECT_URL']))
+		{
+			$offending_pageurl = /* filterParam4URL */ filterParam4FullFilePath($_SERVER['REDIRECT_URL']);
+			if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+			{
+				$content .= sprintf("<p>resp code: %d, req: %s, redir url: %s, name: %s</p>", $rcode, $pagereq, (!empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : '---'), $offending_pageurl);
+			}
+			// check whether we have a 40x for a 'sane' page or for some sort of hack attempt: the latter will have a 'nasty' url (which won't equal the filtered one):
+			if (!empty($offending_pageurl) && $offending_pageurl == $_SERVER['REDIRECT_URL'])
+			{
+				$complete_pageurl = $offending_pageurl;
+			}
+		}
 
 		set_ccms_opt('module', 'error');
 		set_ccms_opt('module_info', null);
@@ -377,6 +398,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('iscoding', "Y");
 		set_ccms_opt('rootdir', $cfg['rootdir']);
 		set_ccms_opt('urlpage', $pagereq); // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
+		set_ccms_opt('complete_page_url', $complete_pageurl);
 		$desc = $ccms['lang']['system']['error_404title'];
 		set_ccms_opt('desc_extra', '');
 		set_ccms_opt('keywords', strval($rcode));
@@ -392,7 +414,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('templatedir', $tplel[0]);
 		set_ccms_opt('template', $tpl);
 
-		$content = $ccms['lang']['system']['error_404content'];
+		$content .= $ccms['lang']['system']['error_404content'];
 
 		switch ($rcode)
 		{
@@ -421,10 +443,20 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 		set_ccms_opt('title', ucfirst($ccms['pagetitle']).' - '.$ccms['sitename'].' | '.$ccms['subheader']);
 
-		// even under error conditions, we need the side-effect of the content loader code: a properly initialized template!
+		/*
+		Even under error conditions, we need the side-effect of the content loader code: a properly initialized template!
+		
+		Also allow the template to override / augment the error page content: when it sets the 'content' slot, we won't override
+		it with the default error message below.
+		*/
+		set_ccms_opt('content40x', $content);
 		$rendered_page = ccmsContent(null, 'Y', false);
 		//$content = $rendered_page['content'];
 		//$rcode = $rendered_page['responsecode'];
+		if (!empty($rendered_page['content']))
+		{
+			$content = $rendered_page['content'];
+		}
 
 		set_ccms_opt('content', $content);
 	}
@@ -639,7 +671,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				$current_class = '';
 				$menu_item_class = 'menu_item_dummy';
 			}
-			else if ($row['islink'] != "Y")
+			else if ($row['islink'] != 'Y')
 			{
 				$current_link = '#';
 				$menu_item_class = 'menu_item_nolink';
@@ -768,6 +800,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				set_ccms_opt('sitename', $cfg['sitename']);
 				set_ccms_opt('rootdir', $cfg['rootdir']);
 				set_ccms_opt('urlpage', $row->urlpage);
+				set_ccms_opt('complete_page_url', $row->urlpage . '.html');
 				set_ccms_opt('pagetitle', $row->pagetitle);
 				set_ccms_opt('subheader', $row->subheader);
 
