@@ -728,10 +728,15 @@ div.tip-text {
 	display: block;
 	margin-top:10px;
 }
-#login-wrapper h2, #install-dir-warning-wrapper h2, #install-wrapper h2
+#login-wrapper h2, #install-wrapper h2
 {
 	font-size:1.2em;
 	border-bottom:solid 1px #90D244;
+}
+#install-dir-warning-wrapper h2
+{
+	font-size:1.2em;
+	border-bottom:solid 2px #FAB6B9;
 }
 .loginMsg, .installMsg
 {
@@ -951,7 +956,8 @@ div.warning
 	color:#8a1f11;
 	padding:.1em;
 	margin-bottom:1em;
-	border:2px solid #FBC2C4;
+	border: 2px solid #FBC2C4;
+	border-bottom: solid 2px #FAB6B9;
 
 	border-radius: 5px;
 }
