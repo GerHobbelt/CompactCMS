@@ -43,6 +43,32 @@ if (!defined('BASE_PATH'))
 
 
 /**
+defines for dump_request_to_logfile():
+*/
+define('DUMP2LOG_SERVER_GLOBALS',  0x0001);
+define('DUMP2LOG_ENV_GLOBALS',     0x0002);
+define('DUMP2LOG_SESSION_GLOBALS', 0x0004);
+define('DUMP2LOG_POST_GLOBALS',    0x0008);
+define('DUMP2LOG_GET_GLOBALS',     0x0010);
+define('DUMP2LOG_REQUEST_GLOBALS', 0x0020);
+define('DUMP2LOG_FILES_GLOBALS',   0x0040);
+define('DUMP2LOG_COOKIE_GLOBALS',  0x0080);
+define('DUMP2LOG_CCMS_GLOBALS',    0x0100);
+define('DUMP2LOG_CFG_GLOBALS',     0x0200);
+define('DUMP2LOG_STACKTRACE',      0x0400);
+
+define('DUMP2LOG_SORT',                            0x0100000);
+define('DUMP2LOG_STRIP_CCMS_I18N_N_CFG_SUBARRAYS', 0x0200000);
+define('DUMP2LOG_FORMAT_AS_HTML',                  0x0400000);
+define('DUMP2LOG_WRITE_TO_FILE',                   0x0800000);
+define('DUMP2LOG_WRITE_TO_STDOUT',                 0x1000000);
+
+
+
+
+
+
+/**
  * Remove the effects of the old dreaded magic_quotes setting.
  *
  * WARNING: we have not placed this in a function but run it immediately, right here,
@@ -2637,20 +2663,24 @@ function checkSpecialPageName($name, $reqd_attrib)
 
 
 
-/*
+/**
 Derived from code by phella.net:
 
   http://nl3.php.net/manual/en/function.var-dump.php
 */
-function var_dump_ex($value, $level = 0)
+function var_dump_ex($value, $level = 0, $sort_before_dump = 0, $show_whitespace = true, $max_subitems = 0x7FFFFFFF)
 {
 	if ($level == -1)
 	{
-		$trans[' '] = '&there4;';
-		$trans["\t"] = '&rArr;';
-		$trans["\n"] = '&para;;';
-		$trans["\r"] = '&lArr;';
-		$trans["\0"] = '&oplus;';
+		$trans = array();
+		if ($show_whitespace)
+		{
+			$trans[' '] = '&there4;';
+			$trans["\t"] = '&rArr;';
+			$trans["\n"] = '&para;';
+			$trans["\r"] = '&lArr;';
+			$trans["\0"] = '&oplus;';
+		}
 		return strtr(htmlspecialchars($value, ENT_COMPAT, 'UTF-8'), $trans);
 	}
 
@@ -2666,7 +2696,7 @@ function var_dump_ex($value, $level = 0)
 	{
 	case 'string':
 		$rv .= '(' . strlen($value) . ')';
-		$value = var_dump_ex($value, -1);
+		$value = var_dump_ex($value, -1, 0, $show_whitespace, $max_subitems);
 		break;
 
 	case 'boolean':
@@ -2674,22 +2704,38 @@ function var_dump_ex($value, $level = 0)
 		break;
 
 	case 'object':
-		$props = get_class_vars(get_class($value));
+		$props = get_object_vars($value);
+		if ($sort_before_dump > $level)
+		{
+			ksort($props);
+		}
 		$rv .= '(' . count($props) . ') <u>' . get_class($value) . '</u>';
 		foreach($props as $key => $val)
 		{
-			$rv .= "\n" . str_repeat("\t", $level + 1) . $key . ' => ';
-			$rv .= var_dump_ex($value->$key, $level + 1);
+			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1, 0, $show_whitespace, $max_subitems) . ' => ';
+			$rv .= var_dump_ex($value->{$key}, $level + 1, $sort_before_dump, $show_whitespace, $max_subitems);
 		}
 		$value = '';
 		break;
 
 	case 'array':
+		if ($sort_before_dump > $level)
+		{
+			$value = array_merge($value); // fastest way to clone the input array
+			ksort($value);
+		}
 		$rv .= '(' . count($value) . ')';
+		$count = 0;
 		foreach($value as $key => $val)
 		{
-			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1) . ' => ';
-			$rv .= var_dump_ex($val, $level + 1);
+			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1, 0, $show_whitespace, $max_subitems) . ' => ';
+			$rv .= var_dump_ex($val, $level + 1, $sort_before_dump, $show_whitespace, $max_subitems);
+			$count++;
+			if ($count >= $max_subitems)
+			{
+				$rv .= "\n" . str_repeat("\t", $level + 1) . '<i>(' . (count($value) - $count) . ' more entries ...)</i>';
+				break;
+			}
 		}
 		$value = '';
 		break;
@@ -2707,7 +2753,21 @@ function var_dump_ex($value, $level = 0)
 
 
 
-function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $strip_CCMS_i18n_n_cfg_subarrays = true, $dump_to_stdout_as_well = false)
+
+/**
+ * Generate a dump of the optional $extra values and/or the global variables $ccms[], $cfg[] and the superglobals.
+ *
+ * @param array $filename_options (optional) specifies a few pieces of the filename which will be generated to write
+ *                                the dump to:
+ *
+ *                                'namebase': the leading part of the filename,
+ *                                'origin-section': follows the timestamp encoded in the filename,
+ *                                'extension': the desired filename extension (default: 'html' for HTML dumps, 'log' for plain dumps)
+ *
+ * @return the generated dump in the format and carrying the content as specified by the $dump_options.
+ */
+define('__DUMP2LOG_DEFAULT_OPTIONS', -1 ^ DUMP2LOG_WRITE_TO_STDOUT);
+function dump_request_to_logfile($extra = null, $dump_options = __DUMP2LOG_DEFAULT_OPTIONS, $filename_options = null)
 {
 	global $_SERVER;
 	global $_ENV;
@@ -2726,56 +2786,90 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $
 		$sequence_number++;
 	}
 
+	$sorting = ($dump_options & DUMP2LOG_SORT);
+	$show_WS = ($dump_options & DUMP2LOG_FORMAT_AS_HTML);
+
 	$rv = '<html><body>';
 
-	if (!empty($_SESSION['dbg_last_dump']))
+	if (isset($_SESSION) && !empty($_SESSION['dbg_last_dump']) && ($dump_options & DUMP2LOG_FORMAT_AS_HTML))
 	{
-		$rv .= '<p><a href="' . $_SESSION['dbg_last_dump'] . '">Go to previous dump</a></p>' ."\n";
+		$rv .= '<p><a href="' . $_SESSION['dbg_last_dump'] . '">Go to previous dump</a></p>' . "\n";
 	}
-	$rv .= '<h1>$_ENV</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_ENV);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_SESSION</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_SESSION);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_POST</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_POST);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_GET</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_GET);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_FILES</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_FILES);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_COOKIE</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_COOKIE);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_REQUEST</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_REQUEST);
-	$rv .= "</pre>";
+
+	$now = microtime(true);
+	if (!empty($_SERVER['REQUEST_TIME']))
+	{
+		$start = $_SERVER['REQUEST_TIME'];
+		$diff = $now - $start;
+
+		$rv .= '<p>Time elapses since request start: ' . number_format($diff, 3) . ' seconds</p>' . "\n";
+	}
 
 	if (!empty($extra))
 	{
 		$rv .= '<h1>EXTRA</h1>';
 		$rv .= "<pre>";
-		$rv .= var_dump_ex($extra);
+		$rv .= var_dump_ex($extra, 0, $sorting, $show_WS, 500);
 		$rv .= "</pre>";
 	}
 
-	if ($dump_CCMS_arrays_too)
+	if ($dump_options & DUMP2LOG_ENV_GLOBALS)
+	{
+		$rv .= '<h1>$_ENV</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_ENV, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_SESSION_GLOBALS)
+	{
+		$rv .= '<h1>$_SESSION</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_SESSION, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_POST_GLOBALS)
+	{
+		$rv .= '<h1>$_POST</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_POST, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_GET_GLOBALS)
+	{
+		$rv .= '<h1>$_GET</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_GET, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_FILES_GLOBALS)
+	{
+		$rv .= '<h1>$_FILES</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_FILES, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_COOKIE_GLOBALS)
+	{
+		$rv .= '<h1>$_COOKIE</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_COOKIE, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_REQUEST_GLOBALS)
+	{
+		$rv .= '<h1>$_REQUEST</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_REQUEST, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+
+	if ($dump_options & DUMP2LOG_CCMS_GLOBALS)
 	{
 		$rv .= '<h1>$ccms</h1>';
 		$rv .= "<pre>";
 
 		$ccms_copy = array_merge($ccms); // fastest way to clone the array
-		if ($strip_CCMS_i18n_n_cfg_subarrays)
+		if ($dump_options & DUMP2LOG_STRIP_CCMS_I18N_N_CFG_SUBARRAYS)
 		{
 			if (isset($ccms_copy['lang']))
 			{
@@ -2786,38 +2880,84 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false, $
 				$ccms_copy['cfg'] = '(skipped)';
 			}
 		}
-		ksort($ccms_copy);
 
-		$rv .= var_dump_ex($ccms_copy);
+		$rv .= var_dump_ex($ccms_copy, 0, $sorting, $show_WS);
 		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_CFG_GLOBALS)
+	{
 		$rv .= '<h1>$cfg</h1>';
 		$rv .= "<pre>";
-		$rv .= var_dump_ex($cfg);
+		$rv .= var_dump_ex($cfg, 0, $sorting, $show_WS);
 		$rv .= "</pre>";
 	}
 
-	$rv .= '<h1>$_SERVER</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_SERVER);
-	$rv .= "</pre>";
+	if ($dump_options & DUMP2LOG_SERVER_GLOBALS)
+	{
+		$rv .= '<h1>$_SERVER</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_SERVER, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+
+	if ($dump_options & DUMP2LOG_STACKTRACE)
+	{
+		$st = debug_backtrace(false);
+		$rv .= '<h1>Stack Trace:</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($st, 0, 0, $show_WS);
+		$rv .= "</pre>";
+	}
+
 	$rv .= '</body></html>';
 
-	$tstamp = date('Y-m-d.His');
+	$tstamp = date('Y-m-d.His') . '.' . sprintf('%07d', fmod($now, 1) * 1E6);
 
-	$fname = 'LOG-' . $tstamp . '-' . sprintf('%03u', $sequence_number) . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
+	$filename_options = array_merge(array(
+			'namebase'       => 'LOG-',
+			'origin-section' => substr($_SERVER['REQUEST_URI'], 0, -42),
+			'extension'      => (($dump_options & DUMP2LOG_FORMAT_AS_HTML) ? 'html' : 'log')
+		), (is_array($filename_options) ? $filename_options : array()));
+
+	$fname = $filename_options['namebase'] . $tstamp . '.' . sprintf('%03u', $sequence_number) . '-' . $filename_options['origin-section'];
+	$fname = substr(preg_replace('/[^A-Za-z0-9_.-]+/', '_', $fname), 0, 46) . '.' . substr(preg_replace('/[^A-Za-z0-9_.-]+/', '_', $filename_options['extension']), 0, 9);    // make suitable for filesystem
 	if (isset($_SESSION))
 	{
 		$_SESSION['dbg_last_dump'] = $fname;
 	}
-	$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
 
-	file_put_contents($fname, $rv);
-
-	if ($dump_to_stdout_as_well)
+	if (!($dump_options & DUMP2LOG_FORMAT_AS_HTML))
 	{
 		$rv = preg_replace('/^.*?<body>(.+)<\/body>.*?$/sD', '\\1', $rv);
+
+		$trans['<h1>'] = "\n\n*** ";
+		$trans['</h1>'] = " ***\n";
+		$rv = strtr($rv, $trans);
+
+		$rv = html_entity_decode(strip_tags($rv), ENT_NOQUOTES, 'UTF-8');
+	}
+
+	if ($dump_options & DUMP2LOG_WRITE_TO_FILE)
+	{
+		$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
+
+		if (@file_put_contents($fname, $rv) === false)
+		{
+			throw new Exception('b0rk at ' . $fname);
+		}
+	}
+
+	if ($dump_options & DUMP2LOG_FORMAT_AS_HTML)
+	{
+		$rv = preg_replace('/^.*?<body>(.+)<\/body>.*?$/sD', '\\1', $rv);
+	}
+
+	if ($dump_options & DUMP2LOG_WRITE_TO_STDOUT)
+	{
 		echo $rv;
 	}
+
+	return array('filename' => $fname, 'content' => $rv);
 }
 
 
@@ -2853,7 +2993,7 @@ function checkAuth()
 	{
 		return true;
 	}
-	
+
 	if (0 && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	{
 		foreach ($_SESSION as $name => $value) 
