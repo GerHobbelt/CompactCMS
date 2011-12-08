@@ -103,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 					$dest = BASE_PATH.'/media/albums/'.$album_name;
 					if(!is_dir($dest))
 					{
-						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w"))
+						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', 'w'))
 						{
 							header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
 							exit();
