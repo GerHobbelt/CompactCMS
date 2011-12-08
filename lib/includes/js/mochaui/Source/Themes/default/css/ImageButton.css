@@ -5,7 +5,7 @@
 
  description: MUI - Image Button control css.
 
- copyright: (c) 2010 Contributors in (/AUTHORS.txt).
+ copyright: (c) 2011 Contributors in (/AUTHORS.txt).
 
  license: MIT-style license in (/MIT-LICENSE.txt).
 
@@ -16,26 +16,50 @@
 
  /* Image Buttons */
 span.imgButton { margin-right: 2px; line-height: 16px; padding-top: 1px; }
-span.imgButton .imgButton { display: inline-block; background-color: white; border: solid 1px #DDDDDD; cursor: pointer; padding: 0 2px 0 4px; margin: 0; vertical-align: middle; font-family: Sans-Serif; font-size: 11px;}
-span.imgButton .imgButton span span { background-color: transparent; border: none; color: #AAAAAA; position: relative; top: -6px; padding: 0 2px 0 2px;   }
-span.imgButton .imgButton:hover { border: solid 1px #790000; text-decoration: none; color: #790000; }
-span.imgButton .imgButton:hover span { text-decoration: none; color: #790000; }
-span.imgButton .imgButton:visited,.imgButton:active,.imgButton:link,.imgButton:hover { text-decoration: none; }
-span.imgButton .imgButton:visited span,span.imgButton .imgButton:active span,span.imgButton .imgButton:link span,span.imgButton .imgButton:hover span { text-decoration: none; }
-span.imgButton .imgButton:link span span,span.imgButton .imgButton:active span span,span.imgButton .imgButton:hover span span,span.imgButton .imgButton:visited span span { border: none; text-decoration: none; }
-span.imgButton .imgButton span img { padding: 0 0 4px 0; position: relative; top: 7px }
-span.imgButton .imgButton span { padding: 0 4px 0 2px; color: #AAAAAA; position: relative; top: -3px;}
+span.imgButton .imgButton {
+	display: inline-block;
+	border: 1px solid #aaa;
+	color: #444;
+	margin-bottom: 0px;
+	min-width: 4em;
+	padding: 1px 9px 0 9px;
+	cursor: pointer;
+	vertical-align: middle;
+	font-family: Sans-Serif;
+	font-size: 11px;
+	font-weight: bold;
+	background: #f4f4f4);
+	background: -webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+	background: -moz-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	min-height: 21px;
+}
+span.imgButton .imgButton:hover {
+	text-decoration: none;
+	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+	background: #ebebeb -webkit-linear-gradient(#fefefe, #f8f8f8 40%, #e9e9e9);
+	background: #ebebeb -moz-linear-gradient(#fefefe, #f8f8f8 40%, #e9e9e9);
+	border-color: #999;
+	color: #222;
+}
+span.imgButton .imgButton span { display: inline-block; line-height: 11px; margin-right: 4px; position: relative; top: 2px }
+span.imgButton .imgButton span.t { margin: 0; top: -2px; }
+span.imgButton a:visited, span.imgButton a:active, span.imgButton a:link, span.imgButton a:hover { text-decoration: none; }
 
 span.imgButton .imgButton.imgOnly { background-color: transparent; border:none; padding: 0; }
 span.imgButton .imgButton.imgOnly span { padding: 0 0 0 2px; }
 span.imgButton .imgButton.imgOnly:hover { background-color: transparent; border: none;  }
 
-div.toolbar div span.imgButton { line-height: 12px; }
-div.toolbar div span.imgButton .imgButton { background-color: transparent; margin-right: 2px; }
-div.toolbar div span.imgButton .imgButton span img { padding: 0 0 3px 0; position: relative; top: 6px }
+div.toolbar span.imgButton { line-height: 11px; }
+div.toolbar span.imgButton .imgButton { background-color: transparent; margin-right: 2px; min-height: 20px; }
 
 div.mochaWindowFooter span.imgButton { line-height:14px; }                                               
-div.mochaWindowFooter span.imgButton .imgButton {background-color: transparent; border: solid 1px #BBBBBB; }
-div.mochaWindowFooter span.imgButton .imgButton span img { padding: 0 0 3px 0; position: relative; top: 6px }
-div.mochaWindowFooter span.imgButton .imgButton span span { color: #BBBBBB; }
+div.mochaWindowFooter span.imgButton .imgButton { background-color: transparent; border: solid 1px #BBBBBB; }
 /* Image Buttons */

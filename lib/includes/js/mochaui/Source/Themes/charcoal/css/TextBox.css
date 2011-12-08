@@ -5,7 +5,7 @@
 
  description: MUI - textbox control css.
 
- copyright: (c) 2010 Contributors in (/AUTHORS.txt).
+ copyright: (c) 2011 Contributors in (/AUTHORS.txt).
 
  license: MIT-style license in (/MIT-LICENSE.txt).
 
@@ -14,7 +14,7 @@
  ...
  */
 
- /* textbox settings */
+/* textbox settings */
 fieldset.form { display: block; padding: 0 0 0 10px; border:none; }
 fieldset.form label { float: left; width: 200px; }
 fieldset.form { font-family:Helvetica,Arial,sans-serif;  }

@@ -2,38 +2,48 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<meta http-equiv="X-UA-Compatible" content="IE=8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
 	<title>MochaUI - A Web Applications User Interface Library</title>
 	<meta name="description"
 		  content="A web applications user interface library built on the Mootools javascript framework"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
-	<link rel="stylesheet" type="text/css" href="../Source/Themes/default/css/content.css"/>
 	<link rel="stylesheet" type="text/css" href="../Source/Themes/default/css/core.css"/>
 	<link rel="stylesheet" type="text/css" href="../Source/Themes/default/css/desktop.css"/>
 	<link rel="stylesheet" type="text/css" href="../Source/Themes/default/css/taskbar.css"/>
 	<link rel="stylesheet" type="text/css" href="../Source/Themes/default/css/window.css"/>
 
 	<!--[if IE]>
-	<script type="text/javascript" src="scripts/excanvas_r43.js"></script>
+	<script type="text/javascript" src="../Demo/scripts/excanvas.js"></script>
 	<![endif]-->
-	<script type="text/javascript" src="scripts/mootools-1.3.0-core-nocompat-yc.js"></script>
-	<script type="text/javascript" src="scripts/mootools-1.3.0-more-yc.js"></script>
+	<script type="text/javascript" src="../Demo/scripts/mootools-core.js"></script>
+	<script type="text/javascript" src="../Demo/scripts/mootools-more.js"></script>
 
 	<!--MOCHAUI-->
 	<script type="text/javascript" src="../Source/Core/core.js"></script>
+	<script type="text/javascript" src="../Source/Core/create.js"></script>
+	<script type="text/javascript" src="../Source/Core/require.js"></script>
 	<script type="text/javascript" src="../Source/Core/canvas.js"></script>
 	<script type="text/javascript" src="../Source/Core/content.js"></script>
-	<script type="text/javascript" src="../Source/Core/desktop.js"></script>
 	<script type="text/javascript" src="../Source/Controls/column/column.js"></script>
 	<script type="text/javascript" src="../Source/Controls/panel/panel.js"></script>
 	<script type="text/javascript" src="../Source/Controls/taskbar/taskbar.js"></script>
 	<script type="text/javascript" src="../Source/Controls/window/window.js"></script>
+	<script type="text/javascript" src="../Source/Controls/desktop/desktop.js"></script>
 	<script type="text/javascript" src="../Source/Controls/window/modal.js"></script>
 	<script type="text/javascript" src="../Source/Core/themes.js"></script>
 	<!--MOCHAUI-->
-	<script type="text/javascript" src="scripts/demo-virtual-desktop-init.js"></script>
+
+	<!-- MOCHAUI lazyloader override: since the lazyloader in mochaUI is crappy, we force the load of these scripts here: no more 'undefined' classes in mochaUI -->
+	<script type="text/javascript" src="../Source/Plugins/coolclock/coolclock.js"></script>
+	<script type="text/javascript" src="../Source/Plugins/coolclock/moreskins.js"></script>
+	<script type="text/javascript" src="../Source/Plugins/coolclock/muiclock.js"></script>
+
+	<script type="text/javascript" src="../Source/Plugins/parametrics/parametrics.js"></script>
+
+
+	<script type="text/javascript" src="scripts/demo-application.js"></script>
 
 	<style type="text/css">
 
@@ -164,7 +174,7 @@
 
 	<div id="desktopFooterWrapper">
 		<div id="desktopFooter">
-			&copy; 2010 <a target="_blank" href="scripts/AUTHORS.txt" id="authorsLink">Various Contributors</a> -
+			&copy; 2011 <a target="_blank" href="scripts/AUTHORS.txt" id="authorsLink">Various Contributors</a> -
 			<a target="_blank" href="license.html" id="licenseLink">MIT License</a>
 		</div>
 	</div>

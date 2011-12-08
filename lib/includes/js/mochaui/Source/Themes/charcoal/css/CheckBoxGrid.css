@@ -5,7 +5,7 @@
 
  description: MUI - CheckBoxGrid CSS.
 
- copyright: (c) 2010 Contributors in (/AUTHORS.txt).
+ copyright: (c) 2011 Contributors in (/AUTHORS.txt).
 
  license: MIT-style license in (/MIT-LICENSE.txt).
 
@@ -14,7 +14,7 @@
  ...
  */
 
- /* CheckboxGrid */
+/* CheckboxGrid */
 fieldset.cbg { display: block; padding: 0 0 0 10px; border:none; }
 fieldset.cbg span { white-space:nowrap; float:left }
 fieldset.cbg label { padding-right:3px; }

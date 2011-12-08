@@ -31,6 +31,7 @@ HtmlTable Method: constructor
 * selectable - (*boolean*) if *true* the rows will be selectable. Defaults to *false*.
 * allowMultiSelect - (*boolean*) if *true* (the default) the user can select more than one row at a time.
 * shiftForMultiSelect - (*boolean*) enables support for holding shift to multi-select files (defaults to *false*). If *false* (and `allowMultiSelect` is *true*), clicking any row selects it.
+* selectHiddenRows - (*boolean*) if *false* (the default), the selection logic ignores hidden rows, as if they were not in the DOM.
 
 ### Events
 
@@ -214,5 +215,32 @@ Deselects all rows
 
 * (*object*) This instance of HtmlTable.
 
+
+HtmlTable Method: serialize {#HtmlTable:serialize}
+----------------------------------------
+
+Return an object storing the select state of the table.
+
+### Syntax
+
+          myTable.serialize();
+
+### Returns
+
+* (*object*) Object containing select state of the table. 
+
+
+HtmlTable Method: restore {#HtmlTable:restore}
+----------------------------------------
+
+Restores the select state of the table from an object passed in.
+
+### Syntax
+
+          myTable.restore(tableState);
+
+### Arguments
+
+1. tableState - Object created by HtmlTable.serialize() which contains the select state of the table.
 
 [HtmlTable]: /more/Interface/HtmlTable
