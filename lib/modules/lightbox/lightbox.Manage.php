@@ -507,6 +507,7 @@ $textarea4descr_id = str2variablename('lightbox_' . $page_id . (!empty($album) ?
 				 * which may be stored in the session, but we MUST DESTROY those values once we've handled the corresponding
 				 * 'save-files' action resulting from a form submit.
 				 */
+				generate_session_sidpatch();
 				$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
 				echo '&SIDCHK=' . $_SESSION['fup1'];
 
