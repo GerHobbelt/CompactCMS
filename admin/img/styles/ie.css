@@ -158,7 +158,7 @@ may need hasLayout as well!
 
 
 /*
-If you do not FORCE the outer <div> in the template ditor to hasLayout, then IE7/IE6[*]
+If you do not FORCE the outer <div> in the template editor to hasLayout, then IE7/IE6[*]
 GOES ABSOLUTELY HONKIN' TOOTIN' MENTAL placing the edit_Area control in there: it keeps
 blinking the dreaded hourglass and you're ab-so-lu-te-ly SOL because you don't get to see,
 not edit the contents in the <textarea>. Instead, you get the '|' text cursor placed
