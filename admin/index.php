@@ -584,7 +584,18 @@ else
 $js_files[] = '../lib/includes/js/Fx.CmsAdminSlide.js';
 $js_files[] = '../lib/includes/js/common.js';
 
-$driver_code = 'lazyloading_commonJS_done("' . $cfg['rootdir'] . '");';
+$cfg_root_dir = $cfg['rootdir'];
+$driver_code = <<<EOT42
+	//if (typeof lazyloading_commonJS_done !== 'undefined')
+	try
+	{
+		lazyloading_commonJS_done("$cfg_root_dir");
+	}
+	catch(e)
+	{
+		alert('lazyload sequence b0rked, probably due to some broken JS being loaded in this sequence. Check the log.');
+	}
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>
