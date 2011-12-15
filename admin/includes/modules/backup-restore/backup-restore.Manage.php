@@ -415,7 +415,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 			<?php
 			if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
 			{
-				if($i>0)
+				if($i > 0)
 				{
 				?>
 					<div class="right">
@@ -496,6 +496,8 @@ $js_files = array(
 $wait4backup = $ccms['lang']['backup']['wait4backup'];
 $driver_code = <<<EOT42
 
+	if ($('create-arch'))
+	{
 		$('create-arch').addEvent('click', function()
 			{
 				var el = $('backup-module');
@@ -510,6 +512,7 @@ $driver_code = <<<EOT42
 				//alert('go! ' + el);
 				return true;
 			});
+	}
 
 EOT42;
 

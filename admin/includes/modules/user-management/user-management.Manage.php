@@ -231,14 +231,22 @@ $status_message = getGETparam4DisplayHTML('msg');
 					<hr class="space"/>
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_user_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
-						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 					</div>
 				</form>
 			<?php
 			}
 			else
 			{
-				echo $ccms['lang']['auth']['featnotallowed'];
+				?>
+				<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+		</div>
+
+		<hr class="space clear" />
+
+		<div class="right">
+			<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+				<?php
 			}
 			?>
 		</div>

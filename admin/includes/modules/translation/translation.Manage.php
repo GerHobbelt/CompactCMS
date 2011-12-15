@@ -415,14 +415,7 @@ if ($do == 'update')
 }
 
 
-
-
-$MCEcodegen = new tinyMCEcodeGen('translation_manager_content', array(array('FileManager' => array())));
-
-$css_files = array('all' => array());
-$css_files['all'][] = $cfg['rootdir'] . 'admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css';
-$css_files = array_merge($css_files, $MCEcodegen->get_CSSheaderfiles());
-$css_files['all:IE'][] = $cfg['rootdir'] . 'admin/img/styles/ie.css';
+$load_editor = false;
 
 ?>
 
@@ -431,9 +424,7 @@ $css_files['all:IE'][] = $cfg['rootdir'] . 'admin/img/styles/ie.css';
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Translation module</title>
-	<?php
-	echo generateCSSheadSection($css_files);
-	?>
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 </head>
 <body>
 <div class="module" id="translation-assist">
@@ -441,6 +432,8 @@ $css_files['all:IE'][] = $cfg['rootdir'] . 'admin/img/styles/ie.css';
 	// (!) Only administrators can change these values
 	if($_SESSION['ccms_userLevel'] >= 4)
 	{
+		$load_editor = true;
+		
 	?>
 	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
 
@@ -494,7 +487,13 @@ $css_files['all:IE'][] = $cfg['rootdir'] . 'admin/img/styles/ie.css';
 	}
 	else
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		?>
+	<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+
+	<div class="right">
+		<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+	</div>
+		<?php
 	}
 	?>
 
@@ -502,7 +501,7 @@ $css_files['all:IE'][] = $cfg['rootdir'] . 'admin/img/styles/ie.css';
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
 	</textarea>
 <?php
 }
@@ -531,20 +530,32 @@ function googleTranslateElementInit()
 
 
 <?php
+	$js_files = array(
+		$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+		'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
+		$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+	);
 
-$js_files = array();
-$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
-$js_files[] = 'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
-$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
+	if ($load_editor)
+	{
+		$MCEcodegen = new tinyMCEcodeGen("translation_manager_content", array(array('FileManager' => array())));
 
-$starter_code = $MCEcodegen->genStarterCode();
+		$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 
-$driver_code = $MCEcodegen->genDriverCode();
+		$starter_code = $MCEcodegen->genStarterCode();
 
-$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
+		$driver_code = $MCEcodegen->genDriverCode();
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
+		$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
+	}
+	else
+	{
+		$driver_code = null;
+		$starter_code = null;
+		$extra_functions_code = null;
+	}
+
+	echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
