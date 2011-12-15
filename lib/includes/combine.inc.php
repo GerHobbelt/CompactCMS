@@ -1427,7 +1427,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 	 */
 	SetUpLanguageAndLocale($cfg['language'], true);
 
-	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element));
+	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element) . 'tiny_mce/jscripts/tiny_mce/');
 
 	$mce_files = array();
 
@@ -1458,6 +1458,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 
 		In all other cases, we need to load the language files and plugins ourselves in some way.
 		*/
+		$plugin_suffix = '_src';
 
 		// Add core language(s)
 		$languages = array($cfg['tinymce_language']);
@@ -1473,7 +1474,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 		$themes = array('advanced');
 		foreach ($themes as $theme)
 		{
-			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
+			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $plugin_suffix . ".js");
 
 			foreach ($languages as $lang)
 			{
@@ -1490,7 +1491,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 			if (!is_real_tinyMCE_plugin($plugin))
 				continue;
 
-			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
+			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $plugin_suffix . ".js");
 
 			foreach ($languages as $lang)
 			{
@@ -1551,7 +1552,7 @@ EOT42;
 		$my_content = preg_replace('/;\s*load\(\);\s*\}\(\)\);/', ';
 
 	// hack/tweak to make dev mode lazyloading work with the CCMS Combiner: delayload the language and plugin code as well!
-	include(\'../2nd-stage.tiny_mce_ccms.js\');
+	include(\'../../../../2nd-stage.tiny_mce_ccms.js\');
 
 	load();
 }());

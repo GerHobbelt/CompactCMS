@@ -3757,8 +3757,11 @@ class tinyMCEcodeGen
 	{
 		$rv = array();
 
-		// pick one of these: tiny_mce_ccms.js (which will lazyload all tinyMCE parts recursively through tiny_mce_dev.js) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
-		$rv[] = $this->rootdir . 'lib/includes/js/tiny_mce/jscripts/tiny_mce/tiny_mce_ccms.js';
+		/*
+		 * pick one of these: tiny_mce_ccms.js (which will lazyload all tinyMCE parts recursively through tiny_mce_dev.js) 
+		 * or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
+		 */
+		$rv[] = $this->rootdir . 'lib/includes/js/tiny_mce_ccms.js';
 		foreach ($this->options as $tag => $options)
 		{
 			if (!empty($options['FileManager']))
