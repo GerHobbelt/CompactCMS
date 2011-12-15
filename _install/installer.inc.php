@@ -413,7 +413,7 @@ if($nextstep == '4' && checkAuth())
 		</table>
 
 		<hr noshade="noshade" />
-		<p class="ss_has_sprite quiet">
+		<p class="ss_has_sprite alert">
 			<span class="ss_sprite_16 ss_exclamation">&#160;</span><strong>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
