@@ -140,7 +140,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		</div>
 		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
 	</div>
-	<div id="notify" class="span-12">
+	<div id="notify" class="span-12 may-fade">
 		<div class="rounded-border">
 			<div class="header">
 				<?php
@@ -192,7 +192,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 			</div>
 		</div>
 	</div>
-	<div id="advanced" class="prepend-1 span-6 last clear-right">
+	<div id="advanced" class="prepend-1 span-6 last clear-right may-fade">
 		<div class="rounded-border">
 			<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
 			<div id="advanced_res">
@@ -270,7 +270,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	}
 	?>
 	
-	<div id="createnew" class="span-9 clear">
+	<div id="createnew" class="span-9 clear may-fade">
 	<?php
 
 	// Start main management section
@@ -378,7 +378,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	?>
 	</div>
 
-	<div id="menudepth" class="span-16 last">
+	<div id="menudepth" class="span-16 last may-fade">
 	<?php
 
 	// Manage menu depths & languages
@@ -419,7 +419,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 
 
 	?>
-	<div id="manage" class="span-25 last clear">
+	<div id="manage" class="span-25 last clear may-fade">
 	<fieldset>
 		<legend><a class="toggle" rel="filelist_wrapper"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
 		<div id="filelist_wrapper">
@@ -467,7 +467,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</fieldset>
 	</div>
 
-	<div id='debugMsg' class="span-25 last clear">
+	<div id='debugMsg' class="span-25 last clear may-fade">
 
 <?php
 
@@ -497,7 +497,7 @@ if (0)
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<div id="democlock_collective" class="span-25 last clear"> </div>
+	<div id="democlock_collective" class="span-25 last clear may-fade"> </div>
 
 	<textarea id="jslog" class="log span-25 last" readonly="readonly">
 	</textarea>
