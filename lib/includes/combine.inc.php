@@ -322,7 +322,7 @@ else
 	// Check for buggy versions of Internet Explorer
 	if (!empty($_SERVER['HTTP_USER_AGENT']))
 	{
-		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || $client_browser->AOL)
+		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || (property_exists($client_browser, 'AOL') && $client_browser->AOL))
 		{
 			$encoding = 'none';
 		}
