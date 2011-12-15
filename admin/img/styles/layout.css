@@ -382,6 +382,15 @@ a.edit, a.editinplace:hover
 	margin: 0;
 	padding: 0;
 	text-align: left;
+	
+	/* 
+	making sure the notify box is sized to the max height of both notify icon and notification text,
+	inspired by the first section of  http://matthewjamestaylor.com/blog/equal-height-columns-cross-browser-css-no-hacks
+	
+	This is the 'container' of that story.
+	*/
+	float: left;
+	width: 100%;
 }
 .notify
 {
@@ -433,6 +442,13 @@ IE6 fix:
 {
 	padding-top: 10px;
 	padding-bottom: 10px;
+	padding-right: 10px;
+
+	min-height: 60px;
+	/* margin-left: 80px; */
+	
+	float: left;
+	width: 395px;
 }
 #notify_res p
 {
@@ -472,11 +488,6 @@ IE6 fix:
 #advanced li
 {
 	line-height: 1.8em;
-}
-#notify_res
-{
-	min-height: 60px;
-	margin-left: 80px;
 }
 #notify_res p.h1
 {
