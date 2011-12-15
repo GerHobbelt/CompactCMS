@@ -838,7 +838,7 @@ if($target_form == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth
 		Tolerate it when the file already exists: do not overwrite the contents then.
 
 		This 'feature' exists to help recover broken upgrades / updates: you can thus
-		manually add the page records in the database again without lossing the original
+		manually add the page records in the database again without losing the original
 		content of the page.
 		*/
 		if (!file_exists($filepath))
