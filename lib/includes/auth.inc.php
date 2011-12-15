@@ -126,7 +126,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 		$values['userPass'] = MySQL::SQLValue($userPass, MySQL::SQLVALUE_TEXT);
 		$values['userActive'] = MySQL::SQLValue(false, MySQL::SQLVALUE_BOOLEAN);
 		$matchNumRows = $db->SelectSingleValue($cfg['db_prefix'].'users', $values, 'COUNT(userID)');
-		if($matchNumRows>0)
+		if ($matchNumRows > 0)
 		{
 			$logmsg = rawurlencode($ccms['lang']['login']['notactive']);
 		}
@@ -172,6 +172,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 					$_SESSION['ccms_userFirst'] = $row['userFirst'];
 					$_SESSION['ccms_userLast']  = $row['userLast'];
 					$_SESSION['ccms_userLevel'] = $row['userLevel'];
+					$_SESSION['ccms_isSwitchedUser'] = false;
 
 					// [i_a] fix for session faking/hijack security issue:
 					// Setting safety variables as well: used for checkAuth() during the session.

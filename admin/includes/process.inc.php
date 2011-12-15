@@ -1319,6 +1319,180 @@ if($do_action == 'liverename' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAu
 
 
 
+/**
+ * switch user ('su'): 
+ * 
+ * - check whether we are authorized to perform this action, and if we are...
+ * 
+ * - check whether we may switch to the indicated user (who should have equal or 
+ *   lower permission settings compared to us (where 'us' is the pluralis majestatis 
+ *   for 'admin'), and when so...
+ * 
+ * - switch the session over to the given user credentials while marking it as a 
+ *   'switched user': we may not 'nest' switching!
+ */
+if ($target_form == 'switch_user' && $_SERVER['REQUEST_METHOD'] == 'POST' && checkAuth())
+{
+	$su_userName = getPOSTparam4IdOrNumber('su_userName');
+	
+	if (empty($_SESSION['ccms_userID']) 
+		/* || empty($_SESSION['ccms_userName']) || empty($_SESSION['ccms_userFirst']) || empty($_SESSION['ccms_userLast']) */
+		|| empty($_SESSION['ccms_userLevel']) || $_SESSION['ccms_userLevel'] < 4
+		|| !empty($_SESSION['ccms_isSwitchedUser'])
+		|| empty($su_userName))
+	{
+		die_with_forged_failure_msg(__FILE__, __LINE__);
+	}
+	
+	$logmsg = null;
+	$su_arr = explode('_', $su_userName, 2);
+	if (count($su_arr) != 2)
+	{
+		die_with_forged_failure_msg(__FILE__, __LINE__);
+	}
+	
+	$values = array();
+	$values['userID'] = MySQL::SQLValue($su_arr[0], MySQL::SQLVALUE_NUMBER);
+	$values['userName'] = MySQL::SQLValue($su_arr[1], MySQL::SQLVALUE_TEXT);
+	$values[] = 'userLevel < ' . MySQL::SQLValue($_SESSION['ccms_userLevel'], MySQL::SQLVALUE_NUMBER);
+	$values['userActive'] = MySQL::SQLValue(true, MySQL::SQLVALUE_BOOLEAN);
+	$row = $db->SelectSingleRowArray($cfg['db_prefix'].'users', $values);
+	if ($db->ErrorNumber()) 
+	{
+		//$db->Kill();
+		$logmsg = $db->MyDyingMessage();
+	}
+	elseif ($db->RowCount() > 1)
+	{
+		// probably corrupt db table (corrupt import?) or hack attempt
+		$logmsg = '<strong>Database corruption or hack attempt. Access denied.</strong>';
+
+		// TODO: alert website owner about this failure/abuse. email to owner?
+	}
+	elseif(!$row)
+	{
+		// no match found in DB: user/pass combo doesn't exist!
+	}
+	elseif($su_arr[1] != $row['userName'] || $row['userActive'] <= 0)
+	{
+		// If no match: count attempt and show error
+		//
+		// NOTE: code should never enter here!
+		//
+		$logmsg = 'INTERNAL ERROR!';
+	}
+	else
+	{
+		// Set system wide session variables for the 'switched user', but keep track of the existing (admin) user so that we can 'switch back' properly later on!
+		$_SESSION['ccms_isSwitchedUser'] = $_SESSION['ccms_userID'] . ':' . $_SESSION['ccms_userLevel'] . ':' . $_SESSION['ccms_userName'];
+		
+		$_SESSION['ccms_userID']    = $row['userID'];
+		$_SESSION['ccms_userName']  = $row['userName'];
+		$_SESSION['ccms_userFirst'] = $row['userFirst'];
+		$_SESSION['ccms_userLast']  = $row['userLast'];
+		$_SESSION['ccms_userLevel'] = $row['userLevel'];
+
+		// [i_a] fix for session faking/hijack security issue:
+		// Setting safety variables as well: used for checkAuth() during the session.
+		SetAuthSafety();
+
+		unset($logmsg);
+		// Return functions result
+		header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
+		exit();
+	}
+	die_and_goto_url(null, $logmsg);
+}
+
+
+
+
+/*
+ * Clear the server-side caches: pages, browscap, combiner/log dumps, etc.
+  */
+if($do_action == 'clearcaches' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth())
+{
+	function recrmdir4cc($dir, $clean_all, $level)
+	{
+		$count = 0;
+		if (is_dir($dir))
+		{
+			$objects = scandir($dir);
+
+			foreach ($objects as $object)
+			{
+				if ($object != "." && $object != "..")
+				{
+					if (is_dir($dir . "/" . $object))
+					{
+						$count += recrmdir($dir . "/" . $object, ($clean_all || ($object == '_thumbs')), $level + 1);
+					}
+					else if ($clean_all && $object != 'index.html')
+					{
+						@unlink($dir . "/" . $object);
+						$count++;
+					}
+				}
+			}
+			reset($objects);
+			if ($level > 0 && $clean_all)     // don't remove the base directory itself
+			{
+				@rmdir($dir);
+				$count++;
+			}
+		}
+		return $count;
+	}
+
+	$error = null;
+	if (true)
+	{
+		// kill all _thumbs subdirectories in /media/* :
+		if (is_dir(BASE_PATH . '/media'))
+		{
+			recrmdir4cc(BASE_PATH . '/media', false, 0);
+		}
+		
+		// kill all EXCEPT index.html in /lib/includes/cache :
+		if (is_dir(BASE_PATH . '/lib/includes/cache'))
+		{
+			recrmdir4cc(BASE_PATH . '/lib/includes/cache', true, 0);
+		}
+	}
+	else
+	{
+		$error = $ccms['lang']['auth']['featnotallowed'];
+	}
+
+	if(empty($error))
+	{
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['success'].'</p>';
+	}
+	else
+	{
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_exclamation" title="'.$ccms['lang']['system']['error_general'].'">&#160;</span>'.$ccms['lang']['system']['error_correct'].'</p><p class="fault">- '.$error.'</p>';
+	}
+	exit();
+}
+
+
+
+
+
+
+
+echo <<<EOT
+
+<pre>
+EOT;
+print_r($do_action);
+
+echo "\nGET = \n";
+print_r($_GET);
+
+print_r($_SESSION);
+
+echo "</pre>\n";
 
 
 

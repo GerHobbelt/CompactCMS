@@ -218,7 +218,8 @@ Make sure the admin content has a scrollbar when needed. Override body+html:over
 	padding: 10px;
 	min-height: 45px;
 }
-a#clockLink
+a#clockLink, 
+a#clearCacheLink
 {
 	text-decoration: none;
 }
@@ -373,7 +374,7 @@ a.edit, a.editinplace:hover
 	height:25px;
 	background-position: 0 -199px;
 }
-#notify .rounded-border
+#notify #notify_box
 {
 	background-color: #EED9BA;
 	border: 2px solid #C7892E;
@@ -478,6 +479,84 @@ IE6 fix:
 #notify_res ul p
 {
 	margin: .1em 0 .1em 0;
+}
+
+#notify #extra_tools_box
+{
+	background-color: #EED9BA;
+	border: 2px solid #C7892E;
+	border-radius: 10px;
+	/* min-height: 20px; */
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	
+	/* 
+	making sure the notify box is sized to the max height of both notify icon and notification text,
+	inspired by the first section of  http://matthewjamestaylor.com/blog/equal-height-columns-cross-browser-css-no-hacks
+	
+	This is the 'container' of that story.
+	*/
+	float: left;
+	width: 100%;
+}
+table#extra_toolbar
+{
+	width: 100%;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+#extra_toolbar td /* div */
+{
+	/* float: left; */
+	/* width: 25%; */
+	border: 0;
+	margin: 0;
+	padding: 3px;
+	
+	text-align: center;
+	font-variant: small-caps;
+	font-size: 1em;
+}
+#extra_toolbar form
+{
+	/* border: 1px solid #CB9E34; /* #C7892E; */
+	border-width: 0;
+	background-color: #EFDFBC;
+	border-radius: 7px;
+	padding: 1px 3px;
+	margin: 0;
+}
+#extra_toolbar select
+{
+	font-size: 11px;
+	
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+#extra_toolbar select
+{
+	background-color: #EFDFBC; /* same as form bg */
+	width: 18px;	/* only show the dropdown box/icon */
+}
+#extra_toolbar optgroup, #extra_toolbar option
+{
+	font-size: 12px;
+	background-color: #FFF;
+}
+#extra_toolbar button
+{
+	float: none;
+	display: inline;
+	background-color: #EFDFBC; /* same as form bg */
+}
+#extra_toolbar button#su_userbtn
+{
+	padding: 0 0 0 3px;
+	border: 0;
+	margin: 0;
 }
 
 #advanced ul

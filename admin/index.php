@@ -140,19 +140,9 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		</div>
 		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
 	</div>
-	<div id="notify" class="span-12 may-fade">
-		<div class="rounded-border">
-			<div class="header">
-				<?php
-				if($cfg['protect'])
-				{
-				?>
-					<a class="right span-6" href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
-				<?php
-				}
-				?>
-				<a id="clockLink" title="<?php echo $ccms['lang']['backend']['show_clock']; ?>"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
-			</div>
+	<div id="notify" class="span-12">
+		<div id="notify_box" class="rounded-border may-fade">
+			<div class="header">&#160;</div>
 			<div id="notify_icon">&#160;</div>
 			<div id="notify_res">
 				<?php
@@ -190,6 +180,89 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				?>
 			</div>
+		</div>
+		<div id="extra_tools_box" class="rounded-border may-fade">
+			<!-- it's a bit 'unclean' to do this as a table but it's the fastest/easiest way to dimension each item dynamically without using JS -->
+			<table id="extra_toolbar">
+				<tr>
+				<td><a id="clockLink" title="<?php echo $ccms['lang']['backend']['show_clock']; ?>"><span class="ss_sprite_16 ss_time">&#160;</span></a></td>
+				<td><a id="clearCacheLink" title="<?php echo $ccms['lang']['backend']['clear_cache']; ?>"><span class="ss_sprite_16 ss_eraser">&#160;</span></a></td>
+				<?php
+				if($cfg['protect'])
+				{
+				?>
+					<td><a href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_user_logout" title="<?php 
+						// check whether this is an SU session (doesn't care about security; that's what security.inc.php will take care of):
+						if ($_SESSION['ccms_isSwitchedUser'])
+						{
+							// return to be an admin
+							echo $ccms['lang']['backend']['logout_helpmsgA']; 
+						}
+						else
+						{
+							// really log out
+							echo $ccms['lang']['backend']['logout_helpmsgX']; 
+						}
+					?>">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
+				</td>
+				<?php
+					// you may only switch to another user when you're an admin:
+					if ($_SESSION['ccms_userLevel'] >= 4 && !$_SESSION['ccms_isSwitchedUser'])
+					{
+						// collect users viable for switching TO:
+						$values = array();
+						$values[] = 'userLevel < ' . MySQL::SQLValue($_SESSION['ccms_userLevel'], MySQL::SQLVALUE_NUMBER);
+						$values['userActive'] = MySQL::SQLValue(true, MySQL::SQLVALUE_BOOLEAN);
+						$rsCfg = $db->SelectArray($cfg['db_prefix'].'users', $values, null, array('userLast', 'userFirst', 'userName'));
+						
+						$values = array();
+						if (!empty($rsCfg))
+						{
+				?>
+				<td>
+					<form method="post" id="switchUserForm" action="./includes/process.inc.php">
+						<button type="submit" id="su_userbtn" name="submit">
+							<span class="ss_sprite_16 ss_group_go" title="<?php echo $ccms['lang']['backend']['switch_user']; ?>">&#160;</span>
+						</button>
+						<select class="text" name="su_userName" id="f_su_user" size="1" title="<?php echo $ccms['lang']['backend']['switch_user_helpmsg']; ?>">
+							<optgroup label="<?php echo $ccms['lang']['backend']['switch_user']; ?>">
+								<?php
+							foreach ($rsCfg as $row)
+							{
+								echo '<option value="' . $row['userID'] . '_' . $row['userName'] . '">' . $row['userFirst'] . ' ' . $row['userLast'] . ' [';
+								switch (intval($row['userLevel']))
+								{
+								case 1:
+									echo $ccms['lang']['permission']['level1'];
+									break;
+								case 2:
+									echo $ccms['lang']['permission']['level2'];
+									break;
+								case 3:
+									echo $ccms['lang']['permission']['level3'];
+									break;
+								case 4:
+									echo $ccms['lang']['permission']['level4'];
+									break;
+								default:
+									echo '???';
+									break;
+								}
+								echo "]</option>\n";
+							}
+								?>
+							</optgroup>
+						</select>
+						<input type="hidden" name="form" value="switch_user" />
+					</form>
+				</td>
+				<?php
+						}
+					}
+				}
+				?>
+				</tr>
+			</table>
 		</div>
 	</div>
 	<div id="advanced" class="prepend-1 span-6 last clear-right may-fade">

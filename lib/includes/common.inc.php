@@ -2126,9 +2126,12 @@ function is_writable_ex($path)
 
 
 
-
+/**
+ * Recursively delete a directory tree.
+ */
 function recrmdir($dir)
 {
+	$count = 0;
 	if (is_dir($dir))
 	{
 		$objects = scandir($dir);
@@ -2139,18 +2142,20 @@ function recrmdir($dir)
 			{
 				if (is_dir($dir."/".$object))
 				{
-					recrmdir($dir."/".$object);
+					$count += recrmdir($dir."/".$object);
 				}
 				else
 				{
 					@unlink($dir."/".$object);
+					$count++;
 				}
 			}
 		}
 		reset($objects);
 		@rmdir($dir);
+		$count++;
 	}
-	return true;
+	return $count;
 }
 
 

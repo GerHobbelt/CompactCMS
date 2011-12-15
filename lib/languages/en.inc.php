@@ -139,6 +139,8 @@ $ccms['lang']['backend']['no']                  = "No";
 $ccms['lang']['backend']['translation']         = "Translations";
 $ccms['lang']['backend']['hello']               = "Hi";
 $ccms['lang']['backend']['logout']              = "Log-out";
+$ccms['lang']['backend']['logout_helpmsgX']     = "Terminate this session. You will return to the login page.";
+$ccms['lang']['backend']['logout_helpmsgA']     = "Terminate this 'switched to user' session. You will return to your regular (admin level) identity.";
 $ccms['lang']['backend']['see_forum']           = "See forum";
 $ccms['lang']['backend']['warning']             = "Warning";
 $ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
@@ -147,6 +149,9 @@ $ccms['lang']['backend']['rename_file']         = "Rename file";
 $ccms['lang']['backend']['file_renamed_from_to'] = "Succesfully renamed file '%s' to '%s'";
 $ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
 $ccms['lang']['backend']['show_clock']          = "Show a clock (displaying the local time)";
+$ccms['lang']['backend']['clear_cache']         = "Clear all server-side caches";
+$ccms['lang']['backend']['switch_user']         = "Switch User";
+$ccms['lang']['backend']['switch_user_helpmsg'] = "Usage: select a user, then click the Switch User icon at left to switch.\nDescription: Temporarily act as if you were another user (until you log out); you can only switch to users who have fewer privileges and you can switch only when you are a site admin yourself.";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']               = "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
