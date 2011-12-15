@@ -151,7 +151,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				<?php
 				}
 				?>
-				<a id="clockLink" class="clock"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
+				<a id="clockLink" title="<?php echo $ccms['lang']['backend']['show_clock']; ?>"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
 			</div>
 			<div id="notify_icon">&#160;</div>
 			<div id="notify_res">

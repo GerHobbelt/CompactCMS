@@ -146,6 +146,7 @@ $ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned 
 $ccms['lang']['backend']['rename_file']         = "Rename file";
 $ccms['lang']['backend']['file_renamed_from_to'] = "Succesfully renamed file '%s' to '%s'";
 $ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
+$ccms['lang']['backend']['show_clock']          = "Show a clock (displaying the local time)";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']               = "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
