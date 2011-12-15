@@ -719,6 +719,16 @@ div.tip-text {
 	border-radius: 10px;
 	padding:10px;
 }
+
+#install-wrapper .error,
+#install-wrapper .alert, 
+#install-wrapper .notice,
+#install-wrapper .success, 
+#install-wrapper .info 			
+{ 
+	border-radius: 5px;
+}
+
 #loginFrm label
 {
 	display: block;
