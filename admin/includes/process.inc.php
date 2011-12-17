@@ -1409,7 +1409,7 @@ if ($target_form == 'switch_user' && $_SERVER['REQUEST_METHOD'] == 'POST' && che
 
 /*
  * Clear the server-side caches: pages, browscap, combiner/log dumps, etc.
-  */
+ */
 if($do_action == 'clearcaches' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAuth())
 {
 	function recrmdir4cc($dir, $clean_all, $level)
@@ -1425,7 +1425,7 @@ if($do_action == 'clearcaches' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
 				{
 					if (is_dir($dir . "/" . $object))
 					{
-						$count += recrmdir($dir . "/" . $object, ($clean_all || ($object == '_thumbs')), $level + 1);
+						$count += recrmdir4cc($dir . "/" . $object, ($clean_all || ($object == '_thumbs')), $level + 1);
 					}
 					else if ($clean_all && $object != 'index.html')
 					{
