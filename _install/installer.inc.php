@@ -878,8 +878,8 @@ if($nextstep == 'final' && checkAuth())
 		$newpath    = $_SESSION['variables']['rootdir'];
 
 		// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
-		$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
-		$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<IfDefine CCMS_installed>)/', '# \\2', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<\/IfDefine>(\s*#\s*CCMS_installed)?)/', '# \\2', $htaccess);
 
 		// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
 		$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
