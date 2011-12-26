@@ -551,10 +551,10 @@ if (0)
 
 if (0)
 {
-	require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+	require_once(BASE_PATH . '/lib/includes/browscap/browscap/Browscap.php');
 
 	$bc = new Browscap(BASE_PATH . '/lib/includes/cache');
-	$bc->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+	$bc->localFile = BASE_PATH . '/lib/includes/browscap-data/php_browscap.ini';
 	$bc = $bc->getBrowser();
 
 	echo '<h1>$bc</h1>';

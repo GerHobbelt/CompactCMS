@@ -148,10 +148,10 @@ $only_when_expression = trim(getGETparam4MathExpression('only-when', ''));
 
 
 
-/*MARKER*/require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/browscap/browscap/Browscap.php');
 
 $client_browser = new Browscap(BASE_PATH . '/lib/includes/cache');
-$client_browser->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+$client_browser->localFile = BASE_PATH . '/lib/includes/browscap-data/php_browscap.ini';
 $client_browser = $client_browser->getBrowser();
 /*
  * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
