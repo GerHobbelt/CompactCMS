@@ -1,10 +1,22 @@
 LazyLoad Changelog
 ================================================================================
 
-Version 2.0.2 (git)
+Version 2.0.3 (2011-07-05)
+  * Fixed a bug caused by an unwanted Closure Compiler optimization that broke
+    CSS load completion detection in Gecko when using the minified version of
+    LazyLoad. [Allex Wang]
+  * Fixed a race condition in which a URL could be removed from the "pending"
+    queue if it finished loading before other URLs in the same batch had been
+    added to the queue, resulting in the queue's length changing unexpectedly
+    during iteration. [Klaas Neirinck]
+  * css() and js() methods now return created node(s)
+
+Version 2.0.2 (2011-04-17)
   * Added support for reliable detection of CSS load completion in Gecko
     browsers based on a technique described by Zach Leatherman at
     <http://www.zachleat.com/web/2010/07/29/load-css-dynamically/>.
+  * Fixed a bug that prevented CSS load completion from being detected in WebKit
+    when there were no other stylesheets on the page. [Klaas Neirinck]
   * Fixed a bug that could prevent CSS callbacks from being called in IE.
 
 Version 2.0.1 (2011-03-05)

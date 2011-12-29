@@ -1,7 +1,7 @@
 LazyLoad
 ========
 
-LazyLoad is a tiny (only 918 bytes minified and gzipped), dependency-free
+LazyLoad is a tiny (only 966 bytes minified and gzipped), dependency-free
 JavaScript utility that makes it super easy to load external JavaScript and CSS
 files on demand.
 
@@ -17,9 +17,9 @@ that larger script loaders provide.
 Downloads
 ---------
 
-  * [lazyload.js](https://github.com/rgrove/lazyload/raw/release-2.0.1/lazyload.js) (full source)
-  * [lazyload-min.js](https://github.com/rgrove/lazyload/raw/release-2.0.1/lazyload-min.js) (minified source)
-  * Archive: [tgz](https://github.com/rgrove/lazyload/tarball/release-2.0.1) | [zip](https://github.com/rgrove/lazyload/zipball/release-2.0.1)
+  * [lazyload.js](https://github.com/rgrove/lazyload/raw/release-2.0.3/lazyload.js) (full source)
+  * [lazyload-min.js](https://github.com/rgrove/lazyload/raw/release-2.0.3/lazyload-min.js) (minified source)
+  * Archive: [tgz](https://github.com/rgrove/lazyload/tarball/release-2.0.3) | [zip](https://github.com/rgrove/lazyload/zipball/release-2.0.3)
 
 Usage
 -----
@@ -30,35 +30,38 @@ You can also provide a callback function if you'd like to be notified when the
 resources have finished loading, as well as an argument to pass to the callback
 and a context in which to execute the callback.
 
-    // Load a single JavaScript file and execute a callback when it finishes.
-    LazyLoad.js('http://example.com/foo.js', function () {
-      alert('foo.js has been loaded');
-    });
+```js
+// Load a single JavaScript file and execute a callback when it finishes.
+LazyLoad.js('http://example.com/foo.js', function () {
+  alert('foo.js has been loaded');
+});
 
-    // Load multiple JS files and execute a callback when they've all finished.
-    LazyLoad.js(['foo.js', 'bar.js', 'baz.js'], function () {
-      alert('all files have been loaded');
-    });
+// Load multiple JS files and execute a callback when they've all finished.
+LazyLoad.js(['foo.js', 'bar.js', 'baz.js'], function () {
+  alert('all files have been loaded');
+});
 
-    // Load a CSS file and pass an argument to the callback function.
-    LazyLoad.css('foo.css', function (arg) {
-      alert(arg);
-    }, 'foo.css has been loaded');
+// Load a CSS file and pass an argument to the callback function.
+LazyLoad.css('foo.css', function (arg) {
+  alert(arg);
+}, 'foo.css has been loaded');
 
-    // Load a CSS file and execute the callback in a different scope.
-    LazyLoad.css('foo.css', function () {
-      alert(this.foo); // displays 'bar'
-    }, null, {foo: 'bar'});
+// Load a CSS file and execute the callback in a different scope.
+LazyLoad.css('foo.css', function () {
+  alert(this.foo); // displays 'bar'
+}, null, {foo: 'bar'});
+```
 
 Supported Browsers
 ------------------
 
   * Firefox 2+
-  * Google Chrome (all versions)
+  * Google Chrome
   * Internet Explorer 6+
   * Opera 9+
   * Safari 3+
-  * Mobile Safari (all versions)
+  * Mobile Safari
+  * Android
 
 Other browsers may work, but haven't been tested. It's a safe bet that anything
 based on a recent version of Gecko or WebKit will probably work.
