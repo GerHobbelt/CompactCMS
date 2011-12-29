@@ -8,26 +8,32 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
  *
  * PHP version 5
  *
- * LICENSE: This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * Copyright (c) 2006-2012 Jonathan Stoppani
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  *
  * @package    Browscap
- * @author     Jonathan Stoppani <st.jonathan@gmail.com>
- * @copyright  Copyright (c) 2006-2008 Jonathan Stoppani
+ * @author     Jonathan Stoppani <jonathan@stoppani.name>
+ * @copyright  Copyright (c) 2006-2012 Jonathan Stoppani
  * @version    0.7
- * @license    http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License
- * @link       http://garetjax.info/projects/browscap/
+ * @license    http://www.opensource.org/licenses/MIT MIT License
+ * @link       https://github.com/GaretJax/phpbrowscap/
  */
 class Browscap
 {
@@ -93,7 +99,7 @@ class Browscap
 	 *                  an UPDATE_* constant, null or false.
 	 */
 	public $remoteIniUrl    = 'http://browsers.garykeith.com/stream.asp?BrowsCapINI';
-	public $remoteVerUrl    = 'http://updates.browserproject.com/version-date.asp';
+	public $remoteVerUrl    = 'http://browsers.garykeith.com/versions/version-date.asp';
 	public $timeout         = 5;
 	public $updateInterval  = 432000; // 5 days
 	public $errorInterval   = 7200;   // 2 hours
@@ -136,15 +142,20 @@ class Browscap
 
 	/**
 	 * Flag to enable/disable individual (very high-speed) UA caching.
-	 * When > 0, the settings fo each UA will be cached individually, reducing memory 
+	 * When > 0, the settings fo each UA will be cached individually, reducing memory
 	 * consumption and loading time of the 'overall' cache file. Generally, a site is
 	 * visited by a large number of people using few browsers, and the total number of
-	 * different UAs visiting is quite manageable. Here we can set up whether any, all 
+	 * different UAs visiting is quite manageable. Here we can set up whether any, all
 	 * or only 'ubiquitous' UAs get their info cached in fast-access, small, cache files.
 	 *
 	 * @var int
+	 *
+	 * Values:
+	 *   0: DO NOT USE the 'smart cache' AT ALL.
+	 *   1: Store any and all incoming UAs' output in the smart cache. Security risk: UA smart cache directory flooding (when visitors use random UA strings).
+	 *   2 (and above): Only store known UAs' output in the smart cache. Prevents UA smart cache directory flooding security risk.
 	 */
-	public $smart_cache     = 1;
+	public $smart_cache     = 2;
 
 	/**
 	 * Where to store the cached PHP arrays.
@@ -237,7 +248,7 @@ class Browscap
 				$user_agent = '';
 			}
 		}
-		
+
 		// see if we might have a fast/tiny cache entry for this one:
 		$array = false;
 		if ($this->smart_cache > 0)
@@ -247,7 +258,7 @@ class Browscap
 			$ua_cache_subdir = 'UAC/' . substr($ua_hash, 0, 2);
 			// file subpath length: 64 chars
 			$ua_cache_filename = substr(preg_replace('/[^A-Za-z0-9.-]+/', '_', $user_agent), 0, 27) . '.' . substr($ua_hash, 2);
-			
+
 			$ua_cache_file = $this->cacheDir . $ua_cache_subdir . '/' . $ua_cache_filename;
 			if (file_exists($ua_cache_file))
 			{
@@ -256,7 +267,7 @@ class Browscap
 				{
 					$data = @unserialize($data);
 				}
-				// when the file is damaged, nuke it so it can be recreated properly: 
+				// when the file is damaged, nuke it so it can be recreated properly:
 				if (!is_array($data))
 				{
 					$this->_destroy_UA_cachefiles($ua_cache_subdir, $ua_cache_filename);
@@ -340,14 +351,18 @@ class Browscap
 
 				$array[$this->_properties[$key]] = $value;
 			}
-			
+
 			// see if we should update the 'fast cache' as well
-			if ($ua_cache_file !== false)
+			if ($ua_cache_file !== false
+				&& ($this->smart_cache == 1 /* store each UA, even the unknown ones, in the 'smart cache'. Security risk: UA cache flooding. */
+					|| count($array) > 0 /* store only _known_ UAs in the 'smart cache'. Prevents UA cache flooding by evil visitors with random UA headers. */
+					)
+				)
 			{
 				@mkdir($this->cacheDir . $ua_cache_subdir, 0775, true);
-				
+
 				$data = serialize($array);
-				if (false === file_put_contents($ua_cache_file, $data))
+				if (false === @file_put_contents($ua_cache_file, $data))
 				{
 					$this->_destroy_UA_cachefiles($ua_cache_subdir, $ua_cache_filename);
 				}
@@ -440,7 +455,7 @@ class Browscap
 		$cache = $this->_buildCache();
 
 		// Save and return
-		return (bool) file_put_contents($cache_path, $cache, LOCK_EX);
+		return (bool) @file_put_contents($cache_path, $cache, LOCK_EX);
 	}
 
 	/**
@@ -451,7 +466,7 @@ class Browscap
 		if (!empty($filename))
 		{
 			@unlink($this->cacheDir . $subdir . '/' . $filename);
-		
+
 			// as we use a 1 level subdir tree, see if we can/should delete the related subdir as well:
 			@rmdir($this->cacheDir . $subdir);
 		}
@@ -460,35 +475,35 @@ class Browscap
 			// we KNOW we're caching files in a 'UAC/xx/' subdirectory tree; blow away those 'xx' subdirs and the 'UAC' base dir as well
 			$parent = dirname($this->cacheDir . 'UAC');
 			$dh = opendir($parent);
-			while ($fn = readdir($dh)) 
+			while ($fn = readdir($dh))
 			{
-				if ($fn == '.' || $fn == '..') 
+				if ($fn == '.' || $fn == '..')
 					continue;
-					
-                $path = $this->cacheDir . 'UAC/' . $fn;
-               
-                if (is_dir($path)) 
+
+				$path = $this->cacheDir . 'UAC/' . $fn;
+
+				if (is_dir($path))
 				{
 					$sdh = opendir($path);
-					while ($sfn = readdir($sdh)) 
+					while ($sfn = readdir($sdh))
 					{
-						if ($sfn == '.' || $sfn == '..') 
+						if ($sfn == '.' || $sfn == '..')
 							continue;
-							
+
 						$spath = $path . '/' . $sfn;
 						@unlink($spath);
 					}
 					closedir($sdh);
 					@rmdir($path);
-                }
+				}
 				else
 				{
 					@unlink($path);
 				}
-            }
+			}
 			closedir($dh);
 			@rmdir($this->cacheDir . 'UAC');
-        }
+		}
 	}
 
 	/**
@@ -581,10 +596,11 @@ class Browscap
 			$content .= preg_replace($pattern, '$1="$2"', $subject) . "\n";
 		}
 
-		if (!@file_put_contents($path, $content)) {
-			throw new Browscap_Exception('Could not write .ini content to ' . $path);
+		if ($url != $path) {
+			if (!@file_put_contents($path, $content)) {
+				throw new Browscap_Exception('Could not write .ini content to ' . $path);
+			}
 		}
-
 		return true;
 	}
 
@@ -698,7 +714,7 @@ class Browscap
 	private function _getRemoteData($url)
 	{
 		ini_set('user_agent', $this->_getUserAgent());
-		
+
 		switch ($this->_getUpdateMethod()) {
 			case self::UPDATE_LOCAL:
 				$file = file_get_contents($url);
@@ -716,7 +732,7 @@ class Browscap
 				if ($file !== false) {
 					return $file;
 				} // else try with the next possibility (break omitted)
-				
+
 			case self::UPDATE_FSOCKOPEN:
 				$remote_url     = parse_url($url);
 				$remote_handler = fsockopen($remote_url['host'], 80, $c, $e, $this->timeout);
@@ -755,7 +771,7 @@ class Browscap
 						return $file;
 					}
 				} // else try with the next possibility
-				
+
 			case self::UPDATE_CURL:
 				if (is_callable("curl_init")) {
 					$ch = curl_init($url);
@@ -772,7 +788,7 @@ class Browscap
 				if ($file !== false) {
 					return $file;
 				} // else try with the next possibility
-				
+
 			case false:
 				throw new Browscap_Exception("Your server can't connect to external resources. Please update the file manually.");
 		}
@@ -790,6 +806,118 @@ class Browscap
 		$ua = str_replace('%m', $this->_getUpdateMethod(), $ua);
 
 		return $ua;
+	}
+
+	public function getRemoteIniUrl() {
+		return $this->remoteIniUrl;
+	}
+
+	public function setRemoteIniUrl($remoteIniUrl) {
+		$this->remoteIniUrl = $remoteIniUrl;
+	}
+
+	public function getRemoteVerUrl() {
+		return $this->remoteVerUrl;
+	}
+
+	public function setRemoteVerUrl($remoteVerUrl) {
+		$this->remoteVerUrl = $remoteVerUrl;
+	}
+
+	public function getTimeout() {
+		return $this->timeout;
+	}
+
+	public function setTimeout($timeout) {
+		$this->timeout = $timeout;
+	}
+
+	public function getUpdateInterval() {
+		return $this->updateInterval;
+	}
+
+	public function setUpdateInterval($updateInterval) {
+		$this->updateInterval = $updateInterval;
+	}
+
+	public function getErrorInterval() {
+		return $this->errorInterval;
+	}
+
+	public function setErrorInterval($errorInterval) {
+		$this->errorInterval = $errorInterval;
+	}
+
+	public function getDoAutoUpdate() {
+		return $this->doAutoUpdate;
+	}
+
+	public function setDoAutoUpdate($doAutoUpdate) {
+		$this->doAutoUpdate = $doAutoUpdate;
+	}
+
+	public function getUpdateMethod() {
+		return $this->updateMethod;
+	}
+
+	public function setUpdateMethod($updateMethod) {
+		$this->updateMethod = $updateMethod;
+	}
+
+	public function getLocalFile() {
+		return $this->localFile;
+	}
+
+	public function setLocalFile($localFile) {
+		$this->localFile = $localFile;
+	}
+
+	public function getUserAgent() {
+		return $this->userAgent;
+	}
+
+	public function setUserAgent($userAgent) {
+		$this->userAgent = $userAgent;
+	}
+
+	public function getLowercase() {
+		return $this->lowercase;
+	}
+
+	public function setLowercase($lowercase) {
+		$this->lowercase = $lowercase;
+	}
+
+	public function getSilent() {
+		return $this->silent;
+	}
+
+	public function setSilent($silent) {
+		$this->silent = $silent;
+	}
+
+	public function getCacheFilename() {
+		return $this->cacheFilename;
+	}
+
+	public function setCacheFilename($cacheFilename) {
+		$this->cacheFilename = $cacheFilename;
+	}
+
+	public function getIniFilename() {
+		return $this->iniFilename;
+	}
+
+	public function setIniFilename($iniFilename) {
+		$this->iniFilename = $iniFilename;
+	}
+
+	public function getCacheDir() {
+		return $this->cacheDir;
+	}
+
+	public function setCacheDir($cacheDir) {
+		$this->cacheDir = $cacheDir;
 	}
 }
 
