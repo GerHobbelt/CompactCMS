@@ -449,7 +449,7 @@ IE6 fix:
 	/* margin-left: 80px; */
 	
 	float: left;
-	width: 395px;
+	width: 390px;
 }
 #notify_res p
 {
@@ -1005,6 +1005,10 @@ div.module
 {
 	overflow: auto;
 }
+#status-report
+{
+	display: none;
+}
 .spinner
 {
 	z-index: 9998;
@@ -1033,7 +1037,10 @@ div.module
 }
 .spinner-content .loading
 {
-	background: transparent url('../spinner.gif') no-repeat center center;
+	background-color: transparent;
+	background-image: url('../spinner.gif');
+	background-repeat: no-repeat;
+	background-position: center center;
 	min-width: 100px;
 	min-height: 100px;
 }
@@ -1155,7 +1162,7 @@ and the other victims of layout:
 
 the backup management page...
 */
-form#create-arch, form#delete-arch
+form#delete-arch
 {
 	overflow: hidden;
 	height: 1%;             /* IE6 needs this */
