@@ -1,0 +1,18 @@
+[submodule "lib/includes/js/mootools-core"]
+	path = lib/includes/js/mootools-core
+	url = git@github.com:GerHobbelt/mootools-core.git
+[submodule "lib/includes/js/mootools-more"]
+	path = lib/includes/js/mootools-more
+	url = git@github.com:GerHobbelt/mootools-more.git
+[submodule "lib/includes/js/lazyload"]
+	path = lib/includes/js/lazyload
+	url = git@github.com:GerHobbelt/lazyload.git
+[submodule "lib/includes/js/mochaui"]
+	path = lib/includes/js/mochaui
+	url = git@github.com:GerHobbelt/mochaui.git
+[submodule "lib/includes/js/tinymce"]
+	path = lib/includes/js/tinymce
+	url = git@github.com:GerHobbelt/tinymce.git
+[submodule "lib/includes/rgrove-jsmin"]
+	path = lib/includes/rgrove-jsmin
+	url = git@github.com:GerHobbelt/jsmin-php.git
