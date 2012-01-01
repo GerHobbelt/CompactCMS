@@ -41,11 +41,24 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 class createZip
 {
-	public $compressedData = array();
-	public $centralDirectory = array(); // central directory
-	public $endOfCentralDirectory = "\x50\x4b\x05\x06\x00\x00\x00\x00"; //end of Central directory record
-	public $oldOffset = 0;
+	protected $compressedData = array();
+	protected $centralDirectory = array(); // central directory
+	protected $endOfCentralDirectory = "\x50\x4b\x05\x06\x00\x00\x00\x00"; //end of Central directory record
+	protected $oldOffset = 0;
 
+	protected $fd = null;
+	protected $flushed_data_len = 0;
+	protected $last_flush_len = 0;		// prevent (failing) flush attempts for every little file added once the threshold has been surpassed
+	protected $flushSizeThreshold = 1048576;  // flush data every 1Mbyte into the ZIP file
+	
+	public function __construct($file_handle)
+	{
+		if (!empty($file_handle))
+		{
+			$this->fd = $file_handle;
+		}
+	}
+	
 	/**
 	 * Function to create the directory where the file(s) will be unzipped
 	 *
@@ -53,7 +66,8 @@ class createZip
 	 *
 	 */
 
-	public function addDirectory($directoryName) {
+	public function addDirectory($directoryName) 
+	{
 		$directoryName = str_replace("\\", "/", $directoryName);
 
 		$feedArrayRow = "\x50\x4b\x03\x04";
@@ -73,9 +87,9 @@ class createZip
 		$feedArrayRow .= pack("V",0);
 		$feedArrayRow .= pack("V",0);
 
-		$this -> compressedData[] = $feedArrayRow;
+		$this->compressedData[] = $feedArrayRow;
 
-		$newOffset = strlen(implode("", $this->compressedData));
+		$newOffset = strlen(implode("", $this->compressedData)) + $this->flushed_data_len;
 
 		$addCentralRecord = "\x50\x4b\x01\x02";
 		$addCentralRecord .="\x00\x00";
@@ -95,12 +109,12 @@ class createZip
 		$ext = "\xff\xff\xff\xff";
 		$addCentralRecord .= pack("V", 16 );
 
-		$addCentralRecord .= pack("V", $this -> oldOffset );
-		$this -> oldOffset = $newOffset;
+		$addCentralRecord .= pack("V", $this->oldOffset );
+		$this->oldOffset = $newOffset;
 
 		$addCentralRecord .= $directoryName;
 
-		$this -> centralDirectory[] = $addCentralRecord;
+		$this->centralDirectory[] = $addCentralRecord;
 	}
 
 	/**
@@ -137,9 +151,9 @@ class createZip
 		$feedArrayRow .= pack("V",$compressedLength);
 		$feedArrayRow .= pack("V",$uncompressedLength);
 
-		$this -> compressedData[] = $feedArrayRow;
+		$this->compressedData[] = $feedArrayRow;
 
-		$newOffset = strlen(implode("", $this->compressedData));
+		$newOffset = strlen(implode("", $this->compressedData)) + $this->flushed_data_len;
 
 		$addCentralRecord = "\x50\x4b\x01\x02";
 		$addCentralRecord .="\x00\x00";
@@ -157,12 +171,19 @@ class createZip
 		$addCentralRecord .= pack("v", 0 );
 		$addCentralRecord .= pack("V", 32 );
 
-		$addCentralRecord .= pack("V", $this -> oldOffset );
-		$this -> oldOffset = $newOffset;
+		$addCentralRecord .= pack("V", $this->oldOffset );
+		$this->oldOffset = $newOffset;
 
 		$addCentralRecord .= $directoryName;
 
-		$this -> centralDirectory[] = $addCentralRecord;
+		$this->centralDirectory[] = $addCentralRecord;
+		
+		if ($newOffset >= $this->flushSizeThreshold + $this->last_flush_len)
+		{
+			$this->last_flush_len = $newOffset;
+			return $this->flushZippedData();
+		}	
+		return $compressedLength;
 	}
 
 	/**
@@ -170,20 +191,59 @@ class createZip
 	 *
 	 * @return zipfile (archive)
 	 */
-	public function getZippedfile() {
-
-		$data = implode("", $this -> compressedData);
-		$controlDirectory = implode("", $this -> centralDirectory);
+	public function getZippedfile() 
+	{
+		$data = implode("", $this->compressedData);
+		$controlDirectory = implode("", $this->centralDirectory);
 
 		return
 			$data.
 			$controlDirectory.
-			$this -> endOfCentralDirectory.
-			pack("v", sizeof($this -> centralDirectory)).
-			pack("v", sizeof($this -> centralDirectory)).
+			$this->endOfCentralDirectory.
+			pack("v", sizeof($this->centralDirectory)).
+			pack("v", sizeof($this->centralDirectory)).
 			pack("V", strlen($controlDirectory)).
-			pack("V", strlen($data)).
+			pack("V", strlen($data) + $this->flushed_data_len).
 			"\x00\x00";
+	}
+
+	/**
+	 * Flush ZIP data in memory to file/disk as much as possible.
+	 */
+	public function flushZippedData()
+	{
+		$data = implode("", $this->compressedData);
+		if (!empty($this->fd))
+		{
+			$out = fwrite($this->fd, $data);
+			if ($out)
+			{
+				$this->flushed_data_len += strlen($data);
+				$this->compressedData = array();
+			}
+			return $out;
+		}
+		return false;
+	}
+	
+	/**
+	 * Save the constructed ZIP file to disk.
+	 */
+	public function saveZipFile()
+	{
+		$data = $this->getZippedfile();
+		if (!empty($this->fd))
+		{
+			$out = fwrite($this->fd, $data);
+			if ($out)
+			{
+				$this->flushed_data_len = 0;
+				$this->compressedData = array();
+				$this->centralDirectory = array();
+			}
+			return $out;
+		}
+		return false;
 	}
 }
 
@@ -233,10 +293,4 @@ function directoryToArray($directory, $recursive, $regex_to_match = null)
 	return $array_items;
 }
 
-function pr($val)
-{
-	echo '<pre>';
-	print_r($val);
-	echo '</pre>';
-}
 ?>
