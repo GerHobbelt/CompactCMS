@@ -286,12 +286,10 @@ if ($do_action == 'backup')
 		}
 		// else: error has already been registered before, no sweat, mate!
 
-		//send_response_status_header(307); 
 		$msg = $ccms['lang']['backend']['newfilecreated'] . ', <a href="../../../../media/files/' . $backupName . '">' . strtolower($ccms['lang']['backup']['download']).'</a>.';
 		//header('Location: ' . makeAbsoluteURI('./backup-restore.Manage.php?status=notice&msg='.rawurlencode($msg)));
 		echo '<p>' . $msg . '</p>';
 		exit();
-		//	throw new FbX($ccms['lang']['auth']['featnotallowed']);
 	}
 	catch (CcmsAjaxFbException $e)
 	{
