@@ -345,10 +345,13 @@ $driver_code = <<<EOT42
 			{
 				clearTimeout(this.progress_timer);
 				this.progress_timer = null;
-				this.report_el.fade(0).get('tween').chain(function()
+				if (0)
 				{
-					//this.report_el.setStyle('display', 'none');
-				}.bind(this));
+					this.report_el.fade(0).get('tween').chain(function()
+					{
+						this.report_el.setStyle('display', 'none');
+					}.bind(this));
+				}
 			},
 			report_backup_progress: function() 
 			{
