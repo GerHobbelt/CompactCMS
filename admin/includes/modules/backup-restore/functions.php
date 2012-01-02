@@ -293,4 +293,70 @@ function directoryToArray($directory, $recursive, $regex_to_match = null)
 	return $array_items;
 }
 
+
+
+/*
+  Log the current state of the running backup to file.
+  
+  Caveat: does not consider two or more backups running in parallel. We neglect this caveat as
+          it is expected to occur never/seldom and when it happens we accept 'flaky' 
+		  progress reporting...
+		  
+		  Also keep this in mind:
+		    http://www.php.net/manual/en/function.microtime.php#101628
+		  while we go on and use microtime() anyway; we are not measuring performance but rather 
+		  using a timer to limit the number of file writes to the report file.
+*/		  
+function log_current_backup_state($progressfile, $file_collection, $currently_processed_index = -2)
+{
+	static $visit_count = 0;
+	static $visit_time = null;
+	global $ccms;
+
+	if (empty($visit_time))
+	{
+		$visit_time = microtime(true);
+	}
+	$visit_count++;
+	switch ($currently_processed_index)
+	{
+	case -2:
+		// state: dir scan; only update for large changes
+		if ($visit_count > 128)
+		{
+			$visit_count = 0;
+			$visit_time = microtime(true);
+			@file_put_contents($progressfile, str_replace('","', "\",\n  \"", json_encode(array(
+				'state' => $ccms['lang']['backup']['scanning'],
+				'count' => count($file_collection)
+			))));
+		}
+		break;
+		
+	case -1:
+		// state: dir scan done
+		$visit_count = 0;
+		$visit_time = microtime(true);
+		@file_put_contents($progressfile, str_replace('","', "\",\n  \"", json_encode(array(
+			'state' => $ccms['lang']['backup']['scanned'],
+			'count' => count($file_collection)
+		))));
+		break;
+		
+	default:
+		// update report in time or count; just keep the overhead write activity within reason...
+		if ($visit_count > 128 || microtime(true) > 3.0 + $visit_time)
+		{
+			$visit_count = 0;
+			$visit_time = microtime(true);
+			@file_put_contents($progressfile, str_replace('","', "\",\n  \"", json_encode(array(
+				'state' => $ccms['lang']['backup']['archiving'],
+				'count' => count($file_collection),
+				'position' => $currently_processed_index + 1,
+				'progress' => $currently_processed_index / count($file_collection)
+			))));
+		}
+		break;
+	}
+}
 ?>

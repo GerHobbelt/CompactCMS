@@ -40,9 +40,6 @@ We're only processing form requests / actions here, no need to load the page con
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
 
-// Compress all output and coding
-header('Content-type: text/html; charset=UTF-8');
-
 // Define default location
 if (!defined('BASE_PATH'))
 {
@@ -71,6 +68,10 @@ if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !chec
 $do_action = getGETparam4IdOrNumber('action');
 
 
+
+define('BACKUP_DIRECTORY', 'media/files/');
+
+
 // Include back-up functions
 /*MARKER*/require_once('./functions.php');
 
@@ -85,8 +86,11 @@ $do_action = getGETparam4IdOrNumber('action');
  */
 if ($do_action == 'backup')
 {
+	header('Content-type: text/html; charset=UTF-8');
+
 	FbX::SetFeedbackLocation('backup-restore.Manage.php');
 	$fd = false;
+	$progressfile = null;
 	try
 	{
 		$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
@@ -98,19 +102,20 @@ if ($do_action == 'backup')
 		 * when the backup is restored at an unfortunate moment later in time.
 		 */
 		$configBackup       = array(
-								 array('dir' => '../../../../content/')
-								,array('tree' => '../../../../lib/templates/')
-								,array('file' => '../../../../lib/config.inc.php')
-								,array('tree' => '../../../../media/albums/:/\.txt$/i')
-								//,array('tree' => '../../../../media/albums/:/\/_thumbs\//i')
+								 array('tree' => 'content/')
+								,array('tree' => 'lib/templates/')
+								,array('file' => 'lib/config.inc.php')
+								,array('tree' => 'media/albums/:/\.txt$/i')
+								//,array('tree' => 'media/albums/:/\/_thumbs\//i')
 							);
-		$configBackupDir    = '../../../../media/files/';
 		$backupName         = date('Ymd_His').'-data'.$current_user.'.zip';
 		
 		$file_collection = array();
-		$listfile = $configBackupDir . $backupName . '.list';
+		$fileName = BASE_PATH . '/' . BACKUP_DIRECTORY . $backupName;
+		$listfile = $fileName . '.list';
+		$progressfile = BASE_PATH . '/' . BACKUP_DIRECTORY . 'progress-data' . $current_user . '.json';
+		log_current_backup_state($progressfile, $file_collection);
 
-		$fileName = $configBackupDir . $backupName;
 		$fd = @fopen($fileName, 'wb');
 		if (!$fd)
 		{
@@ -126,7 +131,7 @@ if ($do_action == 'backup')
 				{
 					foreach($elem as $scantype => $spec)
 					{
-						$pathspec = explode(':', $spec);
+						$pathspec = explode(':', $spec, 2);
 						$dir = $pathspec[0];
 						$regex_to_match = (count($pathspec) > 1 ? $pathspec[1] : null);
 
@@ -135,20 +140,24 @@ if ($do_action == 'backup')
 
 						 Handy when restoring data: extract zip equals (almost) done.
 						*/
-						$basename = substr($dir, strlen('../../../../'));
-						if (is_file($dir))
+						$basename = $dir;
+						if (is_file(BASE_PATH . '/' . $dir))
 						{
 							if ($scantype == 'file')
 							{
 								$file_collection[] = array('file' => $basename);
+								log_current_backup_state($progressfile, $file_collection);
 								
+								if (0)
+								{
 								// kick the PHP watchdog and make sure we can run for a long time at the same time:
 								set_time_limit(0);
 									
-								$fileContents = file_get_contents($dir);
-								if (false === $createZip->addFile($fileContents,$basename))
+								$fileContents = file_get_contents(BASE_PATH . '/' . $dir);
+								if (false === $createZip->addFile($fileContents, $basename))
 								{
 									throw new FbX($ccms['lang']['system']['error_write'] . ": " . $fileName);
+								}
 								}
 							}
 						}
@@ -157,10 +166,11 @@ if ($do_action == 'backup')
 							if ($scantype != 'file')
 							{
 								$basename .= (substr($basename, -1, 1) != '/' ? '/' : '');
-								//$file_collection[] = array('dir' => $basename);
-								$createZip->addDirectory($basename);
+								$file_collection[] = array('dir' => $basename);
+								log_current_backup_state($progressfile, $file_collection);
+								if (0) $createZip->addDirectory($basename);
 								
-								$files = directoryToArray($dir, ($scantype == 'tree'), $regex_to_match);
+								$files = directoryToArray(BASE_PATH . '/' . $dir, ($scantype == 'tree'), $regex_to_match);
 								/*
 								 * opendir+readdir deliver the file set in arbitrary order.
 								 *
@@ -170,17 +180,21 @@ if ($do_action == 'backup')
 
 								foreach ($files as $file)
 								{
-									$zipPath = explode($dir,$file);
+									$zipPath = explode(BASE_PATH . '/' . $dir, $file, 2);
 									$zipPath = $zipPath[1];
 									if (is_dir($file))
 									{
-										//$file_collection[] = array('dir' => $basename . $zipPath);
-										$createZip->addDirectory($basename . $zipPath);
+										$file_collection[] = array('dir' => $basename . $zipPath);
+										log_current_backup_state($progressfile, $file_collection);
+										if (0) $createZip->addDirectory($basename . $zipPath);
 									}
 									else
 									{
 										$file_collection[] = array('file' => $basename . $zipPath);
+										log_current_backup_state($progressfile, $file_collection);
 
+										if (0) 
+										{
 										// kick the PHP watchdog and make sure we can run for a long time at the same time:
 										set_time_limit(0);
 											
@@ -189,9 +203,42 @@ if ($do_action == 'backup')
 										{
 											throw new FbX($ccms['lang']['system']['error_write'] . ": " . $fileName);
 										}
+										}
 									}
 								}
 							}
+						}
+					}
+				}
+
+				log_current_backup_state($progressfile, $file_collection, -1);
+				
+				// now that we have collected the file+dir set, store them in a ZIP archive:
+				foreach ($file_collection as $idx => $elem)
+				{
+					log_current_backup_state($progressfile, $file_collection, $idx);
+					
+					foreach($elem as $scantype => $spec)
+					{
+						switch ($scantype)
+						{
+						case 'dir':
+							$createZip->addDirectory($spec);
+							break;
+							
+						case 'file':
+							// kick the PHP watchdog and make sure we can run for a long time at the same time:
+							set_time_limit(0);
+								
+							$fileContents = file_get_contents(BASE_PATH . '/' . $spec);
+							if (false === $createZip->addFile($fileContents, $spec))
+							{
+								throw new FbX($ccms['lang']['system']['error_write'] . ": " . $spec);
+							}
+							break;
+							
+						default:
+							die('INTERNAL ERROR');
 						}
 					}
 				}
@@ -286,7 +333,10 @@ if ($do_action == 'backup')
 		}
 		// else: error has already been registered before, no sweat, mate!
 
-		$msg = $ccms['lang']['backend']['newfilecreated'] . ', <a href="../../../../media/files/' . $backupName . '">' . strtolower($ccms['lang']['backup']['download']).'</a>.';
+		// and remove the progress info file:
+		@unlink($progressfile);
+		
+		$msg = $ccms['lang']['backend']['newfilecreated'] . ', <a href="media/files/' . $backupName . '">' . strtolower($ccms['lang']['backup']['download']).'</a>.';
 		header('Location: ' . makeAbsoluteURI('./backup-restore.Manage.php?status=notice&msg='.rawurlencode($msg)));
 		//echo '<p>' . $msg . '</p>';
 		exit();
@@ -297,7 +347,43 @@ if ($do_action == 'backup')
 		{
 			fclose($fd);
 		}
+		if (!empty($progressfile))
+		{
+			@unlink($progressfile);
+		}
 		$e->croak();
+	}
+}
+
+
+
+/**
+ * Report the progress on the current backup in JSON format.
+ */
+if ($do_action == 'report_backup_progress')
+{
+	header('Content-type: application/json; charset=UTF-8');
+
+	FbX::SetFeedbackLocation('backup-restore.Manage.php');
+	
+	try
+	{
+		$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
+
+		$progressfile = BASE_PATH . '/' . BACKUP_DIRECTORY . 'progress-data' . $current_user . '.json';
+		
+		$json = @file_get_contents($progressfile);
+		if (empty($json))
+		{
+			throw new FbX($ccms['lang']['system']['error_openfile'] . ": " . $progressfile);
+		}
+		die($json);
+	}
+	catch (CcmsAjaxFbException $e)
+	{
+		$e->croak_json(array(
+				'state' => 'error'
+			));
 	}
 }
 
@@ -305,8 +391,9 @@ if ($do_action == 'backup')
 
 
 
-
 // when we get here, an illegal command was fed to us!
+header('Content-type: text/html; charset=UTF-8');
+
 die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>

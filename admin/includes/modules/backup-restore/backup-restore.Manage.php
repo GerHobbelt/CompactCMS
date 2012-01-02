@@ -256,7 +256,12 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 				}
 				else
 				{
-					echo $ccms['lang']['system']['noresults'];
+				?>
+					<p><?php echo $ccms['lang']['system']['noresults']; ?></p>
+					<div class="right">
+						<a class="button" href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					</div>
+				<?php
 				}
 			}
 			else
@@ -324,6 +329,7 @@ $js_files = array(
 );
 
 $wait4backup = $ccms['lang']['backup']['wait4backup'];
+$progress_update_time = 1000;
 $driver_code = <<<EOT42
 
 	if ($('create-arch'))
@@ -335,7 +341,7 @@ $driver_code = <<<EOT42
 		
 			init_backup_progress: function()
 			{
-				this.progress_timer = setTimeout(this.report_backup_progress, 1000);
+				this.progress_timer = setTimeout(this.report_backup_progress.bind(this), $progress_update_time);
 				this.report_el.setStyles({
 					opacity: 0,
 					display: 'block'
@@ -359,13 +365,33 @@ $driver_code = <<<EOT42
 
 				console.log('backup progress timer!');
 				
-				this.progress_timer = setTimeout(this.report_backup_progress, 1000);
+				new Request.JSON({
+					method: 'post',
+					url: './backup-restore.Process.php?action=report_backup_progress',
+					onComplete: function(data) 
+					{
+						console.log('backup report received!', data);
+				
+						var el = this.module_el;
+						if (el && data.state && data.count)
+						{
+							var spinner = el.get('spinner');
+							if (spinner.msg)
+							{
+								spinner.msg.set('html', "$wait4backup <br> " + data.state + ' ' + (data.position ? '' + data.position + ' / ' + data.count : ' (' + data.count + ')') + (data.progress ? ' ~ ' + data.progress.toFixed(1) + '%' : ' ...'));
+							}
+						}
+						
+						this.progress_timer = setTimeout(this.report_backup_progress.bind(this), $progress_update_time);
+					}.bind(this)
+				}).send();
 			},
 
 			click_evt_handler: function(e)
 			{
 				var el = this.module_el;
-				e.stop();
+				//e.stop();  -- we WANT the event to bubble up and have the browser jump to the URL spec'ced in the HTML!
+				
 				el.set('spinner', {
 						message: "$wait4backup",
 						img: {
@@ -375,25 +401,8 @@ $driver_code = <<<EOT42
 				el.spin(); //obscure the element with the spinner
 
 				obj.init_backup_progress();
-			
-				if (0)
-				{
-					new Request.HTML({
-						method: 'post',
-						url: './backup-restore.Process.php?action=backup',
-						update: this.report_el,
-						onComplete: function() {
-							this.terminate_backup_progress();
-							this.module_el.unspin();
-							console.log('backup COMPLETE!');
-							
-							// and re-attach our handler to the click event or we won't be able to do it a second time
-							$('create-arch').addEvent('click', this.click_evt_handler.bind(this));
-						}.bind(this)
-					}).send();
-				}
-
-				return true;
+				
+				return true;  // jump to the URL specified in the HTML above
 			}
 		};
 

@@ -121,6 +121,44 @@ class CcmsAjaxFbException extends Exception
 		// if we get here, this exception class hasn't been set up according to requirements. Barf a hairball.
 		throw new Exception(__CLASS__ . ": feedback URL missing - a programmer error. INTERNAL ERROR. Happened when reporting the nested exception.", 666, $this);
 	}
+
+	public function croak_json($info_arr)
+	{
+		$err = array();
+		if (!empty(self::$feedback_url))
+		{
+			$q = self::$url_query_data;
+			if (!empty($q))
+			{
+				$q .= '&';
+			}
+
+			$extraq = $this->extra_url_query_data;
+			if (!empty($extraq))
+			{
+				$extraq .= '&';
+			}
+			$err['feedback_url'] = makeAbsoluteURI(self::$feedback_url . '?' . $q . $extraq);
+		}
+		else
+		{
+			// if we get here, this exception class hasn't been set up according to requirements. Barf a hairball.
+			$err['hairball'] = __CLASS__ . ": feedback URL missing - a programmer error. INTERNAL ERROR. Happened when reporting the nested exception.";
+		}
+
+		if (!empty($info_arr))
+		{
+			$err['info'] = $info_arr;
+		}
+		
+		$err['message'] = $this->getMessage();
+		$err['code'] = $this->getCode();
+		$err['file'] = $this->getFile();
+		$err['line'] = $this->getLine();
+		
+		echo json_encode(array('error' => $err));
+		exit();
+	}
 }
 
 

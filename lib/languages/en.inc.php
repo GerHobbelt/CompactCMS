@@ -240,6 +240,9 @@ $ccms['lang']['backup']['currenthd']            = "Available back-ups";
 $ccms['lang']['backup']['timestamp']            = "Back-up file name";
 $ccms['lang']['backup']['download']             = "Download archive";
 $ccms['lang']['backup']['wait4backup']          = "Please wait while the backup is being created...";
+$ccms['lang']['backup']['archiving']			= "Archiving";
+$ccms['lang']['backup']['scanning']				= "Scanning";
+$ccms['lang']['backup']['scanned']				= "Scanned";
 
 // User management messages
 $ccms['lang']['users']['createuser']            = "Create a user";
