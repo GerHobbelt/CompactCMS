@@ -1466,7 +1466,7 @@ if($do_action == 'clearcaches' && $_SERVER['REQUEST_METHOD'] == 'GET' && checkAu
 
 	if(empty($error))
 	{
-		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['success'].'</p>';
+		echo '<p class="h1 ss_has_sprite"><span class="ss_sprite_16 ss_accept" title="'.$ccms['lang']['backend']['success'].'">&#160;</span>'.$ccms['lang']['backend']['cache_cleared'].'</p>';
 	}
 	else
 	{

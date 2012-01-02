@@ -407,6 +407,10 @@ a.edit, a.editinplace:hover
 	float:left;
 	margin-top: 20px;
 }
+.eraser#notify_icon
+{
+	background-position: 0 -380px;
+}
 /*
 IE6 fix:
 */

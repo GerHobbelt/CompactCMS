@@ -152,6 +152,7 @@ $ccms['lang']['backend']['file_renamed_from_to'] = "Succesfully renamed file '%s
 $ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
 $ccms['lang']['backend']['show_clock']          = "Show a clock (displaying the local time)";
 $ccms['lang']['backend']['clear_cache']         = "Clear all server-side caches";
+$ccms['lang']['backend']['cache_cleared']       = "All server-side caches have been cleared.";
 $ccms['lang']['backend']['switch_user']         = "Switch User";
 $ccms['lang']['backend']['switch_user_helpmsg'] = "Usage: select a user, then click the Switch User icon at left to switch.\nDescription: Temporarily act as if you were another user (until you log out); you can only switch to users who have fewer privileges and you can switch only when you are a site admin yourself.";
 
