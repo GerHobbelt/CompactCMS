@@ -169,9 +169,9 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 		<div class="span-8 colborder">
 			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
 			<p><?php echo $ccms['lang']['backup']['explain']; ?></p>
-			<a id="create-arch" class="button" href="http://example.com/"> 
-				<span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?>
-			</a>
+			<form id="create-arch" action="backup-restore.Process.php?action=backup" method="post" accept-charset="utf-8" class="clearfix" >
+				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
+			</form>
 			<?php
 			if ($show_warn_about_partial_backup)
 			{
@@ -375,20 +375,23 @@ $driver_code = <<<EOT42
 				el.spin(); //obscure the element with the spinner
 
 				obj.init_backup_progress();
-				
-				new Request.HTML({
-					method: 'post',
-					url: './backup-restore.Process.php?action=backup',
-					update: this.report_el,
-					onComplete: function() {
-						this.terminate_backup_progress();
-						this.module_el.unspin();
-						console.log('backup COMPLETE!');
-						
-						// and re-attach our handler to the click event or we won't be able to do it a second time
-						$('create-arch').addEvent('click', this.click_evt_handler.bind(this));
-					}.bind(this)
-				}).send();
+			
+				if (0)
+				{
+					new Request.HTML({
+						method: 'post',
+						url: './backup-restore.Process.php?action=backup',
+						update: this.report_el,
+						onComplete: function() {
+							this.terminate_backup_progress();
+							this.module_el.unspin();
+							console.log('backup COMPLETE!');
+							
+							// and re-attach our handler to the click event or we won't be able to do it a second time
+							$('create-arch').addEvent('click', this.click_evt_handler.bind(this));
+						}.bind(this)
+					}).send();
+				}
 
 				return true;
 			}
