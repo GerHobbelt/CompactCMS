@@ -322,7 +322,7 @@ function log_current_backup_state($progressfile, $file_collection, $currently_pr
 	{
 	case -2:
 		// state: dir scan; only update for large changes
-		if ($visit_count > 128)
+		if ($visit_count >= 100)
 		{
 			$visit_count = 0;
 			$visit_time = microtime(true);
@@ -345,7 +345,7 @@ function log_current_backup_state($progressfile, $file_collection, $currently_pr
 		
 	default:
 		// update report in time or count; just keep the overhead write activity within reason...
-		if ($visit_count > 128 || microtime(true) > 3.0 + $visit_time)
+		if ($visit_count >= 100 || microtime(true) >= 1.0 + $visit_time)
 		{
 			$visit_count = 0;
 			$visit_time = microtime(true);
