@@ -169,9 +169,7 @@ $mediawarning[1] = explode("\n", $mediawarning[1]);
 		<div class="span-8 colborder">
 			<h2><?php echo $ccms['lang']['backup']['createhd']; ?></h2>
 			<p><?php echo $ccms['lang']['backup']['explain']; ?></p>
-			<form id="create-arch" action="backup-restore.Process.php?action=backup" method="post" accept-charset="utf-8" class="clearfix" >
-				<button type="submit" name="btn_backup" value="dobackup"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></button>
-			</form>
+			<a id="create-arch" class="button" href="#"><span class="ss_sprite_16 ss_package_add">&#160;</span><?php echo $ccms['lang']['forms']['createbutton']; ?></a>
 			<?php
 			if ($show_warn_about_partial_backup)
 			{
@@ -330,6 +328,7 @@ $js_files = array(
 
 $wait4backup = $ccms['lang']['backup']['wait4backup'];
 $progress_update_time = 1000;
+$result_url = $_SERVER['PHP_SELF'];
 $driver_code = <<<EOT42
 
 	if ($('create-arch'))
@@ -347,17 +346,18 @@ $driver_code = <<<EOT42
 					display: 'block'
 				}).fade(1);
 			},
-			terminate_backup_progress: function()
+			terminate_backup_progress: function(json_data)
 			{
 				clearTimeout(this.progress_timer);
 				this.progress_timer = null;
-				if (0)
+
+				this.report_el.fade(0).get('tween').chain(function()
 				{
-					this.report_el.fade(0).get('tween').chain(function()
-					{
-						this.report_el.setStyle('display', 'none');
-					}.bind(this));
-				}
+					this.report_el.setStyle('display', 'none');
+					
+					// now jump to the indicated URL
+					goto_url(json_data.url ? json_data.url : '$result_url?status=error&msg=' + encodeURIComponent(json_data.error.message));
+				}.bind(this));
 			},
 			report_backup_progress: function() 
 			{
@@ -390,7 +390,7 @@ $driver_code = <<<EOT42
 			click_evt_handler: function(e)
 			{
 				var el = this.module_el;
-				//e.stop();  -- we WANT the event to bubble up and have the browser jump to the URL spec'ced in the HTML!
+				e.stop();
 				
 				el.set('spinner', {
 						message: "$wait4backup",
@@ -400,9 +400,20 @@ $driver_code = <<<EOT42
 					});
 				el.spin(); //obscure the element with the spinner
 
-				obj.init_backup_progress();
+				this.init_backup_progress();
 				
-				return true;  // jump to the URL specified in the HTML above
+				new Request.JSON({
+					method: 'post',
+					url: './backup-restore.Process.php?action=backup',
+					onComplete: function(data) 
+					{
+						console.log('backup completed!', data);
+				
+						this.terminate_backup_progress(data);
+					}.bind(this)
+				}).send();
+				
+				return false;
 			}
 		};
 

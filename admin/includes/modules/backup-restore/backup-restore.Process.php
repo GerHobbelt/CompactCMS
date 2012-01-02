@@ -86,13 +86,15 @@ define('BACKUP_DIRECTORY', 'media/files/');
  */
 if ($do_action == 'backup')
 {
-	header('Content-type: text/html; charset=UTF-8');
+	header('Content-type: application/json; charset=UTF-8');
 
 	FbX::SetFeedbackLocation('backup-restore.Manage.php');
 	$fd = false;
 	$progressfile = null;
 	try
 	{
+		session_write_close(); // as per http://stackoverflow.com/questions/6405658/long-request-blocks-other-requests-in-apache-and-php
+		
 		$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
 
 		/*
@@ -238,7 +240,7 @@ if ($do_action == 'backup')
 							break;
 							
 						default:
-							die('INTERNAL ERROR');
+							throw new FbX('INTERNAL ERROR');
 						}
 					}
 				}
@@ -337,8 +339,7 @@ if ($do_action == 'backup')
 		@unlink($progressfile);
 		
 		$msg = $ccms['lang']['backend']['newfilecreated'] . ', <a href="media/files/' . $backupName . '">' . strtolower($ccms['lang']['backup']['download']).'</a>.';
-		header('Location: ' . makeAbsoluteURI('./backup-restore.Manage.php?status=notice&msg='.rawurlencode($msg)));
-		//echo '<p>' . $msg . '</p>';
+		echo json_encode(array('url' => makeAbsoluteURI('./backup-restore.Manage.php?status=notice&msg='.rawurlencode($msg))));
 		exit();
 	}
 	catch (CcmsAjaxFbException $e)
@@ -351,7 +352,7 @@ if ($do_action == 'backup')
 		{
 			@unlink($progressfile);
 		}
-		$e->croak();
+		$e->croak_json();
 	}
 }
 
@@ -368,6 +369,8 @@ if ($do_action == 'report_backup_progress')
 	
 	try
 	{
+		session_write_close(); // as per http://stackoverflow.com/questions/6405658/long-request-blocks-other-requests-in-apache-and-php
+		
 		$current_user = '-' . preg_replace('/[^a-zA-Z0-9\-]/', '_', $_SESSION['ccms_userFirst'] . '_' . $_SESSION['ccms_userLast']);
 
 		$progressfile = BASE_PATH . '/' . BACKUP_DIRECTORY . 'progress-data' . $current_user . '.json';
