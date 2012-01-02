@@ -45,7 +45,7 @@ for ($i = 1; $i <= MENU_TARGET_COUNT; $i++)
 	print_r($menu_xml);
 	echo '</pre><hr>';
 	echo '<h1>XML</h1><pre>';
-	print_r($menu_xml->asXML());
+	print_r(htmlentities(str_replace('<?xml version="1.0"?>', '', $menu_xml->asXML())));
 	echo '</pre><hr>';
 }
 
