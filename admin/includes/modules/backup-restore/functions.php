@@ -322,7 +322,9 @@ function log_current_backup_state($progressfile, $file_collection, $currently_pr
 	{
 	case -2:
 		// state: dir scan; only update for large changes
-		if ($visit_count >= 100)
+		if ($visit_count >= 100 
+			|| (count($file_collection) > 0  // or push update info when the last entry is a directory...
+				&& array_key_exists('dir', $file_collection[count($file_collection) - 1])))
 		{
 			$visit_count = 0;
 			$visit_time = microtime(true);
