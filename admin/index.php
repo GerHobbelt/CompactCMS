@@ -625,29 +625,29 @@ $js_files[] = '../lib/includes/js/mootools-core.js,mootools-more.js';
 /*--MOCHAUI--*/
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,' .
+	$js_files[] = '../lib/includes/js/dummy.js,' .
 
-   'Core/Core.js,' .
-   'Core/Canvas.js,' .
-   'Core/Content.js,' .
-   'Core/persist.js,' .
-   'Core/themes.js,' .
+   'mochaui/Source/Core/Core.js,' .
+   'mochaui/Source/Core/Canvas.js,' .
+   'mochaui/Source/Core/Content.js,' .
+   'mochaui/Source/Core/persist.js,' .
+   'mochaui/Source/Core/themes.js,' .
 /*
 
-													'Core/core.js,' .
-													'Core/create.js,' .
-													'Core/require.js,' .
-													'Core/canvas.js,' .
-													'Core/content.js,' .
-													'Core/persist.js,' .
-													'Core/themes.js,' .
+													'mochaui/Source/Core/core.js,' .
+													'mochaui/Source/Core/create.js,' .
+													'mochaui/Source/Core/require.js,' .
+													'mochaui/Source/Core/canvas.js,' .
+													'mochaui/Source/Core/content.js,' .
+													'mochaui/Source/Core/persist.js,' .
+													'mochaui/Source/Core/themes.js,' .
 */
-													'Controls/desktop/desktop.js,' .
-													'Controls/panel/panel.js,' .
-													'Controls/column/column.js,' .
-													'Controls/taskbar/taskbar.js,' .
-													'Controls/window/window.js,' .
-													'Controls/window/modal.js';
+													'mochaui/Source/Controls/desktop/desktop.js,' .
+													'mochaui/Source/Controls/panel/panel.js,' .
+													'mochaui/Source/Controls/column/column.js,' .
+													'mochaui/Source/Controls/taskbar/taskbar.js,' .
+													'mochaui/Source/Controls/window/window.js,' .
+													'mochaui/Source/Controls/window/modal.js';
 }
 else
 {
