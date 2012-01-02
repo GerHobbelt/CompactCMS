@@ -378,7 +378,7 @@ $driver_code = <<<EOT42
 							var spinner = el.get('spinner');
 							if (spinner.msg)
 							{
-								spinner.msg.set('html', "$wait4backup <br> " + data.state + ' ' + (data.position ? '' + data.position + ' / ' + data.count : ' (' + data.count + ')') + (data.progress ? ' ~ ' + data.progress.toFixed(1) + '%' : ' ...'));
+								spinner.msg.set('html', "$wait4backup <br><br> " + data.state + ' ' + (data.position ? '' + data.position + ' / ' + data.count : ' (' + data.count + ')') + (data.progress ? ' ~ ' + (data.progress * 100).toFixed(1) + '%' : ' ...'));
 							}
 						}
 						
