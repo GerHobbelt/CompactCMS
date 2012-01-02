@@ -712,15 +712,25 @@ class ccmsParser
 		//     http://nl3.php.net/manual/en/function.eval.php (comments)
 		$short_tag_mode = (ini_get('short_open_tag') > 0);
 
+		$trackerr_old = ini_set('track_errors', true);
+		$php_errormsg = '';
+		
 		$template_engine = $this; // may be accessed within the eval() code
 		if ($short_tag_mode)
 		{
-			$rv = eval(' ?>'.$text.'<? ');
+			$rv = @eval(' ?>'.$text.'<? ');
 		}
 		else
 		{
-			$rv = eval(' ?>'.$text.'<?php ');
+			$rv = @eval(' ?>'.$text.'<?php ');
 		}
+		
+		if ($rv === false)
+		{
+			die("<pre>Error in CheckPHP: '$php_errormsg' for PHP code:\n" . htmlentities($text, ENT_NOQUOTES) . "\n");
+		}			
+		ini_set('track_errors', $trackerr_old);
+		
 		return $rv;
 	}
 
