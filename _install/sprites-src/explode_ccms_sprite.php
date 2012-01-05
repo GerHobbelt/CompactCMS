@@ -1,5 +1,6 @@
 #! /usr/bin/php
-<?php
+<?php 
+
 /*
  generate a rename script for the icons based on the sprite.css fed to ARGV
 */
@@ -30,13 +31,13 @@ $name = null;
 
 $items = array(
 	"external" => "10x18+0+159",
-	"info" => "18x18+0+178",
+	/* "info" => "18x18+0+178",  // does not exist! */ 
 	"ff" => "80x15+0+0",
 	"ie" => "80x15+0+20",
 	"opera" => "80x15+0+40",
 	"safari" => "80x15+0+60",
 	"chrome" => "80x15+0+80",
-	"editinplace" => "18x18+0+100",
+	/* "editinplace" => "18x18+0+100", // does not exist! */
 	"edit" => "18x18+0+121",
 	"logo" => "181x65+0+228",
 	"twittlogo" => "26x24+0+200",

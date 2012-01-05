@@ -1,5 +1,5 @@
-#! /usr/bin/php
-<?php
+<?php  # /usr/bin/php
+
 /*
  generate a rename script for the icons based on the sprite.css fed to ARGV
 */
