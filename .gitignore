@@ -5,7 +5,6 @@ CVS
 *~
 BuildLog.htm
 _docs/*_files/*
-_install/sprites-src/*
 lib/includes/cache/*
 lib/includes/mootools-core/Specs/*
 lib/includes/mootools-more/Specs/*
