@@ -1,4 +1,34 @@
-<?php
+<?php 
+/* ************************************************************
+Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
+Revision:	CompactCMS - v 1.4.2
+	
+This file is part of CompactCMS.
+
+CompactCMS is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CompactCMS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A reference to the original author of CompactCMS and its copyright
+should be clearly visible AT ALL TIMES for the user of the back-
+end. You are NOT allowed to remove any references to the original
+author, communicating the product to be your own, without written
+permission of the original copyright owner.
+
+You should have received a copy of the GNU General Public License
+along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
+	
+> Contact me for any inquiries.
+> E: Xander@CompactCMS.nl
+> W: http://community.CompactCMS.nl/forum
+************************************************************ */
+
 /*
 >> General tags (replace '(' with '{' when using them - using the 'active' version within this comment will cause severe trouble, depending on the substituted content of the variables!)
 - (%urlpage%)       | The current filename that is being shown
@@ -10,14 +40,14 @@
 - (%keywords%)      | Keywords (tags) for the current page as specified per file
 - (%breadcrumb%)    | Show the breadcrumb/pathway to the current file
 - (%printable%)     | Use as: (%IF printable (eq Y)%)<a href="print/(%urlpage%).html">Print</a>(%/IF printable%)
-    
+
 >> Menu items
 - (%mainmenu%)      | Prints an ordered list (<ul>) with all files in specified menu
 - (%leftmenu%)      | ''
 - (%rightmenu%)     | ''
 - (%footermenu%)    | ''
 - (%extramenu%)     | ''
-    
+
 >> Content tag
 - (%content%)       | The content from the current file that is being requested
 
@@ -27,51 +57,65 @@ See below for a simple example that uses all of the tags listed above.
 /* make sure no-one can run anything here if they didn't arrive through 'proper channels' */
 if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 
+//global $cfg, $ccms; // also available: $template_instance;
+
+
+
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{%language%}">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>{%title%}</title>
-<meta name="description" content="{%sitename%} | {%desc%}" />
-<meta name="keywords" content="{%keywords%}" />
-<link href="{%rootdir%}lib/templates/ccms/base.css,layout.css" rel="stylesheet" type="text/css" />
+<meta name="description" content="{%sitename!protect4attr%} | {%desc!protect4attr%}" />
+<meta name="keywords" content="{%keywords!protect4attr%}" />
+<title>{%title!protect4attr%}</title>
+{%CSS.required_files!css_files(combine)%}
+{%CSS.inline!implode('', '<style type="text/css">', '</style>')%}
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
 <body>
 <div class="container-25">
-	<div id="header" class="span-25">
-		<div class="span-5"><h1>&nbsp;<span>{%sitename%} {%pagetitle%}</span></h1></div>
+	<div id="header" class="span-25 last">
+		<div class="span-5"><h1><span>{%sitename%} {%pagetitle%}</span></h1></div>
 		<div class="span-20 last" id="navigation">
-			<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
+			{%IF extramenu eq ()%}
+				<a href="http://www.compactcms.nl">CCMS Home</a> | <a href="http://community.compactcms.nl/forum/">Forum</a> | <a href="http://files.compactcms.nl/">Download</a>
+			{%ELSE%}
+				{%extramenu%}
+			{%/IF%}
 		</div>
 	</div>
 
 	<h2>{%subheader%}</h2>
 
 	<div id="left" class="span-4 colborder">
-		<p style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
-			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="{%lang:backend:administration%}">{%lang:login:login%}</a>
-		</p>
-		
+		<div style="margin-top: 10px; text-align: left;"><strong>Dynamic menu</strong>{%mainmenu%}
+			<br/><em>CompactCMS truly is versatile!</em><br/><br/><a href="admin/" title="{%lang:backend:administration!protect4attr%}">{%lang:login:login%}</a>
+		</div>
+		{%leftmenu%}
 	</div>
 
-	<div id="content" class="span-21 last">
+	<div id="content" class="span-20 last">
 		<div id="printable" class="span-21 last" style="text-align: right;">
-			{%breadcrumb%}
-			{%IF printable (eq Y)%}
-				<br/><a href="{%rootdir%}{%urlpage%}.print">{%lang:template:print%}</a>
-			{%/IF printable%}
+			{%breadcrumb!implode(' &raquo; ', '<span class="breadcrumb">&raquo; ', '</span>')%}
+			{%IF printable eq (Y)%}
+				<span class="print_link"><a href="{%rootdir%}{%urlpage%}.print{%IF preview (eq Y)%}?preview={%previewcode%}{%/IF preview%}"><span class="ss_sprite_16 ss_printer">&#160;</span>{%lang:template:print%}</a>
+			{%/IF%}
 		</div>
-		
+
 		{%content%}
-		
-		{%leftmenu%}
+
+		<div id="rightmenu">
+		{%rightmenu%}
+		</div>
 	</div>
 </div>
 
 <div id="footer" class="quiet small">
+	{%footermenu%}
+
 	<p>&copy; <?php echo date('Y'); ?> {%sitename%} | Maintained with <a href="http://www.compactcms.nl">CompactCMS</a></p>
 </div>
 
@@ -89,47 +133,20 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 <?php
 }
 ?>
-<script type="text/javascript">
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'{%rootdir%}lib/includes/js/mootools-core.js,mootools-more.js'
-	];
 
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
+<script type="text/javascript" charset="utf-8">
+<?php
 
-	// window.addEvent('domready',function()
-	//{
-	//});
-}
+$js_files = <<<EOT42
+{%JS.required_files!js_files(combine)%}
+EOT42;
 
+$driver_code = <<<EOT42
+{%JS.done!implode("\n\n")%}
+EOT42;
 
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 </script>
 <script type="text/javascript" src="{%rootdir%}lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

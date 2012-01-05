@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -34,7 +34,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -50,27 +50,26 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/admin/includes/security.inc.php'); // when session expires or is overridden, the login page won't show if we don't include this one, but a cryptic error will be printed.
 
 
-if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
+if (!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
 {
 	die("No external access to file");
 }
 
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
-$pageID	= getGETparam4Filename('file');
+$page_id = getGETparam4Filename('page_id');
 
-if (empty($pageID))
+if (empty($page_id))
 {
-	die($ccms['lang']['system']['error_forged']);
+	die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 }
 
+$pagerow = $db->SelectSingleRow($cfg['db_prefix'].'pages', array('page_id' => MySQL::SQLValue($page_id,MySQL::SQLVALUE_NUMBER)));
+if (!$pagerow) $db->Kill();
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
@@ -88,39 +87,39 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 <body>
 	<div class="module" id="comment-manager">
 		<div class="center-text <?php echo $status; ?>">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
-				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>'; 
-			} 
+			<?php
+			if(!empty($status_message))
+			{
+				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
+			}
 			?>
 		</div>
-			
+
 		<div class="span-18 colborder">
 		<h2><?php echo $ccms['lang']['guestbook']['manage']; ?></h2>
-		<?php 
+		<?php
 		// Load recordset; most recent comments on top; the extra order by commentID bit is there to ensure the sort/order is repeatable.
 		$i = 0;
-		$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)), null, array('-commentTimestamp', '-commentID'));
+		$commentlist = $db->SelectObjects($cfg['db_prefix'].'modcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)), null, array('-commentTimestamp', '-commentID'));
 		if ($commentlist === false)
 			$db->Kill();
-	
+
 		// Start switch for news, select all the right details
-		if(count($commentlist) > 0) 
+		if(count($commentlist) > 0)
 		{
 		?>
-			<form action="comment.Process.php?action=del-comment" method="post" accept-charset="utf-8">
+			<form action="comment.Process.php?action=del-comments" method="post" accept-charset="utf-8">
 			<div class="table_inside">
 				<table cellspacing="0" cellpadding="0" cols="7">
 					<tr class="head0">
 						<th class="rowspan2" rowspan="2">&#160;</th>
 						<?php
 						/*
-						Do NOT spec any span-X's widths for these columns: let the table settle on its
-						own. The input data shown here is way to varying and screen width (on laptops
-						at least) is too costly a realty to enforce some pre-determined ratios on these
-						columns....
-						*/
+						 * Do NOT spec any span-X's widths for these columns: let the table settle on its
+						 * own. The input data shown here is way to varying and screen width (on laptops
+						 * at least) is too costly a realty to enforce some pre-determined ratios on these
+						 * columns....
+						 */
 						?>
 						<th class="nowrap"><?php echo $ccms['lang']['guestbook']['rating']; ?></th>
 						<th class="nowrap"><?php echo $ccms['lang']['guestbook']['author']; ?></th>
@@ -136,32 +135,32 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 					foreach($commentlist as $rsComment)
 					{
 						// Alternate rows
-						if($i%2 != 1) 
+						if($i%2 != 1)
 						{
 							echo '<tr class="altrgb row0"><td rowspan="2" class="rowspan2 hover">';
-						} 
-						else 
-						{ 
+						}
+						else
+						{
 							echo '<tr class="row0"><td rowspan="2" class="rowspan2 hover">';
-						} 
-						
-							if($perm['manageModNews']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModNews']) 
-							{ 
+						}
+
+							if($perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel']))
+							{
 							?>
 								<label>
 									<input type="checkbox" name="commentID[]" value="<?php echo rm0lead($rsComment->commentID); ?>">
 								</label>
-							<?php 
-							} 
+							<?php
+							}
 							?>
 							</td>
 							<td class="rating-col">
-								<img src="./resources/<?php echo $rsComment->commentRate;?>-star.gif" alt="<?php echo $ccms['lang']['guestbook']['rating']." ".$rsComment->commentRate;?>"/>
+								<img src="./resources/<?php echo $rsComment->commentRate; ?>-star.gif" alt="<?php echo $ccms['lang']['guestbook']['rating']." ".$rsComment->commentRate;?>"/>
 							</td>
 							<td class="name-col nowrap">
-							<?php 
-							if ($cfg['enable_gravatar']) 
-							{ 
+							<?php
+							if ($cfg['enable_gravatar'])
+							{
 							?>
 								<img src="http://www.gravatar.com/avatar.php?gravatar_id=<?php echo md5($rsComment->commentEmail); ?>&amp;size=80&amp;rating=G" style="margin:4px;border:2px solid #000;" alt="<?php echo $ccms['lang']['guestbook']['avatar'];?>"/>
 								<br/>
@@ -171,7 +170,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							<strong><?php echo (!empty($rsComment->commentUrl) ? '<a href="'.$rsComment->commentUrl.'" target="_blank">'.$rsComment->commentName.'</a>' : $rsComment->commentName); ?></strong>
 							</td>
 							<td class="url-col nowrap">
-								<?php 
+								<?php
 								if (!empty($rsComment->commentUrl))
 								{
 									echo '<a href="'.$rsComment->commentUrl.'" target="_blank">'.$rsComment->commentUrl.'</a>';
@@ -185,66 +184,66 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 								<span class="ss_sprite_16 ss_world">&#160;</span><?php echo $rsComment->commentHost; ?>
 							</td>
 							<td class="email-col nowrap small">
-								<?php 
-								/* 
-								show email in title~tooltip, for otherwise the table will be too wide even on 1024px 
-								wide screens for 'usual' data in the table. We DO have an overflow-y for the <table>
-								but that doesn't mean you'll be happy about it when you need to scroll to the bottom
-								of the comment collection, just to move left & right. The scrollbar/overflow-x is
-								there for those occasions where we would be in trouble otherwise, i.e. use sparingly...
-								*/
+								<?php
+								/*
+								 * show email in title~tooltip, for otherwise the table will be too wide even on 1024px
+								 * wide screens for 'usual' data in the table. We DO have an overflow-y for the <table>
+								 * but that doesn't mean you'll be happy about it when you need to scroll to the bottom
+								 * of the comment collection, just to move left & right. The scrollbar/overflow-x is
+								 * there for those occasions where we would be in trouble otherwise, i.e. use sparingly...
+								 */
 								?>
 								<a href="mailto:<?php echo $rsComment->commentEmail; ?>" title="<?php echo $rsComment->commentEmail; ?>"><span class="ss_sprite_16 ss_email">&#160;</span></a>
 							</td>
 						</tr>
 						<?php
-						
-						if($i%2 != 1) 
+
+						if($i%2 != 1)
 						{
 							echo '<tr class="altrgb row1">';
-						} 
-						else 
-						{ 
+						}
+						else
+						{
 							echo '<tr class="row1">';
-						} 
+						}
 						?>
 							<td colspan="6" class="comment-col">
 								<p><?php echo nl2br(strip_tags($rsComment->commentContent));?></p>
 							</td>
 						</tr>
-						<?php 
-						$i++; 
+						<?php
+						$i++;
 					}
 					?>
 				</table>
 			</div>
-			<?php 
-			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
-			{ 
+			<?php
+			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel']))
+			{
 			?>
-				<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID">
+				<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id">
 				<div class="right">
 					<button type="submit" onclick="return confirmation_delete();" name="deleteComments"><span class="ss_sprite_16 ss_newspaper_delete">&#160;</span><?php echo $ccms['lang']['backend']['delete']; ?></button>
 				</div>
-			<?php 
-			} 
+			<?php
+			}
 			?>
 			</form>
 		<?php
-		} 
-		else 
+		}
+		else
 		{
-			echo $ccms['lang']['guestbook']['noposts']; 
+			echo $ccms['lang']['guestbook']['noposts'];
 		}
 		?>
 		</div>
-	
+
 		<div class="span-6 last">
 			<h2><?php echo $ccms['lang']['guestbook']['configuration']; ?></h2>
-			<?php 
-			if($perm['manageModComment']>0 && $_SESSION['ccms_userLevel']>=$perm['manageModComment']) 
-			{ 
-				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('pageID' => MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT)));
+			<?php
+			if($perm->is_level_okay('manageModComment', $_SESSION['ccms_userLevel']))
+			{
+				$rsCfg = $db->SelectSingleRow($cfg['db_prefix'].'cfgcomment', array('page_id' => MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER)));
 				if ($db->ErrorNumber() != 0) $db->Kill();
 				if ($rsCfg !== false)
 				{
@@ -252,7 +251,7 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 					$locale = $rsCfg->showLocale;
 					//$newscfgid = $rsCfg->cfgID;
 				}
-				else // set defaults 
+				else // set defaults
 				{
 					// [i_a] when no cfg record, fill in the defaults as were also set in the database
 					$showmsg = 3;
@@ -261,13 +260,13 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 				}
 				?>
 				<form action="comment.Process.php?action=save-cfg" method="post" accept-charset="utf-8">
-					
+
 					<label for="messages"><?php echo $ccms['lang']['news']['numbermess']; ?></label>
 					<input type="input" class="text span-25 last" name="messages" value="<?php echo $showmsg; ?>" id="messages" />
-					
+
 					<label for="locale"><?php echo $ccms['lang']['forms']['setlocale']; ?></label>
 					<select name="locale" class="title span-25 last" id="locale" size="1">
-						<?php 
+						<?php
 						// Get current languages
 						$s = (isset($_SESSION['variables']['language']) ? $_SESSION['variables']['language'] : 'en');
 						$lcoll = GetAvailableLanguages();
@@ -276,26 +275,26 @@ if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 							$c = ($lcode == $s ? 'selected="selected"' : null);
 							echo '<option value="'.$ldesc['locale'].'" '.$c.'>'.$ldesc['name'].'</option>';
 						}
-						?>   	
+						?>
 					</select>
-					
-					<?php 
-					if ($rsCfg !== false) 
+
+					<?php
+					if ($rsCfg !== false)
 					{
-						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />'; 
+						echo '<input type="hidden" name="cfgID" value="' . rm0lead($rsCfg->cfgID) . '" id="cfgID" />';
 					}
 					?>
-					<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+					<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 					<div class="right">
 						<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton']; ?></button>
 						<a class="button" href="../../../admin/index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 					</div>
 				</form>
-			<?php 
-			} 
-			else 
+			<?php
+			}
+			else
 			{
-				echo $ccms['lang']['auth']['featnotallowed']; 
+				echo $ccms['lang']['auth']['featnotallowed'];
 			}
 			?>
 		</div>
@@ -314,7 +313,7 @@ function confirmation()
 	var answer = <?php echo (strpos($cfg['verify_alert'], 'X') !== false ? 'confirm("'.$ccms['lang']['editor']['confirmclose'].'")' : 'true'); ?>;
 	if(answer)
 	{
-		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pageID; ?>_ccms');
+		return !close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'); ?>", '<?php echo $pagerow->urlpage; ?>_ccms');
 	}
 	return false;
 }

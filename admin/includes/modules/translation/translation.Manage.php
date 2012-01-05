@@ -1,8 +1,8 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
-	
+Revision:   CompactCMS - v 1.4.2
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -33,7 +33,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -50,19 +50,19 @@ if (!defined('BASE_PATH'))
 
 
 // security check done ASAP
-if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2'])) 
-{ 
+if(!checkAuth() || empty($_SESSION['rc1']) || empty($_SESSION['rc2']))
+{
 	die("No external access to file");
 }
 
-if(!$cfg['IN_DEVELOPMENT_ENVIRONMENT']) 
-{ 
+if(!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+{
 	die($ccms['lang']['auth']['featnotallowed']);
-} 
+}
 
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 $to_lang = getGETparam4IdOrNumber('to_lang');
 if (!empty($_COOKIE['googtrans']))
 {
@@ -72,15 +72,26 @@ if (empty($to_lang)) $to_lang = 'xx';
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 
 
 
 function load_lang_file($language)
 {
+	/*
+	We collect hand-checked translation strings by loading the language file 
+	itself, then discard the babelfish-produced translations.
+	
+	(Rather, the automated translations originate from the google 
+	 translation service, rather than babelfish, but alas. You get the point.)
+
+	Since we are within function scope, the global $ccms[] is not accessible 
+	from here, which is actually GOOD, because we trick the loading by 
+	eval()ing the selected language file and then return the LOCAL $ccms[] 
+	array as a result, thus staying completely independent of the global 
+	$ccms[] and its language strings!
+	*/
+
 	$ccms = array();
 	$lang_file = BASE_PATH . '/lib/languages/' . $language . '.inc.php';
 	if (is_file($lang_file))
@@ -90,7 +101,7 @@ function load_lang_file($language)
 		$str = preg_replace('/\$ccms[^\n]+\/\* BABELFISH \*\/[^\n]+/u', '', $str);
 		eval('?>' . $str . '<?php');
 	}
-	
+
 	return $ccms;
 }
 
@@ -98,33 +109,29 @@ function load_lang_file($language)
 function collect_translations($language)
 {
 	/*
-	We collect all translation strings by first loading the default (English) and then the language file itself.
-	
-	This way, we'll be sure to have all language strings (as the English one is assumed to be complete at all
-	times) while any gaps in the language X file are filled by those English ones.
-	
-	Since we are within function scope, the global $ccms[] is not accessible from here, which is actually GOOD.
-	
-	Because we trick the loading by include()ing both the english and the selected language file and then
-	return the LOCAL $ccms[] array as a result, thus staying completely independent of the global $ccms[] and
-	its language strings!
+	We collect all translation strings by first loading the default (English) 
+	and then the language file itself.
+
+	This way, we'll be sure to have all language strings (as the English one 
+	is assumed to be complete at all times) while any gaps in the language X 
+	file are filled by those English ones.
 	*/
 
-		// English indexes are our 'master base':
-	$ccms = load_lang_file('en');
-	
+	// English indexes are our 'master base':
+	$lang_entries = load_lang_file('en');
+
 	$i18n = load_lang_file($language);
 	// now ONLY override entries which EXIST in 'en'; anything else is superfluous/outdated in the language file anyway and will corrupt our index-counting later on
 	foreach($i18n as $key => $value)
 	{
-		if (!empty($value) && array_key_exists($key, $ccms))
+		if (!empty($value) && array_key_exists($key, $lang_entries))
 		{
 			// override value now!
-			$ccms[$key] = $value;
+			$lang_entries[$key] = $value;
 		}
 	}
-	
-	return $ccms;
+
+	return $lang_entries;
 }
 
 
@@ -140,10 +147,10 @@ function show_all_translations($lang_arr, $item_prefix = '$ccms[\'lang\']', $ind
 		else
 		{
 			$item = $item_prefix . "['" . $key . "']";
-			
-			echo '<tr' . ($index % 2 == 0 ? ' style="background-color:#f0f0f0;"' : '') . '><td class="nowrap" style="font-size:.7em; vertical-align: baseline;">' . $item . "</td>\n" 
+
+			echo '<tr' . ($index % 2 == 0 ? ' style="background-color:#f0f0f0;"' : '') . '><td class="nowrap" style="font-size:.7em; vertical-align: baseline;">' . $item . "</td>\n"
 				. '<td style="vertical-align: baseline;"><span class="sprite-hover liveedit" id="'.md5($item).'" rel="i18n_string">'
-				. $value 
+				. $value
 				. '</span></td>' . "</tr>\n";
 		}
 	}
@@ -164,7 +171,7 @@ function get_i18n_ccms_key_as_code(&$entry, $lang_arr, $wanted_index, $item_pref
 		else
 		{
 			$item = $item_prefix . "['" . $key . "']";
-			
+
 			if ($wanted_index == md5($item))
 			{
 				$entry = $item;
@@ -190,7 +197,7 @@ function get_i18n_ccms_value(&$entry, $lang_arr, $wanted_index, $item_prefix = '
 		else
 		{
 			$item = $item_prefix . "['" . $key . "']";
-			
+
 			if ($wanted_index == md5($item))
 			{
 				$entry = $value;
@@ -226,7 +233,7 @@ function array_diff_assoc_recursive(&$a, &$b)
 		}
 	}
 }
-	
+
 
 
 
@@ -234,30 +241,30 @@ function array_diff_assoc_recursive(&$a, &$b)
 if ($do == 'update')
 {
 	$error = true;
-	
+
 	$content = getPOSTparam4RAWHTML('content'); // must be RAW CONTENT
 	if (!empty($content))
 	{
 		$to_lang_arr = collect_translations($to_lang);
 		$i18n_arr = collect_translations('en');
 		array_diff_assoc_recursive($to_lang_arr, $i18n_arr);
-		
+
 		// process content as c&p'd by the translator/user
 		//$content = file_get_contents(BASE_PATH . '/media/files/trial.html');
-		
+
 		// clean the content:
 		$content = preg_replace('/ style=".*?"/u', '', $content);
-		
+
 		// strip anything outside the translation table.
 		if (preg_match('/ id="i18n-list".*?>(.*)<\/table>/su', $content, $matches))
 		{
 			$content = $matches[1];
-			
+
 			// extract the translated content:
 			if ($mcount = preg_match_all('/<tr.*?<td>(<span id="[0-9a-fA-F]+" .*?)<\/td>/su', $content, $matches))
 			{
 				$i18n_units = array();
-				
+
 				$content = 'count = '.$mcount . "\n\n\n";
 				for ($i = 0; $i < $mcount; $i++)
 				{
@@ -268,14 +275,14 @@ if ($do == 'update')
 					{
 						$idx = $ematch[1];
 						$entry = $ematch[2];
-						
+
 						// strip <span>s
 						$entry = preg_replace('/<[\/]?span>/u', '', $entry);
-						// replace newlines, etc. by space: 
+						// replace newlines, etc. by space:
 						$entry = preg_replace('/\s+/u', ' ', $entry);
 
 						$content .= "\n".$idx.' = '.$entry;
-						
+
 						// make it UTF-8 data; no more HTML entities in there.
 						$entry = html_entity_decode($entry, ENT_QUOTES, 'UTF-8');
 
@@ -284,17 +291,17 @@ if ($do == 'update')
 						$entry = preg_replace('/\s*:\s*:\s*/u', ' :: ', $entry);
 						$entry = preg_replace('/\s*：\s*：\s*/u', ' :: ', $entry);
 						$entry = trim($entry);
-						
+
 						$entry_phpcode = '---';
 						get_i18n_ccms_key_as_code($entry_phpcode, $i18n_arr['lang'], $idx);
-						
+
 						$original_value = '';
 						get_i18n_ccms_value($original_value, $to_lang_arr['lang'], $idx);
 
 						$english_value = '';
 						get_i18n_ccms_value($english_value, $i18n_arr['lang'], $idx);
-						
-						
+
+
 						if (!empty($original_value))
 						{
 							$i18n_units[$entry_phpcode] = '"'.str_replace('"', "'", $original_value).'";';
@@ -304,14 +311,14 @@ if ($do == 'update')
 							// actual translation has happened!
 							$i18n_units[$entry_phpcode] = '/* BABELFISH */ "'.str_replace('"', "'", $entry).'";';
 						}
-						else 
+						else
 						{
 							// no translation whatsoever
 							$i18n_units[$entry_phpcode] = '"'.str_replace('"', "'", $english_value).'";';
 						}
-						
+
 						//$content .= "\n".$entry_phpcode.' = /* BABELFISH */ "'.$entry.'";';
-						//$content .= "\n:::".htmlspecialchars($orig_str);
+						//$content .= "\n:::".htmlspecialchars($orig_str, ENT_COMPAT, 'UTF-8');
 					}
 				}
 				//file_put_contents(BASE_PATH . '/media/files/trial.html', $content);
@@ -325,7 +332,7 @@ if ($do == 'update')
 					$orig_content = preg_replace('/<\?php/', '', $orig_content);
 					$orig_content = preg_replace('/\?>/', '', $orig_content);
 				}
-				
+
 				$remaining = $i18n_units;
 				foreach($i18n_units as $key => $value)
 				{
@@ -345,11 +352,11 @@ if ($do == 'update')
 						$orig_content .= "\n" . $key . ' = ' . $value;
 					}
 				}
-				
+
 				file_put_contents(BASE_PATH . '/media/files/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
 				if (0)
 				{
-					echo "<html><body><pre>" . htmlspecialchars($orig_content);
+					echo "<html><body><pre>" . htmlspecialchars($orig_content, ENT_COMPAT, 'UTF-8');
 				}
 
 
@@ -366,7 +373,7 @@ if ($do == 'update')
 					$orig_content = preg_replace('/<\?php/', '', $orig_content);
 					$orig_content = preg_replace('/\?>/', '', $orig_content);
 				}
-				
+
 				$remaining = $i18n_units;
 				foreach($i18n_units as $key => $value)
 				{
@@ -386,7 +393,7 @@ if ($do == 'update')
 						$orig_content .= "\n" . $key . ' = ' . $value;
 					}
 				}
-				
+
 				@mkdir(BASE_PATH . '/media/files/lang-babel');
 				file_put_contents(BASE_PATH . '/media/files/lang-babel/'.$to_lang.'.inc.php', "<?php\n" . $orig_content . "\n?>");
 				$status_message = "The augmented translation data has been written to the file " . BASE_PATH . '/lib/languages/' . 'en' . '.inc.php';
@@ -395,24 +402,20 @@ if ($do == 'update')
 			}
 		}
 	}
-	
+
 	if ($error)
 	{
 		echo "boom!";
 		if (0)
 		{
-			echo '<h1>$_POST</h1>';
-			echo "<pre>";
-			var_dump($_POST);
-			echo "</pre>";
-			echo '<h1>$_COOKIE</h1>';
-			echo "<pre>";
-			var_dump($_COOKIE);
-			echo "</pre>";
+			dump_request_to_logfile();
 		}
 		die();
 	}
 }
+
+
+$load_editor = false;
 
 ?>
 
@@ -421,45 +424,42 @@ if ($do == 'update')
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Translation module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
-	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
-	<![endif]-->
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 </head>
 <body>
 <div class="module" id="translation-assist">
-	<?php 
+	<?php
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4) 
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
+		$load_editor = true;
+		
 	?>
 	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
-	
+
 		<div id="google_translate_element"></div>
 	<?php
 	}
 	?>
 		<div class="center-text <?php echo $status; ?>">
-			<?php 
-			if(!empty($status_message)) 
-			{ 
+			<?php
+			if(!empty($status_message))
+			{
 				echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message;
-				if ($status != 'error')  
+				if ($status != 'error')
 				{
-					echo '<br/><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$ccms['lang']['backend']['must_refresh']; 
+					echo '<br/><span class="ss_sprite_16 ss_exclamation">&#160;</span>'.$ccms['lang']['backend']['must_refresh'];
 				}
 				echo '</p>';
-			} 
+			}
 			?>
 		</div>
 
 		<h2><?php echo $ccms['lang']['translation']['header']; ?></h2>
-	<?php 
+	<?php
 
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4) 
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
 	?>
 		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
@@ -475,19 +475,25 @@ if ($do == 'update')
 		</table>
 		<hr />
 		<p>Copy and paste the entire page into the edit box below; we will sort it out...</p>
-		
-		<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
-		
+
+		<textarea id="translation_manager_content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
+
 		<div class="right">
-			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button> 
+			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button>
 			<a class="button" href=="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 		</div>
 	</form>
 	<?php
 	}
-	else 
+	else
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		?>
+	<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+
+	<div class="right">
+		<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+	</div>
+		<?php
 	}
 	?>
 
@@ -495,7 +501,7 @@ if ($do == 'update')
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
 	</textarea>
 <?php
 }
@@ -514,7 +520,7 @@ function confirmation()
 	return false;
 }
 
-function googleTranslateElementInit() 
+function googleTranslateElementInit()
 {
 	new google.translate.TranslateElement({
 			pageLanguage: 'en', /* <?php echo $to_lang; ?> */
@@ -523,127 +529,34 @@ function googleTranslateElementInit()
 }
 
 
+<?php
+	$js_files = array(
+		$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+		'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
+		$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+	);
 
-
-
-
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../../../lib/includes/js/the_goto_guy.js',
-	'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
-	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
-	'../../../../lib/includes/js/mootools-core.js,mootools-more.js',
-	/* File uploader JS */
-	'../../../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
-	if ($cfg['fancyupload_language'] != 'en')
+	if ($load_editor)
 	{
-		echo 'Language/Language.en.js,';
-	}
-	?>Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'
-	];
+		$MCEcodegen = new tinyMCEcodeGen("translation_manager_content", array(array('FileManager' => array())));
 
-	
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
+		$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
+
+		$starter_code = $MCEcodegen->genStarterCode();
+
+		$driver_code = $MCEcodegen->genDriverCode();
+
+		$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
 	}
 	else
 	{
-		jslog('All JS has been loaded!');
+		$driver_code = null;
+		$starter_code = null;
+		$extra_functions_code = null;
 	}
 
-	// window.addEvent('domready',function()
-	//{
-
-
-	
-tinyMCE.init(
-	{
-		mode: 'exact',
-		elements: 'content',
-		theme: 'advanced',
-		<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
-		skin: 'o2k7',
-		skin_variant: 'silver',
-		plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-		theme_advanced_toolbar_location: 'top',
-		theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
-		theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
-		theme_advanced_buttons3: '',
-		theme_advanced_toolbar_align: 'left',
-		theme_advanced_statusbar_location: 'bottom',
-		dialog_type: 'modal',
-		paste_auto_cleanup_on_paste:true,
-		theme_advanced_resizing:true,
-		relative_urls:true,
-		convert_urls:false,
-		remove_script_host:true,
-		document_base_url: '<?php echo $cfg['rootdir']; ?>',
-		<?php
-		if($cfg['iframe'])
-		{
-		?>
-		extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',
-		<?php
-		}
-		?>
-		spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
-		file_browser_callback:FileManager.TinyMCE(
-			function(type)
-			{
-				return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-					url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-					baseURL: '<?php echo $cfg['rootdir']; ?>',
-					assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
-					<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
-					selectable: true,
-					uploadAuthData:
-					{
-						session:'ccms_userLevel',
-						sid:'<?php echo session_id(); ?>'
-					}
-				};
-			})
-	});
-	//});
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-
-
-
-	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-
-	LazyLoad.js(js, jsComplete);
-}
+	echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
+?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

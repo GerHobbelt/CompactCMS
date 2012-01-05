@@ -1,4 +1,4 @@
-strong.date {
+.news-date {
 	background: transparent url("./calendar.png") no-repeat 0 0;
 	color:#fff;
 	display:block;
@@ -11,10 +11,57 @@ strong.date {
 	text-align:center;
 	text-transform:uppercase;
 }
-strong.date span {color:#000;display:block;font-size:2.5em;line-height:1.8em;}
+.news-date span {color:#000;display:block;font-size:2.5em;line-height:1.8em;}
 
 .news-timestamp
 {
 	font-size: 0.8em;
 	font-style: italic;
 }
+
+.news-author /* == .right-text */
+{
+	text-align: right;
+}
+
+.news-view-archive
+{
+	text-align: center;
+}
+
+
+/*
+The <div> around each teaser block in the news archive view:
+
+Inside are a <h3>, <div class="news-timestamp">, <p class="news-teaser">
+*/
+.news-item-short
+{
+}
+
+
+/*
+The <div> around each news block in the news view:
+
+Inside are, for list view:
+  <p class="news-date">, <h2>, either <p class="news-teaser"> or <div class="news-content">, <p class="news-author">, <p class="news-view-item">
+and at the end, beyond the <div>:
+  <hr class="clear" />, <p class="news-view-archive">
+*/
+.news-item
+{
+}
+
+
+/*
+The <div> around each news block in the news view:
+
+Inside are, for single news item view:
+  <p class="news-date">, <h1>, <p class="news-teaser">, <div class="news-content">, <p class="news-author">
+and at the end, beyond the <div>:
+  <hr class="clear" />, <p class="news-view-archive4single">
+*/
+.news-item-single
+{
+}
+

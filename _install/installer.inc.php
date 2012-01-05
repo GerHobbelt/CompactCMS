@@ -40,13 +40,20 @@ if (!defined('BASE_PATH'))
 
 
 // Start the current session
-session_start();
+if (!session_start()) die('session_start(INSTALLER_INC) failed');
+
+
+// Load installer-specific configuration bits
+/*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
 
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
 
 // Load generic functions
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
+
+// Load upgrade helper functions
+/*MARKER*/require_once('./upgrader.inc.php');
 
 
 // Set current && additional step
@@ -55,17 +62,16 @@ $nextstep = getPOSTparam4IdOrNumber('do');
 $may_upgrade = (!empty($_SESSION['variables']['may_upgrade']) && $_SESSION['variables']['may_upgrade'] != false); 
 $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variables']['do_upgrade'] != false); 
 
-$dump_queries_n_stuff_in_devmode = false;
 
 
 /**
-*
-* Per step processing of input
-*
-**/
+ *
+ * Per step processing of input
+ *
+ **/
 
 // Step two
-if($nextstep == md5('2') && CheckAuth())
+if($nextstep == '2' && checkAuth())
 {
 	//
 	// Installation actions
@@ -78,7 +84,13 @@ if($nextstep == md5('2') && CheckAuth())
 
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$rootdir,$sitename,$language);
-	
+
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		echo 'WRITE_CFG_FILES_TO_DISK: ' . (1*WRITE_CFG_FILES_TO_DISK) . '<br>';
+		echo 'EXECUTE_QUERIES: ' . (1*EXECUTE_QUERIES) . '<br>';
+		echo 'DUMP_QUERIES_N_STUFF_IN_DEVMODE: ' . (1*DUMP_QUERIES_N_STUFF_IN_DEVMODE) . '<br>';
+	}
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
 		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password
@@ -86,7 +98,9 @@ if($nextstep == md5('2') && CheckAuth())
 			<a class="ss_has_sprite small" onclick="randomPassword(8); return false;"><span class="ss_sprite_16 ss_arrow_refresh">&#160;</span>Auto generate a safe password</a>
 		</label>
 		<input type="text" class="alt title" name="userPass" onkeyup="passwordStrength(this.value)" value="" id="userPass" />
-		<div id="passwordStrength" class="strength0"></div>
+		<div class="clear strength0" id="passwordStrength">
+			<div id="pws1">&#160;</div>
+		</div>
 		<p class="ss_has_sprite small quiet clear"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>Remember your admin password as it cannot be retrieved</p>
 		<label for="authcode"><span class="ss_sprite_16 ss_textfield_key">&#160;</span>Authentication PIN
 			<br/>
@@ -147,7 +161,7 @@ if($nextstep == md5('2') && CheckAuth())
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo '3'; ?>" id="do" />
 		<script>
 function mkNewAuthCode()		
 {
@@ -189,7 +203,7 @@ if ($nextstep == 'mkNewAuthCode')
 }
 
 // Step three
-if($nextstep == md5('3') && CheckAuth()) 
+if($nextstep == '3' && checkAuth()) 
 {
 	//
 	// Installation actions
@@ -232,14 +246,14 @@ if($nextstep == md5('3') && CheckAuth())
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_information">&#160;</span>To confirmation</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo '4'; ?>" id="do" />
 <?php
 
 	exit();
 } // Close step three
 
 // Step four
-if($nextstep == md5('4') && CheckAuth())
+if($nextstep == '4' && checkAuth())
 {
 	//
 	// Installation actions
@@ -255,23 +269,31 @@ if($nextstep == md5('4') && CheckAuth())
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$db_host,$db_user,$db_pass,$db_name,$db_prefix);
 
 	//
+	// make sure that these directories exist (previous manual efforts may have removed them):
+	//
+	@mkdir(BASE_PATH.'/media');
+	@mkdir(BASE_PATH.'/media/albums');
+	@mkdir(BASE_PATH.'/media/files');
+	@mkdir(BASE_PATH.'/lib/includes/cache');
+	
+	//
 	// Check for current chmod(); we only are interesting in whether these files and directories are readable and writeable:
 	// this also works out for Windows-based servers.
 	//
 	$chfile = array();
 	/*
-	Note that the 'required' 0666/0777 access rights are, in reality, overdoing it. To be more precise:
-	these files and directories should have [W]rite access enabled for the user the php binary is running
-	under. Generally that user would be the user under which the webserver, e.g. apache, is running
-	(CGI may be a different story!)
-
-	Next to that, the directories tested here need e[X]ecutable access for that same user as well.
-
-	This is /less/ than the 0666/0777 splattergun, but the latter is easier to grok and do for novices.
-	So the message can remain 0666/0777 but in here we're performing the stricter check, as 'is_writable_ex()'
-	is the one which really counts after all: that's the very same check performed by the PHP engine on
-	open-for-writing any file/directory.
-	*/
+	 * Note that the 'required' 0666/0777 access rights are, in reality, overdoing it. To be more precise:
+	 * these files and directories should have [W]rite access enabled for the user the php binary is running
+	 * under. Generally that user would be the user under which the webserver, e.g. apache, is running
+	 * (CGI may be a different story!)
+     * 
+	 * Next to that, the directories tested here need e[X]ecutable access for that same user as well.
+     * 
+	 * This is /less/ than the 0666/0777 splattergun, but the latter is easier to grok and do for novices.
+	 * So the message can remain 0666/0777 but in here we're performing the stricter check, as 'is_writable_ex()'
+	 * is the one which really counts after all: that's the very same check performed by the PHP engine on
+	 * open-for-writing any file/directory.
+	 */
 	if(!is_writable_ex(BASE_PATH.'/.htaccess')) { $chfile[] = '.htaccess (0666)'; }
 	if(!is_writable_ex(BASE_PATH.'/lib/config.inc.php')) { $chfile[] = '/lib/config.inc.php (0666)'; }
 	if(!is_writable_ex(BASE_PATH.'/content/home.php')) { $chfile[] = '/content/home.php (0666)'; }
@@ -299,7 +321,7 @@ if($nextstep == md5('4') && CheckAuth())
 			<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span>Warning</h2>
 			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> 
 			for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the 
-			<a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
+			<a href="index.php?do=ftp">built-in FTP chmod function</a>.</p>
 			<span>&rarr; <em>Files that still require chmod():</em></span>
 			<ul>
 				<?php 
@@ -357,11 +379,11 @@ if($nextstep == md5('4') && CheckAuth())
 			<tr class="altcolor">
 				<th width="55%" scope="row">Install Type</th>
 				<td><?php 
-				if ($_SESSION['variables']['do_upgrade'])
+				if ($do_upgrade)
 				{
 					echo '<span class="signal_upgrade_mode">Upgrade/Restore</span>';
 				}
-				else if ($_SESSION['variables']['may_upgrade'])
+				else if ($may_upgrade)
 				{
 					// we MAY but we DO NOT upgrade... hmmm...
 					echo '<span class="signal_upgrade_mode">New Installation</span>';
@@ -399,7 +421,7 @@ if($nextstep == md5('4') && CheckAuth())
 		</table>
 
 		<hr noshade="noshade" />
-		<p class="ss_has_sprite quiet">
+		<p class="ss_has_sprite alert">
 			<span class="ss_sprite_16 ss_exclamation">&#160;</span><strong>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
@@ -408,20 +430,20 @@ if($nextstep == md5('4') && CheckAuth())
 			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite_16 ss_accept">&#160;</span>Install <strong>CompactCMS</strong></button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo 'final'; ?>" id="do" />
 <?php
 
 	exit();
 } // Close step four
 
 /**
-*
-* Do the actual configuration
-*
-**/
+ *
+ * Do the actual configuration
+ *
+ **/
 
 // Final step
-if($nextstep == md5('final') && CheckAuth())
+if($nextstep == 'final' && checkAuth())
 {
 	//
 	// Installation actions
@@ -438,17 +460,55 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	// Try database connection
 	//
-	if (!$db->Open($_SESSION['variables']['db_name'], $_SESSION['variables']['db_host'], $_SESSION['variables']['db_user'], $_SESSION['variables']['db_pass']))
+	if (!$db->Open(null, $_SESSION['variables']['db_host'], $_SESSION['variables']['db_user'], $_SESSION['variables']['db_pass'], 'utf8', 'utf8_unicode_ci'))
 	{
-		$errors[] = 'Error: could not connect to the database';
+		$errors[] = 'Error: could not connect to the database engine';
 		$errors[] = $db->Error();
+		$errors[] = $db->MyDyingMessage();
 		$err++;
 	}
 	else
 	{
-		$log[] = "Database connection successful";
+		$log[] = "Database engine connection successful";
 	}
 
+	//
+	// Either Select the database or create it when it does not exist yet
+	//
+	if (!$db->SelectDatabase($_SESSION['variables']['db_name']))
+	{
+		if (!$db->CreateDatabase($_SESSION['variables']['db_name']))
+		{
+			$errors[] = 'Error: could not create the database "' . $_SESSION['variables']['db_name'] . '"';
+			$errors[] = $db->Error();
+			$errors[] = $db->MyDyingMessage();
+			$err++;
+		}
+		else
+		{
+			$log[] = "Database creation successful";
+		}
+
+		// and once created, try to select it, again:
+		if (!$db->SelectDatabase($_SESSION['variables']['db_name']))
+		{
+			$errors[] = 'Error: could not switch to the newly created database "' . $_SESSION['variables']['db_name'] . '"';
+			$errors[] = $db->Error();
+			$errors[] = $db->MyDyingMessage();
+			$err++;
+		}
+		else
+		{
+			$log[] = "Database selection successful";
+		}
+	}
+	else
+	{
+		$log[] = "Database selection successful";
+	}
+
+
+	
 	//
 	// Insert database structure and sample data
 	//
@@ -500,9 +560,11 @@ if($nextstep == md5('final') && CheckAuth())
 		$sqldump = array();
 
 		$sql = file_get_contents(BASE_PATH.'/_docs/structure.sql');
+		$sql = preg_replace('/compactcms/', $_SESSION['variables']['db_name'], $sql);
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
 		$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
-		$sql = str_replace("\r\n", "\n", $sql);
+		// trim trailing whitespace for SQL command lines, so that the explode() below will work without a hitch:
+		$sql = preg_replace('/;[ \t\r]+\n/', ";\n", $sql);
 
 		// Execute per sql piece: 
 		$currently_in_sqltextdata = false;
@@ -529,7 +591,7 @@ if($nextstep == md5('final') && CheckAuth())
 			if (empty($tok))
 				continue;
 
-			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || EXECUTE_QUERIES)
 			{
 				$results = $db->Query($tok);
 				if ($results == false)
@@ -551,110 +613,23 @@ if($nextstep == md5('final') && CheckAuth())
 			die();
 		}
 
-		if ($err == 0 && $_SESSION['variables']['do_upgrade'])
+		if ($err == 0 && $do_upgrade)
 		{
-			$sql = file_get_contents(BASE_PATH.'/media/files/ccms-restore/compactcms-sqldump.sql');
-			$sql = preg_replace('/\\bccms_\\B/', $_SESSION['variables']['db_prefix'], $sql); // all tables here-in will get the correct prefix: we're doing a restore, so we have this info from the config.inc.php file, but we may have changed our setup in the install run just before!
-			$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
-			// note that the passwords for the other users in the backup may be invalid IFF you changed the authcode!
-			$sql = str_replace("\r\n", "\n", $sql);
-			
-			// Execute per sql piece: 
-			$currently_in_sqltextdata = false;
-			$query_so_far = '';
-			$queries = explode(";\n", $sql);
-			foreach($queries as $tok)
-			{
-				// filter query: remove comment lines, then see if there's anything left to BE a query...
-				$lines = array_filter(explode("\n", $tok), "is_a_sql_query_piece");
-				if ($currently_in_sqltextdata)
-				{
-					/*
-					MySQL supports multiline texts in queries; apparently we have a text here which has a line ending with a semicolon :-(
-					
-					We can only be certain it's a b0rked query by the time we've reached the very end of the SQL file!
-					*/
-					$query_so_far .= implode("\n", $lines) . ";\n";
-					continue;
-				}
-					
-				$tok = trim($query_so_far . implode("\n", $lines));
-				$query_so_far = '';
-
-				if (empty($tok))
-					continue;
-
-				/*
-				- ignore 'DROP TABLE' queries
-				
-				- process 'CREATE TABLE' queries by REPLACING them with 'TRUNCATE TABLE' queries; 
-				  after all, they will soon be followed up with INSERT INTO queries and we don't 
-				  want the 'fresh install' records to linger in there when performing 
-				  an upgrade/restore.
-				  
-				  NOTE that SQL dumps since 1.4.2 (rev. 2011/01/11) do contain their own TRUNCATE TABLE
-				  statements, and we do know that is so, but here we wish to be as backwards compatible
-				  as humanly possible. Besides a dual TRUNCATE TABLE doesn't hurt, so we don't filter
-				  those TRUNCATE statements when they exist in the original SQL script.
-				*/
-				if (preg_match('/DROP\s+TABLE/i', $tok))
-					continue;
-					
-				if (preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([a-zA-Z0-9_\-]+)`?\s+\(/is', $tok, $matches))
-				{
-					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-					{
-						$results = $db->TruncateTable($matches[2]);
-						if ($results == false)
-						{
-							$errors[] = 'Error: executing query: ' . $db->GetLastSQL();
-							$errors[] = $db->Error();
-							$err++;
-						}
-					}
-					else
-					{
-						$sqldump[] = "Execute query:\n---------------------------------------\nTRUNCATE TABLE `" . $matches[2] . "`\n---------------------------------------\n";
-					}
-				}
-				else
-				{
-					if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-					{
-						$results = $db->Query($tok);
-						if ($results == false)
-						{
-							$errors[] = 'Error: executing query: ' . $tok;
-							$errors[] = $db->Error();
-							$err++;
-						}
-					}
-					else
-					{
-						$sqldump[] = "Execute query:\n---------------------------------------\n" . $tok . "\n---------------------------------------\n";
-					}
-				}
-			}
-			
-			if ($currently_in_sqltextdata)
-			{
-				echo "<pre>B0rked on query:\n".$query_so_far."\n---------------------------------\n";
-				die();
-			}
+			$err = perform_upgrade($db, $log, $errors, $sqldump);
 		}
 		
 		if ($err == 0)
 		{
 			$log[] = "Database structure and data successfully imported";
 		}
-		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && $dump_queries_n_stuff_in_devmode)
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
 		{
 ?>
 			<h2>Database Initialization</h2>
 			<pre class="small"><?php
 				foreach($sqldump as $line)
 				{
-					echo htmlspecialchars($line);
+					echo htmlspecialchars($line, ENT_COMPAT, 'UTF-8');
 				}
 			?></pre>
 <?php
@@ -682,7 +657,8 @@ if($nextstep == md5('final') && CheckAuth())
 		function setChmod($path, $value) 
 		{
 			// Check current chmod() status
-			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4) != $value) 
+			$perms = @fileperms(BASE_PATH.$path);
+			if ($perms === false || substr(sprintf('%o', $perms), -4) != $value) 
 			{
 				// If not set, set
 				if(@chmod(BASE_PATH.$path, $value)) 
@@ -694,6 +670,7 @@ if($nextstep == md5('final') && CheckAuth())
 			{
 				return true;
 			}
+			return false;
 		}
 
 		// Do chmod() per necessary folder and set status
@@ -716,14 +693,14 @@ if($nextstep == md5('final') && CheckAuth())
 		{
 			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files/directories.</abbr>';
 		}
-		if($chmod==0 || count($errfile) > 0) 
+		if ($chmod == 0 || count($errfile) > 0) 
 		{
 			$errors[] = 'Warning: could not chmod() all files.';
 			foreach ($errfile as $key => $value) 
 			{
 				$errors[] = $value;
 			}
-			$errors[] = 'Either use the <a href="index.php?do=' . md5('ftp') . '">built-in FTP chmod function</a>, or manually perform chmod().';
+			$errors[] = 'Either use the <a href="index.php?do=ftp">built-in FTP chmod function</a>, or manually perform chmod().';
 		}
 	}
 
@@ -737,7 +714,7 @@ if($nextstep == md5('final') && CheckAuth())
 		if ($conn_id !== false)
 		{
 			// Try to login using provided details
-			if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+			if (@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
 			{
 				// trimPath function
 				function trimPath($path,$depth) 
@@ -756,9 +733,9 @@ if($nextstep == md5('final') && CheckAuth())
 				$path   = $_POST['ftp_path'];
 
 				// Set max tries to 15
-				for ($i=1; $i<15; $i++) 
+				for ($i = 1; $i < 15; $i++) 
 				{ 
-					if(@ftp_chdir($conn_id, trimPath($path,$i))) 
+					if (@ftp_chdir($conn_id, trimPath($path,$i))) 
 					{
 						$log[] = "Successfully connected to FTP server";
 						$i = 15;
@@ -781,17 +758,17 @@ if($nextstep == md5('final') && CheckAuth())
 			if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
 			if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
 			// Directories under risk due to chmod(0777)
-			if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
-			if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
+			if(@ftp_chmod($conn_id, 0777, "./content")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
+			if(@ftp_chmod($conn_id, 0777, "./media")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
 			if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
-			if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
-			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+			if(@ftp_chmod($conn_id, 0777, "./media/files")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
 
-			if($ftp_chmod>0) 
+			if($ftp_chmod > 0) 
 			{
 				$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files/directories using FTP.</abbr>';
 			} 
-			if($ftp_chmod==0 || count($errfile) > 0) 
+			if($ftp_chmod == 0 || count($errfile) > 0) 
 			{
 				$errors[] = 'Fatal: could not FTP chmod() various files.';
 				foreach ($errfile as $key => $value) 
@@ -856,7 +833,7 @@ if($nextstep == md5('final') && CheckAuth())
 		}
 
 		// Write the new setup to the config file
-		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+		if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
 		{
 			// make sure the fopen(..., 'w') is only called when the destination is writable; otherwise an empty file may be produced.
 			if (is_writable_ex(BASE_PATH . '/lib/config.inc.php') && ($fp = fopen(BASE_PATH . '/lib/config.inc.php', 'w')))
@@ -875,17 +852,17 @@ if($nextstep == md5('final') && CheckAuth())
 			else
 			{
 				$errors[] = 'Fatal: the configuration file is not writable.';
-				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 				$err++;
 			}
 		}
 		else
 		{
-			if ($dump_queries_n_stuff_in_devmode)
+			if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
 			{
 ?>
 				<h2>config.inc.php Configuration Values - after modification</h2>
-				<pre class="small"><?php echo htmlspecialchars($configinc); ?></pre>
+				<pre class="small"><?php echo htmlspecialchars($configinc, ENT_COMPAT, 'UTF-8'); ?></pre>
 <?php
 			}
 			
@@ -897,61 +874,124 @@ if($nextstep == md5('final') && CheckAuth())
 	//
 	if($err==0)
 	{
-		$htaccess   = @file_get_contents(BASE_PATH.'/.htaccess');
+		$htaccess   = @file_get_contents(BASE_PATH . '/.htaccess');
 		$newpath    = $_SESSION['variables']['rootdir'];
 
-		if(strpos($htaccess, $newline)===false)
-		{
-			// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
-			$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
-			$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
+		// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
+		$htaccess = preg_replace('/([# \t]*)(<IfDefine CCMS_installed>)/', '# \\2', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<\/IfDefine>(\s*#\s*CCMS_installed)?)/', '# \\2', $htaccess);
 
-			// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
-			$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
-			$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
-			if (!$htaccess)
+		// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
+		$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
+		$htaccess = preg_replace('/(RewriteBase\s+)\/.*/', '\\1' . $newpath, $htaccess);
+		if (!$htaccess)
+		{
+			$errors[] = 'Fatal: could not set the RewriteBase in the .htaccess file.';
+			$err++;
+		}
+		else
+		{
+			if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
 			{
-				$errors[] = 'Fatal: could not set the RewriteBase in the .htaccess file.';
+				if (is_writable_ex(BASE_PATH . '/.htaccess') && ($fp = fopen(BASE_PATH . '/.htaccess', 'w')))
+				{
+					if(fwrite($fp, $htaccess, strlen($htaccess)))
+					{
+						$log[] = "Successfully rewrote the .htaccess file";
+					}
+					else
+					{
+						$errors[] = "Fatal: Problem saving new .htaccess file.";
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
+						$err++;
+					}
+					fclose($fp);
+				}
+				else
+				{
+					$errors[] = 'Fatal: the .htaccess file is not writable.';
+					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
+					$err++;
+				}
+			}
+			else
+			{
+				if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
+				{
+?>
+					<h2>.htaccess Rewrite Rules - after modification</h2>
+					<pre class="small"><?php echo htmlspecialchars($htaccess, ENT_COMPAT, 'UTF-8'); ?></pre>
+<?php
+				}
+				
+				$log[] = "Successfully rewrote the .htaccess file";
+			}
+		}
+	}
+
+	//
+	// Modify robots.txt file
+	//
+	if($err == 0)
+	{
+		$targetpath = $_SERVER['DOCUMENT_ROOT'] .  '/robots.txt';
+		
+		// only set up robots.txt if it hasn;t been set up yet:
+		if (!file_exists($targetpath))
+		{
+			$robots_txt = @file_get_contents(BASE_PATH . '/robots.txt');
+			$newrootpath = $_SESSION['variables']['rootdir'];
+
+			// make sure the regexes tolerate a setup where the robots.txt points at a subdirectory instead of the / root, so we can use a robots.txt in a development environment too:
+			$robots_txt = preg_replace('/(llow:\s+)(\/|'. str_replace('/', '\/', $newrootpath) . ')/', '\\1' . $newrootpath, $robots_txt);
+			if (!$robots_txt)
+			{
+				$errors[] = 'Fatal: could not set the base path in the robots.txt file.';
 				$err++;
 			}
 			else
 			{
-				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+				if (!$cfg['IN_DEVELOPMENT_ENVIRONMENT'] || WRITE_CFG_FILES_TO_DISK)
 				{
-					if (is_writable_ex(BASE_PATH . '/.htaccess') && ($fp = fopen(BASE_PATH . '/.htaccess', 'w')))
+					$fp = fopen($targetpath, 'w');
+					if ($fp)
 					{
-						if(fwrite($fp, $htaccess, strlen($htaccess)))
+						if(fwrite($fp, $robots_txt, strlen($robots_txt)))
 						{
-							$log[] = "Successfully rewrote the .htaccess file";
+							$log[] = "Successfully rewrote the robots.txt file.";
 						}
 						else
 						{
-							$errors[] = "Fatal: Problem saving new .htaccess file.";
-							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+							$errors[] = "Fatal: Problem saving new robots.txt file.";
+							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 							$err++;
 						}
 						fclose($fp);
 					}
 					else
 					{
-						$errors[] = 'Fatal: the .htaccess file is not writable.';
-						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$errors[] = 'Fatal: the robots.txt file is not writable.';
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 						$err++;
 					}
 				}
 				else
 				{
-					if ($dump_queries_n_stuff_in_devmode)
+					if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'] && DUMP_QUERIES_N_STUFF_IN_DEVMODE)
 					{
 ?>
-						<h2>.htaccess Rewrite Rules - after modification</h2>
-						<pre class="small"><?php echo htmlspecialchars($htaccess); ?></pre>
+						<h2>robots.txt Rewrite Rules - after modification</h2>
+						<pre class="small"><?php echo htmlspecialchars($robots_txt, ENT_COMPAT, 'UTF-8'); ?></pre>
 <?php
 					}
 					
-					$log[] = "Successfully rewrote the .htaccess file";
+					$log[] = "Successfully wrote the robots.txt file.";
 				}
 			}
+		}
+		else
+		{
+			$log[] = "<strong>Skipped configuring the robots.txt file as it already exists.</strong>";
 		}
 	}
 
@@ -987,7 +1027,7 @@ if($nextstep == md5('final') && CheckAuth())
 		<p>The installation has been successful! You should now follow the steps below, to get you started.</p>
 		<ol>
 			<li>Delete the <em>./_install</em> directory</li>
-			<li><a href="../admin/">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
+			<li><a href="../lib/includes/auth.inc.php?logon_user=admin">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
 			<li>Change your password through the back-end</li>
 			<li><a href="http://www.compactcms.nl/contact.html" target="_blank">Let me know</a> how you like CompactCMS!</li>
 		</ol>
@@ -997,7 +1037,7 @@ if($nextstep == md5('final') && CheckAuth())
 	{
 	?>
 		<div class="right">
-			<p class="ss_has_sprite"><a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a></p>
+			<a class="button" href="index.php"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span>Retry setting the variables</a>
 		</div>
 	<?php
 	}

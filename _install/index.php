@@ -40,6 +40,8 @@ if (!defined('BASE_PATH'))
 
 if(empty($_GET['do'])) 
 { 
+	unset($_COOKIE[session_name()]);
+	
 	// destroy the session if it existed before: start a new session
 	session_start();
 	session_unset();
@@ -47,7 +49,7 @@ if(empty($_GET['do']))
 	{
 		$params = session_get_cookie_params();
 		setcookie(session_name(), '', time() - 42000,
-			(!empty($params["ccms_userID"]) ? $params["ccms_userID"] : ''), 
+			(!empty($params["path"]) ? $params["path"] : ''), 
 			(!empty($params["domain"]) ? $params["domain"] : ''),
 			(!empty($params["secure"]) ? $params["secure"] : ''),
 			(!empty($params["httponly"]) ? $params["httponly"] : '')
@@ -57,7 +59,15 @@ if(empty($_GET['do']))
 	session_regenerate_id();
 }
 // Start the current session
-session_start();
+$rv = session_start();
+if ($rv != 1)
+{
+	echo "<p>Fatal error: failed to init session.</p>";
+	exit();
+}
+
+// Load installer-specific configuration bits
+/*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
 
 // Load basic configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/config.inc.php');
@@ -65,10 +75,12 @@ session_start();
 if (!isset($cfg))
 {
 	?>
+	<div class="error">
 	<h1>Fatal Error</h1>
 	<p>The installer has apparently rewritten the config.inc.php file but failed to rewrite its content. 
 	This is a severe failure and you must restore a backup or re-install the CompactCMS source code, in
 	particular the <file>lib/config.inc.php</file> and <file>.htaccess</file> files!</p>
+	</div>
 	<?php
 	die();
 }
@@ -80,13 +92,13 @@ if (!isset($cfg))
 $do	= getGETparam4IdOrNumber('do');
 
 // If no step, set session hash
-if(empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
+if (empty($do) && empty($_SESSION['id']) && empty($_SESSION['authcheck'])) 
 {
 	// Setting safety variables
 	SetAuthSafety();
 } 
 
-$do_ftp_chmod = ($do == md5('ftp') && CheckAuth());
+$do_ftp_chmod = ($do == 'ftp' && checkAuth());
 
 
 
@@ -101,20 +113,20 @@ if($rootdir != '/')
 
 
 /*
-To detect the possiblity of an upgrade action, there's two ways we support:
-
-1) someone extracted a backup archive and (when this is from a pre-1.4.2 backup) moved all the files
-   in the appropriate spots, which we ASSUME HAS HAPPENED when we find the 
-     compactcms-sqldump.sql
-   file in the site's media/files/ccms-restore/ directory. 
-   This implies the config.inc.php file has also been copied to that directory already.
-   
-2) someone actually ran the 'backup' command in the admin backup within the last
-   hour or so (timeout configurable through the UPGRADE_FROM_BACKUP_ACTION_TIMEOUT
-   constant) as the backup will have not only generated the expected .zip archive
-   but (since 1.4.2) also dumped the SQL dump and config file to the /media/files/ccms-restore/
-   directory.
-*/
+ * To detect the possiblity of an upgrade action, there's two ways we support:
+ * 
+ * 1) someone extracted a backup archive and (when this is from a pre-1.4.2 backup) moved all the files
+ *    in the appropriate spots, which we ASSUME HAS HAPPENED when we find the 
+ *      compactcms-sqldump.sql
+ *    file in the site's media/files/ccms-restore/ directory. 
+ *    This implies the config.inc.php file has also been copied to that directory already.
+ *    
+ * 2) someone actually ran the 'backup' command in the admin backup within the last
+ *    hour or so (timeout configurable through the UPGRADE_FROM_BACKUP_ACTION_TIMEOUT
+ *    constant) as the backup will have not only generated the expected .zip archive
+ *    but (since 1.4.2) also dumped the SQL dump and config file to the /media/files/ccms-restore/
+ *    directory.
+ */
 
 if (empty($_SESSION['variables']))
 {
@@ -165,7 +177,7 @@ if (empty($_SESSION['variables']['db_user']) && !empty($cfg['db_user']))
 {
 	$_SESSION['variables']['db_user'] = $cfg['db_user'];
 }
-if (empty($_SESSION['variables']['db_pass']) && !empty($cfg['db_pass']))
+if (empty($_SESSION['variables']['db_pass']) && isset($cfg['db_pass']))
 {
 	$_SESSION['variables']['db_pass'] = $cfg['db_pass'];
 }
@@ -173,7 +185,7 @@ if (empty($_SESSION['variables']['db_name']) && !empty($cfg['db_name']))
 {
 	$_SESSION['variables']['db_name'] = $cfg['db_name'];
 }
-if (empty($_SESSION['variables']['db_prefix']) && !empty($cfg['db_prefix']))
+if (empty($_SESSION['variables']['db_prefix']) && isset($cfg['db_prefix']))
 {
 	$_SESSION['variables']['db_prefix'] = $cfg['db_prefix'];
 }
@@ -204,32 +216,32 @@ if (empty($_SESSION['variables']['HTTPD_SERVER_TAKES_CARE_OF_CONTENT_COMPRESSION
 }
 
 /*
-now see whether the prerequisite files exist in ../media/files/ccms-restore/ 
-*AND* 
-whether at the SQL dump file has a 'last nodified' timestamp equal or beyond ANY
-of the content files stored in ../content/ or ../media/
-
-... because only if it has, can we be sure the backup producing those prerequisite
-files is of the 'most recent activity' kind.
-
-Naturally, there is a hitch: when we are performing a 'site restore' operation right
-now, then there MAY be some lingering content which has not been replaced by the 
-'restore' operation so far, i.e. the archive extract and /content/... + /media/... 
-directory overwrite. That is, assuming such an overwrite-on-restore was done in an
-unclean way. Which should be frowned upon most severely as it can cause all sorts
-of site editing ulcers later on, when the lingering content disrupts the creation
-of, say, fresh pages with the same name as the lingering (not cleaned up) files.
-
-Hence, we should put up a FATAL warning informing the user she's got some lingering
-files in there, which are not part of the backup. Plus a little hint for the truly
-stubborn and savvy ones: after all it only takes a UNIX' touch to fix the problem
-in a way of your liking. ;-)
-Nevertheless, when using the magick of UNIX' touch, you're on your own from that point
-on as using magick like that is only for grownups who should've learned their lesson
-already.
-(And maybe, just maybe, I shouldn't have read Neil Gaiman so very early in the 
-morning when the dawn is yet only a hint from yesterday's tale.)
-*/
+ * now see whether the prerequisite files exist in ../media/files/ccms-restore/ 
+ * *AND* 
+ * whether at the SQL dump file has a 'last nodified' timestamp equal or beyond ANY
+ * of the content files stored in ../content/ or ../media/
+ * 
+ * ... because only if it has, can we be sure the backup producing those prerequisite
+ * files is of the 'most recent activity' kind.
+ * 
+ * Naturally, there is a hitch: when we are performing a 'site restore' operation right
+ * now, then there MAY be some lingering content which has not been replaced by the 
+ * 'restore' operation so far, i.e. the archive extract and /content/... + /media/... 
+ * directory overwrite. That is, assuming such an overwrite-on-restore was done in an
+ * unclean way. Which should be frowned upon most severely as it can cause all sorts
+ * of site editing ulcers later on, when the lingering content disrupts the creation
+ * of, say, fresh pages with the same name as the lingering (not cleaned up) files.
+ * 
+ * Hence, we should put up a FATAL warning informing the user she's got some lingering
+ * files in there, which are not part of the backup. Plus a little hint for the truly
+ * stubborn and savvy ones: after all it only takes a UNIX' touch to fix the problem
+ * in a way of your liking. ;-)
+ * Nevertheless, when using the magick of UNIX' touch, you're on your own from that point
+ * on as using magick like that is only for grownups who should've learned their lesson
+ * already.
+ * (And maybe, just maybe, I shouldn't have read Neil Gaiman so very early in the 
+ * morning when the dawn is yet only a hint from yesterday's tale.)
+ */
 
 $has_prepped_restore = false;
 $has_uptodate_backup = false;
@@ -238,10 +250,10 @@ if (is_file($filepath . 'config.inc.php') && is_file($filepath . 'compactcms-sql
 {
 	$has_prepped_restore = true;
 	/*
-	NOTE that the sqldump file will be the LAST file WRITTEN by the backup procedure and will have, upon extraction from the archive,
-	     a create/modify timestamp equaling the time the backup was being performed. As such, it MUST be the latest file in the
-		 entire content region!
-	*/
+	 * NOTE that the sqldump file will be the LAST file WRITTEN by the backup procedure and will have, upon extraction from the archive,
+	 *      a create/modify timestamp equaling the time the backup was being performed. As such, it MUST be the latest file in the
+	 * 	    entire content region!
+	 */
 	$backup_time = filemtime($filepath . 'compactcms-sqldump.sql');
 
 	/*
@@ -262,26 +274,26 @@ if (is_file($filepath . 'config.inc.php') && is_file($filepath . 'compactcms-sql
 	}
 	
 	/*
-	If we have ANY more recent content than the files in .../ccms-restore/ , this signals two things:
-	
-	a) we have performed backups before OR extracted an older backup archive and prepared that restore directory,
-	   either way signalling that we MAY desire a restore/upgrade operation now, while
-	   
-	b) the fact that there's more recent content than our latest backup signal files means we haven't 
-	   created a backup very recently. THIS implies that going through on such a 'automated' restore
-	   operation would REWIND the site content to some prior UNIDENTIFIED state: UNIDENTIFIED because
-	   we have failed to either clean the content&media directory trees of recent content which MUST be
-	   removed as we apparently wish to rewind to the state as of an older date (restore/rewind), or we
-	   simply failed to run a recent backup (meaning 'we', as in ANY user with sufficient priveleges)
-	   changed or augmented the site content AFTER the last backup was made.
-	   
-	That, my friends, is a clear cut case of Nuking Your Site With Extreme Prejudice and we don't want
-	to be a party in such Murphian Madness. So you either do a proper backup, a proper restore OR you
-	tweak the SQL dump file last-modified timestamp to agree with our rule here, in which case, of course,
-	you just handed yourself a paddle to travel upcreek. Who am I, my dearies, to stand in the way of 
-	a Viking so visionary as to crave a UNIX' touch? Have it your way then, and may the gods look 
-	favorably upon your soul in the here-on-after. Ta ta.
-	*/
+	 * If we have ANY more recent content than the files in .../ccms-restore/ , this signals two things:
+	 * 
+	 * a) we have performed backups before OR extracted an older backup archive and prepared that restore directory,
+	 *    either way signalling that we MAY desire a restore/upgrade operation now, while
+	 *    
+	 * b) the fact that there's more recent content than our latest backup signal files means we haven't 
+	 *    created a backup very recently. THIS implies that going through on such a 'automated' restore
+	 *    operation would REWIND the site content to some prior UNIDENTIFIED state: UNIDENTIFIED because
+	 *    we have failed to either clean the content&media directory trees of recent content which MUST be
+	 *    removed as we apparently wish to rewind to the state as of an older date (restore/rewind), or we
+	 *    simply failed to run a recent backup (meaning 'we', as in ANY user with sufficient priveleges)
+	 *    changed or augmented the site content AFTER the last backup was made.
+	 *    
+	 * That, my friends, is a clear cut case of Nuking Your Site With Extreme Prejudice and we don't want
+	 * to be a party in such Murphian Madness. So you either do a proper backup, a proper restore OR you
+	 * tweak the SQL dump file last-modified timestamp to agree with our rule here, in which case, of course,
+	 * you just handed yourself a paddle to travel upcreek. Who am I, my dearies, to stand in the way of 
+	 * a Viking so visionary as to crave a UNIX' touch? Have it your way then, and may the gods look 
+	 * favorably upon your soul in the here-on-after. Ta ta.
+	 */
 	$has_uptodate_backup = ($lastmtime < $backup_time);
 }
 	
@@ -300,6 +312,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 
 
 
+session_write_close(); 
+
 
 
 ?>
@@ -317,6 +331,19 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	</head>
 <body>
 
+<?php
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+?>
+<pre>
+<?php
+		var_dump(headers_list());
+?>
+</pre>
+<?php
+	}
+?>
+
 <noscript class="noscript" id="noscript">
 	<h1>Your browser does not support JavaScript</h1>
 	<h2>... or has JavaScript disabled.</h2>
@@ -328,6 +355,54 @@ if (empty($_SESSION['variables']['do_upgrade']))
 	
 	<hr class="space" />
 </noscript>
+
+<?php
+// B0RK when the server still has that old hack active:
+$old_hacks = array(
+	'magic_quotes_gpc' => 0,    // warn
+	'magic_quotes_sybase' => 1, // fatal
+	'magic_quotes_runtime' => 1 // fatal
+	);
+	
+$die_on_old_hacks = false;	
+foreach ($old_hacks as $key => $value)
+{	
+	if (ini_get($key))
+	{
+	?>
+		<div class="error">
+			<h1><?php echo ($value == 0 ? 'Warning' : 'Fatal error'); ?></h1>
+			<p>Your server still has the old PHP '<?php echo $key; ?>' hack setting turned ON; 
+			<a href="http://www.php.net/manual/en/security.magicquotes.php">it is obsoleted</a> and 
+			poses an indirect security risk: any software on your machine still depending on that 
+			setting should be upgraded/overhauled!
+			</p>
+			<?php
+			if ($value == 0)
+			{
+			?>
+				<p><strong>CompactCMS will plod on, but be very much aware that you are doing so at 
+				your own peril. <em>Any</em> statements regarding quality of service, robustness 
+				or operation are,	from this point onwards, <em>void</em>.</strong></p>
+			<?php
+			}
+			else
+			{
+				$die_on_old_hacks = true;
+			?>
+				<p><strong>CompactCMS will NOT install as long as this setting is active.</strong></p>
+			<?php
+			}
+			?>
+		</div>
+	<?php
+	}
+}
+if ($die_on_old_hacks)
+{
+	die();
+}
+?>
 
 <div id="install-wrapper" class="container-18" style="display:none;" >
 	<div id="help" class="span-8 colborder">
@@ -463,7 +538,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 						}
 						?>   	
 					</select>
-					<input type="hidden" name="do" value="<?php echo md5('2'); ?>" id="do" />
+					<input type="hidden" name="do" value="<?php echo '2'; ?>" id="do" />
 				<?php 
 				} 
 				// Populate optional FTP form
@@ -485,7 +560,7 @@ if (empty($_SESSION['variables']['do_upgrade']))
 					<input type="text" class="alt title" name="ftp_path" value="<?php echo dirname(getcwd()); ?>" id="ftp_path"/>
 					<p class="ss_has_sprite small quiet"><span class="ss_sprite_16 ss_bullet_star">&#160;</span>CCMS will try to auto-find this using the default value above</p>
 					
-					<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
+					<input type="hidden" name="do" value="<?php echo 'final'; ?>" id="do" />
 				<?php 
 				} 
 				?>
@@ -506,8 +581,8 @@ if (empty($_SESSION['variables']['do_upgrade']))
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-<div>
-  <textarea id="jslog" class="log span-25" readonly="readonly">
+<div class="container-25">
+  <textarea id="jslog" class="log span-25 clear" readonly="readonly">
   </textarea>
 </div>
 <?php
@@ -515,46 +590,21 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 ?>
 
 
-<p class="quiet small" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
+<p class="quiet small clear" style="text-align:center;">&copy; 2008 - <?php echo date('Y'); ?> <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a>. All rights reserved.</p>
 
 <script type="text/javascript" charset="utf-8">
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../lib/includes/js/mootools-core.js',
-	'../lib/includes/js/mootools-more.js',
-	'../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running',
-	'install.js'
-	];
+<?php
+$js_files = array();
+$js_files[] = '../lib/includes/js/mootools-core.js';
+$js_files[] = '../lib/includes/js/mootools-more.js';
+$js_files[] = '../admin/includes/modules/user-management/passwordcheck.js?cb=ccms_combiner_running';
+$js_files[] = 'install.js';
 
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-}
+$driver_code = <<<EOT42
+EOT42;
 
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code);
+?>
 
 function ccms_combiner_running()
 {
@@ -564,11 +614,6 @@ function ccms_combiner_running()
 /* now show the correct DIV, as we do have JavaScript up & running */
 document.getElementById("noscript").style.display = "none";
 document.getElementById("install-wrapper").style.display = "block";
-
-if (typeof window.ccms_lazyload_setup_GHO == 'function')
-{
-	//alert('2');
-}
 
 </script>
 <script type="text/javascript" src="../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

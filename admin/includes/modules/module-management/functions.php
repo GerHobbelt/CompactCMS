@@ -2,7 +2,7 @@
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-	
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -34,18 +34,18 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 // the code on this page is currently unused!
-die('Illegal entry point!'); 
+die('Illegal entry point!');
 
 
 // Read SQL info & execute
 $mod_structure = "../../lib/modules/".strtolower($post_module)."/mod_structure.sql";
 if(is_file($mod_structure)) {
-	$mod_query 	= file_get_contents($mod_structure);
-	$tok 		= strtok($mod_query, ";");
+	$mod_query  = file_get_contents($mod_structure);
+	$tok        = strtok($mod_query, ";");
 	while ($tok !== false) {
 		$results = $db->Query($tok);
 		$tok = strtok(";");
 	}
 } // Else no database structure file was found (depends on module, no check possible).
 
-?>
+?>

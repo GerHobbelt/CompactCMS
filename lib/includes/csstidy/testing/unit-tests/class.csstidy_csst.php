@@ -90,7 +90,7 @@ class csstidy_csst extends SimpleExpectation
      * Implements SimpleExpectation::testMessage().
      */
     function testMessage() {
-        $message = $this->test . ' test at '. htmlspecialchars($this->filename);
+        $message = $this->test . ' test at '. htmlspecialchars($this->filename, ENT_COMPAT, 'UTF-8');
         return $message;
     }
     
@@ -98,7 +98,7 @@ class csstidy_csst extends SimpleExpectation
      * Renders the test with an HTML diff table.
      */
     function render() {
-        $message = '<pre>'. htmlspecialchars($this->css) .'</pre>';
+        $message = '<pre>'. htmlspecialchars($this->css, ENT_COMPAT, 'UTF-8') .'</pre>';
         $diff = new Text_Diff('auto', array(explode("\n", $this->expect), explode("\n", $this->actual)));
         $renderer = new Text_Diff_Renderer_parallel();
         $renderer->original = 'Expected';

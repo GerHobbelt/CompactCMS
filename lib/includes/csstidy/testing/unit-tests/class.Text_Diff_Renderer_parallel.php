@@ -20,17 +20,17 @@ class Text_Diff_Renderer_parallel extends Text_Diff_Renderer
         return '</tbody></table>';
     }
     function _context($lines) {
-        return '<tr><td><pre>'. htmlspecialchars(implode("\n", $lines)) .'</pre></td>
-          <td><pre>'. htmlspecialchars(implode("\n", $lines)) .'</pre></td></tr>';
+        return '<tr><td><pre>'. htmlspecialchars(implode("\n", $lines), ENT_COMPAT, 'UTF-8') .'</pre></td>
+          <td><pre>'. htmlspecialchars(implode("\n", $lines), ENT_COMPAT, 'UTF-8') .'</pre></td></tr>';
     }
     function _added($lines) {
-        return '<tr><td>&nbsp;</td><td class="added"><pre>'. htmlspecialchars(implode("\n", $lines)) .'</pre></td></tr>';
+        return '<tr><td>&nbsp;</td><td class="added"><pre>'. htmlspecialchars(implode("\n", $lines), ENT_COMPAT, 'UTF-8') .'</pre></td></tr>';
     }
     function _deleted($lines) {
-        return '<tr><td class="deleted"><pre>'. htmlspecialchars(implode("\n", $lines)) .'</pre></td><td>&nbsp;</td></tr>';
+        return '<tr><td class="deleted"><pre>'. htmlspecialchars(implode("\n", $lines), ENT_COMPAT, 'UTF-8') .'</pre></td><td>&nbsp;</td></tr>';
     }
     function _changed($orig, $final) {
-        return '<tr class="changed"><td><pre>'. htmlspecialchars(implode("\n", $orig)) .'</pre></td>
-        <td><pre>'. htmlspecialchars(implode("\n", $final)) .'</pre></td></tr>';
+        return '<tr class="changed"><td><pre>'. htmlspecialchars(implode("\n", $orig), ENT_COMPAT, 'UTF-8') .'</pre></td>
+        <td><pre>'. htmlspecialchars(implode("\n", $final), ENT_COMPAT, 'UTF-8') .'</pre></td></tr>';
     }
 }

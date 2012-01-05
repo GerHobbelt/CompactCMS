@@ -1,15 +1,15 @@
 <?php
  /**
  * Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
- * 
+ *
  * Last changed: $LastChangedDate$
  * @author $Author$
  * @version $Revision$
  * @package CompactCMS.nl
  * @license GNU General Public License v3
- * 
+ *
  * This file is part of CompactCMS.
- * 
+ *
  * CompactCMS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,16 +19,16 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * A reference to the original author of CompactCMS and its copyright
  * should be clearly visible AT ALL TIMES for the user of the back-
  * end. You are NOT allowed to remove any references to the original
  * author, communicating the product to be your own, without written
  * permission of the original copyright owner.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * > Contact me for any inquiries.
  * > E: Xander@CompactCMS.nl
  * > W: http://community.CompactCMS.nl/forum
@@ -38,7 +38,7 @@
 if(!defined("COMPACTCMS_CODE")) { define("COMPACTCMS_CODE", 1); } /*MARKER*/
 
 /*
-We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc. 
+We're only processing form requests / actions here, no need to load the page content in sitemap.php, etc.
 */
 if (!defined('CCMS_PERFORM_MINIMAL_INIT')) { define('CCMS_PERFORM_MINIMAL_INIT', true); }
 
@@ -58,26 +58,23 @@ if (!defined('BASE_PATH'))
 
 class FbX extends CcmsAjaxFbException {}; // nasty way to do 'shorthand in PHP -- I do miss my #define macros! :'-|
 
-// Security functions
 
 
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+
 
 /**
  *
  * Either INSERT or UPDATE preferences
  *
  */
-if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth()) 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 {
 	FbX::SetFeedbackLocation("permissions.Manage.php");
 	try
 	{
 		// (!) Only administrators can change these values
-		if($_SESSION['ccms_userLevel']>=4) 
+		if($_SESSION['ccms_userLevel'] >= 4)
 		{
 			// Execute UPDATE
 			$values = array(); // [i_a] make sure $values is an empty array to start with here
@@ -86,20 +83,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 				$key = filterParam4IdOrNumber($key);
 				$setting = filterParam4Number($value);
 				if (empty($key) || (empty($setting) && $value !== "0"))
-					throw new FbX($ccms['lang']['system']['error_forged']); 
-				$values[$key] = MySQL::SQLValue($setting, MySQL::SQLVALUE_NUMBER);
+				{
+					throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+				}
+				$perm->set($key, $value);
 			}
-			if($db->UpdateRows($cfg['db_prefix'].'cfgpermissions', $values)) 
+
+			if($perm->SavePermissions($db, $cfg['db_prefix'], false))
 			{
 				header('Location: ' . makeAbsoluteURI('permissions.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 				exit();
-			} 
-			else 
+			}
+			else
 			{
 				throw new FbX($db->MyDyingMessage());
 			}
-		} 
-		else 
+		}
+		else
 		{
 			throw new FbX($ccms['lang']['auth']['featnotallowed']);
 		}
@@ -108,8 +108,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST) && checkAuth())
 	{
 		$e->croak();
 	}
-	exit();
-} 
+}
 
-die("No external access to file");
+
+// when we get here, an illegal command was fed to us!
+die_with_forged_failure_msg(__FILE__, __LINE__);
+
 ?>
