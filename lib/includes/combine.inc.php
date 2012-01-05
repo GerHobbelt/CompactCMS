@@ -148,11 +148,28 @@ $only_when_expression = trim(getGETparam4MathExpression('only-when', ''));
 
 
 
-/*MARKER*/require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/browscap/browscap/Browscap.php');
 
 $client_browser = new Browscap(BASE_PATH . '/lib/includes/cache');
-$client_browser->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+$client_browser->localFile = BASE_PATH . '/lib/includes/browscap-data/php_browscap.ini';
 $client_browser = $client_browser->getBrowser();
+/*
+ * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
+ * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
+ *
+ * On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
+ * stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an
+ * entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
+ * past the second '.' dot in there.
+ */
+if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
+{
+	// illegal format: report this and fail dramatically
+	send_response_status_header(500);
+	die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
+}
+$client_browser->SniffedVersion = floatval($vmp[1]);
+
 
 if (0)
 {
@@ -165,17 +182,11 @@ if (0)
  * we abuse the browscap conditional filter to check whether we should okay or discard this load request.
  *
  * This is our server-side alternative, suitable for use with lazyloading, to the MSIE conditional
- * comment:
- *
- * <--[equ IEx] .... -->
- *
- * For this we 'fake'; a wee bit of content (a single line) and see whether the filter leaves it be, or not:
+ * comment.
  */
 if (!empty($only_when_expression))
 {
-	$faked_content = '1 /*:: ' . $only_when_expression . ' */';
-	$faked_content = filter4browser($faked_content, $client_browser);
-	$do_not_load = (empty($faked_content) || $faked_content[0] != '1');
+	$do_not_load = (interpret_conditional_filter_expr($only_when_expression, $client_browser) == 0);
 }
 else
 {
@@ -311,7 +322,7 @@ else
 	// Check for buggy versions of Internet Explorer
 	if (!empty($_SERVER['HTTP_USER_AGENT']))
 	{
-		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || $client_browser->AOL)
+		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || (property_exists($client_browser, 'AOL') && $client_browser->AOL))
 		{
 			$encoding = 'none';
 		}
@@ -622,6 +633,115 @@ function css_mk_abs_path($relpath, $basedir)
 }
 
 
+/**
+ * Interpret an expression string; this is a single-pass parser.
+ *
+ * @param $expression     is assumed to be whitespace-trimmed and non-empty.
+ *
+ * @param $skip_checks    TRUE when the parser has already decided the remainder of the expression can be short-circuited. Just parse/munge the input, do not perform checks.
+ */
+function interpret_conditional_filter_expr(&$expression, $client_browser, $depth = 0, $skip_checks = false)
+{
+	$pass = -1;
+	
+	while (!empty($expression))
+	{
+		if (strlen($expression) < 2)
+			return -1;
+	
+		switch ($expression[0])
+		{
+		case '(':
+			$expression = ltrim(substr($expression, 1));
+			$pass = interpret_conditional_filter_expr($expression, $client_browser, $depth + 1, $skip_checks);
+			if ($pass < 0) 
+				return $pass;
+			break;
+			
+		case ')':
+			if ($depth < 1)
+				return -1;
+				
+			$expression = ltrim(substr($expression, 1));
+			return $pass;
+			
+		case '|':
+			if ($pass < 0) 
+				return $pass;
+		
+			$pos = 1 + ($expression[1] == '|');
+			$expression = ltrim(substr($expression, $pos));
+			$skip_checks = $pass;   // OR with TRUE remains TRUE
+			break;
+			
+		case '&':
+			if ($pass < 0) 
+				return $pass;
+		
+			$pos = 1 + ($expression[1] == '&');
+			$expression = ltrim(substr($expression, $pos));
+			$skip_checks = !$pass;   // AND with FALSE remains FALSE
+			break;
+			
+		default:
+			if (!preg_match('/^([=<>!]=|>|<)\s*([^0-9:|&*\/=<>!]+)([0-9]+(\.[0-9]+)?)?\s*(.*)$/', $expression, $matches))
+			{
+				// illegal format: report this and fail dramatically
+				return -1;
+			}
+			$op = $matches[1];
+			$brand = trim($matches[2]);
+			$b_v_set = !empty($matches[3]);
+			$b_version = ($b_v_set ? floatval($matches[3]) : 0.0);
+			$expression = ltrim($matches[5]);
+
+			// perform check, set $pass=false when there's a match
+			//echo "<pre>check: ($op) ($brand) ($b_version)\n";
+			//echo "<pre>matches: \n"; var_dump($matches);
+			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
+			$vchk = $client_browser->SniffedVersion - $b_version;
+			//echo "\n<pre>browser says: " . $client_browser->Browser . " " . $client_browser->Version;
+			//echo "\n<pre>we want: " . $op . " " . $brand . " " . $b_version;
+			//echo "\n<pre>we got: gotcha = $gotcha, sniffed = $client_browser->SniffedVersion, vchk = $vchk, b_v_set = $b_v_set";
+
+			switch ($op)
+			{
+			case '!=':
+				$pass = !($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+
+			case '==':
+				$pass = ($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+
+			case '>=':
+				$pass = ($gotcha && (!$b_v_set || $vchk >= 0));
+				break;
+
+			case '<=':
+				$pass = ($gotcha && (!$b_v_set || $vchk <= 0));
+				break;
+
+			case '>':
+				$pass = ($gotcha && (!$b_v_set || $vchk > 0));
+				break;
+
+			case '<':
+				$pass = ($gotcha && (!$b_v_set || $vchk < 0));
+				break;
+
+			default:
+				// illegal format: report this and fail dramatically
+				return -1;
+			}
+			break;
+		}	
+	}
+	return $pass;
+}
+
+
+
 
 /**
  * Filter the CSS/JS based on sniffed browser capacilities: this way we can deliver nicely compliant CSS/JS files to
@@ -699,93 +819,49 @@ function filter4browser($contents, $client_browser)
 		$prev_content .= substr($contents, 0, $nlidx);
 
 		$contents = substr($contents, $nlidx);
-		$eol = strcspn($contents, "\n");
-		$this_line = substr($contents, 0, $eol);
-
-		$contents = substr($contents, $eol);
-		if (!preg_match('/^(.*)\/\*\:\:\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*(|\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*)*(::.*)?\*\/\s*$/', $this_line, $matches))
+		// problem: multiple combined conditions of arbitrary complexity can not be split nicely using a single regex, so we resort to a nested approach:
+		if (!preg_match('/^(.*?)\s*\/\*\:\:\s*(([=<>!]=|>|<)\s*([^:*]+))\s*(::.*)?\*\/\s*/', $contents, $matches))
 		{
 			// illegal format: report this and fail dramatically
 			send_response_status_header(500);
-			die("Illegal filter condition string: " . $this_line);
+			die("Illegal filter condition string: '" . substr($contents, 0, 256) . "(continued...)'");
 		}
-
-		$pass = false;
 
 		$src = $matches[1];
-		$match_count = count($matches);
-		$comment = trim($matches[$match_count - 1]);
-		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
-		$extra_first_step = 1;
-		for ($i = 2; $i + 4 <= $match_count - 1 /* discount the last one: the trailing comment */; $i++)
+		$this_line = $matches[0];
+		$condition = rtrim($matches[2]);
+		$contents = substr($contents, strlen($matches[0]));
+
+		$condexpr = '' . $condition;    // copy, so munging does not destroy '$condition'
+		$pass = interpret_conditional_filter_expr($condexpr, $client_browser);
+		
+		if (0)
 		{
-			$op = $matches[$i++];
-			$brand = trim($matches[$i++]);
-			$b_v_set = !empty($matches[$i]);
-			$b_version = floatval($matches[$i++]);
-			$i++; // skip the minor version match
-			$i += $extra_first_step; // move to the next of a combined set (if there are any more conditions in there)
-			$extra_first_step = 0;
+			static $counter;
+			
+			$counter++;
+			$fname = str_replace('\\', '/', dirname(__FILE__)) . '/combiner-' . date('Y-m-d.His') . '.' . sprintf('%07d', fmod(microtime(true), 1) * 1E6) . '-' . $counter . '.log';
 
-			// perform check, set $pass=false when there's a match
-			//echo "<pre>check: ($op) ($brand) ($b_version) ($this_line) ($comment)\n";
-			//echo "<pre>matches: \n"; var_dump($matches);
-			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
-			/*
-			 * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
-			 * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
-			 *
-			 * On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
-			 * stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an
-			 * entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
-			 * past the second '.' dot in there.
-			 */
-			if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
-			{
-				// illegal format: report this and fail dramatically
-				send_response_status_header(500);
-				die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
-			}
-			$sniffed_version = floatval($vmp[1]);
-			$vchk = $sniffed_version - $b_version;
-			//echo "\n<pre>browser says: " . $client_browser->Browser . " " . $client_browser->Version;
-			//echo "\n<pre>we want: " . $op . " " . $brand . " " . $b_version;
-			//echo "\n<pre>we got: gotcha = $gotcha, sniffed = $sniffed_version, vchk = $vchk, b_v_set = $b_v_set";
-
-			switch ($op)
-			{
-			default:
-				// illegal format: report this and fail dramatically
-				send_response_status_header(500);
-				echo "\n<pre>contents = $contents";
-				die("Illegal filter comparison operator: " . $this_line);
-
-			case '!=':
-				$pass |= !($gotcha && (!$b_v_set || $vchk == 0));
-				break;
-
-			case '==':
-				$pass |= ($gotcha && (!$b_v_set || $vchk == 0));
-				break;
-
-			case '>=':
-				$pass |= ($gotcha && (!$b_v_set || $vchk >= 0));
-				break;
-
-			case '>':
-				$pass |= ($gotcha && (!$b_v_set || $vchk > 0));
-				break;
-
-			case '<':
-				$pass |= ($gotcha && (!$b_v_set || $vchk < 0));
-				break;
-
-			case '<=':
-				$pass |= ($gotcha && (!$b_v_set || $vchk <= 0));
-				break;
-			}
-			//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
+			@file_put_contents($fname, print_r(array(
+				'input' => $this_line, 
+				'current browser' => $client_browser,
+				'regex matches' => $matches,
+				'src' => $src,
+				'this line' => $this_line,
+				'condition' => $condition,
+				'munged condition remainder' => $condexpr,
+				'verdict' => ($pass ? $pass : 'FALSE')
+			), true));
 		}
+
+		if ($pass < 0)
+		{
+			// illegal format: report this and fail dramatically
+			send_response_status_header(500);
+			die("Illegal filter condition string: offending position: '" . $condexpr . "' in expression: '" . substr($contents, 0, 256) . "(continued...)'");
+		}
+
+		//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
 
 		if (!$pass)
 		{
@@ -965,7 +1041,7 @@ function filter4browser($contents, $client_browser)
 		else
 		{
 			// we must keep the current line/block:
-			$prev_content .= $this_line;   // or: $prev_content .= $src;  iff you don't want to keep the conditional comment in the output, ever.
+			$prev_content .= $this_line;   // or: $prev_content .= $src . "\n";  /* iff you don't want to keep the conditional comment in the output, ever. */
 		}
 	}
 
@@ -1101,25 +1177,9 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		$is_Opera = (0 == strncasecmp('Opera', $client_browser->Browser, 5));
 		$is_Safari = (0 == strcasecmp('Safari', $client_browser->Browser));
 		$is_mobile = !!$client_browser->isMobileDevice;
-		/*
-		 * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
-		 * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
-		 *
-		 * On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
-		 * stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an
-		 * entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
-		 * past the second '.' dot in there.
-		 */
-		if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
-		{
-			// illegal format: report this and fail dramatically
-			send_response_status_header(500);
-			die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
-		}
-		$sniffed_version = floatval($vmp[1]);
 
 		/*
-		 fix CSS3 border-radius for IE:
+		 fix CSS3 border-radius, box-shadow, ... for IE:
 
 		 we DON'T. It's a mess and frankly, I can do without the hassle right now. So MSIE6/7/8 do NOT support rounded corners
 		 like that in the admin screens.
@@ -1194,7 +1254,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
 			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
 
-			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
+			//$contents = preg_replace('/\sbox-shadow:/', "-o-box-shadow:", $contents);
 
 			/*
 			Opera (11.0 build 1156) does not render border-radius correctly for <fieldset> borders (the background fill is correctly rendered, amazingly).
@@ -1311,20 +1371,24 @@ function fixup_MT_FileManagerJS($contents, $type, $http_base, $base, $root, $ele
 	/*
 	 * The offending bit we're looking for is this:
 	 * 
-	 * 	// ->> load DEPENDENCIES
-	 * 	var __DIR__ = (function() {
-	 * 		var scripts = document.getElementsByTagName('script');
-	 * 		var script = scripts[scripts.length - 1].src;
-	 * 		var host = window.location.href.replace(window.location.pathname+window.location.hash,'');
-	 * 		return script.substring(0, script.lastIndexOf('/')).replace(host,'') + '/';
-	 * 	})();
-	 * 	Asset.javascript(__DIR__+'../Assets/js/milkbox/milkbox.js');
-	 * 	Asset.css(__DIR__+'../Assets/js/milkbox/css/milkbox.css');
-	 * 	Asset.css(__DIR__+'../Assets/Css/FileManager.css');
-	 * 	Asset.css(__DIR__+'../Assets/Css/Additions.css');
-	 * 	Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
+     * // ->> load DEPENDENCIES
+     * if(typeof __MFM_ASSETS_DIR__ == 'undefined')
+     * {
+     * 	var __DIR__ = (function() {
+     * 			var scripts = document.getElementsByTagName('script');
+     * 			var script = scripts[scripts.length - 1].src;
+     * 			var host = window.location.href.replace(window.location.pathname+window.location.hash,'');
+     * 			return script.substring(0, script.lastIndexOf('/')).replace(host,'') + '/';
+     * 	})();
+     * 	__MFM_ASSETS_DIR__ = __DIR__ + "../Assets";
+     * }
+     * Asset.javascript(__MFM_ASSETS_DIR__+'/js/milkbox/milkbox.js');
+     * Asset.css(__MFM_ASSETS_DIR__+'/js/milkbox/css/milkbox.css');
+     * Asset.css(__MFM_ASSETS_DIR__+'/Css/FileManager.css');
+     * Asset.css(__MFM_ASSETS_DIR__+'/Css/Additions.css');
+     * Asset.javascript(__MFM_ASSETS_DIR__+'/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
 	 */
-	$pos1 = strpos($contents, 'var __DIR__' );
+	$pos1 = strpos($contents, '->> load DEPENDENCIES' );
 	if ($pos1 === false)
 	{
 		send_response_status_header(500);
@@ -1363,7 +1427,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 	 */
 	SetUpLanguageAndLocale($cfg['language'], true);
 
-	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element));
+	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element) . 'tiny_mce/jscripts/tiny_mce/');
 
 	$mce_files = array();
 
@@ -1394,6 +1458,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 
 		In all other cases, we need to load the language files and plugins ourselves in some way.
 		*/
+		$plugin_suffix = '_src';
 
 		// Add core language(s)
 		$languages = array($cfg['tinymce_language']);
@@ -1409,7 +1474,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 		$themes = array('advanced');
 		foreach ($themes as $theme)
 		{
-			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
+			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $plugin_suffix . ".js");
 
 			foreach ($languages as $lang)
 			{
@@ -1426,7 +1491,7 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 			if (!is_real_tinyMCE_plugin($plugin))
 				continue;
 
-			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
+			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $plugin_suffix . ".js");
 
 			foreach ($languages as $lang)
 			{
@@ -1435,10 +1500,6 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 			}
 		}
 	}
-
-//echo "<pre>";
-//var_dump($mce_files);
-//echo "</pre>\n";
 
 	// now load all content:
 	$my_content = '';
@@ -1485,6 +1546,19 @@ EOT42;
 		}
 	}
 
+	if (!$stage2 && $suffix == '_dev')
+	{
+		// Add 2nd stage into the lazyload chain:
+		$my_content = preg_replace('/;\s*load\(\);\s*\}\(\)\);/', ';
+
+	// hack/tweak to make dev mode lazyloading work with the CCMS Combiner: delayload the language and plugin code as well!
+	include(\'../../../../2nd-stage.tiny_mce_ccms.js\');
+
+	load();
+}());
+			', $my_content);
+	}
+	
 	return $my_content;
 }
 

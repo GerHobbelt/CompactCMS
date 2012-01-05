@@ -131,8 +131,8 @@ body
 {
   /* font-size: 75%; */
   font-size:0.825em;
-  /* font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; */
-  font-family:'Palatino Linotype',Palatino, Baskerville, 'Book Antiqua', Georgia,serif;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; 
+  /* font-family:'Palatino Linotype',Palatino, Baskerville, 'Book Antiqua', Georgia,serif; */
   line-height:1.5; /* was: 1.6em in CCMS before */
 }
 

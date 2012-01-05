@@ -130,6 +130,7 @@ if(count($newsrows) > 0)
 					$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$page_name.'/'.rm0lead($rsNews->newsID).'-'.$newsTitle.'.html'.$preview_qry.'" title="'.$rsNews->newsTitle.'">'.$rsNews->newsTitle.'</a>';
 
 					$ccms['urlpage']   = $page_name . '/' . rm0lead($rsNews->newsID).'-'.$newsTitle;
+					$ccms['complete_page_url'] = $ccms['urlpage'] . '.html';
 					$ccms['pagetitle'] = $rsNews->newsTitle;
 					//$ccms['subheader']  = $row->subheader;
 					$ccms['desc']       = $rsNews->newsContent;
@@ -224,6 +225,7 @@ if(count($newsrows) > 0)
 		$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$page_name.'.html?do=all'.$preview_qry.'" title="'.$ccms['lang']['news']['viewarchive'].'">'.$ccms['lang']['news']['viewarchive'].'</a>';
 
 		$ccms['urlpage']   = $page_name . '?do=all';
+		$ccms['complete_page_url'] = $ccms['urlpage'] . '.html';
 		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['news']['viewarchive'];
 		//$ccms['subheader']  = $row->subheader;
 		//$ccms['desc']       = $rsNews->newsContent;

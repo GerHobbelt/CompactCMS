@@ -58,7 +58,7 @@ function show($foo)
          the comments should exhibit that the encoding is indeed UTF-8: no screwed-up names in there, 
          e.g. the 'Based on work by' comment line
 
-<p>link: <a href="/c/lib/includes/js/mootools-core.js,mootools-more.js,common.js,mochaUI.js"> /c/lib/includes/js/mootools-core.js,mootools-more.js,common.js,mochaUI.js </a>
+<p>link: <a href="/c/lib/includes/js/mootools-core.js,mootools-more.js,Fx.CmsAdminSlide.js,common.js,mochaUI.js"> /c/lib/includes/js/mootools-core.js,mootools-more.js,Fx.CmsAdminSlide.js,common.js,mochaUI.js </a>
 
 <p>link: <a href="/c/_install/install.css"> /c/_install/install.css </a> -- should NEVER be processed by the RewriteEngine!
 
@@ -72,7 +72,7 @@ function show($foo)
 
 <p>link: <a href="/c/_install/"> /c/_install/ </a> -- direct access to the installer (IFF it's there)
 
-<p> link: <a href="/c/lib/includes/js/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX"> tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX </a> -- see if the combiner processes the tinyMCE implicit source merge correctly + test the callback code generator at the end of the JS output
+<p> link: <a href="/c/lib/includes/js/tiny_mce/jscripts/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX"> tiny_mce/jscripts/tiny_mce/tiny_mce_ccms.js?cb=XXXXXXX </a> -- see if the combiner processes the tinyMCE implicit source merge correctly + test the callback code generator at the end of the JS output
 
 <p> link: <a href="/c/lib/includes/js/tiny_mce/examples/index.html"> tiny_mce/examples/index.html </a> -- the tinyMCE examples directory for testing
 

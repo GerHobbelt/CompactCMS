@@ -70,6 +70,87 @@ if(empty($_SESSION['ccms_userID']) && $cfg['protect'])
 // Do log-out (kill sessions) and redirect
 if($do == 'logout')
 {
+	// check if the current user is a 'switched to' user; check whether the switching info is valid.
+	//
+	// Note that the latter bit there is NOT about doing a full security check; any user which can
+	// manipulate the session data (e.g. by having the PHP coding page edit right) has everything you'll
+	// ever need to become an admin anyhow; we are not worried such users are 'bad guys' trying to
+	// hack the site; all security checks rather focus on whether you are a valid user or not-a-user.
+	// Keep that in mind when secuirty auditing. This bit has to be safe from attackers who do not
+	// have write access to the $_SESSION[] array.
+	if (checkAuth() 
+		&& !empty($_SESSION['ccms_userID']) 
+		/* && !empty($_SESSION['ccms_userName']) && !empty($_SESSION['ccms_userFirst']) && !empty($_SESSION['ccms_userLast']) */
+		&& !empty($_SESSION['ccms_userLevel']) && $_SESSION['ccms_userLevel'] >= 1  
+		&& !empty($_SESSION['ccms_isSwitchedUser']))
+	{
+		// set a default error message:
+		$logmsg = '<strong>Session data corruption or hack attempt. Access denied.</strong>';
+		
+		$su_arr = explode(':', $_SESSION['ccms_isSwitchedUser'], 3);
+		if (count($su_arr) != 3 || intval($su_arr[1]) != 4 /* admin level */)
+		{
+			// something was corrupted; treat this as a regular logout!
+		}
+		else
+		{
+			$values = array();
+			$values['userID'] = MySQL::SQLValue($su_arr[0], MySQL::SQLVALUE_NUMBER);
+			$values['userName'] = MySQL::SQLValue($su_arr[2], MySQL::SQLVALUE_TEXT);
+			$values['userLevel'] = MySQL::SQLValue($su_arr[1], MySQL::SQLVALUE_NUMBER);
+			$values['userActive'] = MySQL::SQLValue(true, MySQL::SQLVALUE_BOOLEAN);
+			$row = $db->SelectSingleRowArray($cfg['db_prefix'].'users', $values);
+
+			if ($db->ErrorNumber()) 
+			{
+				//$db->Kill();
+				$logmsg = $db->MyDyingMessage();
+			}
+			elseif ($db->RowCount() > 1)
+			{
+				// probably corrupt db table (corrupt import?) or hack attempt
+				$logmsg = '<strong>Database corruption or hack attempt. Access denied.</strong>';
+
+				// TODO: alert website owner about this failure/abuse. email to owner?
+			}
+			elseif(!$row)
+			{
+				// no match found in DB: user/pass combo doesn't exist!
+				//
+				// If no match: count attempt and show error
+			}
+			elseif($su_arr[2] != $row['userName'] || $row['userActive'] <= 0)
+			{
+				// If no match: count attempt and show error
+				//
+				// NOTE: code should never enter here!
+				//
+				$logmsg = 'INTERNAL ERROR!';
+			}
+			else
+			{
+				// Set system wide session variables
+				$_SESSION['ccms_isSwitchedUser'] = false;
+				
+				$_SESSION['ccms_userID']    = $row['userID'];
+				$_SESSION['ccms_userName']  = $row['userName'];
+				$_SESSION['ccms_userFirst'] = $row['userFirst'];
+				$_SESSION['ccms_userLast']  = $row['userLast'];
+				$_SESSION['ccms_userLevel'] = $row['userLevel'];
+
+				// [i_a] fix for session faking/hijack security issue:
+				// Setting safety variables as well: used for checkAuth() during the session.
+				SetAuthSafety();
+
+				unset($logmsg);
+				// Return functions result
+				header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
+				exit();
+			}
+		}
+		die_and_goto_url(null, $logmsg);
+	}
+	
 	// Unset all of the session variables.
 	$_SESSION = array();
 
@@ -102,6 +183,7 @@ if($do == 'logout')
 		exit();
 	}
 }
+
 
 
 /*

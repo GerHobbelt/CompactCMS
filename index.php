@@ -57,7 +57,7 @@ $ccms['extramenu']  = (isset($ccms['structure5']) ? $ccms['structure5'] : null);
 ccmsParser::setTemplateAndEchoPHP(BASE_PATH . '/lib/templates/'.$ccms['template'].'.tpl.html', $ccms, '<?php global $ccms, $cfg, $db, $modules, $v; ?>');
 
 
-if (0)
+if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 	dump_request_to_logfile(null, true, true, true);
 }

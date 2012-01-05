@@ -269,6 +269,14 @@ if($nextstep == '4' && checkAuth())
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$db_host,$db_user,$db_pass,$db_name,$db_prefix);
 
 	//
+	// make sure that these directories exist (previous manual efforts may have removed them):
+	//
+	@mkdir(BASE_PATH.'/media');
+	@mkdir(BASE_PATH.'/media/albums');
+	@mkdir(BASE_PATH.'/media/files');
+	@mkdir(BASE_PATH.'/lib/includes/cache');
+	
+	//
 	// Check for current chmod(); we only are interesting in whether these files and directories are readable and writeable:
 	// this also works out for Windows-based servers.
 	//
@@ -413,7 +421,7 @@ if($nextstep == '4' && checkAuth())
 		</table>
 
 		<hr noshade="noshade" />
-		<p class="ss_has_sprite quiet">
+		<p class="ss_has_sprite alert">
 			<span class="ss_sprite_16 ss_exclamation">&#160;</span><strong>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
@@ -649,7 +657,8 @@ if($nextstep == 'final' && checkAuth())
 		function setChmod($path, $value) 
 		{
 			// Check current chmod() status
-			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4) != $value) 
+			$perms = @fileperms(BASE_PATH.$path);
+			if ($perms === false || substr(sprintf('%o', $perms), -4) != $value) 
 			{
 				// If not set, set
 				if(@chmod(BASE_PATH.$path, $value)) 
@@ -661,6 +670,7 @@ if($nextstep == 'final' && checkAuth())
 			{
 				return true;
 			}
+			return false;
 		}
 
 		// Do chmod() per necessary folder and set status
@@ -683,7 +693,7 @@ if($nextstep == 'final' && checkAuth())
 		{
 			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files/directories.</abbr>';
 		}
-		if($chmod==0 || count($errfile) > 0) 
+		if ($chmod == 0 || count($errfile) > 0) 
 		{
 			$errors[] = 'Warning: could not chmod() all files.';
 			foreach ($errfile as $key => $value) 
@@ -704,7 +714,7 @@ if($nextstep == 'final' && checkAuth())
 		if ($conn_id !== false)
 		{
 			// Try to login using provided details
-			if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+			if (@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
 			{
 				// trimPath function
 				function trimPath($path,$depth) 
@@ -723,9 +733,9 @@ if($nextstep == 'final' && checkAuth())
 				$path   = $_POST['ftp_path'];
 
 				// Set max tries to 15
-				for ($i=1; $i<15; $i++) 
+				for ($i = 1; $i < 15; $i++) 
 				{ 
-					if(@ftp_chdir($conn_id, trimPath($path,$i))) 
+					if (@ftp_chdir($conn_id, trimPath($path,$i))) 
 					{
 						$log[] = "Successfully connected to FTP server";
 						$i = 15;
@@ -748,17 +758,17 @@ if($nextstep == 'final' && checkAuth())
 			if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
 			if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
 			// Directories under risk due to chmod(0777)
-			if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
-			if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
+			if(@ftp_chmod($conn_id, 0777, "./content")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
+			if(@ftp_chmod($conn_id, 0777, "./media")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
 			if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
-			if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
-			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+			if(@ftp_chmod($conn_id, 0777, "./media/files")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
 
-			if($ftp_chmod>0) 
+			if($ftp_chmod > 0) 
 			{
 				$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files/directories using FTP.</abbr>';
 			} 
-			if($ftp_chmod==0 || count($errfile) > 0) 
+			if($ftp_chmod == 0 || count($errfile) > 0) 
 			{
 				$errors[] = 'Fatal: could not FTP chmod() various files.';
 				foreach ($errfile as $key => $value) 
@@ -868,8 +878,8 @@ if($nextstep == 'final' && checkAuth())
 		$newpath    = $_SESSION['variables']['rootdir'];
 
 		// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
-		$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
-		$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<IfDefine CCMS_installed>)/', '# \\2', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<\/IfDefine>(\s*#\s*CCMS_installed)?)/', '# \\2', $htaccess);
 
 		// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
 		$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);

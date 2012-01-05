@@ -166,7 +166,13 @@ $status_message = getGETparam4DisplayHTML('msg');
 	}
 	else
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+	?>
+	<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+
+	<div class="right">
+		<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+	</div>
+	<?php
 	}
 	?>
 

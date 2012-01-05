@@ -47,6 +47,59 @@ if (!defined('BASE_PATH')) die('BASE_PATH not defined!');
 
 
 
+/**
+Regenerates a properly secured session CHECK CODE: it immediately replaces the old one, so anyone
+checking against this item is rejected, unless they pass in this latest CHECK CODE.
+
+To prevent session replay issue hijacking, the CHECK ID is constructed from both 'secret' and
+time-dependent data. Since we should not leak the 'secret data', it is double-hashed before 
+ending up in the CHECK CODE.
+*/
+function generate_session_sidpatch()
+{
+	global $cfg, $ccms;
+
+	$secret = md5($cfg['authcode'] . 'SIDcheck');
+	$time_dep_data = md5($secret.mt_rand().time().mt_rand());
+	
+	// make sure we use a unique (with high probability) tag name for inclusion in form submits or URL query sections:
+	$getid = 'S'.substr($time_dep_data, 0, 8);
+	$sesid = session_id();
+	$sesname = session_name();
+	// the SWF.Upload / FancyUpload FLASH components do pass along the cookies, but as extra URL query entities:
+	if (!empty($_GET[$getid]))
+	{
+		$sesid = preg_replace('/[^A-Za-z0-9]/', 'X', $_GET[$getid]);
+
+		/*
+		 * Before we set the sessionID, we'd better make darn sure it's a legitimate request instead of a hacker trying to get in:
+		 *
+		 * however, before we can access any $_SESSION[] variables do we have to load the session for the given ID.
+		 */
+		session_id($sesid);
+		if (!session_start()) die('session_start(SIDPATCH) failed');
+		//session_write_close();
+		if (!empty($_GET['SIDCHK']) && !empty($_SESSION['fup1']) && $_SESSION['fup1'] == $_GET['SIDCHK'])
+		{
+			//echo " :: legal session ID forced! \n";
+			//session_id($sesid);
+		}
+		else
+		{
+			//echo " :: illegal session override! IGNORED! \n";
+
+			// do NOT nuke the session; this might have been a interloper trying a DoS attack... let it all run its natural course.
+			$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
+
+			die_and_goto_url(null, $ccms['lang']['auth']['featnotallowed']); // default URL: login!
+		}
+	}
+	else
+	{
+		if (!session_start()) die('session_start(SIDCHECK_ALT) failed');
+	}
+}
+
 function check_session_sidpatch_and_start()
 {
 	global $cfg, $ccms;
@@ -299,10 +352,31 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 	function setup_ccms_for_40x_error($rcode, $pagereq)
 	{
-		global $cfg, $ccms;
+		global $cfg, $ccms, $_SERVER;
 
 		// ERROR 403/404; if not 403, then we default to 404
 		// Or if DB query returns zero, show error 404: file does not exist
+		
+		// support custom Apache ErrorDocument rewrites, which use SERVER['REDIRECT_URL'], etc.:
+		$content = "";
+		$complete_pageurl = $pagereq . ".html";
+		if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+		{
+			$content .= sprintf("<p>resp code: %d, req: %s, redir url: %s</p>", $rcode, $pagereq, !empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : '---');
+		}
+		if (is_http_response_code($pagereq) && !empty($_SERVER['REDIRECT_URL']))
+		{
+			$offending_pageurl = /* filterParam4URL */ filterParam4FullFilePath($_SERVER['REDIRECT_URL']);
+			if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+			{
+				$content .= sprintf("<p>resp code: %d, req: %s, redir url: %s, name: %s</p>", $rcode, $pagereq, (!empty($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : '---'), $offending_pageurl);
+			}
+			// check whether we have a 40x for a 'sane' page or for some sort of hack attempt: the latter will have a 'nasty' url (which won't equal the filtered one):
+			if (!empty($offending_pageurl) && $offending_pageurl == $_SERVER['REDIRECT_URL'])
+			{
+				$complete_pageurl = $offending_pageurl;
+			}
+		}
 
 		set_ccms_opt('module', 'error');
 		set_ccms_opt('module_info', null);
@@ -324,6 +398,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('iscoding', "Y");
 		set_ccms_opt('rootdir', $cfg['rootdir']);
 		set_ccms_opt('urlpage', $pagereq); // "404" or 'real' page -- the pagename is already filtered so no bad feedback can happen here, when site is under attack
+		set_ccms_opt('complete_page_url', $complete_pageurl);
 		$desc = $ccms['lang']['system']['error_404title'];
 		set_ccms_opt('desc_extra', '');
 		set_ccms_opt('keywords', strval($rcode));
@@ -339,7 +414,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 		set_ccms_opt('templatedir', $tplel[0]);
 		set_ccms_opt('template', $tpl);
 
-		$content = $ccms['lang']['system']['error_404content'];
+		$content .= $ccms['lang']['system']['error_404content'];
 
 		switch ($rcode)
 		{
@@ -368,10 +443,20 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 
 		set_ccms_opt('title', ucfirst($ccms['pagetitle']).' - '.$ccms['sitename'].' | '.$ccms['subheader']);
 
-		// even under error conditions, we need the side-effect of the content loader code: a properly initialized template!
+		/*
+		Even under error conditions, we need the side-effect of the content loader code: a properly initialized template!
+		
+		Also allow the template to override / augment the error page content: when it sets the 'content' slot, we won't override
+		it with the default error message below.
+		*/
+		set_ccms_opt('content40x', $content);
 		$rendered_page = ccmsContent(null, 'Y', false);
 		//$content = $rendered_page['content'];
 		//$rcode = $rendered_page['responsecode'];
+		if (!empty($rendered_page['content']))
+		{
+			$content = $rendered_page['content'];
+		}
 
 		set_ccms_opt('content', $content);
 	}
@@ -522,7 +607,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				$sub_done = false;
 
 				// Start this menu root item: UL
-				$ccms[$current_structure] = '<ul>';
+				$menu_id = 'menu_list_id_' . $current_menuID . '_' . $top_idx;
+				$ccms[$current_structure] = '<ul id="' . $menu_id . '">';
 
 				// prevent loading the next record on the next round through the loop:
 				$dummy_top_written = true;
@@ -559,7 +645,8 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				}
 				else
 				{
-					$ccms[$current_structure] .= "\n<ul class=\"sublevel\">\n";
+					$menu_id = 'menu_list_id_' . $current_menuID . '_' . $top_idx;
+					$ccms[$current_structure] .= "\n<ul class=\"sublevel\" id=\"" . $menu_id . "\">\n";
 				}
 				$sub_idx++;
 				$sub_done = true;
@@ -586,7 +673,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				$current_class = '';
 				$menu_item_class = 'menu_item_dummy';
 			}
-			else if ($row['islink'] != "Y")
+			else if ($row['islink'] != 'Y')
 			{
 				$current_link = '#';
 				$menu_item_class = 'menu_item_nolink';
@@ -620,25 +707,52 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 			$current_link_classes = trim($current_class . ' ' . $menu_item_class);
 			if (!empty($current_link_classes))
 			{
-				$current_link_classes = 'class="' . $current_link_classes . '"';
+				$current_link_classes = 'class="' . $current_link_classes . '" ';
 			}
-			$menu_item_text = '<a '.$current_link_classes.' href="'.$current_link.'" title="'.$link_title.'">'.$link_text.'</a>'.$current_extra;
+			// no HTML tags allowed in the 'title' attribute!
+			$menu_item_text = '<a '.$current_link_classes.'href="'.$current_link.'" title="'.strip_tags($link_title).'">'.$link_text.'</a>'.$current_extra;
 
-			$menu_top_class = 'menu_item' . ($top_idx % 2);
-			$menu_sub_class = 'menu_item' . ($sub_idx % 2);
+			/*
+			most flexible approach to custom-render particular [series of] menu items:
+			when you wish to detect _series_ of menu entries, you can XML-parse the generated
+			UL/LI-based structure and extract the UL and LI ID's to, for example, produce 
+			odd/even classes in the regenerated structure.
+			
+			Of course, this is assumed to happen in your template's init.inc.php, maybe using
+			simplexml_load_string() (http://nl3.php.net/manual/en/function.simplexml-load-string.php)
+			et al.
+			
+			See the ccms default template for a (contrived) example.
+			*/
+			$menu_item_id = 'menu_item_id_' . $current_menuID . '_' . $top_idx . '_' . $sub_idx;
 
 			if ($dummy_top_written)
 			{
 				$menu_item_text = '<span ' . $current_link_classes . '>-</span>';
-				$ccms[$current_structure] .= '<li class="' . trim( /* $current_class . ' ' . */ $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
+				$menu_item_classes = trim( /* $current_class . ' ' . */ $menu_item_class);
+				if (!empty($menu_item_classes))
+				{
+					$menu_item_classes = 'class="' . $menu_item_classes . '" ';
+				}
+				$ccms[$current_structure] .= '<li ' . $menu_item_classes . 'id="' . $menu_item_id . '">' . $menu_item_text;
 			}
 			else if ($row['sublevel'] != 0)
 			{
-				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_sub_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
+				$menu_item_classes = trim($current_class . ' ' . $menu_item_class);
+				if (!empty($menu_item_classes))
+				{
+					$menu_item_classes = 'class="' . $menu_item_classes . '" ';
+				}
+				$ccms[$current_structure] .= '<li ' . $menu_item_classes . 'id="' . $menu_item_id . '">' . $menu_item_text;
 			}
 			else
 			{
-				$ccms[$current_structure] .= '<li class="' . trim($current_class . ' ' . $menu_top_class . ' ' . $menu_item_class) . '">' . $menu_item_text;
+				$menu_item_classes = trim($current_class . ' ' . $menu_item_class);
+				if (!empty($menu_item_classes))
+				{
+					$menu_item_classes = 'class="' . $menu_item_classes . '" ';
+				}
+				$ccms[$current_structure] .= '<li ' . $menu_item_classes . 'id="' . $menu_item_id . '">' . $menu_item_text;
 			}
 		}
 
@@ -715,6 +829,7 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 				set_ccms_opt('sitename', $cfg['sitename']);
 				set_ccms_opt('rootdir', $cfg['rootdir']);
 				set_ccms_opt('urlpage', $row->urlpage);
+				set_ccms_opt('complete_page_url', $row->urlpage . '.html');
 				set_ccms_opt('pagetitle', $row->pagetitle);
 				set_ccms_opt('subheader', $row->subheader);
 
@@ -892,6 +1007,12 @@ if($current != "sitemap.php" && $current != 'sitemap.xml' && $pagereq != 'sitema
 	if (is_http_response_code($ccms['responsecode']))
 	{
 		send_response_status_header($ccms['responsecode']);
+	}
+	
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		dump_request_to_logfile(array('invocation_mode' => get_interpreter_invocation_mode()),
+								true, true, true);
 	}
 }
 else /* if($current == "sitemap.php" || $current == "sitemap.xml") */   // [i_a] if() removed so the GET URL index.php?page=sitemap doesn't slip through the cracks.

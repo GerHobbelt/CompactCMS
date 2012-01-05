@@ -166,7 +166,7 @@ if($do_action == 'edit-user-details' && $_SERVER['REQUEST_METHOD'] == 'POST' && 
 		if($perm->is_level_okay('manageUsers', $_SESSION['ccms_userLevel']) || $_SESSION['ccms_userID'] == $userID)
 		{
 			// Check length of values
-			if(strlen($userFirst) > 2 && strlen($userLast) > 2 && strlen($userEmail) > 6)
+			if(strlen($userFirst) >= 1 && strlen($userLast) >= 1 && strlen($userEmail) > 6)
 			{
 				$values = array(); // [i_a] make sure $values is an empty array to start with here
 				$values['userFirst'] = MySQL::SQLValue($userFirst,MySQL::SQLVALUE_TEXT);

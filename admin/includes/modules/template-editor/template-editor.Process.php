@@ -97,7 +97,10 @@ if($do_action == 'save-template' && $_SERVER['REQUEST_METHOD'] == 'POST' && chec
 
 			if (is_writable_ex($filename))
 			{
-				if (!$handle = fopen($filename, 'w'))  throw new FbX($ccms['lang']['system']['error_openfile'].' ('.$filename.').');
+				if (!$handle = fopen($filename, 'w')) 
+				{
+					throw new FbX($ccms['lang']['system']['error_openfile'].' ('.$filename.').');
+				}
 				if (fwrite($handle, $content) === FALSE)
 				{
 					fclose($handle);

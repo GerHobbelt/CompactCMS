@@ -218,7 +218,8 @@ Make sure the admin content has a scrollbar when needed. Override body+html:over
 	padding: 10px;
 	min-height: 45px;
 }
-a#clockLink
+a#clockLink, 
+a#clearCacheLink
 {
 	text-decoration: none;
 }
@@ -373,7 +374,7 @@ a.edit, a.editinplace:hover
 	height:25px;
 	background-position: 0 -199px;
 }
-#notify .rounded-border
+#notify #notify_box
 {
 	background-color: #EED9BA;
 	border: 2px solid #C7892E;
@@ -382,6 +383,15 @@ a.edit, a.editinplace:hover
 	margin: 0;
 	padding: 0;
 	text-align: left;
+	
+	/* 
+	making sure the notify box is sized to the max height of both notify icon and notification text,
+	inspired by the first section of  http://matthewjamestaylor.com/blog/equal-height-columns-cross-browser-css-no-hacks
+	
+	This is the 'container' of that story.
+	*/
+	float: left;
+	width: 100%;
 }
 .notify
 {
@@ -396,6 +406,10 @@ a.edit, a.editinplace:hover
 	width: 65px;
 	float:left;
 	margin-top: 20px;
+}
+.eraser#notify_icon
+{
+	background-position: 0 -380px;
 }
 /*
 IE6 fix:
@@ -433,6 +447,13 @@ IE6 fix:
 {
 	padding-top: 10px;
 	padding-bottom: 10px;
+	padding-right: 10px;
+
+	min-height: 60px;
+	/* margin-left: 80px; */
+	
+	float: left;
+	width: 390px;
 }
 #notify_res p
 {
@@ -464,6 +485,84 @@ IE6 fix:
 	margin: .1em 0 .1em 0;
 }
 
+#notify #extra_tools_box
+{
+	background-color: #EED9BA;
+	border: 2px solid #C7892E;
+	border-radius: 10px;
+	/* min-height: 20px; */
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	
+	/* 
+	making sure the notify box is sized to the max height of both notify icon and notification text,
+	inspired by the first section of  http://matthewjamestaylor.com/blog/equal-height-columns-cross-browser-css-no-hacks
+	
+	This is the 'container' of that story.
+	*/
+	float: left;
+	width: 100%;
+}
+table#extra_toolbar
+{
+	width: 100%;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+#extra_toolbar td /* div */
+{
+	/* float: left; */
+	/* width: 25%; */
+	border: 0;
+	margin: 0;
+	padding: 3px;
+	
+	text-align: center;
+	font-variant: small-caps;
+	font-size: 1em;
+}
+#extra_toolbar form
+{
+	/* border: 1px solid #CB9E34; /* #C7892E; */
+	border-width: 0;
+	background-color: #EFDFBC;
+	border-radius: 7px;
+	padding: 1px 3px;
+	margin: 0;
+}
+#extra_toolbar select
+{
+	font-size: 11px;
+	
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+#extra_toolbar select
+{
+	background-color: #EFDFBC; /* same as form bg */
+	width: 18px;	/* only show the dropdown box/icon */
+}
+#extra_toolbar optgroup, #extra_toolbar option
+{
+	font-size: 12px;
+	background-color: #FFF;
+}
+#extra_toolbar button
+{
+	float: none;
+	display: inline;
+	background-color: #EFDFBC; /* same as form bg */
+}
+#extra_toolbar button#su_userbtn
+{
+	padding: 0 0 0 3px;
+	border: 0;
+	margin: 0;
+}
+
 #advanced ul
 {
 	margin: 5px;
@@ -472,11 +571,6 @@ IE6 fix:
 #advanced li
 {
 	line-height: 1.8em;
-}
-#notify_res
-{
-	min-height: 60px;
-	margin-left: 80px;
 }
 #notify_res p.h1
 {
@@ -719,6 +813,16 @@ div.tip-text {
 	border-radius: 10px;
 	padding:10px;
 }
+
+#install-wrapper .error,
+#install-wrapper .alert, 
+#install-wrapper .notice,
+#install-wrapper .success, 
+#install-wrapper .info 			
+{ 
+	border-radius: 5px;
+}
+
 #loginFrm label
 {
 	display: block;
@@ -728,10 +832,15 @@ div.tip-text {
 	display: block;
 	margin-top:10px;
 }
-#login-wrapper h2, #install-dir-warning-wrapper h2, #install-wrapper h2
+#login-wrapper h2, #install-wrapper h2
 {
 	font-size:1.2em;
 	border-bottom:solid 1px #90D244;
+}
+#install-dir-warning-wrapper h2
+{
+	font-size:1.2em;
+	border-bottom:solid 2px #FAB6B9;
 }
 .loginMsg, .installMsg
 {
@@ -900,6 +1009,10 @@ div.module
 {
 	overflow: auto;
 }
+#status-report
+{
+	display: none;
+}
 .spinner
 {
 	z-index: 9998;
@@ -928,7 +1041,10 @@ div.module
 }
 .spinner-content .loading
 {
-	background: transparent url('../spinner.gif') no-repeat center center;
+	background-color: transparent;
+	background-image: url('../spinner.gif');
+	background-repeat: no-repeat;
+	background-position: center center;
 	min-width: 100px;
 	min-height: 100px;
 }
@@ -951,7 +1067,8 @@ div.warning
 	color:#8a1f11;
 	padding:.1em;
 	margin-bottom:1em;
-	border:2px solid #FBC2C4;
+	border: 2px solid #FBC2C4;
+	border-bottom: solid 2px #FAB6B9;
 
 	border-radius: 5px;
 }
@@ -1049,7 +1166,7 @@ and the other victims of layout:
 
 the backup management page...
 */
-form#create-arch, form#delete-arch
+form#delete-arch
 {
 	overflow: hidden;
 	height: 1%;             /* IE6 needs this */
@@ -1260,7 +1377,7 @@ PLUS: same password strength liquid layout story again for #edit-user-details
 #edit-page textarea
 {
 	/* height: 345px; */
-	/* width: 99%;       -- see common.inc.php :: generateJS4tinyMCEinit() 'lessons learned': the width MUST be PERCENTAGE and it MUST be placed in a STYLE attribute in the <textarea> element itself! */
+	/* width: 99%;       -- see common.inc.php :: class tinyMCEcodeGen 'lessons learned': the width MUST be PERCENTAGE and it MUST be placed in a STYLE attribute in the <textarea> element itself! */
 	color: #000;
 }
 

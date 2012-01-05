@@ -612,7 +612,7 @@ if (!empty($argv[0]) && stristr($argv[0], '.php') !== false &&
 		{
 			if($mtime==-1)
 				$mtime=time();
-			$fp = @fopen($file, "wb");
+			$fp = @fopen($file, 'wb');
 			if ($fp) {
 				fwrite($fp, $content);
 				fclose($fp);

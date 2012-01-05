@@ -126,7 +126,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 		$values['userPass'] = MySQL::SQLValue($userPass, MySQL::SQLVALUE_TEXT);
 		$values['userActive'] = MySQL::SQLValue(false, MySQL::SQLVALUE_BOOLEAN);
 		$matchNumRows = $db->SelectSingleValue($cfg['db_prefix'].'users', $values, 'COUNT(userID)');
-		if($matchNumRows>0)
+		if ($matchNumRows > 0)
 		{
 			$logmsg = rawurlencode($ccms['lang']['login']['notactive']);
 		}
@@ -172,6 +172,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 					$_SESSION['ccms_userFirst'] = $row['userFirst'];
 					$_SESSION['ccms_userLast']  = $row['userLast'];
 					$_SESSION['ccms_userLevel'] = $row['userLevel'];
+					$_SESSION['ccms_isSwitchedUser'] = false;
 
 					// [i_a] fix for session faking/hijack security issue:
 					// Setting safety variables as well: used for checkAuth() during the session.
@@ -207,16 +208,20 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 	</head>
 <body>
 
+<?php
+if(!empty($status_message))
+{
+?>
 <div id="logon-error-report-wrapper" class="container-18">
 	<div class="center-text <?php echo $status; ?>">
 		<?php
-		if(!empty($status_message))
-		{
-			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
-		}
+		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
 		?>
 	</div>
 </div>
+<?php
+}
+?>
 
 <?php
 // yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):
