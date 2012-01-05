@@ -54,29 +54,40 @@ if (!defined('BASE_PATH'))
  * URLs and local paths in here MUST be absolute: use $cfg['rootdir'] and BASE_PATH respectively to make it so.
  */
 
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
+
 // If session already exists
-if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && CheckAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
+if(!empty($_SESSION['ccms_userID']) && !empty($_SESSION['ccms_userName']) && checkAuth()) // [i_a] session vars must exist AND NOT BE EMPTY to be deemed valid.
 {
-	header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php'));
+	$qry = '';
+	if (!empty($status) || !empty($status_message))
+	{
+		$qry = '?status=' . rawurlencode($status) . '&msg=' . rawurlencode(!empty($status_message) ? $status_message : $ccms['lang']['system']['error_general']);
+	}
+	header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/index.php') . $qry);
 	exit();
 }
 
 // Check for ./install directory
-if(is_dir(BASE_PATH . '_install/') && !$cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+if ($cfg['install_dir_exists'] && !$cfg['install_dir_override'])
 {
 	die('<strong>Security risk: the installation directory is still present.</strong><br/>Either first <a href="../../_install/">run the installer</a>, or remove the <em>./_install</em> directory, before accessing <a href="../../admin/">the back-end</a>.');
 }
 
 $userName = strtolower(getPOSTparam4IdOrNumber('userName'));
-$status = getGETparam4IdOrNumber('status');
-$status_message = getGETparam4DisplayHTML('msg');
+// also allow logon actions where the user is already 'pre-configured'; easy logon!
+if (empty($userName))
+{
+	$userName = strtolower(getGETparam4IdOrNumber('logon_user'));
+}
 
 // Do authentication
 if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	/*
 	 * This code does NOT require that the submitted data (user+pass) originates from the
-	 * web form below and was entered in the same session (as we don't have the CheckAuth()
+	 * web form below and was entered in the same session (as we don't have the checkAuth()
 	 * condition checked in the if(...) above).
 	 *
 	 * This is intentional: users may store the login credentials in any form and still log
@@ -115,7 +126,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 		$values['userPass'] = MySQL::SQLValue($userPass, MySQL::SQLVALUE_TEXT);
 		$values['userActive'] = MySQL::SQLValue(false, MySQL::SQLVALUE_BOOLEAN);
 		$matchNumRows = $db->SelectSingleValue($cfg['db_prefix'].'users', $values, 'COUNT(userID)');
-		if($matchNumRows>0)
+		if ($matchNumRows > 0)
 		{
 			$logmsg = rawurlencode($ccms['lang']['login']['notactive']);
 		}
@@ -161,6 +172,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 					$_SESSION['ccms_userFirst'] = $row['userFirst'];
 					$_SESSION['ccms_userLast']  = $row['userLast'];
 					$_SESSION['ccms_userLevel'] = $row['userLevel'];
+					$_SESSION['ccms_isSwitchedUser'] = false;
 
 					// [i_a] fix for session faking/hijack security issue:
 					// Setting safety variables as well: used for checkAuth() during the session.
@@ -196,16 +208,36 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 	</head>
 <body>
 
+<?php
+if(!empty($status_message))
+{
+?>
 <div id="logon-error-report-wrapper" class="container-18">
 	<div class="center-text <?php echo $status; ?>">
 		<?php
-		if(!empty($status_message))
-		{
-			echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
-		}
+		echo '<p class="ss_has_sprite"><span class="ss_sprite_16 '.($status == 'notice' ? 'ss_accept' : 'ss_error').'">&#160;</span>'.$status_message.'</p>';
 		?>
 	</div>
 </div>
+<?php
+}
+?>
+
+<?php
+// yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):
+printf("<p>install_dir = %s, base path = %s, isdir = %d, isfile = %d", 1 * $cfg['install_dir_exists'], BASE_PATH, is_dir(BASE_PATH . '/_install/'), is_file(BASE_PATH . '/_install/index.php'));
+if ($cfg['install_dir_exists'])
+{
+?>
+<div id="install-dir-warning-wrapper" class="container-18">
+	<div class="center-text warning">
+		<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['warning']; ?></h2>
+		<p class="center-text"><?php echo $ccms['lang']['backend']['install_dir_exists']; ?></p>
+	</div>
+</div>
+<?php
+}
+?>
 
 <div id="login-wrapper" class="container-18">
 	<div id="help" class="span-8 colborder">
@@ -213,7 +245,7 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 			<h1>CompactCMS administration</h1>
 		</div>
 		<h2><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['login']['login']; ?></h2>
-		<p><?php echo $ccms['lang']['login']['welcome'];?></p>
+		<p><?php echo $ccms['lang']['login']['welcome']; ?></p>
 	</div>
 
 	<div id="login" class="span-9 last">
@@ -228,53 +260,47 @@ if(isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] == 'POST')
 		</form>
 	</div>
 </div>
-<p class="quiet small" style="text-align:center;">&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
+<p class="quiet small center-text" >&copy; 2010 <a href="http://www.compactcms.nl" title="Maintained with CompactCMS.nl">CompactCMS.nl</a></p>
 
 <script type="text/javascript" charset="utf-8">
-
+<?php
 /*
-we're parsed before the external file will be; make it call back to us to execute the check and optional redirect:
-*/
-function jump_if_not_top()
-{
-	/*
-	 * make sure we are NOT loaded in a [i]frame (~ MochaUI window)
-	 *
-	 * code bit taken from mootools 'domready' internals; rest derived from
-	 *   http://tjkdesign.com/articles/frames/4.asp#breaking
-	 */
-	var isFramed = false;
-	// Thanks to Rich Dougherty <http://www.richdougherty.com/>
-	try
-	{
-		isFramed = (window.frameElement != null);
-	}
-	catch(e){}
-	/* another way to detect placement in a frame/iframe */
-	try
-	{
-		var f = (top != this);
-		if (f) isFramed = true;
-	}
-	catch(e){}
-	/* and for those rare occasions where the login screen is (inadvertedly) loaded through an AJAX load into a <div> or other in the current document: */
-	try
-	{
-		if (this.location && this.location.href)
-		{
-			var f = (this.location.href.indexOf("<?php echo $_SERVER['PHP_SELF']; ?>") < 0);
-			if (f) isFramed = true;
-		}
-	}
-	catch(e){}
+In-line JavaScript is parsed before the external file will be; make it call back to us to execute the check and optional redirect.
 
-	if (isFramed)
+However...
+
+The /external/ script won't be loaded when this page is fetched due to a session timeout or authentication error, when the request
+is performed through a mootools Request.HTML action. (stripScripts() drops items like these!)
+
+Hence we have to check whether the functions loaded there actually exist and only act when they do. (We can assume the functions
+have been loaded by the page issuing the Request.HTML action, so there's no need for panic when we are in such a situation where
+our external script load is discarded through Request.HTML + stripScripts() inside mootools.
+
+This is further complicated due to the lazy-loading process: when this page is loaded as-is, the external file will be
+parsed AFTER the code above has been executed, while, when loaded through Request.HTML, we cannot be sure the functions we need
+have been lazyloaded yet, so we must make sure we don't crash the browser by invoking functions which
+are not (yet) available when executing the code above.
+
+
+The real redirect-when-we're-not-the-top-page-itself magicking happens in the jump_if_not_top() function. jump_if_not_top2() is
+here to make sure we invoke it only when it is actually available.
+
+This means that EVERY admin page MUST load 'the_goto_guy.js', whether they use it themselves or not: the unlying code may decide
+the session is invalid and go through here, where availability is required for suitable action.
+*/
+?>
+function jump_if_not_top2()
+{
+	if (typeof window.jump_if_not_top == 'function')
 	{
-		close_mochaUI_window_or_goto_url("<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>", null);
+		//alert('invoking jump_if_not_top');
+		window.jump_if_not_top("<?php echo $_SERVER['PHP_SELF']; ?>", "<?php echo makeAbsoluteURI($_SERVER['PHP_SELF']); ?>");
 	}
 }
 
+jump_if_not_top2();
+
 </script>
-<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top" charset="utf-8"></script>
+<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/includes/js/the_goto_guy.js?cb=jump_if_not_top2" charset="utf-8"></script>
 </body>
 </html>

@@ -75,7 +75,9 @@ define('THUMBNAIL_JPEG_QUALITY', 70);
 
 // Set default variables
 $album_name = getPOSTparam4Filename('album');
-$do_action  = getGETparam4IdOrNumber('action');
+
+$page_id = getGETparam4IdOrNumber('page_id');
+$do_action = getGETparam4IdOrNumber('action');
 
 
 
@@ -86,24 +88,24 @@ $do_action  = getGETparam4IdOrNumber('action');
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 {
-	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id);
 	try
 	{
 		if(!empty($album_name))
 		{
-			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id . '&album=' . $album_name);
 
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 			{
-				if($album_name!=null)
+				if(!empty($album_name))
 				{
 					$dest = BASE_PATH.'/media/albums/'.$album_name;
 					if(!is_dir($dest))
 					{
-						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', "w"))
+						if(@mkdir($dest) && @mkdir($dest.'/_thumbs') && @fopen($dest.'/info.txt', 'w'))
 						{
-							header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
+							header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
 							exit();
 						}
 						else
@@ -128,7 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['system']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_tooshort']);
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -144,7 +146,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'create-album')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
 {
-	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id);
 	try
 	{
 		// Only if current user has the rights
@@ -177,7 +179,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
 				}
 				if($total==$i)
 				{
-					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
+					header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'])));
 					exit();
 				}
 				else
@@ -204,14 +206,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-album')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 {
-	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id);
 	try
 	{
-		$album = getGETparam4Filename('album');
+		$album_name = getGETparam4Filename('album');
 
-		if(!empty($album))
+		if(!empty($album_name))
 		{
-			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album);
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id . '&album=' . $album_name);
 
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
@@ -220,9 +222,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 				$total = (!empty($_POST['imageName']) && is_array($_POST['imageName']) ? count($_POST['imageName']) : 0);
 
 				// If nothing selected, throw error
-				if($total==0)
+				if($total == 0)
 				{
-					throw new FbX($ccms['lang']['system']['error_selection'], 'album=' . $album);
+					throw new FbX($ccms['lang']['system']['error_selection']);
 				}
 
 				$i=0;
@@ -232,8 +234,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 
 					if(!empty($picname))
 					{
-						$file   = BASE_PATH.'/media/albums/'.$album.'/'.$picname;
-						$thumb  = BASE_PATH.'/media/albums/'.$album.'/_thumbs/'.$picname;
+						$file   = BASE_PATH.'/media/albums/'.$album_name.'/'.$picname;
+						$thumb  = BASE_PATH.'/media/albums/'.$album_name.'/_thumbs/'.$picname;
 						if(is_file($file))
 						{
 							// first kill the thumbnail: if anything goes wrong then, we always regenerate later.
@@ -259,7 +261,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
 					$i++;
 				}
 
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'].' ('.$i.' '.$ccms['lang']['album']['files'].')').'&album='.$album));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullremoved'].' ('.$i.' '.$ccms['lang']['album']['files'].')')));
 				exit();
 			}
 			else
@@ -285,12 +287,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-images')
  */
 if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 {
-	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id);
 	try
 	{
 		if(!empty($album_name))
 		{
-			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album_name);
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id . '&album=' . $album_name);
 
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
@@ -304,7 +306,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 				{
 					if (fwrite($handle, $topage."\r\n".$description))
 					{
-						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?album='.$album_name.'&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
+						header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['settingssaved'])));
 						exit();
 					}
 					else
@@ -319,7 +321,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'apply-album')
 			}
 			else
 			{
-				throw new FbX($ccms['lang']['system']['featnotallowed']);
+				throw new FbX($ccms['lang']['auth']['featnotallowed']);
 			}
 		}
 		else
@@ -346,18 +348,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && ($do_action == 'save-files' || $do_ac
 	$error      = false;
 	$error_code = 0;
 
-	if (!checkAuth() || ($do_action == 'save-files' && (empty($_GET['SIDCHK']) || $_SESSION['fup1'] != $_GET['SIDCHK'])))
-	{
-if (0)
-{
-		dump_request_to_logfile();
-}
-		// $_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-
-		$error = $ccms['lang']['auth']['featnotallowed'];
-		$error_code = 403;
-	}
-
 	if (empty($error))
 	{
 		/*
@@ -370,8 +360,6 @@ if (0)
 		 *
 		 *          Alas.
 		 */
-		//$_SESSION['fup1'] = md5(mt_rand().time().mt_rand());
-
 		$dest = BASE_PATH.'/media/albums/'.$album_name;
 		if(!is_dir($dest))
 		{
@@ -391,7 +379,7 @@ if (0)
 	$target_filename = (isset($_FILES['Filedata']) && !empty($_FILES['Filedata']['name']) ? $_FILES['Filedata']['name'] : null);
 	// make filename safe but try to keep it unique at the same time!
 	$target_filename = filterParam4Filename($target_filename, null, true);
-	
+
 	// Set file and get file extension
 	$extension = strtolower(pathinfo($target_filename, PATHINFO_EXTENSION));
 
@@ -582,7 +570,12 @@ if (0)
 
 		case 'png':
 			imagepng($tmp, $original, 9);
-			imagepng($tmp_t, $thumbnail, 9);
+
+			$t = $dest . '/_thumbs/' . basename($f, pathinfo($f, PATHINFO_EXTENSION)) . '.jpg';  // could be done as pathinfo($f, PATHINFO_FILENAME), but that's for PHP 5.2+ only!
+			@unlink($t);
+
+			imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
+			//imagepng($tmp_t, $thumbnail, 9);
 			break;
 
 		case 'gif':
@@ -647,11 +640,11 @@ if (0)
 		{
 			if (empty($error))
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated']).'&album='.$album_name));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['itemcreated'])));
 			}
 			else
 			{
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=error&msg='.rawurlencode($return['error'] . (!empty($return['code']) ? ' (' . $return['code'] . ')' : '')).'&album='.$album_name));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=error&msg='.rawurlencode($return['error'] . (!empty($return['code']) ? ' (' . $return['code'] . ')' : ''))));
 			}
 		}
 //  }
@@ -662,21 +655,21 @@ if (0)
 /**
  * Regenerate all thumbnails. This will delete any existing thumbnails!
  */
-if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
+if($_SERVER['REQUEST_METHOD'] == 'GET' && $do_action == 'confirm_regen')
 {
-	FbX::SetFeedbackLocation('lightbox.Manage.php');
+	FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id);
 	try
 	{
-		$album = getGETparam4Filename('album');
+		$album_name = getGETparam4Filename('album');
 
-		if(!empty($album))
+		if(!empty($album_name))
 		{
-			FbX::SetFeedbackLocation('lightbox.Manage.php', 'album=' . $album);
+			FbX::SetFeedbackLocation('lightbox.Manage.php', 'page_id=' . $page_id . '&album=' . $album_name);
 
 			// Only if current user has the rights
 			if($perm->is_level_okay('manageModLightbox', $_SESSION['ccms_userLevel']))
 			{
-				$dest = BASE_PATH.'/media/albums/'.$album;
+				$dest = BASE_PATH.'/media/albums/'.$album_name;
 				if(!is_dir($dest) && is_writable_ex($dest))
 				{
 					throw new FbX($ccms['lang']['system']['error_dirwrite']);
@@ -777,7 +770,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 						imagecopyresampled($tmp_t,$src,0,0,0,0,$newwidth_t,$newheight_t,$width,$height);
 
 						// Save newly generated versions
-						$thumbnail  = $dest.'/_thumbs/'.$f;
+						$thumbnail  = $dest . '/_thumbs/' . $f;
 
 						@unlink($thumbnail);
 
@@ -789,7 +782,12 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 							break;
 
 						case 'png':
-							imagepng($tmp_t, $thumbnail, 9);
+							//imagepng($tmp_t, $thumbnail, 9);
+
+							$t = $dest . '/_thumbs/' . basename($f, pathinfo($f, PATHINFO_EXTENSION)) . '.jpg';  // could be done as pathinfo($f, PATHINFO_FILENAME), but that's for PHP 5.2+ only!
+							@unlink($t);
+
+							imagejpeg($tmp_t, $thumbnail, THUMBNAIL_JPEG_QUALITY);
 							break;
 
 						case 'gif':
@@ -805,7 +803,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 					}
 				}
 
-				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullregenerated']).'&album='.$album));
+				header('Location: ' . makeAbsoluteURI('lightbox.Manage.php?page_id=' . $page_id . '&album=' . $album_name . '&status=notice&msg='.rawurlencode($ccms['lang']['backend']['fullregenerated'])));
 				exit();
 			}
 			else
@@ -827,6 +825,6 @@ if($_SERVER['REQUEST_METHOD'] == "GET" && $do_action == "confirm_regen")
 
 
 // when we get here, an illegal command was fed to us!
-die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>

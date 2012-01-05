@@ -78,6 +78,20 @@ $status_message = getGETparam4DisplayHTML('msg');
 
 function load_lang_file($language)
 {
+	/*
+	We collect hand-checked translation strings by loading the language file 
+	itself, then discard the babelfish-produced translations.
+	
+	(Rather, the automated translations originate from the google 
+	 translation service, rather than babelfish, but alas. You get the point.)
+
+	Since we are within function scope, the global $ccms[] is not accessible 
+	from here, which is actually GOOD, because we trick the loading by 
+	eval()ing the selected language file and then return the LOCAL $ccms[] 
+	array as a result, thus staying completely independent of the global 
+	$ccms[] and its language strings!
+	*/
+
 	$ccms = array();
 	$lang_file = BASE_PATH . '/lib/languages/' . $language . '.inc.php';
 	if (is_file($lang_file))
@@ -95,33 +109,29 @@ function load_lang_file($language)
 function collect_translations($language)
 {
 	/*
-	We collect all translation strings by first loading the default (English) and then the language file itself.
+	We collect all translation strings by first loading the default (English) 
+	and then the language file itself.
 
-	This way, we'll be sure to have all language strings (as the English one is assumed to be complete at all
-	times) while any gaps in the language X file are filled by those English ones.
-
-	Since we are within function scope, the global $ccms[] is not accessible from here, which is actually GOOD.
-
-	Because we trick the loading by include()ing both the english and the selected language file and then
-	return the LOCAL $ccms[] array as a result, thus staying completely independent of the global $ccms[] and
-	its language strings!
+	This way, we'll be sure to have all language strings (as the English one 
+	is assumed to be complete at all times) while any gaps in the language X 
+	file are filled by those English ones.
 	*/
 
-		// English indexes are our 'master base':
-	$ccms = load_lang_file('en');
+	// English indexes are our 'master base':
+	$lang_entries = load_lang_file('en');
 
 	$i18n = load_lang_file($language);
 	// now ONLY override entries which EXIST in 'en'; anything else is superfluous/outdated in the language file anyway and will corrupt our index-counting later on
 	foreach($i18n as $key => $value)
 	{
-		if (!empty($value) && array_key_exists($key, $ccms))
+		if (!empty($value) && array_key_exists($key, $lang_entries))
 		{
 			// override value now!
-			$ccms[$key] = $value;
+			$lang_entries[$key] = $value;
 		}
 	}
 
-	return $ccms;
+	return $lang_entries;
 }
 
 
@@ -404,6 +414,9 @@ if ($do == 'update')
 	}
 }
 
+
+$load_editor = false;
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -411,19 +424,16 @@ if ($do == 'update')
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Translation module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
-	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
-	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
-	<![endif]-->
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 </head>
 <body>
 <div class="module" id="translation-assist">
 	<?php
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4)
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
+		$load_editor = true;
+		
 	?>
 	<form action="<?php echo $_SERVER['PHP_SELF'];?>?do=update" method="post" accept-charset="utf-8">
 
@@ -449,7 +459,7 @@ if ($do == 'update')
 	<?php
 
 	// (!) Only administrators can change these values
-	if($_SESSION['ccms_userLevel']>=4)
+	if($_SESSION['ccms_userLevel'] >= 4)
 	{
 	?>
 		<p><?php echo $ccms['lang']['translation']['explain']; ?></p>
@@ -466,7 +476,7 @@ if ($do == 'update')
 		<hr />
 		<p>Copy and paste the entire page into the edit box below; we will sort it out...</p>
 
-		<textarea id="content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
+		<textarea id="translation_manager_content" name="content" style="height:400px;width:100%;color:#000;">---copy&amp;paste your stuff in here!---</textarea>
 
 		<div class="right">
 			<button type="submit"><span class="ss_sprite_16 ss_disk">&#160;</span><?php echo $ccms['lang']['forms']['savebutton'];?></button>
@@ -477,7 +487,13 @@ if ($do == 'update')
 	}
 	else
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		?>
+	<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+
+	<div class="right">
+		<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+	</div>
+		<?php
 	}
 	?>
 
@@ -485,7 +501,7 @@ if ($do == 'update')
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<textarea id="jslog" class="log span-25" readonly="readonly">
+	<textarea id="jslog" class="log span-25 last clear" readonly="readonly">
 	</textarea>
 <?php
 }
@@ -514,17 +530,32 @@ function googleTranslateElementInit()
 
 
 <?php
-$js_files = array();
-$js_files[] = '../../../../lib/includes/js/the_goto_guy.js';
-$js_files[] = 'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-$js_files[] = '../../../../lib/includes/js/mootools-core.js,mootools-more.js';
-$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'content'));
+	$js_files = array(
+		$cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js',
+		'http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit',
+		$cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js'
+	);
 
-$driver_code = generateJS4TinyMCEinit(2, 'content');
+	if ($load_editor)
+	{
+		$MCEcodegen = new tinyMCEcodeGen("translation_manager_content", array(array('FileManager' => array())));
 
-$starter_code = generateJS4TinyMCEinit(1, 'content');
+		$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+		$starter_code = $MCEcodegen->genStarterCode();
+
+		$driver_code = $MCEcodegen->genDriverCode();
+
+		$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
+	}
+	else
+	{
+		$driver_code = null;
+		$starter_code = null;
+		$extra_functions_code = null;
+	}
+
+	echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

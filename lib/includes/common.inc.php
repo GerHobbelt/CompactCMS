@@ -43,6 +43,32 @@ if (!defined('BASE_PATH'))
 
 
 /**
+defines for dump_request_to_logfile():
+*/
+define('DUMP2LOG_SERVER_GLOBALS',  0x0001);
+define('DUMP2LOG_ENV_GLOBALS',     0x0002);
+define('DUMP2LOG_SESSION_GLOBALS', 0x0004);
+define('DUMP2LOG_POST_GLOBALS',    0x0008);
+define('DUMP2LOG_GET_GLOBALS',     0x0010);
+define('DUMP2LOG_REQUEST_GLOBALS', 0x0020);
+define('DUMP2LOG_FILES_GLOBALS',   0x0040);
+define('DUMP2LOG_COOKIE_GLOBALS',  0x0080);
+define('DUMP2LOG_CCMS_GLOBALS',    0x0100);
+define('DUMP2LOG_CFG_GLOBALS',     0x0200);
+define('DUMP2LOG_STACKTRACE',      0x0400);
+
+define('DUMP2LOG_SORT',                            0x0100000);
+define('DUMP2LOG_STRIP_CCMS_I18N_N_CFG_SUBARRAYS', 0x0200000);
+define('DUMP2LOG_FORMAT_AS_HTML',                  0x0400000);
+define('DUMP2LOG_WRITE_TO_FILE',                   0x0800000);
+define('DUMP2LOG_WRITE_TO_STDOUT',                 0x1000000);
+
+
+
+
+
+
+/**
  * Remove the effects of the old dreaded magic_quotes setting.
  *
  * WARNING: we have not placed this in a function but run it immediately, right here,
@@ -64,7 +90,7 @@ if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
 }
 
 
-if (01)
+if (0)
 {
 	dump_request_to_logfile();
 }
@@ -78,22 +104,36 @@ if (01)
 
 
 /**
- * Return TRUE when one string matches the 'tail' of the other string
+ * Return TRUE when $tail matches the 'tail' of $str
  */
-function strmatch_tail($a, $b)
+function strmatch_tail($str, $tail)
 {
-	if (strlen($a) < strlen($b))
-	{
-		$tmp = $a;
-		$a = $b;
-		$b = $tmp;
-	}
-
-	$idx = strpos($a, $b);
+	$idx = strpos($str, $tail);
 	if ($idx === false)
 		return false;
-	return ($idx + strlen($b) == strlen($a));
+	return ($idx + strlen($tail) == strlen($str));
 }
+
+
+
+
+
+/**
+ * Return the part of the string up to (and including, depending on the $inc_last_slash boolean: default TRUE)
+ * the last '/'.
+ * If no slash exists in the source string, an empty string is therefore returned.
+ */
+function get_remainder_upto_slash($str, $inc_last_slash = true)
+{
+	$idx = strpos($str, '/');
+	if ($idx === false)
+		return '';
+	return substr($str, 0, $idx + ($inc_last_slash ? 1 : 0));
+}
+
+
+
+
 
 
 
@@ -127,7 +167,7 @@ function rm0lead($str)
  * Use this function for filtering any input which doesn't need the full UTF8 range. Most useful as a preprocessor for further
  * security-oriented input filters.
  *
- * Code ripped from function pagetitle($data, $options = array()) in the 'fancyupload' PHP module.
+ * Code ripped from function pagetitle($data, $options = array()) in the 'mootools-filemanager::Assets/Connector/FileManager' PHP module.
  */
 function str2USASCII($src)
 {
@@ -141,9 +181,6 @@ function str2USASCII($src)
 			explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
 		);
 
-		//$regex[0][] = '"';
-		//$regex[0][] = "'";
-		
 		// also check whether iconv exists AND performs correctly in transliteration:
 		$iconv_ok = false;
 		if (function_exists('iconv'))
@@ -161,20 +198,20 @@ function str2USASCII($src)
 	if ($iconv_ok)
 	{
 		/*
-		iconv may still b0rk by prematurely aborting the process. 
+		iconv may still b0rk by prematurely aborting the process.
 		We check for that by placing a recognizable tail at the
-		end of the input string: if it's not there in the output, 
+		end of the input string: if it's not there in the output,
 		we know we got b0rked after all.
 		*/
 		$rv = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $src . ' (tail)');
 		if (substr($rv, -7) == ' (tail)')
 		{
 			// strip off the telltale:
-			$src = substr($rv, strlen($rv) - 6);
+			$src = substr($rv, strlen($rv) - 7);
 		}
 		// else: fall through: let the next step do the ASCIIfication.
 	}
-	
+
 	// ... even if we don't have a iconv at all or a b0rked iconv!
 	$src = str_replace($regex[0], $regex[1], $src);
 	// replace any remaining non-ASCII chars...
@@ -229,11 +266,11 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 			case ']': // would be interpreted as 'end of set'
 				$es .= '\]';
 				break;
-				
+
 			case '-': // would be interpreted as 'range from..to'
 				$es .= '\-';
 				break;
-				
+
 			default:
 				$es .= $c;
 				break;
@@ -287,10 +324,10 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	{
 		/*
 		Try to ensure -- with reasonably high probability -- that even a transformed filename remains unique.
-		
-		This is done by appending a part of the MD5 hash of the RAW, original filename to the 
+
+		This is done by appending a part of the MD5 hash of the RAW, original filename to the
 		transformed filename: where the transformation will have lost some characters (turning them
-		into underscores or removing them entirely), the extra MD5 characters will add that 
+		into underscores or removing them entirely), the extra MD5 characters will add that
 		uniqueness again.
 		*/
 		$src = str_replace('\\', '/', $src);
@@ -316,7 +353,7 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 			$tl = 4;
 		}
 	}
-	
+
 	/*
 	now check the length of the filename: when it is too large, we must reduce it!
 	*/
@@ -325,30 +362,57 @@ function str2VarOrFileName($src, $extra_accept_set = '', $accept_leading_minus =
 	{
 		$tl = 2 + intval($max_outlen / 16); // round up tail len (the hash-replaced bit), so for very small sizes it's > 0
 	}
-	
+
 	if ($tl > 0)
 	{
 		$max_outlen--; // account for the extra '-' or '.' inserted
-		
+
 		$tl = min(21, $max_outlen, $tl); // make sure we only go as far as the available range produced by the hash string
-		
+
 		// compact the hash into ~21 characters, so each char/byte has the maximum possible range --> more hash in fewer chars
 		$h = strtr(base64_encode(md5($src)), '+/=', '-__');
-	
+
 		// flexible way to pick a neat character as a separator, depending on what is allowed in the output:
 		$extra_accept_set .= '-_';
 		$markerpos = strcspn($extra_accept_set, '.-_~!,');
-		$marker = substr($extra_accept_set, $markerpos, 1); 
-		
-		$dst = substr($dst, 0, $max_outlen - $tl) . $marker . substr($h, -$tl);
+		$marker = substr($extra_accept_set, $markerpos, 1);
+
+		$dst = substr($dst, 0, $max_outlen - $tl) . $marker . substr($h, 0, $tl);
 	}
 
 	return $path . $dst . $ext;
 }
 
-/*
- * moved here from tiny_mce_gzip.php; augmented to accept '.', NOT accepting '_' as it's a wildcard in SQL
+
+
+
+
+/**
+ * Convert any input to a viable variable name, usable in PHP and JavaScript.
+ *
+ * @return (string) the generated variable name, or FALSE when the input cannot be converted to a legal variable name.
  */
+function str2variablename($str)
+{
+	if (empty($str) || !is_string($str)) return false;
+
+	// underscore is not part of the regex set as ANY sequence of multiple underscores should be converted to a single one.
+	// Yep, this is a matter of taste...
+	$dst = preg_replace('/[^A-Za-z0-9]+/', '_', $str);
+	// does the string start with a digit?
+	if (ord($dst[0]) <= 39)
+	{
+		$dst = 'X' . $dst;
+	}
+	return $dst;
+}
+
+
+
+
+
+
+
 
 /**
  * Return the value of a $_GET[] entry (or $def if the entity doesn't exist), stripped of
@@ -681,7 +745,7 @@ function filterParam4Number($value, $def = null)
 
 	// see if the value is a valid integer (plus or minus)
 	$value = rm0lead($value);
-	$numval = (is_numeric($value)?intval($value):null);
+	$numval = (is_numeric($value) ? intval($value) : null);
 	if (strval($numval) !== $value)
 	{
 		// no full match for the integer check, so this is a non-numeric string:
@@ -728,18 +792,11 @@ function filterParam4DisplayHTML($value, $def = null)
 	// use HTMLpurifier to strip undesirable content. sanitize.inc.php is not an option as it's a type of blacklist filter and we WANT a whitelist approach for future-safe processing.
 
 	// convert the input to a string which can be safely printed as HTML; no XSS through JS or 'smart' use of HTML tags:
-if (0)
-{
-	$value = htmlentities($value, ENT_NOQUOTES, 'UTF-8');
-}
-else
-{
 	$config = array(
 				'safe' => 1
 				// , 'elements' => 'a, em, strong'
 				);
 	$value = htmLawed($value, $config);
-}
 
 	return $value;
 }
@@ -1147,24 +1204,7 @@ function filterParam4MathExpression($value, $def = null)
 
 
 
-/*
-	public static function pagetitle($data, $options = array()){
-		static $regex;
-		if (!$regex){
-			$regex = array(
-				explode(' ', 'Æ æ Œ œ ß Ü ü Ö ö Ä ä À Á Â Ã Ä Å &#260; &#258; Ç &#262; &#268; &#270; &#272; Ð È É Ê Ë &#280; &#282; &#286; Ì Í Î Ï &#304; &#321; &#317; &#313; Ñ &#323; &#327; Ò Ó Ô Õ Ö Ø &#336; &#340; &#344; Š &#346; &#350; &#356; &#354; Ù Ú Û Ü &#366; &#368; Ý Ž &#377; &#379; à á â ã ä å &#261; &#259; ç &#263; &#269; &#271; &#273; è é ê ë &#281; &#283; &#287; ì í î ï &#305; &#322; &#318; &#314; ñ &#324; &#328; ð ò ó ô õ ö ø &#337; &#341; &#345; &#347; š &#351; &#357; &#355; ù ú û ü &#367; &#369; ý ÿ ž &#378; &#380;'),
-				explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
-			);
 
-			$regex[0][] = '"';
-			$regex[0][] = "'";
-		}
-
-		$data = trim(substr(preg_replace('/(?:[^A-z0-9]|_|\^)+/i', '_', str_replace($regex[0], $regex[1], $data)), 0, 64), '_');
-		return !empty($options) ? self::checkTitle($data, $options) : $data;
-	}
-
-*/
 
 
 
@@ -1517,7 +1557,7 @@ function path_remove_dot_segments($path)
  */
 function makeAbsoluteURI($path)
 {
-	$reqpage = filterParam4FullFilePath($_SERVER["PHP_SELF"]);
+	$reqpage = filterParam4FullFilePath($_SERVER['PHP_SELF']);
 
 	$page = array();
 	if (strpos($path, '://'))
@@ -1960,10 +2000,10 @@ if (!function_exists('fnmatch'))
 /**#@+
  * Extra GLOB constant for safe_glob()
  */
-define('GLOB_NODIR',256);
-define('GLOB_PATH',512);
-define('GLOB_NODOTS',1024);
-define('GLOB_RECURSE',2048);
+if (!defined('GLOB_NODIR'))       define('GLOB_NODIR',256);
+if (!defined('GLOB_PATH'))        define('GLOB_PATH',512);
+if (!defined('GLOB_NODOTS'))      define('GLOB_NODOTS',1024);
+if (!defined('GLOB_RECURSE'))     define('GLOB_RECURSE',2048);
 /**#@-*/
 
 /**
@@ -2053,7 +2093,7 @@ function is_writable_ex($path)
 		} while (@file_exists($filepath));
 
 		$path = $filepath;
-		$f = @fopen($path, 'w');
+		$f = @fopen($path, 'wb');
 		if ($f===false)
 		{
 			return false;
@@ -2065,7 +2105,7 @@ function is_writable_ex($path)
 	if (is_file($path))
 	{
 		// check file for read/write capabilities
-		$f = @fopen($path, 'r+');
+		$f = @fopen($path, 'r+b');
 		if ($f===false)
 			return false;
 		fclose($f);
@@ -2079,9 +2119,12 @@ function is_writable_ex($path)
 
 
 
-
+/**
+ * Recursively delete a directory tree.
+ */
 function recrmdir($dir)
 {
+	$count = 0;
 	if (is_dir($dir))
 	{
 		$objects = scandir($dir);
@@ -2092,18 +2135,20 @@ function recrmdir($dir)
 			{
 				if (is_dir($dir."/".$object))
 				{
-					recrmdir($dir."/".$object);
+					$count += recrmdir($dir."/".$object);
 				}
 				else
 				{
 					@unlink($dir."/".$object);
+					$count++;
 				}
 			}
 		}
 		reset($objects);
 		@rmdir($dir);
+		$count++;
 	}
-	return true;
+	return $count;
 }
 
 
@@ -2273,9 +2318,9 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		if (substr($locale, -6) != '.UTF-8')
 		{
 			/*
-			This is required to make iconv work (instead of making it spit out '?' question 
+			This is required to make iconv work (instead of making it spit out '?' question
 			marks for anything not in the target charset). See also comments in:
-			
+
 			http://nl.php.net/manual/en/function.iconv.php
 			*/
 			$locale .= '.UTF-8';
@@ -2286,18 +2331,18 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 
 	// core language
 	$mce_langfile = array();
-	$mce_langfile[] = BASE_PATH . '/lib/includes/js/tiny_mce/langs/'.$language.'.js';
+	$mce_langfile[] = BASE_PATH . '/lib/includes/js/tiny_mce/jscripts/tiny_mce/langs/'.$language.'.js';
 	if (0)
 	{
 		// themes language
-		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/jscripts/tiny_mce/themes/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
 			$mce_langfile[] = $dir . '/langs/'.$language.'_dlg.js';
 		}
 		// plugins language
-		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
+		$dirlist = safe_glob(BASE_PATH . '/lib/includes/js/tiny_mce/jscripts/tiny_mce/plugins/*', GLOB_NODOTS | GLOB_PATH | GLOB_ONLYDIR);
 		foreach($dirlist as $dir)
 		{
 			$mce_langfile[] = $dir . '/langs/'.$language.'.js';
@@ -2323,7 +2368,7 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		$cfg['tinymce_language'] = 'en';
 	}
 
-	$editarea_langfile = BASE_PATH . '/lib/includes/js/edit_area/langs/'.$language.'.js';
+	$editarea_langfile = BASE_PATH . '/lib/includes/js/edit_area/edit_area/langs/'.$language.'.js';
 	if (is_file($editarea_langfile))
 	{
 		$cfg['editarea_language'] = $language;
@@ -2333,14 +2378,14 @@ function SetUpLanguageAndLocale($language, $only_set_cfg_array = false)
 		$cfg['editarea_language'] = 'en';
 	}
 
-	$fancyupload_langfile = BASE_PATH . '/lib/includes/js/fancyupload/Language/Language.'.$language.'.js';
-	if (is_file($fancyupload_langfile))
+	$MT_FileManager_langfile = BASE_PATH . '/lib/includes/js/mootools-filemanager/Language/Language.'.$language.'.js';
+	if (is_file($MT_FileManager_langfile))
 	{
-		$cfg['fancyupload_language'] = $language;
+		$cfg['MT_FileManager_language'] = $language;
 	}
 	else
 	{
-		$cfg['fancyupload_language'] = 'en';
+		$cfg['MT_FileManager_language'] = 'en';
 	}
 
 	$cfg['language'] = $language;
@@ -2543,25 +2588,102 @@ function cvt_ordercode2list($ordercode)
 
 
 
-/*
-Derived from code by phella.net: 
+
+/**
+The various attributes which can be requested through
+checkSpecialPageName()
+*/
+define('SPG_IS_NONREMOVABLE', 1);  // you cannot delete 'home', 'index', etc.
+define('SPG_GIVE_PAGE_URL', 2);    // returns the page URL for /any/ page; special transformations for the special pages are applied
+define('SPG_MUST_BE_LINKED_IN_MENU', 3); // when a page /must/ occur in the menu with a hyperlink to it
+define('SPG_GIVE_PAGENAME', 4); // return the pagename for /any/ page; apply special transformations for special pages
+define('SPG_IS_HOMEPAGE', 5); // whether the page is the site homepage (or not)
+define('SPG_GIVE_MENU_SPECIAL', 6);  // if the page needs special formatting when appearing in a menu, this produces an array of settings
+define('SPG_GIVE_SITEMAP_SPECIAL', 7); // if the page needs special treatment when producing the sitemap.xml, this produces an array of settings
+
+
+/**
+Check a given page name to see whether it's one of the special ones (home, index, 404, ...) and
+return the required attribute for it.
+*/
+function checkSpecialPageName($name, $reqd_attrib)
+{
+	global $cfg;
+
+	if (empty($name) || in_array($name, array('home', 'index')))
+	{
+		$name = 'home';
+	}
+
+	switch ($reqd_attrib)
+	{
+	case SPG_IS_NONREMOVABLE:
+		return in_array($name, array('403', '404', 'sitemap', 'home'));
+
+	case SPG_IS_HOMEPAGE:
+		return ($name == 'home');
+
+	case SPG_GIVE_PAGE_URL:
+		return ($name != 'home' ? $name . '.html' : '');
+
+	case SPG_GIVE_PAGENAME:
+		return $name;
+
+	case SPG_GIVE_MENU_SPECIAL:
+		if ($name == 'home')
+		{
+			return array('link' => $cfg['rootdir'],
+						   'class' => 'menu_item_home');
+		}
+		return null;
+
+	case SPG_GIVE_SITEMAP_SPECIAL:
+		if ($name == 'home')
+		{
+			return array('loc' => 'http://' . $_SERVER['SERVER_NAME'] . $cfg['rootdir'],
+						   'prio' => 0.80);
+		}
+		return null;
+
+	case SPG_MUST_BE_LINKED_IN_MENU:
+		if (in_array($name, array('403', '404')))
+			return false;
+		if ($name == 'home')
+			return true;
+		return null;
+
+	default:
+		throw new Exception('Undefined attribute requested in checkSpecialPageName()');
+	}
+}
+
+
+
+
+
+/**
+Derived from code by phella.net:
 
   http://nl3.php.net/manual/en/function.var-dump.php
 */
-function var_dump_ex($value, $level = 0)
+function var_dump_ex($value, $level = 0, $sort_before_dump = 0, $show_whitespace = true, $max_subitems = 0x7FFFFFFF)
 {
 	if ($level == -1)
 	{
-		$trans[' '] = '&there4;';
-		$trans["\t"] = '&rArr;';
-		$trans["\n"] = '&para;;';
-		$trans["\r"] = '&lArr;';
-		$trans["\0"] = '&oplus;';
+		$trans = array();
+		if ($show_whitespace)
+		{
+			$trans[' '] = '&there4;';
+			$trans["\t"] = '&rArr;';
+			$trans["\n"] = '&para;';
+			$trans["\r"] = '&lArr;';
+			$trans["\0"] = '&oplus;';
+		}
 		return strtr(htmlspecialchars($value, ENT_COMPAT, 'UTF-8'), $trans);
 	}
-	
+
 	$rv = '';
-	if ($level == 0) 
+	if ($level == 0)
 	{
 		$rv .= '<pre>';
 	}
@@ -2572,39 +2694,55 @@ function var_dump_ex($value, $level = 0)
 	{
 	case 'string':
 		$rv .= '(' . strlen($value) . ')';
-		$value = var_dump_ex($value, -1);
+		$value = var_dump_ex($value, -1, 0, $show_whitespace, $max_subitems);
 		break;
-  
+
 	case 'boolean':
 		$value = ($value ? 'true' : 'false');
 		break;
-	
+
 	case 'object':
-		$props = get_class_vars(get_class($value));
+		$props = get_object_vars($value);
+		if ($sort_before_dump > $level)
+		{
+			ksort($props);
+		}
 		$rv .= '(' . count($props) . ') <u>' . get_class($value) . '</u>';
 		foreach($props as $key => $val)
 		{
-			$rv .= "\n" . str_repeat("\t", $level + 1) . $key . ' => ';
-			$rv .= var_dump_ex($value->$key, $level + 1);
+			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1, 0, $show_whitespace, $max_subitems) . ' => ';
+			$rv .= var_dump_ex($value->{$key}, $level + 1, $sort_before_dump, $show_whitespace, $max_subitems);
 		}
 		$value = '';
 		break;
-  
+
 	case 'array':
+		if ($sort_before_dump > $level)
+		{
+			$value = array_merge($value); // fastest way to clone the input array
+			ksort($value);
+		}
 		$rv .= '(' . count($value) . ')';
+		$count = 0;
 		foreach($value as $key => $val)
 		{
-			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1) . ' => ';
-			$rv .= var_dump_ex($val, $level + 1);
+			$rv .= "\n" . str_repeat("\t", $level + 1) . var_dump_ex($key, -1, 0, $show_whitespace, $max_subitems) . ' => ';
+			$rv .= var_dump_ex($val, $level + 1, $sort_before_dump, $show_whitespace, $max_subitems);
+			$count++;
+			if ($count >= $max_subitems)
+			{
+				$rv .= "\n" . str_repeat("\t", $level + 1) . '<i>(' . (count($value) - $count) . ' more entries ...)</i>';
+				break;
+			}
 		}
 		$value = '';
 		break;
-		
+
 	default:
 		break;
 	}
 	$rv .= ' <b>' . $value . '</b>';
-	if ($level == 0) 
+	if ($level == 0)
 	{
 		$rv .= '</pre>';
 	}
@@ -2613,7 +2751,21 @@ function var_dump_ex($value, $level = 0)
 
 
 
-function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
+
+/**
+ * Generate a dump of the optional $extra values and/or the global variables $ccms[], $cfg[] and the superglobals.
+ *
+ * @param array $filename_options (optional) specifies a few pieces of the filename which will be generated to write
+ *                                the dump to:
+ *
+ *                                'namebase': the leading part of the filename,
+ *                                'origin-section': follows the timestamp encoded in the filename,
+ *                                'extension': the desired filename extension (default: 'html' for HTML dumps, 'log' for plain dumps)
+ *
+ * @return the generated dump in the format and carrying the content as specified by the $dump_options.
+ */
+define('__DUMP2LOG_DEFAULT_OPTIONS', -1 ^ DUMP2LOG_WRITE_TO_STDOUT);
+function dump_request_to_logfile($extra = null, $dump_options = __DUMP2LOG_DEFAULT_OPTIONS, $filename_options = null)
 {
 	global $_SERVER;
 	global $_ENV;
@@ -2621,78 +2773,189 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
 	global $_SESSION;
 	global $ccms;
 	global $cfg;
+	static $sequence_number;
+
+	if (!$sequence_number)
+	{
+		$sequence_number = 1;
+	}
+	else
+	{
+		$sequence_number++;
+	}
+
+	$sorting = ($dump_options & DUMP2LOG_SORT);
+	$show_WS = ($dump_options & DUMP2LOG_FORMAT_AS_HTML);
 
 	$rv = '<html><body>';
-	
-	if (!empty($_SESSION['dbg_last_dump']))
+
+	if (isset($_SESSION) && !empty($_SESSION['dbg_last_dump']) && ($dump_options & DUMP2LOG_FORMAT_AS_HTML))
 	{
-		$rv .= '<p><a href="' . $_SESSION['dbg_last_dump'] . '">Go to previous dump</a></p>' ."\n";
+		$rv .= '<p><a href="' . $_SESSION['dbg_last_dump'] . '">Go to previous dump</a></p>' . "\n";
 	}
-	$rv .= '<h1>$_ENV</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_ENV);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_SESSION</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_SESSION);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_POST</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_POST);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_GET</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_GET);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_FILES</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_FILES);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_COOKIE</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_COOKIE);
-	$rv .= "</pre>";
-	$rv .= '<h1>$_REQUEST</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_REQUEST);
-	$rv .= "</pre>";
+
+	$now = microtime(true);
+	if (!empty($_SERVER['REQUEST_TIME']))
+	{
+		$start = $_SERVER['REQUEST_TIME'];
+		$diff = $now - $start;
+
+		$rv .= '<p>Time elapses since request start: ' . number_format($diff, 3) . ' seconds</p>' . "\n";
+	}
 
 	if (!empty($extra))
 	{
 		$rv .= '<h1>EXTRA</h1>';
 		$rv .= "<pre>";
-		$rv .= var_dump_ex($extra);
+		$rv .= var_dump_ex($extra, 0, $sorting, $show_WS, 500);
 		$rv .= "</pre>";
 	}
 
-	if ($dump_CCMS_arrays_too)
+	if ($dump_options & DUMP2LOG_ENV_GLOBALS)
+	{
+		$rv .= '<h1>$_ENV</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_ENV, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_SESSION_GLOBALS)
+	{
+		$rv .= '<h1>$_SESSION</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_SESSION, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_POST_GLOBALS)
+	{
+		$rv .= '<h1>$_POST</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_POST, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_GET_GLOBALS)
+	{
+		$rv .= '<h1>$_GET</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_GET, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_FILES_GLOBALS)
+	{
+		$rv .= '<h1>$_FILES</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_FILES, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_COOKIE_GLOBALS)
+	{
+		$rv .= '<h1>$_COOKIE</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_COOKIE, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_REQUEST_GLOBALS)
+	{
+		$rv .= '<h1>$_REQUEST</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_REQUEST, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+
+	if ($dump_options & DUMP2LOG_CCMS_GLOBALS)
 	{
 		$rv .= '<h1>$ccms</h1>';
 		$rv .= "<pre>";
-		$rv .= var_dump_ex($ccms);
+
+		$ccms_copy = array_merge($ccms); // fastest way to clone the array
+		if ($dump_options & DUMP2LOG_STRIP_CCMS_I18N_N_CFG_SUBARRAYS)
+		{
+			if (isset($ccms_copy['lang']))
+			{
+				$ccms_copy['lang'] = '(skipped)';
+			}
+			if (isset($ccms_copy['cfg']))
+			{
+				$ccms_copy['cfg'] = '(skipped)';
+			}
+		}
+
+		$rv .= var_dump_ex($ccms_copy, 0, $sorting, $show_WS);
 		$rv .= "</pre>";
+	}
+	if ($dump_options & DUMP2LOG_CFG_GLOBALS)
+	{
 		$rv .= '<h1>$cfg</h1>';
 		$rv .= "<pre>";
-		$rv .= var_dump_ex($cfg);
+		$rv .= var_dump_ex($cfg, 0, $sorting, $show_WS);
 		$rv .= "</pre>";
 	}
 
-	$rv .= '<h1>$_SERVER</h1>';
-	$rv .= "<pre>";
-	$rv .= var_dump_ex($_SERVER);
-	$rv .= "</pre>";
+	if ($dump_options & DUMP2LOG_SERVER_GLOBALS)
+	{
+		$rv .= '<h1>$_SERVER</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($_SERVER, 0, $sorting, $show_WS);
+		$rv .= "</pre>";
+	}
+
+	if ($dump_options & DUMP2LOG_STACKTRACE)
+	{
+		$st = debug_backtrace(false);
+		$rv .= '<h1>Stack Trace:</h1>';
+		$rv .= "<pre>";
+		$rv .= var_dump_ex($st, 0, 0, $show_WS);
+		$rv .= "</pre>";
+	}
+
 	$rv .= '</body></html>';
-	
-	$tstamp = date('Y-m-d.His');
-	
-	$fname = 'LOG-' . $tstamp . '-' . str2VarOrFileName($_SERVER['REQUEST_URI']) . '.html';
+
+	$tstamp = date('Y-m-d.His') . '.' . sprintf('%07d', fmod($now, 1) * 1E6);
+
+	$filename_options = array_merge(array(
+			'namebase'       => 'LOG-',
+			'origin-section' => substr($_SERVER['REQUEST_URI'], 0, -42),
+			'extension'      => (($dump_options & DUMP2LOG_FORMAT_AS_HTML) ? 'html' : 'log')
+		), (is_array($filename_options) ? $filename_options : array()));
+
+	$fname = $filename_options['namebase'] . $tstamp . '.' . sprintf('%03u', $sequence_number) . '-' . $filename_options['origin-section'];
+	$fname = substr(preg_replace('/[^A-Za-z0-9_.-]+/', '_', $fname), 0, 46) . '.' . substr(preg_replace('/[^A-Za-z0-9_.-]+/', '_', $filename_options['extension']), 0, 9);    // make suitable for filesystem
 	if (isset($_SESSION))
 	{
 		$_SESSION['dbg_last_dump'] = $fname;
 	}
-	$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
-	
-	file_put_contents($fname, $rv);
+
+	if (!($dump_options & DUMP2LOG_FORMAT_AS_HTML))
+	{
+		$rv = preg_replace('/^.*?<body>(.+)<\/body>.*?$/sD', '\\1', $rv);
+
+		$trans['<h1>'] = "\n\n*** ";
+		$trans['</h1>'] = " ***\n";
+		$rv = strtr($rv, $trans);
+
+		$rv = html_entity_decode(strip_tags($rv), ENT_NOQUOTES, 'UTF-8');
+	}
+
+	if ($dump_options & DUMP2LOG_WRITE_TO_FILE)
+	{
+		$fname = BASE_PATH . '/lib/includes/cache/' . $fname;
+
+		if (@file_put_contents($fname, $rv) === false)
+		{
+			throw new Exception('b0rk at ' . $fname);
+		}
+	}
+
+	if ($dump_options & DUMP2LOG_FORMAT_AS_HTML)
+	{
+		$rv = preg_replace('/^.*?<body>(.+)<\/body>.*?$/sD', '\\1', $rv);
+	}
+
+	if ($dump_options & DUMP2LOG_WRITE_TO_STDOUT)
+	{
+		echo $rv;
+	}
+
+	return array('filename' => $fname, 'content' => $rv);
 }
 
 
@@ -2713,6 +2976,8 @@ function dump_request_to_logfile($extra = null, $dump_CCMS_arrays_too = false)
  */
 function checkAuth()
 {
+	global $cfg;
+	
 	/*
 	 * The remaining MD5 call in here is NOT for security but to keep session storage tiny: the collected data
 	 * is packed in a fixed, limited number of characters. Meanwhile, MD5 is still quite good enough to hash this
@@ -2721,10 +2986,33 @@ function checkAuth()
 	$canarycage = session_id();
 	$currenthost = md5($_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] /* . '::' . $_SERVER['HTTP_USER_AGENT'] */ );
 
-	if (!empty($_SESSION['id']) && $canarycage == $_SESSION['id']
+	if (is_array($_SESSION) && !empty($_SESSION['id']) && $canarycage == $_SESSION['id']
 		&& !empty($_SESSION['authcheck']) && $currenthost == $_SESSION['authcheck'])
 	{
 		return true;
+	}
+
+	if (0 && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		foreach ($_SESSION as $name => $value) 
+		{
+			$name = htmlspecialchars($name);
+			$value = htmlspecialchars($value);
+			printf("<p>session[%s] = [%s]</p>", $name, $value);
+		}
+		foreach ($_COOKIE as $name => $value) 
+		{
+			$name = htmlspecialchars($name);
+			$value = htmlspecialchars($value);
+			printf("<p>cookie[%s] = [%s]</p>", $name, $value);
+		}
+		printf("<p>host::address::agent/host_md5 = [%s]/[%s], session = %d, canarycage = [%s], sessionID = [%s], authcheck = [%s]</p>",
+				$_SERVER['HTTP_HOST'] . '::' . $_SERVER['REMOTE_ADDR'] . '::' . $_SERVER['HTTP_USER_AGENT'],
+				$currenthost,
+				is_array($_SESSION),
+				$canarycage, 
+				((is_array($_SESSION) && !empty($_SESSION['id'])) ? $_SESSION['id'] : '---'),
+				((is_array($_SESSION) && !empty($_SESSION['authcheck'])) ? $_SESSION['authcheck'] : '---'));
 	}
 	return false;
 }
@@ -2818,8 +3106,111 @@ function IsValidPreviewCode($previewCode)
 
 
 
+/*
+Push a 'hack attempt!' error message to the output; when possible, redirect to the login page immediately.
+*/
+function die_with_forged_failure_msg($filepath = __FILE__, $lineno = __LINE__, $extra = null)
+{
+	global $ccms;
+	global $cfg;
 
-function get_tinyMCE_plugin_list()
+	$filepath = str_replace('\\', '/', $filepath);
+	$pos = strpos($filepath, BASE_PATH);
+	if ($pos !== false)
+	{
+		$filepath = substr($filepath, $pos + strlen(BASE_PATH) + 1);
+	}
+	if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
+	{
+		$msg = $ccms['lang']['system']['error_session_expired'] . ' <sub>(' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')</sub>';
+	}
+	else
+	{
+		$msg = $ccms['lang']['system']['error_forged'] . ' <sub>(' . $filepath . ', ' . $lineno . (!empty($extra) ? ', ' . $extra : '') . ')</sub>';
+	}
+
+	if (!headers_sent())
+	{
+		header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'lib/includes/auth.inc.php?status=error&msg='.rawurlencode($msg)));
+	}
+	die($msg);
+}
+
+
+
+
+/*
+Return a suitable EditArea syntax ID string for the given filename+extension
+*/
+function cvt_extension2EAsyntax($filepath)
+{
+	$pi = pathinfo($filepath);
+	// WARNING: empty components are not included in the result array by pathinfo() !
+	$ext = strtolower(!empty($pi['extension']) ? $pi['extension'] : '');
+	switch ($ext)
+	{
+	default:
+		return ''; // unknown syntax: assume none special
+
+	case 'htm':
+	case 'html':
+		return 'html';
+
+	case 'css':
+	case 'js':
+	case 'php':
+	case 'sql':
+	case 'xml':
+	case 'xsl':
+	case 'c':
+	case 'cpp':
+	case 'java':
+	case 'vb':
+		return $ext;
+
+	case 'txt':
+		if (strtolower(!empty($pi['filename']) ? $pi['filename'] : '') == 'robots')
+		{
+			return 'robotstxt';
+		}
+		return '';
+
+	case 'bas':
+		return 'basic';
+
+	case 'cf':
+		return 'coldfusion';
+
+	case 'pas':
+		return 'pascal';
+
+	case 'py':
+		return 'python';
+
+	case 'pl':
+		return 'perl';
+
+	case 'rb':
+		return 'ruby';
+
+	case 'tsql':
+		return 'tsql';
+	}
+}
+
+
+
+
+
+/*
+Produce the list of tinyMCE plugins (and their properties) as an array.
+
+When the $desired_plugins argument is not NULL, it must be either a string
+specifying a prefined set name ('*': all; 'basic': a limited set of plugins, ...)
+or a comma-separated list of required plugins, or the argument can be an array,
+where each entry specifies a required plugin.
+*/
+function get_tinyMCE_plugin_list($desired_plugins = null)
 {
 	/*
 	 * available plugins:
@@ -2827,7 +3218,6 @@ function get_tinyMCE_plugin_list()
 	 *   advimage
 	 *   advlink
 	 *   advlist
-	 *   autolink
 	 *   autoresize
 	 *   autosave
 	 *   bbcode
@@ -2842,7 +3232,6 @@ function get_tinyMCE_plugin_list()
 	 *   insertdatetime
 	 *   layer
 	 *   legacyoutput
-	 *   lists
 	 *   media
 	 *   nonbreaking
 	 *   noneditable
@@ -2862,51 +3251,99 @@ function get_tinyMCE_plugin_list()
 	 *   xhtmlxtras
 	 */
 	static $mce_plugins = array(
-		'advhr' => 1,
-		'advimage' => 1,
-		'advlink' => 1,
-		'advlist' => 1,
-		'autolink' => 0,
-		'autoresize' => 0,
-		'autosave' => 1,
-		'bbcode' => 0,
-		'contextmenu' => 0,
-		'directionality' => 0,
-		'emotions' => 0,
-		'example' => 0,
-		'fullpage' => 0,
-		'fullscreen' => 1,
-		'iespell' => 0,
-		'inlinepopups' => 1,
-		'insertdatetime' => 0,
-		'layer' => 0,
-		'legacyoutput' => 0,
-		'lists' => 1,
-		'media' => 1,
-		'nonbreaking' => 1,
-		'noneditable' => 0,
-		'pagebreak' => 1,
-		'paste' => 1,
-		'preview' => 1,
-		'print' => 1,
-		'save' => 0,
-		'searchreplace' => 1,
-		'spellchecker' => 1,
-		'style' => 1,
-		'tabfocus' => 0,
-		'table' => 1,
-		'template' => 0,
-		'visualchars' => 1,
-		'wordcount' => 0,
-		'xhtmlxtras' => 0
-		);
+		// DEV NOTE: search for .addButton() invocations in the plugins to dig out the button names
+		'advhr'              => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'advhr'),
+		'advimage'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
+		'advlink'            => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link'),
+		'advlist'            => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'autolink'           => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // ephox addition
+		'autoresize'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // scale editor height to actual content
+		'autosave'           => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'restoredraft'),
+		'bbcode'             => array('default_on' => 0, 'grouping' =>   0, 'buttons' => ''),           // return page content as BBcode instead of HTML
+		'contextmenu'        => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'directionality'     => array('default_on' => 1, 'grouping' => 200, 'buttons' => 'ltr,rtl'),
+		'emotions'           => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'emotions'),
+		'example'            => array('default_on' => 0, 'grouping' => 210, 'buttons' => 'example'),
+		'fullpage'           => array('default_on' => 0, 'grouping' => 770, 'buttons' => 'fullpage'),   // show page properties and generate complete HTML page code, including headers; do not use as we don't use the generated <head> section anyhow
+		// TODO/IDEA: ^^^^ use 'fullpage' module to have page title, etc. in there, editable n all, but then we need generate that from the beginning then!
+		'fullscreen'         => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'fullscreen'),
+		'iespell'            => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'iespell'),
+		'inlinepopups'       => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'insertdatetime'     => array('default_on' => 1, 'grouping' => 180, 'buttons' => 'insertdate,inserttime'),
+		'layer'              => array('default_on' => 1, 'grouping' => 150, 'buttons' => 'insertlayer,moveforward,movebackward,absolute'),
+		'legacyoutput'       => array('default_on' => 0, 'grouping' =>   0, 'buttons' => ''),
+		'lists'              => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),           // ephox addition
+		'media'              => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'media'),
+		'nonbreaking'        => array('default_on' => 1, 'grouping' =>  65, 'buttons' => 'nonbreaking'),
+		'noneditable'        => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'pagebreak'          => array('default_on' => 1, 'grouping' =>  75, 'buttons' => 'pagebreak'),
+		'paste'              => array('default_on' => 1, 'grouping' =>  16, 'buttons' => 'selectall,pastetext,pasteword'),
+		'preview'            => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'preview'),
+		'print'              => array('default_on' => 1, 'grouping' =>  10, 'buttons' => 'print'),
+		'save'               => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'save,cancel'),
+		'searchreplace'      => array('default_on' => 1, 'grouping' =>  20, 'buttons' => 'search,replace'),
+		'spellchecker'       => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'spellchecker'),
+		'style'              => array('default_on' => 1, 'grouping' =>  51, 'buttons' => 'styleprops'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
+		'tabfocus'           => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'table'              => array('default_on' => 1, 'grouping' => 141, 'buttons' => 'table,delete_table,delete_col,delete_row,col_before,col_after,row_before,row_after,row_props,cell_props,split_cells,merge_cells'),
+		'template'           => array('default_on' => 1, 'grouping' => 180, 'buttons' => 'template'),
+		'visualchars'        => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualchars'),
+		'wordcount'          => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'xhtmlxtras'         => array('default_on' => 1, 'grouping' =>  70, 'buttons' => 'cite,q,acronym,abbr,del,ins,attribs'),
+
+		// built-ins:
+
+		'.basicformat'       => array('default_on' => 1, 'grouping' =>  30, 'buttons' => 'bold,italic,underline,strikethrough'),
+		'.charmap'           => array('default_on' => 1, 'grouping' =>  61, 'buttons' => 'charmap'),
+		'.cleanup'           => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'cleanup'),
+		'.clipboard'         => array('default_on' => 1, 'grouping' =>  15, 'buttons' => 'cut,copy,paste'),
+		'.code'              => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'code'),
+		'.colorpicker'       => array('default_on' => 1, 'grouping' =>  52, 'buttons' => 'forecolor:44,forecolorpicker,backcolor:44,backcolorpicker'),  // the .selectable_format' toolbar section seesm to 'eat' anything we group with it, so keep this in separate group
+		'.help'              => array('default_on' => 1, 'grouping' => 800, 'buttons' => 'help'),
+		'.hierarchy'         => array('default_on' => 1, 'grouping' =>  58, 'buttons' => 'outdent,indent'),
+		'.hr'                => array('default_on' => 1, 'grouping' => 135, 'buttons' => 'hr'),
+		'.image'             => array('default_on' => 1, 'grouping' => 130, 'buttons' => 'image'),
+		'.justify'           => array('default_on' => 1, 'grouping' =>  40, 'buttons' => 'justifyleft,justifycenter,justifyright,justifyfull'),
+		'.linkage'           => array('default_on' => 1, 'grouping' => 120, 'buttons' => 'link,unlink,anchor'),
+		'.lists'             => array('default_on' => 1, 'grouping' =>  66, 'buttons' => 'bullist:44,numlist:44'),
+		'.new'               => array('default_on' => 1, 'grouping' =>  11, 'buttons' => 'newdocument'),
+		'.quotation'         => array('default_on' => 1, 'grouping' =>  67, 'buttons' => 'blockquote'),
+		'.removeformat'      => array('default_on' => 1, 'grouping' => 600, 'buttons' => 'removeformat'),
+		'.selectable_format' => array('default_on' => 1, 'grouping' =>  50, 'buttons' => 'styleselect:88,formatselect:88,fontselect:88,fontsizeselect:88'),
+		'.shortcuts'         => array('default_on' => 1, 'grouping' =>   0, 'buttons' => ''),
+		'.superscript'       => array('default_on' => 1, 'grouping' =>  35, 'buttons' => 'sub,sup'),
+		'.table'             => array('default_on' => 0, 'grouping' => 140, 'buttons' => 'tablecontrols:282'),  // must be in a separate group by its own, before the 'table' buttons; if you group them, you'll get extra empty toolbar chunks in the view :-(
+		// ^^ this is disabled due this being a tinyMCE 2.x backwards compat item clashing with 'table' above: == ["table","|","row_props","cell_props","|","row_before","row_after","delete_row","|","col_before","col_after","delete_col","|","split_cells","merge_cells"]
+		'.undo'              => array('default_on' => 1, 'grouping' =>  14, 'buttons' => 'undo,redo'),
+		'.visualaid'         => array('default_on' => 1, 'grouping' => 750, 'buttons' => 'visualaid')
+	);
+
+	if ($desired_plugins !== null && !is_array($desired_plugins))
+	{
+		$desired_plugins = ','.preg_replace('/\s+/', '', strval($desired_plugins)).',';
+
+		if (strpos($desired_plugins, '*') !== false)
+		{
+			$desired_plugins = null;
+		}
+		else
+		{
+			// expand 'set names':
+			$desired_plugins = str_replace(',basic,', ',fullscreen,preview,searchreplace,spellchecker,style,table,visualchars,xhtmlxtras,', $desired_plugins);
+
+			$desired_plugins = explode(',', $desired_plugins);
+		}
+	}
 
 	$rv = array();
-	foreach ($mce_plugins as $plugin => $in_use)
+	foreach ($mce_plugins as $plugin => $props)
 	{
-		if (!$in_use) continue;
+		if (!$props['default_on']) continue;
 
-		$rv[] = $plugin;
+		if ($desired_plugins === null || in_array($plugin, $desired_plugins))
+		{
+			$rv[$plugin] = $props;
+		}
 	}
 	return $rv;
 }
@@ -2915,114 +3352,17 @@ function get_tinyMCE_plugin_list()
 
 
 
-function get_tinyMCE_button_list($plugin = null)
+
+
+/*
+filter function: return TRUE only when a plugin name looks like it is actually a real tinyMCE plugin!
+*/
+function is_real_tinyMCE_plugin($name)
 {
-	/*
-	 * available plugins:
-	 *   advhr
-	 *   advimage
-	 *   advlink
-	 *   advlist
-	 *   autolink
-	 *   autoresize
-	 *   autosave
-	 *   bbcode
-	 *   contextmenu
-	 *   directionality
-	 *   emotions
-	 *   example
-	 *   fullpage
-	 *   fullscreen
-	 *   iespell
-	 *   inlinepopups
-	 *   insertdatetime
-	 *   layer
-	 *   legacyoutput
-	 *   lists
-	 *   media
-	 *   nonbreaking
-	 *   noneditable
-	 *   pagebreak
-	 *   paste
-	 *   preview
-	 *   print
-	 *   save
-	 *   searchreplace
-	 *   spellchecker
-	 *   style
-	 *   tabfocus
-	 *   table
-	 *   template
-	 *   visualchars
-	 *   wordcount
-	 *   xhtmlxtras
-	 */
-	static $mce_plugin_buttons = array(
-		'advhr' => 'advhr',  // search for .addButton() invocations in the plugins to dig out the button names
-		'advimage' => 'image',
-		'advlink' => 'link',
-		'advlist' => '',
-		'autolink' => '',
-		'autoresize' => '',
-		'autosave' => 'restoredraft',
-		'bbcode' => '',
-		'contextmenu' => '',
-		'directionality' => 'ltr,rtl',
-		'emotions' => 'emotions',
-		'example' => 'example',
-		'fullpage' => 'fullpage',
-		'fullscreen' => 'fullscreen',
-		'iespell' => 'iespell',
-		'inlinepopups' => '',
-		'insertdatetime' => 'insertdate,inserttime',
-		'layer' => 'insertlayer,moveforward,movebackward,absolute',
-		'legacyoutput' => '',
-		'lists' => '',
-		'media' => 'media',
-		'nonbreaking' => 'nonbreaking',
-		'noneditable' => 'noneditable',
-		'pagebreak' => 'pagebreak',
-		'paste' => 'selectall,pastetext,pasteword',
-		'preview' => 'preview',
-		'print' => 'print',
-		'save' => 'save,cancel',
-		'searchreplace' => 'search,replace',
-		'spellchecker' => 'spellchecker',
-		'style' => 'styleprops',
-		'tabfocus' => '',
-		'table' => 'table,delete_table,delete_col,delete_row,col_after,col_before,row_after,row_before,row_props,cell_props,split_cells,merge_cells',
-		'template' => 'template',
-		'visualchars' => 'visualchars',
-		'wordcount' => '',
-		'xhtmlxtras' =>'cite,acronym,abbr,del,ins,attribs',
-		'.1' => 'newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull',
-		'.2' => 'styleselect,formatselect,fontselect,fontsizeselect,|,forecolor,forecolorpicker,backcolor,backcolorpicker',
-		'.3' => 'bullist,numlist,|,outdent,indent,|,cut,copy,paste,|,undo,redo,|,link,unlink,anchor,image,|,cleanup,shortcuts,code,help',
-		'.4' => 'sub,sup,|,blockquote,hr,removeformat,visualaid,|,charmap'
-		);
+	if (empty($name))
+		return false;
 
-	$active_plugins = null;
-	if (is_array($plugin))
-	{
-		$active_plugins = $plugin;
-	}
-	else if (!empty($plugin))
-	{
-		$active_plugins = explode(',', strval($plugin));
-	}
-	else
-	{
-		$active_plugins = get_tinyMCE_plugin_list();
-	}
-
-	$rv = array();
-	foreach ($mce_plugin_buttons as $plugin => $buttons)
-	{
-		if (!in_array($plugin, $active_plugins)) continue;
-
-		$rv[$plugin] = $buttons;
-	}
-	return $rv;
+	return strpos('abcdefghijklmnopqrstuvwxyz', $name[0]) !== false;
 }
 
 
@@ -3037,214 +3377,543 @@ state == 0: the lazyload filespec
 state == 1: the PREinit code section
 
 state == 2: the init() code section
+
+state == 3: extra assistent functions section
+
+----------------------------------------------
+
+A lesson learned the HARD way: when looking at the MCE demos you'll note those buggers autoresize when the window
+size changes (due to resizeTo() being called from the MCE-registered resize event).
+
+Two things you should ALSO note:
+
+- when you configure a width & height, the autoresizing, i.e. following the resizing of the underlying textarea,
+  IS GONE. Down the toilet.
+
+  We do NOT WANT THAT!
+
+- when the user jiggles the resize triangle in the lower right croner, the autoresizing is disabled from that point
+  onwards as well.
+
+  The resizing gets stored in a cookie (TinyMCE_<textarea_id>_size:(ch,cw values) and when you reload
+  and the cookie is there, no autoresize/follow anyhow as TinyMCE will (due to 'theme_advanced_resizing_use_cookie = true')
+  restore the cookie-stored dimensions and keep it that way until you resize again using that resize triangle in
+  the lower right corner again!
+
+
+The autoresize being gone, even after reload, is due to the cookie existing AND containing those cw and ch values.
+
+
+Lesson:
+
+- the TinyMCE textarea ID should therefore be unique per editor instance, so that resize actions in one don't 'show up'
+  in the behaviour of other TinyMCE editors in the site.
+
+- If you want TinyMCE to recall such dimensioning PER DOCUMENT, you'd better make sure each document gets its own
+  <textarwa> ID!
+
+- Do NOT SPECIFY WIDTH AND HEIGHT when instantiating a TinyMCE object!
+
+- the <textarea> itself MUST have a 'style="width: 100%"' or similar percentage-based setting. Putting this in a CSS file
+  and a class is NOT going to work! If you want TinyMCE to resize along with window size changes, you've got to do it
+  this way!
+
+
+---------------------------------------------------------------------
+
+@param string $editarea_tags       is a comma-separated set of textarea tags.
+
+								   WARNING: each tag must also be suitable as a variable name for use JavaScript!
+											Hence tags MUST only contain alphanumerics and underscores and MUST START with
+											an alpha character ([A-Za-z]).
 */
-function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true, $js_load_callback = 'jsComplete')
+class tinyMCEcodeGen
 {
-	global $cfg;
+	protected $rootdir;
+	protected $MCE_language;
+	protected $FM_language;
+	protected $options;
+	protected $js_load_callback;
 
-	$editarea_tags = explode(',', $editarea_tags);
 
-	switch ($state)
+	public function __construct($textarea_ids, $usr_options = null, $js_load_callback = 'jsComplete')
 	{
-	default:
-		return false;
+		global $cfg;
 
-	case 0:
-		$rv = array();
+		$this->rootdir = $cfg['rootdir'];
+		$this->MCE_language = $cfg['tinymce_language'];
+		$this->FM_language = $cfg['MT_FileManager_language'];
 
-		// pick one of these: tiny_mce_dev.js (which will lazyload all tinyMCE parts recursively) or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
-		if ($cfg['USE_JS_DEVELOPMENT_SOURCES'])
+		$this->js_load_callback = $js_load_callback;
+
+		// split the ID set and create a full MCE options array for each of 'em, keeping track of generic and specific user options
+		$editarea_tags = explode(',', $textarea_ids);
+		$options = array();
+
+		$generic_user_opts = ((isset($usr_options[0]) && is_array($usr_options[0])) ? $usr_options[0] : array());
+		foreach ($editarea_tags as $tag)
 		{
-			$rv[] = $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_dev.js";
+			$user_opts = ((isset($usr_options[$tag]) && is_array($usr_options[$tag])) ? $usr_options[$tag] : array());
+			$options[$tag] = array_merge(array(
+					'theme' => 'advanced',
+				), $generic_user_opts, $user_opts);
+
+			// do this defaulting in two steps: some of the item names are dependent on the actual theme picked for this tinyMCE instance:
+			$theme = $options[$tag]['theme'];
+
+			if($cfg['iframe'])
+			{
+				$iframe_def_options = array(
+					'extended_valid_elements' => 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]'
+				);
+			}
+			else
+			{
+				$iframe_def_options = array();
+			}
+
+			$options[$tag] = array_merge(array(
+					'skin' => 'o2k7',
+					'skin_variant' => 'silver',
+
+					'mode' => 'exact',
+					'elements' => $tag,
+					'language' => $this->MCE_language,
+					'dialog_type' => 'modal',
+
+					'paste_auto_cleanup_on_paste' => true,
+
+					'autoresize_on_init' => true,
+
+					'autosave_ask_before_unload' => false,    // don't bug the user when he's aborting his edit
+
+					'relative_urls' => false,
+					'convert_urls' => true,
+					'remove_script_host' => true,
+					'document_base_url' => $this->rootdir,
+
+					// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
+					'content_css' => $this->rootdir . 'admin/img/styles/base.css,' . $this->rootdir . 'admin/img/styles/liquid.css,' . $this->rootdir . 'admin/img/styles/layout.css' .
+										',' . $this->rootdir . 'admin/img/styles/sprite.css,' . $this->rootdir . 'admin/img/styles/last_minute_fixes.css' .
+										',' . $this->rootdir . 'admin/img/styles/ie.css?only-when=%3d%3d+IE',
+
+					'spellchecker_languages' => '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
+
+					"theme_{$theme}_toolbar_location" => 'top',
+					"theme_{$theme}_toolbar_align" => 'left',
+					"theme_{$theme}_statusbar_location" => 'bottom',
+
+					"theme_{$theme}_resizing" => true,  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
+					"theme_{$theme}_resizing_use_cookie" => 1,
+					"theme_{$theme}_resize_horizontal" => true,
+					"theme_{$theme}_resizing_min_width" => 362,  /* turns out the widest toolbar block of ours is 362px wide */
+					"theme_{$theme}_resizing_min_height" => 100,
+					"theme_{$theme}_resizing_max_width" => null, /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+					"theme_{$theme}_resizing_max_height" => 0xFFFF
+
+					//height: '300px',
+					//width: editWinWidth   /* default: width in pixels */
+
+				), $iframe_def_options, $options[$tag]);
+
+
+
+
+
+			// make sure, when the FileManager is required, that it's options are set up as well:
+			if (isset($options[$tag]['FileManager']))
+			{
+				$session_id = session_id();
+				if (!empty($session_id))
+				{
+					$sid_def_options = array(
+						'uploadAuthData' => array(
+							'session' => $session_id
+						)
+					);
+				}
+				else
+				{
+					$sid_def_options = array();
+				}
+				$fm_user_opts = (is_array($options[$tag]['FileManager']) ? $options[$tag]['FileManager'] : array());
+
+				$options[$tag]['FileManager'] = array_merge(array(
+						'url' => $this->rootdir . 'lib/includes/js/mootools-filemanager/ccms/manager.php',
+						'baseURL' => $this->rootdir,
+						'assetBasePath' => $this->rootdir . 'lib/includes/js/mootools-filemanager/Assets',
+						'language' => $this->FM_language,
+						'selectable' => true,
+						'destroy' => true,
+						'upload' => true,
+						'rename' => true,
+						'download' => true,
+						'createFolders' => true,
+						'hideClose' => false,
+						'hideOverlay' => false,
+						'uploadAuthData' => array(),
+						'propagateData' => array(
+							'editor_req_type' => null // =='image', ...
+						)
+					), $sid_def_options, $fm_user_opts);
+			}
+			else
+			{
+				unset($options[$tag]['FileManager']);
+			}
+
+
+
+			$pluginarr = get_tinyMCE_plugin_list((!empty($options[$tag]['plugins']) ? $options[$tag]['plugins'] : null));
+			$plugs = array_keys($pluginarr);
+			$plugs = array_filter($plugs, 'is_real_tinyMCE_plugin');
+			$options[$tag]['plugins'] = implode(',', $plugs);
+			dump_request_to_logfile(array('pluginarr' => $pluginarr));
+
+			/*
+			now create a list of buttons:
+
+			we've moved the construction of the toolbars to the backend as we've found that using many small toolbars helps when the editor is resizing:
+			wider (larger) toolbars block the editor from shrinking.
+
+			The 'grouping' setting instructs us which tools should sit on the same toolbar.
+			*/
+
+			$btngrp = array();
+			$btnset = array();
+			foreach($pluginarr as $name => $info)
+			{
+				$bs = $info['buttons'];
+				if (empty($bs)) continue;
+
+				$grp = $info['grouping'];
+
+				$bsa = explode(',', $bs);
+				foreach($bsa as $btn1)
+				{
+					$bdef = explode(':', $btn1);
+					if (count($bdef) > 1)
+					{
+						// a button which is wider than the usual ones: length is specced as number of 'regular' buttons eqv.:
+						$bdef[1] = intval($bdef[1]);
+					}
+					else
+					{
+						$bdef[1] = ($bdef[0] == '|' ? 10 : 22); /* [px] width per button */
+					}
+
+					if (!isset($btngrp[$grp]))
+					{
+						$btngrp[$grp] = array();
+					}
+
+					// also check whether button isn't already in the group/toolbar-set: some adv(anced) plugins override existing buttons/functions:
+					$xsist = array_key_exists($bdef[0], $btnset);
+					if (!$xsist)
+					{
+						$btngrp[$grp][] = $bdef;
+						$btnset[$bdef[0]] = true;
+					}
+				}
+			}
+			ksort($btngrp);
+			dump_request_to_logfile(array('pluginarr' => $pluginarr, 'btngrp' => $btngrp));
+
+			// bigger toolbar chunks are bad because you are limiting the shrinking capability of the editor window...
+			$tbdef = $this->generateToolbarLayout($btngrp, 100);
+			dump_request_to_logfile(array('pluginarr' => $pluginarr, 'btngrp' => $btngrp, 'tbdef' => $tbdef));
+
+			for ($i = count($tbdef); $i > 0; $i--)
+			{
+				$options[$tag]["theme_{$theme}_buttons" . $i] = $tbdef[$i - 1];
+			}
+			// and make sure we blow away any inadvertedly user defined toolbars:
+			for ($i = count($tbdef) + 1; isset($options[$tag]["theme_{$theme}_buttons" . $i]); $i++)
+			{
+				unset($options[$tag]["theme_{$theme}_buttons" . $i]);
+			}
+		}
+
+		$this->options = $options;
+	}
+
+
+
+
+	protected function generateToolbarLayout($btngrp, $editWinWidth)
+	{
+		$lwleft = $editWinWidth - 10; // subtract edges.
+		$max_singlegrp_width = 0;
+
+		$tbcoll = array();
+		$tb = array();
+		foreach($btngrp as $group => $btnarr)
+		{
+			$grpwidth = 0;
+			$tb1 = array();
+			foreach($btnarr as $btn)
+			{
+				$grpwidth += $btn[1];
+				$tb1[] = $btn[0];
+			}
+			if ($grpwidth > $max_singlegrp_width)
+				$max_singlegrp_width = $grpwidth;
+
+			if ($grpwidth + 5 > $lwleft)
+			{
+				// not enough space: start a new toolbar row; push the previous toolbar first:
+				$tbcoll[] = implode(',', $tb);
+
+				$tb = array();
+				$lwleft = $editWinWidth - 10; // subtract edges.
+			}
+
+			if (count($tb) > 0)
+			{
+				$lwleft -= 10;
+				// add separator first!
+				$tb[] = '|';
+			}
+			$tb = array_merge($tb, $tb1);
+
+			$lwleft -= $grpwidth;
+		}
+		// and push the final row:
+		if (count($tb) > 0)
+		{
+			$tbcoll[] = implode(',', $tb);
+		}
+
+		// now if we find that the minimum toolbar block width is larger than the originally specified width, we can be sure
+		// we can't get any less wide than that, so we recalc the toolbar layout with that new width:
+		//return ($max_singlegrp_width > $editWinWidth - 10 ? $this->generateToolbarLayout($btngrp, $max_singlegrp_width + 10) : $tbcoll);
+		//
+		// EDIT: it's nicer to have some small toolbars as well, as the wrapping on shrinking the editor will look slightly better that way.
+		return $tbcoll;
+	}
+
+
+	protected function cvt_opt2JS(&$lineterm, $member, $value, $JS_expression = null)
+	{
+		if ($JS_expression !== null)
+		{
+			$rv = $lineterm . $member . ': ' . $JS_expression;
+		}
+		else if (is_string($value))
+		{
+			$value = addcslashes($value, "\0..\37\"");
+			$rv = $lineterm . $member . ': "' . $value . '"';
+		}
+		else if (is_bool($value))
+		{
+			$rv = $lineterm . $member . ': ' . ($value ? 'true' : 'false');
+		}
+		else if (is_scalar($value))
+		{
+			$rv = $lineterm . $member . ': ' . $value;
 		}
 		else
 		{
-			$rv[] = $cfg['rootdir'] . "lib/includes/js/tiny_mce/tiny_mce_ccms.js,tiny_mce_full.js";
+			return '';
 		}
-		if ($with_fancyupload)
-		{
-			/* File uploader JS */
-			$ls = $cfg['rootdir'] . "lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,";
-			if ($cfg['fancyupload_language'] != 'en')
-			{
-				$ls .= "Language/Language.en.js,";
-			}
-			$ls .= "Language/Language." . $cfg['fancyupload_language'] . ".js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js";
+		$lineterm = ",\n";
+		return $rv;
+	}
 
-			$rv[] = $ls;
+
+
+	public function getCSSheaderfiles()
+	{
+		$rv = array('all' => array());
+
+		foreach ($this->options as $tag => $options)
+		{
+			if (!empty($options['FileManager']))
+			{
+				$csspath = $this->rootdir . 'lib/includes/js/mootools-filemanager/dummy.css' .
+								',Assets/js/milkbox/css/milkbox.css' .
+								',Assets/Css/FileManager.css' .
+								',Assets/Css/Additions.css';
+
+				$rv['all'][] = $csspath;
+				break;  // once is enough...
+			}
+		}
+
+		return $rv;
+	}
+
+
+
+
+	public function get_JSheaderfiles()
+	{
+		$rv = array();
+
+		/*
+		 * pick one of these: tiny_mce_ccms.js (which will lazyload all tinyMCE parts recursively through tiny_mce_dev.js) 
+		 * or tiny_mce_full.js (the 'flattened' tinyMCE source) - the latter is tiny_mce_src.js plus all the plugins merged in
+		 */
+		$rv[] = $this->rootdir . 'lib/includes/js/tiny_mce_ccms.js';
+		foreach ($this->options as $tag => $options)
+		{
+			if (!empty($options['FileManager']))
+			{
+				/* File uploader JS */
+				$ls = $this->rootdir . 'lib/includes/js/mootools-filemanager/dummy.js,Source/FileManager.js,';
+				if ($this->FM_language != 'en')
+				{
+					$ls .= 'Language/Language.en.js,';
+				}
+				$ls .= 'Language/Language.' . $this->FM_language . '.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js';
+
+				// and make sure these are added BEFORE this series of scripts (the Combiner will filter out those lines from FileManager.js to prevent clashes):
+				//
+				//Asset.javascript(__DIR__+'../Assets/js/milkbox/milkbox.js');
+				//Asset.css(__DIR__+'../Assets/js/milkbox/css/milkbox.css');
+				//Asset.css(__DIR__+'../Assets/Css/FileManager.css');
+				//Asset.css(__DIR__+'../Assets/Css/Additions.css');
+				//Asset.javascript(__DIR__+'../Assets/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
+				$rv[] = $this->rootdir . 'lib/includes/js/mootools-filemanager/Assets/js/jsGET.js';
+				$rv[] = $this->rootdir . 'lib/includes/js/mootools-filemanager/Assets/js/milkbox/milkbox.js';
+
+				$rv[] = $ls;
+				break; // once is enough...
+			}
 		}
 		return $rv;
+	}
 
-	case 1:
+
+
+
+	public function genStarterCode()
+	{
 		/*
 		 * when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
 		 * however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
 		 * file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
 		 */
-		$rv = "";
-		$rv .= "tinyMCEPreInit = {\n";
-		$rv .= "      suffix: '_src'\n"; /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		$rv .= "    , base: '" . $cfg['rootdir'] . "lib/includes/js/tiny_mce'\n";
-		$rv .= "    , query: 'load_callback=" . $js_load_callback . "'\n"; /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-		$rv .= "};\n";
+		$rootdir = $this->rootdir;
+		$callback = $this->js_load_callback;
+
+		$rv = <<<EOT42
+
+	tinyMCEPreInit = {
+		  suffix: '_src'    /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugin */
+		, base: '{$rootdir}lib/includes/js/tiny_mce/jscripts/tiny_mce'
+		, query: 'load_callback={$callback}' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
+	};
+
+EOT42;
 		return $rv;
+	}
 
-	case 2:
-		$rv = "";
-		// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
-		$rv .= "var dimensions;\n";
-		$rv .= "var editwinwidth;\n";
 
-		foreach($editarea_tags as $tag)
+
+
+	public function genDriverCode()
+	{
+		$rv = <<<EOT42
+
+	// var has_mocha = (parent && parent.MochaUI && (typeof parent.$ == 'function'));
+	var dimensions;
+	var editWinWidth;
+	var editwinmaxwidth;
+	var editwinmaxheight;
+
+	if (!tinyMCE.dom.Event.domLoaded) tinyMCE.dom.Event.domLoaded = 42;
+	if (!tinyMCE.domLoaded) tinyMCE.domLoaded = 666;
+
+
+EOT42;
+
+		foreach ($this->options as $tag => $options)
 		{
-			$rv .= "dimensions = window.getSize();\n";
-			$rv .= "editwinwidth = dimensions.x - 20;\n";
-			$rv .= "dimensions = \$('" . $tag . "').getSize();\n";
-			$rv .= "editwinwidth = dimensions.x;\n";
-			//$rv .= "alert('width: ' + editwinwidth + 'px');\n";
-			$rv .= "\n";
-			$rv .= "tinyMCE.init(\n";
-			$rv .= "    {\n";
-			$rv .= "        mode: 'exact',\n";
-			$rv .= "        elements: '" . $tag . "',\n";
-			$rv .= "        theme: 'advanced',\n";
-			$rv .= "        language: '" . $cfg['tinymce_language'] ."',\n";
-			$rv .= "        skin: 'o2k7',\n";
-			$rv .= "        skin_variant: 'silver',\n";
+			$rv .= <<<EOT42
 
-			$pluginarr = get_tinyMCE_plugin_list();
-			$pstr = implode(',', $pluginarr);
+	dimensions = window.getSize();
+	editwinmaxwidth = dimensions.x - 20;
+	editwinmaxheight = dimensions.y - 80;
+	dimensions = \$('{$tag}').getSize();
+	editWinWidth = dimensions.x;
+	//if (typeof console !== 'undefined' && console.log) console.log('width: ' + editWinWidth + 'px');
 
-			$rv .= "        plugins: '" . $pstr . "',\n";
-			$rv .= "        theme_advanced_toolbar_location: 'top',\n";
+	var MCEsettings_{$tag} = {
 
-			$rv .= "        theme_advanced_buttons1 : 'fullscreen,restoredraft,print,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',\n";
-			$rv .= "        theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,forecolorpicker,backcolor,backcolorpicker',\n";
-			$rv .= "        theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,spellchecker,media,advhr,|,print,|,ltr,rtl',\n"; /* iespell */
-			$rv .= "        theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak',\n";
+EOT42;
 
-			$rv .= "        theme_advanced_toolbar_align: 'left',\n";
-			$rv .= "        theme_advanced_statusbar_location: 'bottom',\n";
-			$rv .= "        dialog_type: 'modal',\n";
-			$rv .= "        paste_auto_cleanup_on_paste: true,\n";
-			$rv .= "        theme_advanced_resizing: true,\n";  /* This bugger is responsible for resizing (on init!) the edit window, due to a lingering cookie when you've used the same edit window in a browser tab and a mochaUI window */
-			$rv .= "        theme_advanced_resize_horizontal : 1,\n";
-			$rv .= "        theme_advanced_resizing_use_cookie : 1,\n";
-			$rv .= "        theme_advanced_resize_horizontal: false,\n";
-			$rv .= "        theme_advanced_resizing_min_width: 400,\n";
-			$rv .= "        theme_advanced_resizing_min_height: 100,\n";
-			$rv .= "        theme_advanced_resizing_max_width: editwinwidth,\n"; /* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
-			$rv .= "        theme_advanced_resizing_max_height: 0xFFFF,\n";
-			$rv .= "        relative_urls: true,\n";
-			$rv .= "        convert_urls: false,\n";
-			$rv .= "        remove_script_host: true,\n";
-			$rv .= "        document_base_url: '" . $cfg['rootdir'] . "',\n";
+			$theme = $options['theme'];
+			$theme_tag1 = "theme_{$theme}_resizing_max_width";
 
-			// TODO: determine the template of the given page: fetch those CSS files.
-
-			// note: content_css is split on the ',' comma by tinyMCE itself, so this is NOT A COMBINER URL (though that last bit with ie.css depends on another combiner feature)
-			$rv .= "        content_css: '" . $cfg['rootdir'] . 'admin/img/styles/base.css,' . $cfg['rootdir'] . 'admin/img/styles/liquid.css,' . $cfg['rootdir'] . 'admin/img/styles/layout.css' .
-										',' . $cfg['rootdir'] . 'admin/img/styles/sprite.css,' . $cfg['rootdir'] . 'admin/img/styles/last_minute_fixes.css' .
-										',' . $cfg['rootdir'] . 'admin/img/styles/ie.css?only-when=%3d%3d+IE' . "',\n";
-
-			if($cfg['iframe'])
+			$lineterm = '';
+			foreach($options as $member => $value)
 			{
-				$rv .= "        extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',\n";
+				/* limit the width to ensure the width NEVER surpasses that of the mochaUI window, IFF we are in one... */
+				if ($member == $theme_tag1 && $value === null)
+				{
+					$rv .= $this->cvt_opt2JS($lineterm, $member, null, 'editWinWidth');
+				}
+				else
+				{
+					$rv .= $this->cvt_opt2JS($lineterm, $member, $value);
+				}
 			}
-			$rv .= "        spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',\n";
-			if ($with_fancyupload)
+
+
+			if (!empty($options['FileManager']))
 			{
-				$rv .= "        file_browser_callback: FileManager.TinyMCE(\n";
-				$rv .= "            function(type)\n";
-				$rv .= "            {\n";
-				$rv .= "                return {\n"; /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-				$rv .= "                    url: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),\n";
-				$rv .= "                    baseURL: '" . $cfg['rootdir'] . "',\n";
-				$rv .= "                    assetBasePath: '" . $cfg['rootdir'] . "lib/includes/js/fancyupload/Assets',\n";
-				$rv .= "                    language: '" . $cfg['fancyupload_language'] . "',\n";
-				$rv .= "                    selectable: true,\n";
-				$rv .= "                    uploadAuthData: {\n";
-				$rv .= "                        session: 'ccms_userLevel',\n";
-				$rv .= "                        sid: '" . session_id() . "'\n";
-				$rv .= "                    }\n";
-				$rv .= "                };\n";
-				$rv .= "            }),\n";
+				$rv .= $lineterm . <<<EOT42
+
+		/* Here goes the Magic */
+		file_browser_callback: FileManager.TinyMCE(
+			function(type)
+			{
+				return {  /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
+
+EOT42;
+
+				$lineterm = '';
+				foreach($options['FileManager'] as $member => $value)
+				{
+					if ($member == 'editor_req_type' && $value === null)
+					{
+						$rv .= $this->cvt_opt2JS($lineterm, $member, null, 'type');  // =='image', ...
+					}
+					else
+					{
+						$rv .= $this->cvt_opt2JS($lineterm, $member, $value);
+					}
+				}
+
+				$rv .= <<<EOT42
+
+				};
+			})
+
+EOT42;
 			}
-			//$rv .= "        height: '300px',\n";
-			$rv .= "        width: editwinwidth\n"; // default: width in pixels
-			$rv .= "    });\n";
+			$rv .= <<<EOT42
+
+	};
+
+	tinyMCE.init(MCEsettings_{$tag});
+
+EOT42;
 		}
 
 		return $rv;
-
-		/*
-		plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,autosave",
-
-		// Theme options
-		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
-		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-		theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-		theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak,restoredraft",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_resizing : true,
-
-		// Example content CSS (should be your site CSS)
-		content_css : "css/content.css",
-
-		// Drop lists for link/image/media/template dialogs
-		template_external_list_url : "lists/template_list.js",
-		external_link_list_url : "lists/link_list.js",
-		external_image_list_url : "lists/image_list.js",
-		media_external_list_url : "lists/media_list.js",
-
-		// Style formats
-		style_formats : [
-			{title : 'Bold text', inline : 'b'},
-			{title : 'Red text', inline : 'span', styles : {color : '#ff0000'}},
-			{title : 'Red header', block : 'h1', styles : {color : '#ff0000'}},
-			{title : 'Example 1', inline : 'span', classes : 'example1'},
-			{title : 'Example 2', inline : 'span', classes : 'example2'},
-			{title : 'Table styles'},
-			{title : 'Table row 1', selector : 'tr', classes : 'tablerow1'}
-		],
-
-		// Replace values for the template plugin
-		template_replace_values : {
-			username : "Some User",
-			staffid : "991234"
-		}
+	}
 
 
 
-		// Patch callbacks, make them point to window.opener
-		patchCallback(settings, 'urlconverter_callback');
-		patchCallback(settings, 'insertlink_callback');
-		patchCallback(settings, 'insertimage_callback');
-		patchCallback(settings, 'setupcontent_callback');
-		patchCallback(settings, 'save_callback');
-		patchCallback(settings, 'onchange_callback');
-		patchCallback(settings, 'init_instance_callback');
-		patchCallback(settings, 'file_browser_callback');
-		patchCallback(settings, 'cleanup_callback');
-		patchCallback(settings, 'execcommand_callback');
-		patchCallback(settings, 'oninit');
-
-		// Set options
-		delete settings.id;
-		settings['mode'] = 'exact';
-		settings['elements'] = 'fullscreenarea';
-		settings['add_unload_trigger'] = false;
-		settings['ask'] = false;
-		settings['document_base_url'] = window.opener.tinyMCE.activeEditor.documentBaseURI.getURI();
-		settings['fullscreen_is_enabled'] = true;
-		settings['fullscreen_editor_id'] = oeID;
-		settings['theme_advanced_resizing'] = false;
-		settings['strict_loading_mode'] = true;
-		*/
+	public function genExtraFunctionsCode()
+	{
+		return '';
 	}
 }
+
+
 
 
 
@@ -3254,7 +3923,7 @@ function generateJS4tinyMCEinit($state, $editarea_tags, $with_fancyupload = true
 Generate the common JS lazyload driver block which should be included in each HTML output where
 multiple JS files need to be loaded.
 */
-function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code = null)
+function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code = null, $extra_functions_code = null)
 {
 	global $cfg;
 
@@ -3273,68 +3942,129 @@ function generateJS4lazyloadDriver($js_files, $driver_code = null, $starter_code
 	}
 	if (!empty($fs))
 	{
-		$rv = "var jsLogEl = document.getElementById('jslog');\n";
-		$rv .= "var js = [\n";
-		$rv .= $fs . "\n";
-		$rv .= "    ];\n";
-		$rv .= "\n";
-		$rv .= "function jsComplete(user_obj, lazy_obj)\n";
-		$rv .= "{\n";
-		$rv .= "    var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');\n";
-		$rv .= "    \n";
-		$rv .= "    if (lazy_obj.todo_count)\n";
-		$rv .= "    {\n";
-		$rv .= "        /* nested invocation of LazyLoad added one or more sets to the load queue */\n";
-		$rv .= "        jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);\n";
-		$rv .= "        return false;\n";
-		$rv .= "    }\n";
-		$rv .= "    else\n";
-		$rv .= "    {\n";
-		$rv .= "        jslog('All JS has been loaded!');\n";
-		$rv .= "    }\n";
-		$rv .= "\n";
-		$rv .= "    // window.addEvent('domready',function()\n";
-		$rv .= "    //{\n";
-		$rv .= $driver_code . "\n";
-		$rv .= "    //});\n";
-		$rv .= "\n";
-		$rv .= "    //alert('stop_loading = ' + (1 * stop_loading));\n";
-		$rv .= "    return stop_loading;\n";
-		$rv .= "}\n";
-		$rv .= "\n";
-		$rv .= "\n";
-		$rv .= "function jslog(message) \n";
-		$rv .= "{\n";
-		$rv .= "    if (jsLogEl)\n";
-		$rv .= "    {\n";
-		$rv .= "        jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';\n";
-		$rv .= "    }\n";
-		$rv .= "}\n";
-		$rv .= "\n";
-		$rv .= "\n";
-		$rv .= "/* the magic function which will start it all, thanks to the augmented lazyload.js: */\n";
-		$rv .= "function ccms_lazyload_setup_GHO()\n";
-		$rv .= "{\n";
-		$rv .= "    jslog('loading JS (sequential calls)');\n";
-		$rv .= "\n";
-		$rv .= $starter_code . "\n";
-		$rv .= "\n";
-		$rv .= "    LazyLoad.js(js, jsComplete);\n";
-		$rv .= "}\n";
+		$rv = <<<EOT42
+
+var jsLogEl = document.getElementById('jslog');
+var js = [
+
+{$fs}
+
+	];
+
+function jsComplete(user_obj, lazy_obj)
+{
+	var stop_loading = (lazy_obj.pending_count == 0 && lazy_obj.type !== 'css');
+
+	if (lazy_obj.todo_count)
+	{
+		/* nested invocation of LazyLoad added one or more sets to the load queue */
+		var next_one;
+		
+		if (lazy_obj.pending_set.js.urls.length > 0)
+		{
+			next_one = lazy_obj.pending_set.js.urls[0];
+		}
+		else 
+		{
+			next_one = lazy_obj.load_queue['js'][0].urls[0];
+		}
+		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ next_one);
+		return false;
 	}
 	else
 	{
-		$rv = "\n";
-		$rv .= $starter_code . "\n";
-		$rv .= "\n";
-		$rv .= "// window.addEvent('domready',function()\n"; // TODO !
-		$rv .= "//{\n";
-		$rv .= $driver_code . "\n";
-		$rv .= "//});\n";
+		jslog('All JS has been loaded!');
+	}
+
+	// window.addEvent('domready',function()
+	//{
+
+{$driver_code}
+
+	//});
+
+	//alert('stop_loading = ' + (1 * stop_loading));
+	return stop_loading;
+}
+
+
+function jslog(message)
+{
+	if (jsLogEl)
+	{
+		jsLogEl.value += '[' + (new Date()).toTimeString() + '] ' + message + '\\r\\n';
+	}
+}
+
+
+/* the magic function which will start it all, thanks to the augmented lazyload.js: */
+function ccms_lazyload_setup_GHO()
+{
+	jslog('loading JS (sequential calls)');
+
+{$starter_code}
+
+	LazyLoad.js(js, jsComplete);
+}
+
+{$extra_functions_code}
+
+
+EOT42;
+	}
+	else
+	{
+		$rv = <<<EOT42
+
+{$extra_functions_code}
+
+{$starter_code}
+
+// window.addEvent('domready',function()
+//{
+
+{$driver_code}
+
+//});
+EOT42;
 	}
 	return $rv;
 }
 
+
+
+function generateCSSheadSection($files)
+{
+	$rv = '';
+
+	foreach($files as $media => $file)
+	{
+		$md = explode(':', $media);
+		$media_str = $md[0];
+		if ($media_str != 'all')
+			$media_str = ' media="' . $media_str . '"';
+		else
+			$media_str = '';
+
+		if (!empty($md[1]))
+		{
+			$IE_cond = array(
+					'\n<!--[if ' . $md[1] . "]>\n",
+					"\n<![endif]-->\n"
+				);
+		}
+		else
+		{
+			$IE_cond = '';
+		}
+
+		$rv .= $IE_cond[0] .
+				'  <link rel="stylesheet" type="text/css" ' . $media_str . ' href="' . $file . '" />' .
+			   $IE_cond[1];
+	}
+
+	return $rv;
+}
 
 
 

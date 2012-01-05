@@ -98,7 +98,6 @@ if (!defined('BASE_PATH'))
 /*MARKER*/require_once(BASE_PATH . '/lib/includes/common.inc.php');
 
 
-define('COMBINER_DEV_DUMP_OUTPUT', false); // dump generated content to cache dir with processed 'files' names - only happens when in DEVELOPMENT mode!
 
 
 $optimize = array();
@@ -149,16 +148,33 @@ $only_when_expression = trim(getGETparam4MathExpression('only-when', ''));
 
 
 
-require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+/*MARKER*/require_once(BASE_PATH . '/lib/includes/browscap/browscap/Browscap.php');
 
 $client_browser = new Browscap(BASE_PATH . '/lib/includes/cache');
-$client_browser->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+$client_browser->localFile = BASE_PATH . '/lib/includes/browscap-data/php_browscap.ini';
 $client_browser = $client_browser->getBrowser();
+/*
+ * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
+ * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
+ *
+ * On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
+ * stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an
+ * entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
+ * past the second '.' dot in there.
+ */
+if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
+{
+	// illegal format: report this and fail dramatically
+	send_response_status_header(500);
+	die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
+}
+$client_browser->SniffedVersion = floatval($vmp[1]);
+
 
 if (0)
 {
 	dump_request_to_logfile(array('client_browser' => $client_browser,
-							       'OPTIMIZE' => $optimize),
+								   'OPTIMIZE' => $optimize),
 							false);
 }
 
@@ -166,17 +182,11 @@ if (0)
  * we abuse the browscap conditional filter to check whether we should okay or discard this load request.
  *
  * This is our server-side alternative, suitable for use with lazyloading, to the MSIE conditional
- * comment:
- *
- * <--[equ IEx] .... -->
- *
- * For this we 'fake'; a wee bit of content (a single line) and see whether the filter leaves it be, or not:
+ * comment.
  */
 if (!empty($only_when_expression))
 {
-	$faked_content = '1 /*:: ' . $only_when_expression . ' */';
-	$faked_content = filter4browser($faked_content, $client_browser);
-	$do_not_load = (empty($faked_content) || $faked_content[0] != '1');
+	$do_not_load = (interpret_conditional_filter_expr($only_when_expression, $client_browser) == 0);
 }
 else
 {
@@ -205,7 +215,7 @@ $elements = explode(',', getGETparam4CommaSeppedFullFilePaths('files'));
 if (substr($base, 0, strlen(BASE_PATH)) != BASE_PATH)
 {
 	send_response_status_header(403); // Illegal Access
-	die();
+	die("\n" . get_response_code_string(403) . " - Combiner: illegal base path: type='$type'\n");
 }
 
 
@@ -224,7 +234,7 @@ foreach($elements as $element)
 		($type == 'css' && substr($path, -4) != '.css'))
 	{
 		send_response_status_header(403); // Forbidden
-		die();
+		die("\n" . get_response_code_string(403) . " - Combiner: illegal type request or file/path does not exist: type='$type', element='$element'\n");
 	}
 
 	/*
@@ -235,12 +245,12 @@ foreach($elements as $element)
 	if (substr($path, 0, strlen($root)) != $root)
 	{
 		send_response_status_header(403); // Illegal Access
-		die();
+		die("\n" . get_response_code_string(403) . " - Combiner: accessing out of bounds path: type='$type', element='$element'\n");
 	}
 	if (!file_exists($path))
 	{
 		send_response_status_header(404); // Not Found
-		die();
+		die("\n" . get_response_code_string(404) . " - Combiner: file does not exist: type='$type', element='$element'\n");
 	}
 
 	$lastmodified = max($lastmodified, filemtime($path));
@@ -312,7 +322,7 @@ else
 	// Check for buggy versions of Internet Explorer
 	if (!empty($_SERVER['HTTP_USER_AGENT']))
 	{
-		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || $client_browser->AOL)
+		if (('IE' == $client_browser->Browser && $client_browser->MajorVer <= 6) || (property_exists($client_browser, 'AOL') && $client_browser->AOL))
 		{
 			$encoding = 'none';
 		}
@@ -360,7 +370,7 @@ else
 
 	// Get contents of the files
 	$contents = '/* Browser: ' . $client_browser->Browser . ' ' . $client_browser->Version . " */\n\n";
-	
+
 	foreach($elements as $element)
 	{
 		$my_content = load_one($type, $http_base, $base, $root, $element);
@@ -492,7 +502,21 @@ else
 		// make sure to paste the callback invocation at the end:
 		if (!empty($extra_JS_callback))
 		{
-			$contents .= "\n\nif (typeof window.$extra_JS_callback == 'function')\n{\n //alert('invoking $extra_JS_callback');\n window.$extra_JS_callback();\n}\n";
+			$contents .= <<<EOT42
+
+
+
+if (typeof window.$extra_JS_callback == 'function')
+{
+	//alert('invoking $extra_JS_callback');
+	window.$extra_JS_callback();
+}
+else
+{
+	alert('NOT existing function $extra_JS_callback');
+}
+
+EOT42;
 		}
 
 		switch ($optimize['javascript'])
@@ -529,7 +553,7 @@ else
 		}
 	}
 
-	if (COMBINER_DEV_DUMP_OUTPUT && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	if ($cfg['COMBINER_DEV_DUMP_OUTPUT'] && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	{
 		$dump_filename = str2VarOrFileName($_GET['files']) . '.' . ($type == 'javascript' ? 'js' : $type);
 
@@ -609,6 +633,115 @@ function css_mk_abs_path($relpath, $basedir)
 }
 
 
+/**
+ * Interpret an expression string; this is a single-pass parser.
+ *
+ * @param $expression     is assumed to be whitespace-trimmed and non-empty.
+ *
+ * @param $skip_checks    TRUE when the parser has already decided the remainder of the expression can be short-circuited. Just parse/munge the input, do not perform checks.
+ */
+function interpret_conditional_filter_expr(&$expression, $client_browser, $depth = 0, $skip_checks = false)
+{
+	$pass = -1;
+	
+	while (!empty($expression))
+	{
+		if (strlen($expression) < 2)
+			return -1;
+	
+		switch ($expression[0])
+		{
+		case '(':
+			$expression = ltrim(substr($expression, 1));
+			$pass = interpret_conditional_filter_expr($expression, $client_browser, $depth + 1, $skip_checks);
+			if ($pass < 0) 
+				return $pass;
+			break;
+			
+		case ')':
+			if ($depth < 1)
+				return -1;
+				
+			$expression = ltrim(substr($expression, 1));
+			return $pass;
+			
+		case '|':
+			if ($pass < 0) 
+				return $pass;
+		
+			$pos = 1 + ($expression[1] == '|');
+			$expression = ltrim(substr($expression, $pos));
+			$skip_checks = $pass;   // OR with TRUE remains TRUE
+			break;
+			
+		case '&':
+			if ($pass < 0) 
+				return $pass;
+		
+			$pos = 1 + ($expression[1] == '&');
+			$expression = ltrim(substr($expression, $pos));
+			$skip_checks = !$pass;   // AND with FALSE remains FALSE
+			break;
+			
+		default:
+			if (!preg_match('/^([=<>!]=|>|<)\s*([^0-9:|&*\/=<>!]+)([0-9]+(\.[0-9]+)?)?\s*(.*)$/', $expression, $matches))
+			{
+				// illegal format: report this and fail dramatically
+				return -1;
+			}
+			$op = $matches[1];
+			$brand = trim($matches[2]);
+			$b_v_set = !empty($matches[3]);
+			$b_version = ($b_v_set ? floatval($matches[3]) : 0.0);
+			$expression = ltrim($matches[5]);
+
+			// perform check, set $pass=false when there's a match
+			//echo "<pre>check: ($op) ($brand) ($b_version)\n";
+			//echo "<pre>matches: \n"; var_dump($matches);
+			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
+			$vchk = $client_browser->SniffedVersion - $b_version;
+			//echo "\n<pre>browser says: " . $client_browser->Browser . " " . $client_browser->Version;
+			//echo "\n<pre>we want: " . $op . " " . $brand . " " . $b_version;
+			//echo "\n<pre>we got: gotcha = $gotcha, sniffed = $client_browser->SniffedVersion, vchk = $vchk, b_v_set = $b_v_set";
+
+			switch ($op)
+			{
+			case '!=':
+				$pass = !($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+
+			case '==':
+				$pass = ($gotcha && (!$b_v_set || $vchk == 0));
+				break;
+
+			case '>=':
+				$pass = ($gotcha && (!$b_v_set || $vchk >= 0));
+				break;
+
+			case '<=':
+				$pass = ($gotcha && (!$b_v_set || $vchk <= 0));
+				break;
+
+			case '>':
+				$pass = ($gotcha && (!$b_v_set || $vchk > 0));
+				break;
+
+			case '<':
+				$pass = ($gotcha && (!$b_v_set || $vchk < 0));
+				break;
+
+			default:
+				// illegal format: report this and fail dramatically
+				return -1;
+			}
+			break;
+		}	
+	}
+	return $pass;
+}
+
+
+
 
 /**
  * Filter the CSS/JS based on sniffed browser capacilities: this way we can deliver nicely compliant CSS/JS files to
@@ -686,93 +819,49 @@ function filter4browser($contents, $client_browser)
 		$prev_content .= substr($contents, 0, $nlidx);
 
 		$contents = substr($contents, $nlidx);
-		$eol = strcspn($contents, "\n");
-		$this_line = substr($contents, 0, $eol);
-
-		$contents = substr($contents, $eol);
-		if (!preg_match('/^(.*)\/\*\:\:\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*(|\s*([=<>!]=)\s*([^0-9:|*\/]+)([0-9]+(\.[0-9]+)?)?\s*)*(::.*)?\*\/\s*$/', $this_line, $matches))
+		// problem: multiple combined conditions of arbitrary complexity can not be split nicely using a single regex, so we resort to a nested approach:
+		if (!preg_match('/^(.*?)\s*\/\*\:\:\s*(([=<>!]=|>|<)\s*([^:*]+))\s*(::.*)?\*\/\s*/', $contents, $matches))
 		{
 			// illegal format: report this and fail dramatically
 			send_response_status_header(500);
-			die("Illegal filter condition string: " . $this_line);
+			die("Illegal filter condition string: '" . substr($contents, 0, 256) . "(continued...)'");
 		}
-
-		$pass = false;
 
 		$src = $matches[1];
-		$match_count = count($matches);
-		$comment = trim($matches[$match_count - 1]);
-		/* op/brand/version = indexes 2/3/4 and a combined set has a index step of initial 5, and 4 after that */
-		$extra_first_step = 1;
-		for ($i = 2; $i + 4 <= $match_count - 1 /* discount the last one: the trailing comment */; $i++)
+		$this_line = $matches[0];
+		$condition = rtrim($matches[2]);
+		$contents = substr($contents, strlen($matches[0]));
+
+		$condexpr = '' . $condition;    // copy, so munging does not destroy '$condition'
+		$pass = interpret_conditional_filter_expr($condexpr, $client_browser);
+		
+		if (0)
 		{
-			$op = $matches[$i++];
-			$brand = trim($matches[$i++]);
-			$b_v_set = !empty($matches[$i]);
-			$b_version = floatval($matches[$i++]);
-			$i++; // skip the minor version match
-			$i += $extra_first_step; // move to the next of a combined set (if there are any more conditions in there)
-			$extra_first_step = 0;
+			static $counter;
+			
+			$counter++;
+			$fname = str_replace('\\', '/', dirname(__FILE__)) . '/combiner-' . date('Y-m-d.His') . '.' . sprintf('%07d', fmod(microtime(true), 1) * 1E6) . '-' . $counter . '.log';
 
-			// perform check, set $pass=false when there's a match
-			//echo "<pre>check: ($op) ($brand) ($b_version) ($this_line) ($comment)\n";
-			//echo "<pre>matches: \n"; var_dump($matches);
-			$gotcha = (0 == strcasecmp($brand, $client_browser->Browser));
-			/*
-			 * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
-			 * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
-			 *
-			 * On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
-			 * stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an
-			 * entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
-			 * past the second '.' dot in there.
-			 */
-			if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
-			{
-				// illegal format: report this and fail dramatically
-				send_response_status_header(500);
-				die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
-			}
-			$sniffed_version = floatval($vmp[1]);
-			$vchk = $sniffed_version - $b_version;
-			//echo "\n<pre>browser says: " . $client_browser->Browser . " " . $client_browser->Version;
-			//echo "\n<pre>we want: " . $op . " " . $brand . " " . $b_version;
-			//echo "\n<pre>we got: gotcha = $gotcha, sniffed = $sniffed_version, vchk = $vchk, b_v_set = $b_v_set";
-
-			switch ($op)
-			{
-			default:
-				// illegal format: report this and fail dramatically
-				send_response_status_header(500);
-				echo "\n<pre>contents = $contents";
-				die("Illegal filter comparison operator: " . $this_line);
-
-			case '!=':
-				$pass |= !($gotcha && (!$b_v_set || $vchk == 0));
-				break;
-
-			case '==':
-				$pass |= ($gotcha && (!$b_v_set || $vchk == 0));
-				break;
-
-			case '>=':
-				$pass |= ($gotcha && (!$b_v_set || $vchk >= 0));
-				break;
-
-			case '>':
-				$pass |= ($gotcha && (!$b_v_set || $vchk > 0));
-				break;
-
-			case '<':
-				$pass |= ($gotcha && (!$b_v_set || $vchk < 0));
-				break;
-
-			case '<=':
-				$pass |= ($gotcha && (!$b_v_set || $vchk <= 0));
-				break;
-			}
-			//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
+			@file_put_contents($fname, print_r(array(
+				'input' => $this_line, 
+				'current browser' => $client_browser,
+				'regex matches' => $matches,
+				'src' => $src,
+				'this line' => $this_line,
+				'condition' => $condition,
+				'munged condition remainder' => $condexpr,
+				'verdict' => ($pass ? $pass : 'FALSE')
+			), true));
 		}
+
+		if ($pass < 0)
+		{
+			// illegal format: report this and fail dramatically
+			send_response_status_header(500);
+			die("Illegal filter condition string: offending position: '" . $condexpr . "' in expression: '" . substr($contents, 0, 256) . "(continued...)'");
+		}
+
+		//echo "\n<pre>#### Verdict: " . ($pass ? "FILTER" : "PASS") . "\n";
 
 		if (!$pass)
 		{
@@ -952,7 +1041,7 @@ function filter4browser($contents, $client_browser)
 		else
 		{
 			// we must keep the current line/block:
-			$prev_content .= $this_line;   // or: $prev_content .= $src;  iff you don't want to keep the conditional comment in the output, ever.
+			$prev_content .= $this_line;   // or: $prev_content .= $src . "\n";  /* iff you don't want to keep the conditional comment in the output, ever. */
 		}
 	}
 
@@ -977,7 +1066,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 	/*
 	 ASSUMPTION: make sure the @import statements are on their own lines: easier for us to process them!
-	 
+
 	 WARNING: Note that we should skip all mention of @import inside comments!
 	*/
 	$prev_content = '';
@@ -986,9 +1075,9 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		// shift non-@import-ing lead off to other buffer, so we're never bothered with it again in this loop: speed!
 		$lead_in = substr($contents, 0, $idx);
 		$prev_content .= $lead_in;
-		
+
 		$contents = substr($contents, $idx);
-		
+
 		$idx = strrpos($lead_in, "/*");
 		if ($idx !== false)
 		{
@@ -998,7 +1087,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			if ($idx === false)
 			{
 				// no, we don't. So this @import sits right smack inside a comment: skip it!
-				
+
 				// see where the honest goods continue again:
 				$idx = strpos($contents, "*/");
 				if ($idx === false)
@@ -1009,7 +1098,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 				}
 				$idx += 2;
 				$prev_content .= substr($contents, 0, $idx);
-				
+
 				$contents = substr($contents, $idx);
 				continue;
 			}
@@ -1088,25 +1177,9 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 		$is_Opera = (0 == strncasecmp('Opera', $client_browser->Browser, 5));
 		$is_Safari = (0 == strcasecmp('Safari', $client_browser->Browser));
 		$is_mobile = !!$client_browser->isMobileDevice;
-		/*
-		 * we would have liked to calculate the version 'float' value from the ["MajorVer"] and ["MinorVer"] entries,
-		 * but then we'd be screwed when you got versions like '3.01' which would be encoded as 3 and 1.
-		 *
-		 * On the other hand we cannot assume the ["Version"] entry has just a single point. After all, there's nothing
-		 * stopping the format from speccing for example '3.01.2750' and again we'ld be screwed if we casted such an
-		 * entry to float without watching out. So we do it the hard way and pick ["Version"] and strip off anything
-		 * past the second '.' dot in there.
-		 */
-		if (!preg_match('/^([0-9]+(\.[0-9]+)?)/', $client_browser->Version, $vmp))
-		{
-			// illegal format: report this and fail dramatically
-			send_response_status_header(500);
-			die("Unexpected version format in browser capabilities DB: " . $client_browser->Version);
-		}
-		$sniffed_version = floatval($vmp[1]);
 
 		/*
-		 fix CSS3 border-radius for IE:
+		 fix CSS3 border-radius, box-shadow, ... for IE:
 
 		 we DON'T. It's a mess and frankly, I can do without the hassle right now. So MSIE6/7/8 do NOT support rounded corners
 		 like that in the admin screens.
@@ -1181,7 +1254,7 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 			$contents = preg_replace('/\s-[a-z]+-opacity:\s*[0-9.]+;?/', ' ', $contents);
 			$contents = preg_replace('/\s-[a-z]+-box-shadow:\s*[^;}]+;?/', ' ', $contents);
 
-			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
+			//$contents = preg_replace('/\sbox-shadow:/', "-o-box-shadow:", $contents);
 
 			/*
 			Opera (11.0 build 1156) does not render border-radius correctly for <fieldset> borders (the background fill is correctly rendered, amazingly).
@@ -1199,10 +1272,10 @@ function fixup_css($contents, $http_base, $type, $base, $root, $element)
 
 			//$contents = preg_replace('/\sborder-radius/', "-webkit-border-radius", $contents);
 		}
-		else 
+		else
 		{
 			// Other browsers: must be fully CSS compliant to appreciate the styling entries: no browser-specific trickery here!
-				
+
 			// remove any border-radius alike entry, including the mozilla+webkit specific ones:
 			$contents = preg_replace('/\s-[a-z-]+border-radius[^:]*:\s*[^;}]+;?/', ' ', $contents);
 
@@ -1260,8 +1333,22 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 {
 	if (strmatch_tail($element, "tiny_mce_ccms.js"))
 	{
-		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element);
+		$suffix = '_src'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
+
+		$flattened_content = load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix);
 		$contents .= "\n" . $flattened_content;
+	}
+	else if (strmatch_tail($element, "edit_area_ccms.js"))
+	{
+		$suffix = '_src'; /* can be '_src' or '_dev' for development work; '' or '_full' for production / tests */
+
+		$flattened_content = load_EditArea_js($type, $http_base, $base, $root, $element, $suffix);
+		$contents .= "\n" . $flattened_content;
+	}
+	else if ($element == 'Source/FileManager.js')
+	{
+		// a flattened set of mootools_manager JavaScript: clean up potentially offending lazyload code as we have loaded the whole shebang
+		$contents = fixup_MT_FileManagerJS($contents, $type, $http_base, $base, $root, $element);
 	}
 
 	return $contents;
@@ -1269,7 +1356,64 @@ function fixup_js($contents, $http_base, $type, $base, $root, $element)
 
 
 
-function load_tinyMCE_js($type, $http_base, $base, $root, $element)
+
+/*
+As we produce a flattened JS file for multiple mootools_FileManager JS files, any path based lazyloading activity in there
+will calculate the WRONG relative-to-absolute path as we mix files from various directories into another.
+
+The way out is do all the lazyloadiung ourselves (we do that laready!) and have such offending bits of JavaScript
+forcibly REMOVED from the original. We do this on the fly, right here.
+
+This code is used to fixup FileManager.js itself.
+*/
+function fixup_MT_FileManagerJS($contents, $type, $http_base, $base, $root, $element)
+{
+	/*
+	 * The offending bit we're looking for is this:
+	 * 
+     * // ->> load DEPENDENCIES
+     * if(typeof __MFM_ASSETS_DIR__ == 'undefined')
+     * {
+     * 	var __DIR__ = (function() {
+     * 			var scripts = document.getElementsByTagName('script');
+     * 			var script = scripts[scripts.length - 1].src;
+     * 			var host = window.location.href.replace(window.location.pathname+window.location.hash,'');
+     * 			return script.substring(0, script.lastIndexOf('/')).replace(host,'') + '/';
+     * 	})();
+     * 	__MFM_ASSETS_DIR__ = __DIR__ + "../Assets";
+     * }
+     * Asset.javascript(__MFM_ASSETS_DIR__+'/js/milkbox/milkbox.js');
+     * Asset.css(__MFM_ASSETS_DIR__+'/js/milkbox/css/milkbox.css');
+     * Asset.css(__MFM_ASSETS_DIR__+'/Css/FileManager.css');
+     * Asset.css(__MFM_ASSETS_DIR__+'/Css/Additions.css');
+     * Asset.javascript(__MFM_ASSETS_DIR__+'/js/jsGET.js', { events: {load: (function(){ window.fireEvent('jsGETloaded'); }).bind(this)}});
+	 */
+	$pos1 = strpos($contents, '->> load DEPENDENCIES' );
+	if ($pos1 === false)
+	{
+		send_response_status_header(500);
+		die("\n" . get_response_code_string(500) . " - Combiner: mootools FileManager JS code is invalid; cannot clean. Abortus Provocatus. Contact your medic for meds.\n");
+	}
+	$s1 = substr($contents, 0, $pos1);
+	$contents = substr($contents, $pos1);
+
+	$pos2 = strpos($contents, 'jsGET.js');
+	$pos3 = strpos($contents, 'bind(this)', $pos2);
+	$pos4 = strpos($contents, ';', $pos3);
+	if ($pos2 === false || $pos3 === false || $pos4 === false)
+	{
+		send_response_status_header(500);
+		die("\n" . get_response_code_string(500) . " - Combiner: mootools FileManager JS code is invalid; cannot clean. Abortus Provocatus. Contact your medic for meds.\n");
+	}
+	$contents = substr($contents, $pos4 + 1);
+	
+	return $s1 . "\n\n/* **** ASSET LAZYLOAD ACTIVITY CLEANED OUT BY THE CompactCMS Combiner ****/\n\n" . $contents;
+}	
+
+
+
+
+function load_tinyMCE_js($type, $http_base, $base, $root, $element, $suffix)
 {
 	global $cfg;
 	global $do_not_load;
@@ -1279,57 +1423,83 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 	/*
 	 * Make sure the tinyMCE language is set up correctly!
 	 *
-	 * If we don't this here, then $cfg['tinymce_language'] will not exist and we will croak further down below.
+	 * If we don't do this here, then $cfg['tinymce_language'] will not exist and we will croak further down below.
 	 */
 	SetUpLanguageAndLocale($cfg['language'], true);
 
-	$mce_basepath = merge_path_elems($base, substr($element, 0, strlen($element) - strlen("tiny_mce_ccms.js")));
+	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element) . 'tiny_mce/jscripts/tiny_mce/');
 
 	$mce_files = array();
-	$suffix = ''; /* can be '_src' or '_dev' for development work; '' for production / tests */
 
-	// Add core
-	$mce_files[] = merge_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
-	// Add core language(s)
-	$languages = array($cfg['tinymce_language']);
-	if ($cfg['tinymce_language'] != 'en')
-	{
-		$languages[] = 'en';
-	}
-	foreach ($languages as $lang)
-	{
-		$mce_files[] = merge_path_elems($mce_basepath, "langs/" . $lang . ".js");
-	}
-	// Add themes
-	$themes = array('advanced');
-	foreach ($themes as $theme)
-	{
-		$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $suffix . ".js");
+	/*
+	To facilitate the lazyloading of tinyMCE in parts when the $suffix is set to '_dev', we do this as
+	a two-stage process:
 
+	the first stage if for all of 'em and loads the tinyMCE 'core' code at least, lazyloaded or flattened.
+
+	When we're in '_dev' mode, the second stage is triggered by the first stage having added a lazyload
+	instruction for '2nd-stage.tiny_mce_ccms.js', a fake filename, which will nevertheless trigger the Combiner
+	into going here AGAIN and that time around we add the flattened set of language files and plugins.
+
+	When we're NOT in '_dev' mode, the second stage won't happen, because the trigger isn't written into
+	the produced JS code, so we're good to go either way!
+	*/
+	$stage2 = strmatch_tail($element, "2nd-stage.tiny_mce_ccms.js");
+
+	if (!$stage2)
+	{
+		// Add core
+		$mce_files[] = merge_path_elems($mce_basepath, "tiny_mce" . $suffix . ".js");
+	}
+	else if ($suffix != '_full')
+	{
+		/*
+		_full is a prebuilt version with everything included by the ant build.
+
+		In all other cases, we need to load the language files and plugins ourselves in some way.
+		*/
+		$plugin_suffix = '_src';
+
+		// Add core language(s)
+		$languages = array($cfg['tinymce_language']);
+		if ($cfg['tinymce_language'] != 'en')
+		{
+			$languages[] = 'en';
+		}
 		foreach ($languages as $lang)
 		{
-			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
-			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
+			$mce_files[] = merge_path_elems($mce_basepath, "langs/" . $lang . ".js");
 		}
-	}
-	// Add plugins
-
-	$pluginarr = get_tinyMCE_plugin_list();
-
-	foreach ($pluginarr as $plugin)
-	{
-		$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $suffix . ".js");
-
-		foreach ($languages as $lang)
+		// Add themes
+		$themes = array('advanced');
+		foreach ($themes as $theme)
 		{
-			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
-			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
+			$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "editor_template" . $plugin_suffix . ".js");
+
+			foreach ($languages as $lang)
+			{
+				$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . ".js");
+				$mce_files[] = merge_path_elems($mce_basepath, "themes", $theme, "langs", $lang . "_dlg.js");
+			}
+		}
+
+		// Add plugins
+		$pluginarr = get_tinyMCE_plugin_list();
+
+		foreach ($pluginarr as $plugin => $info)
+		{
+			if (!is_real_tinyMCE_plugin($plugin))
+				continue;
+
+			$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "editor_plugin" . $plugin_suffix . ".js");
+
+			foreach ($languages as $lang)
+			{
+				$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . ".js");
+				$mce_files[] = merge_path_elems($mce_basepath, "plugins", $plugin, "langs", $lang . "_dlg.js");
+			}
 		}
 	}
-
-//echo "<pre>";
-//var_dump($mce_files);
-//echo "</pre>\n";
 
 	// now load all content:
 	$my_content = '';
@@ -1338,21 +1508,140 @@ function load_tinyMCE_js($type, $http_base, $base, $root, $element)
 		$path = realpath($jsf);
 		if (is_file($path))
 		{
-			$c = file_get_contents($path) . "\n";
+			$c = @file_get_contents($path) . "\n";
 			if ($c !== false)
 			{
+			$my_content .= <<<EOT42
+
+
+/*
+#------------------------------------------------------------------------------------
+# processed: ($path :: $jsf)
+#------------------------------------------------------------------------------------
+*/
+
+
+EOT42;
 				$my_content .= $c;
 			}
 			else
 			{
 				send_response_status_header(404); // Not Found
-				die();
+				die("\n" . get_response_code_string(404) . " - Combiner: could not load data from file: type='$type', element='$element'\n");
 			}
+		}
+		else
+		{
+			$my_content .= <<<EOT42
+
+
+/*
+#####################################################################################
+# file not found: ($path :: $jsf)
+#####################################################################################
+*/
+
+
+EOT42;
 		}
 	}
 
+	if (!$stage2 && $suffix == '_dev')
+	{
+		// Add 2nd stage into the lazyload chain:
+		$my_content = preg_replace('/;\s*load\(\);\s*\}\(\)\);/', ';
+
+	// hack/tweak to make dev mode lazyloading work with the CCMS Combiner: delayload the language and plugin code as well!
+	include(\'../../../../2nd-stage.tiny_mce_ccms.js\');
+
+	load();
+}());
+			', $my_content);
+	}
+	
 	return $my_content;
 }
+
+
+
+
+
+
+
+
+function load_EditArea_js($type, $http_base, $base, $root, $element, $suffix)
+{
+	global $cfg;
+	global $do_not_load;
+
+	if ($do_not_load) return ''; // return zip, nada, nothing
+
+	/*
+	 * Make sure the EditArea language is set up correctly!
+	 *
+	 * If we don't do this here, then $cfg['editarea_language'] will not exist and we will croak further down below.
+	 */
+	SetUpLanguageAndLocale($cfg['language'], true);
+
+	$mce_basepath = merge_path_elems($base, get_remainder_upto_slash($element));
+
+	/*MARKER*/require_once(BASE_PATH . '/lib/includes/js/edit_area/edit_area/edit_area_compressor.php');
+
+	// CONFIG
+	$param['cache_duration'] = 3600 * 24 * 10;      // 10 days util client cache expires
+	$param['compress'] = ($suffix == '_full' || $suffix == ''); // Enable the code compression, should be activated but it can be useful to deactivate it for easier error diagnostics (true or false)
+	$param['debug'] = ($suffix == '_dev');          // Enable this option if you need debugging info
+	$param['use_disk_cache'] = false;               // If you enable this option gzip files will be cached on disk.
+	$param['use_gzip']= false;                      // Enable gzip compression
+	$param['plugins'] = true;                       // Include plugins in the compressed/flattened JS output.
+	$param['echo2stdout'] = false;                  // Output generated JS to stdout; alternative is to store it in the object for later retrieval.
+	$param['include_langs_and_syntaxes'] = true;    // Set to FALSE for backwards compatibility: do not include the language files and syntax definitions in the flattened output.
+	// END CONFIG
+
+	$compressor = new Compressor($param);
+
+	$my_content = $compressor->get_flattened();
+
+	/*
+	WARNING:
+
+	because the 'trigger' file 'edit_area_ccms.js' is located in the PARENT directory of the edit_area_loader.js,
+	the code in the latter will produce the WRONG this.baseURL value ('http://site.com/lib/includes/js/edit_area/'
+	instead of 'http://site.com/lib/includes/js/edit_area/edit_area/').
+
+	The culprit is the set_base_url() method, which derives the baseURL from the first JavaScript <script> element
+	which contains a filepath which contains 'edit_area': hence it finds our edit_area_ccms.js load.
+
+	There are several ways to solve this, but given the code of set_base_url(), we can simply predefine the 'baseURL'
+	and it will NOT look at the <script> collection at all. HOWEVER, we cannot programmatically preset 'baseURL'...
+	unless, for example, we derive our own editArea instance, hack the constructor around, and replace it, yada yada yada.
+
+	Sounds like too much work where a fast hack will do the trick: bluntly replacing the line
+		t.baseURL="";
+	in here, while we're producing the (possibly minified) EA code.
+
+	We can do it here (and not patch the edit_area_compressor for this) because we won't be serving pre-GZIP-ped
+	versions of this baby, EVER. If we GZIP at all, we will be doing it ourselves, AFTER we've gone through here.
+
+	So in all scenarios, we're right on time right now to last-minute-patch the bugger.
+	*/
+	$my_content = preg_replace('/t\.baseURL\s*=\s*"";/', 't.baseURL="' . $cfg['rootdir'] . 'lib/includes/js/edit_area/edit_area";', $my_content);
+
+	/*
+	And because the lazyloader in edit_area itself, which is used to load any required language and/or syntax
+	file, is not working for us on some browsers (Safari 5.0, for example), we circumvent the issue by allowing
+	those items to be flattended into the output as well.
+
+	Optimally, we'd flatten only the required-at-this-time items in there, but we don't mind about a few extra
+	lines of language def's right now; besides, we don't need to touch up the ETag/cache hash code section in
+	here when we do it this way.
+	*/
+
+	return $my_content;
+}
+
+
+
 
 
 /**
@@ -1389,12 +1678,13 @@ function load_one($type, $http_base, $base, $root, $element)
 	}
 	else
 	{
-		die("<pre>$type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root));
+		send_response_status_header(404); // Not Found
+		die("\n" . get_response_code_string(404) . " - Combiner: not a legal path: $type, $http_base, \n$base, \n$root, $element, \n$uri --> $path, " . strpos($path, $root));
 	}
 	if ($my_content === false)
 	{
 		send_response_status_header(404); // Not Found
-		die();
+		die("\n" . get_response_code_string(404) . " - Combiner: failed to load data from file: type='$type', element='$element'\n");
 	}
 
 	switch ($type)

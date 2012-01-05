@@ -57,7 +57,8 @@ and make those toolbars float so they reposition themselves when the space is wi
 /*
 http://www.sohtanaka.com/web-design/styling-pre-tags-with-css-code-block/
 */
-pre {
+pre 
+{
 	/* font-family: “Consolas”,monospace; */
 
 	overflow-x: auto; /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */

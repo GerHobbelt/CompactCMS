@@ -62,6 +62,13 @@ define('USE_CAPTCHA_AGAINST_SPAM', true);
 */
 define('USE_HONEYTRAP_AGAINST_SPAM', true);
 
+/*
+ CONFIGURATION:
+ 
+ Specify the 'To:' email address where the contact form submission
+ should be sent.
+*/
+define('YOUR_ADDRESS_HERE', '<YOUR_ADDRESS_HERE>');
 
 
 
@@ -69,10 +76,16 @@ define('USE_HONEYTRAP_AGAINST_SPAM', true);
  * Load session if not already done by CCMS: this is mandatory for the form 
  * to work as it won't have the benefit of CCMS doing its prep work for it 
  * on form submission!
+ *
+ * Check if session has already been started as per 
+ *   http://www.ajaykumarsingh.com/php/notice-a-session-had-already-been-started-ignoring-session_start-in-on-line.html
+ * but take into account that empty(session_id()) gives us:
+ *   Fatal error: Can't use function return value in write context
  */
-if (empty($_SESSION))
+$sid = session_id();
+if (empty($sid))
 {
-	session_start();
+	if (!session_start()) die('session_start() failed');
 }
 
 
@@ -204,7 +217,7 @@ if ($action_type == 'send'
 			$mailmessage = str_replace("\n.", "\n..", $mailmessage);
 			
 			ob_start();
-				$result = @mail("<YOUR_ADDRESS_HERE>", $subject, $mailmessage, $headers);
+				$result = @mail(YOUR_ADDRESS_HERE, $subject, $mailmessage, $headers);
 				$content = ob_get_contents();
 			ob_end_clean();
 			if($result) 
@@ -399,7 +412,7 @@ EOT42;
 ?>
 <p>This is a simple contact form to show how you are able to code e.g. PHP code directly within the CCMS back-end. 
 Feel free to modify the styling of this basic form to suit your websites' look &amp; feel. Don't forget to adjust 
-the &lt;YOUR_ADDRESS_HERE&gt; line to your own e-mail address.</p>
+the <strong>YOUR_ADDRESS_HERE</strong> PHP define to your own e-mail address.</p>
 
 <div id="status"><!-- spinner --></div>
 <?php
@@ -451,7 +464,7 @@ else if (!empty($success))
 			<label for="message">Message content</label>
 		</td>
 		<td>
-			<textarea name="message" id="message" class="minLength:10" rows="8" cols="40"><?php echo /* htmlentities( */ $message /* , ENT_NOQUOTES, 'UTF-8') */ ; ?></textarea>
+			<textarea name="message" id="message" class="minLength:10" rows="8" cols="40" style="width: 100%"><?php echo /* htmlentities( */ $message /* , ENT_NOQUOTES, 'UTF-8') */ ; ?></textarea>
 		</td>
 		</tr>
 <?php

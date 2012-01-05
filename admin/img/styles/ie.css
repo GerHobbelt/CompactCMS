@@ -94,6 +94,12 @@ legend     /* IE8 */
 	background-color: #fdd;
 }
 
+#desktop #install_dir_notice fieldset
+{
+	background-image: url('../admin_panel_bg_red.gif');
+	background-color: #fdd;
+}
+
 
 /*
 Only IE7 shows a horizontal scrollbar @ 1024x768 displays due to miscalculating the pageWrapper/.container-25 div set.
@@ -152,7 +158,7 @@ may need hasLayout as well!
 
 
 /*
-If you do not FORCE the outer <div> in the template ditor to hasLayout, then IE7/IE6[*]
+If you do not FORCE the outer <div> in the template editor to hasLayout, then IE7/IE6[*]
 GOES ABSOLUTELY HONKIN' TOOTIN' MENTAL placing the edit_Area control in there: it keeps
 blinking the dreaded hourglass and you're ab-so-lu-te-ly SOL because you don't get to see,
 not edit the contents in the <textarea>. Instead, you get the '|' text cursor placed
@@ -213,3 +219,20 @@ html
 	overflow: hidden; // more trouble that it's worth; now fixed in common.js for admin.php, like it should!
 }
 */
+
+
+
+/*
+left-align the texts in tinyMCE and its preview, despite the 'body { text-align: center; }' in src/ie.css, 
+which exists for other reasons!
+*/
+body#content /* preview window */
+{ 
+	text-align: left; 
+}
+body#tinymce /* editor window */
+{ 
+	text-align: left; 
+}
+
+

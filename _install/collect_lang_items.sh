@@ -41,7 +41,8 @@ echo collecting data...
 #      statement as they exist out there. This is written so that we NOT require ccms[a][b][c]
 #      triple index levels; it's rather more flexible.
 #      UNFORTUNATELY, some $ccms['lang'] entries have PHP code in their index, so those get
-#      corrupted. Currently this applies to ['lang']['menu'][$coded_index_something] only.
+#      corrupted. Currently this applies to ['lang']['menu'][$coded_index_something] and
+#      $ccms['lang']['permitem']['manageXYZ'] entries.
 #      ALSO split at the ':' at the end of the filepath printed by grep.
 #   4: take this newline-riddled feed and extract the only two things we want to hear about:
 #      /where/, i.e. the filepaths which grep reported, and the $ccms[] entries themselves
@@ -58,31 +59,89 @@ echo collecting data...
 #   8: again uniquify them and dump to file. THIS list will be used to check the /lib/languages/*
 #      files against!
 
+cat > add-lang-items.$$.awk.tmp <<EOF
+
+BEGIN { 
+	qt=39; 
+	for (i=1; i<=5; i++) 
+	{ 
+		printf("../--manually-added--/:\t\$ccms['lang']['menu']['%d']\n", i); 
+	} 
+	
+	n = "manageMenu";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageModBackup";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageModComment";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageModLightbox";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageModNews";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageModTranslate";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageModules";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageOwners";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "managePageActivation";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "managePageCoding";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "managePageEditing";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "managePages";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageTemplate";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+	n = "manageUsers";
+	printf("../--manually-added--/:\t\$ccms['lang']['permitem']['%s']\n", n); 
+} 
+
+/:/ { 
+	path=\$0; 
+	next; 
+} 
+
+/./ { 
+	printf("%s\t%s\n", path, \$0); 
+}
+
+EOF
+
+
 find ../ -type f -a \( -name '*.htm*' -o -name '*.inc' -o -name '*.php' \) -a ! -path '*/lib/languages/*' \
 		-a ! -path '*/media/*' -a ! -path '*/includes/cache/*' -a ! -path '*.sh' \
-		-a ! -path '*.bak'  -a ! -path '*~' -print0 \
+		-a ! -path '*.bak' -a ! -path '*~' -print0 \
 	| xargs -0 grep -e "\$ccms\['lang'\]" \
 	| sed -e 's/\$/\n\$/g' -e 's/\:/:\n/g' -e 's/;/\n/g' -e 's/\]\./\]\n/g' -e 's/\]:/\]\n/g' -e 's/)/\n/g' -e 's/ /\n/g' \
 	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(\.\./[.a-zA-Z0-9_/-]\+\:\)$" \
-	| gawk -- 'BEGIN { qt=39; for (i=1; i<=5; i++) { printf("../--manually-added--/:\t$ccms[%clang%c][%cmenu%c][%c%d%c]\n", qt, qt, qt, qt, qt, i, qt); } } /:/ { path=$0; next; } /./ { printf("%s\t%s\n", path, $0); }' \
+	| gawk -f add-lang-items.$$.awk.tmp \
 	| sort | uniq | tee ccms_lang_entries_log.txt \
-	> ccms_lang_entries.txt.tmp
+	> ccms_lang_entries.$$.txt.tmp
 	
 # also find all template references to '{%lang:xyz:abc%}' template args as those are language items as well:
 # these are the template-language equivalent of $ccms['lang']['xyz']['abc']
-find ../lib/templates -type f -a ! -name '*.jpg' -a ! -name '*.png' -a ! -name '*.gif' -print0 \
-	| xargs -0 grep -e "\{%lang\:" \
-	| sed -e "s/{%/\n\$ccms\['/g" -e "s/\:\([a-z]\)/'\]\['\\1/g" -e "s/%}/'\]\n/g" \
+#
+# Note: remove everything after the exclamation mark ('!') because that bit would be postprocessing 
+#       commands for the template engine itself.
+find ../lib/templates -type f -a ! -name '*.jpg' -a ! -name '*.png' -a ! -name '*.gif' \
+		-a ! -path '*.bak' -a ! -path '*~' -print0 \
+	| xargs -0 grep -e "{%lang\:" \
+	| sed -e "s/{%/\n\$ccms\['/g" -e "s/\:\([a-z]\)/'\]\['\\1/g" -e "s/\(%}\|!\)/'\]\n/g" \
 	| sed -e "s/^\(\.\.\/[.a-zA-Z0-9_/-]\+\:\).*$/\\1/g" \
 	| grep -e "^\(\$ccms\['lang'\].*\]\)$\|^\(\.\./[.a-zA-Z0-9_/-]\+\:\)$" \
 	| gawk -- ' /:/ { path=$0; next; } /./ { printf("%s\t%s\n", path, $0); }' \
 	| sort | uniq | tee -a ccms_lang_entries_log.txt \
-	>> ccms_lang_entries.txt.tmp
+	>> ccms_lang_template_entries.$$.txt.tmp
 
-	
-# marge both and turn them into one	
-cat ccms_lang_entries.txt.tmp \
+# merge both and turn them into one	
+#
+# Note: all valid language entries have the format $ccms[1][2][3], filter out 
+#       any with fewer indices:
+cat ccms_lang_entries.$$.txt.tmp ccms_lang_template_entries.$$.txt.tmp \
 	| sed -e 's/^.*:\t//' \
+	| grep -e "\$ccms\['lang'\]\['.\+'\]\['.\+'\]$" \
 	| sort | uniq \
 	> ccms_lang_entries.txt
 	
@@ -210,12 +269,15 @@ for f in $( find ../lib/languages/ -type f -name '*.inc.php' -print ) ; do
 done
 
 # remove temp files:
+rm add-lang-items.$$.awk.tmp
 rm lang_diff.$$.tmp
 rm lang_list.$$.tmp
 rm lang.$$.php.tmp
-rm ccms_lang_entries.txt.tmp
+rm ccms_lang_entries.$$.txt.tmp
+rm ccms_lang_template_entries.$$.txt.tmp
 rm ccms_lang_entries.txt
 # keep the ccms_lang_entries_log.txt
+#rm ccms_lang_entries_log.txt
 
 popd
 

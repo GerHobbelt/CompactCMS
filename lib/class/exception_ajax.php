@@ -49,7 +49,7 @@
  *
  * <pre>
  * // start of run due to AJAX request incoming
- * CcmsAjaxFbException::SetFeedbackLocation($cfg['rootdir'] . "admin/modules/template-editor/backend.php");
+ * CcmsAjaxFbException::SetFeedbackLocation($cfg['rootdir'] . "admin/modules/template-editor/template-editor.Manage.php");
  *
  * try
  * {
@@ -58,7 +58,7 @@
  *   if (some_operation() == failed)
  *     throw new CcmsAjaxFbException("urgh! we failed dramtically!");
  *   ...
- *   header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/modules/template-editor/backend.php&status=success&msg=hunky+dory!'));
+ *   header('Location: ' . makeAbsoluteURI($cfg['rootdir'] . 'admin/modules/template-editor/template-editor.Manage.php&status=success&msg=hunky+dory!'));
  *   exit();
  * }
  * catch (CcmsAjaxFbException $e)
@@ -77,6 +77,12 @@ class CcmsAjaxFbException extends Exception
 	{
 		self::$feedback_url = $location;
 		self::$url_query_data = $query_data;
+	}
+
+	public static function GetFeedbackLocation(&$query_data = null)
+	{
+		$query_data = self::$url_query_data;
+		return self::$feedback_url;
 	}
 
 	// Redefine the exception so message isn't optional
@@ -114,6 +120,44 @@ class CcmsAjaxFbException extends Exception
 		}
 		// if we get here, this exception class hasn't been set up according to requirements. Barf a hairball.
 		throw new Exception(__CLASS__ . ": feedback URL missing - a programmer error. INTERNAL ERROR. Happened when reporting the nested exception.", 666, $this);
+	}
+
+	public function croak_json($info_arr)
+	{
+		$err = array();
+		if (!empty(self::$feedback_url))
+		{
+			$q = self::$url_query_data;
+			if (!empty($q))
+			{
+				$q .= '&';
+			}
+
+			$extraq = $this->extra_url_query_data;
+			if (!empty($extraq))
+			{
+				$extraq .= '&';
+			}
+			$err['feedback_url'] = makeAbsoluteURI(self::$feedback_url . '?' . $q . $extraq);
+		}
+		else
+		{
+			// if we get here, this exception class hasn't been set up according to requirements. Barf a hairball.
+			$err['hairball'] = __CLASS__ . ": feedback URL missing - a programmer error. INTERNAL ERROR. Happened when reporting the nested exception.";
+		}
+
+		if (!empty($info_arr))
+		{
+			$err['info'] = $info_arr;
+		}
+		
+		$err['message'] = $this->getMessage();
+		$err['code'] = $this->getCode();
+		$err['file'] = $this->getFile();
+		$err['line'] = $this->getLine();
+		
+		echo json_encode(array('error' => $err));
+		exit();
 	}
 }
 

@@ -39,7 +39,6 @@ $ccms['lang']['system']['error_dirwrite'] = /* BABELFISH */ "ディレクトリ�
 $ccms['lang']['system']['error_chmod'] = /* BABELFISH */ "現在のファイルを変更することはできませんでした。 /コンテンツディレクトリ（666）内のファイルのパーミッションを確認してください。";
 $ccms['lang']['system']['error_value'] = /* BABELFISH */ "エラー：不正な値";
 $ccms['lang']['system']['error_default'] = /* BABELFISH */ "デフォルトのページを削除することはできません。";
-$ccms['lang']['system']['error_forged'] = /* BABELFISH */ "値が改ざんされている";
 $ccms['lang']['system']['error_filedots'] = /* BABELFISH */ "ファイル名は、例えば、ドットを含めることはできません'html'も。";
 $ccms['lang']['system']['error_filesize'] = /* BABELFISH */ "ファイル名は、少なくとも3文字の長さがあります。";
 $ccms['lang']['system']['error_filesize_2'] = /* BABELFISH */ "ファイル名は、最大で50文字の長さがあります。";
@@ -337,17 +336,17 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "あなたのコメン�
        
          ----------------------------------------------------------
 	
-	$ccms['lang']['album']['nodir']			
-	$ccms['lang']['backend']['fileexists'] 		
-	$ccms['lang']['backend']['startedittitle'] 	
-	$ccms['lang']['backend']['updatelist']		
-	$ccms['lang']['editor']['closeeditor']	
-	$ccms['lang']['guestbook']['reaction']	
-	$ccms['lang']['guestbook']['removed'] 	
-	$ccms['lang']['login']['falsetries']		
-	$ccms['lang']['login']['provide']			
-	$ccms['lang']['system']['error_default']	
-	$ccms['lang']['system']['error_sitemap'] 	
+	$ccms['lang']['album']['nodir'] 
+	$ccms['lang']['backend']['fileexists'] 
+	$ccms['lang']['backend']['startedittitle'] 
+	$ccms['lang']['backend']['updatelist'] 
+	$ccms['lang']['editor']['closeeditor'] 
+	$ccms['lang']['guestbook']['delentry'] 
+	$ccms['lang']['guestbook']['removed'] 
+	$ccms['lang']['login']['falsetries'] 
+	$ccms['lang']['login']['provide'] 
+	$ccms['lang']['system']['error_default'] 
+	$ccms['lang']['system']['error_sitemap'] 
        
          ----------------------------------------------------------
 	
@@ -363,6 +362,41 @@ $ccms['lang']['guestbook']['rejected'] = /* BABELFISH */ "あなたのコメン�
          ----------------------------------------------------------
       */
 	  
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
+$ccms['lang']['backend']['floatingtitle']       = "Other";
+$ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
+$ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
+$ccms['lang']['backend']['reload_admin_screen'] = "Refresh the admininistration screen";
+$ccms['lang']['backend']['rename_file']         = "Rename file";
+$ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned new (renumbered) menu positions";
+$ccms['lang']['backend']['warning']             = "Warning";
+$ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
+$ccms['lang']['forms']['reorderbutton']         = "Re-order";
+$ccms['lang']['guestbook']['author']            = "Author";
+$ccms['lang']['guestbook']['configuration']     = "Configuration";
+$ccms['lang']['guestbook']['date']              = "Date";
+$ccms['lang']['guestbook']['host']              = "IP address";
+$ccms['lang']['hints']['reordercmdhelp']        = "Renumber all menu entries to ensure both each menu entry has a unique top+sublevel position and the positions are sequential";
+$ccms['lang']['permitem']['manageMenu']         = "From what user level on can users manage menu preferences";
+$ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
+$ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
+$ccms['lang']['permitem']['manageModLightbox']  = "From what user level on can users manage albums throught the lightbox module (add, modify, delete)";
+$ccms['lang']['permitem']['manageModNews']      = "From what user level on can users manage news items through the news module (add, modify, delete)";
+$ccms['lang']['permitem']['manageModTranslate'] = "The level of a user that is allowed to use the (experimental) translation support utility";
+$ccms['lang']['permitem']['manageModules']      = "From what user level on can users manage modules";
+$ccms['lang']['permitem']['manageOwners']       = "To allow to appoint certain users to a specific page";
+$ccms['lang']['permitem']['managePageActivation']     = "From what user level on can users manage the activeness of pages (published vs. unpublished)";
+$ccms['lang']['permitem']['managePageCoding']    = "From what user level on can users set whether a page contains coding (wysiwyg vs. code editor)";
+$ccms['lang']['permitem']['managePageEditing']  = "From what user level on can users edit pages (content, title, subheader, keywords, etc.)";
+$ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
+$ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
+$ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
+$ccms['lang']['system']['error_forged']         = "You attempted to access site areas for which you are not authorized";
+$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database";
+$ccms['lang']['system']['error_rename']         = "Failed to rename the file";
+$ccms['lang']['system']['error_rename_target_exists'] = "Cannot rename the file as a file with the new name already exists";
+$ccms['lang']['system']['error_session_expired'] = "Your session has expired or you are not logged in";
+$ccms['lang']['system']['home']                 = "Home";
        
       /*
          ----------------------------------------------------------

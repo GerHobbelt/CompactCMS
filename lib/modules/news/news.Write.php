@@ -50,7 +50,7 @@ if (!defined('BASE_PATH'))
 
 
 
-if (empty($cfg['fancyupload_language']) || empty($cfg['tinymce_language']))
+if (empty($cfg['MT_FileManager_language']) || empty($cfg['tinymce_language']))
 {
 	die("INTERNAL LANGUAGE INIT ERROR!");
 }
@@ -80,6 +80,8 @@ if($newsID && $page_id)
 	if (!$news) $db->Kill();
 }
 
+$textarea4teaser_id = str2variablename('newstease_' . $page_id . (!empty($newsID) ? '_' . $newsID : ''));
+$textarea4article_id = str2variablename('newsarticle_' . $page_id . (!empty($newsID) ? '_' . $newsID : ''));
 
 
 ?>
@@ -92,7 +94,8 @@ if($newsID && $page_id)
 	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 
 	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/js/milkbox/css/milkbox.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/Css/FileManager.css,Additions.css" />
 
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
@@ -151,13 +154,13 @@ if($newsID && $page_id)
 					</tr>
 				</table>
 			</div>
-				<label class="clear" for="newsTeaser"><?php echo $ccms['lang']['news']['teaser']; ?></label>
-				<textarea name="newsTeaser" id="newsTeaser" class="minLength:3 text span-25" rows="4" cols="40"><?php
+				<label class="clear" for="<?php echo $textarea4teaser_id; ?>"><?php echo $ccms['lang']['news']['teaser']; ?></label>
+				<textarea name="newsTeaser" id="<?php echo $textarea4teaser_id; ?>" class="minLength:3 text" rows="4" cols="40" style="width: 100%"><?php
 					echo (isset($news) ? $news->newsTeaser : null);
 				?></textarea>
 
-				<label for="newsContent"><?php echo $ccms['lang']['news']['contents']; ?></label>
-				<textarea name="newsContent" id="newsContent" class="text span-25" rows="8" cols="40"><?php
+				<label for="<?php echo $textarea4article_id; ?>"><?php echo $ccms['lang']['news']['contents']; ?></label>
+				<textarea name="newsContent" id="<?php echo $textarea4article_id; ?>" class="text" rows="8" cols="40" style="width: 100%"><?php
 					echo (isset($news) ? $news->newsContent : null);
 				?></textarea>
 				<hr class="space"/>
@@ -214,11 +217,29 @@ $ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-core.js'] = coun
 $ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-more.js'] = count($ccms['JS.required_files']);
 
 $js_files = array();
-$js_files[] = '../../includes/js/the_goto_guy.js';
-$js_files[] = '../../includes/js/mootools-core.js,mootools-more.js';
-$js_files = array_merge($js_files, generateJS4TinyMCEinit(0, 'newsContent,newsTeaser'));
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 
-$driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT
+$mce_options = array(
+	// [0] carries the generic settings:
+	array(
+		$textarea4teaser_id => array(
+			'theme' => 'simple'
+			)
+		)
+	);
+		
+$MCEcodegen = new tinyMCEcodeGen($textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
+
+$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
+
+$starter_code = $MCEcodegen->genStarterCode();
+
+$driver_code = $MCEcodegen->genDriverCode();
+
+$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
+
+$driver_code .= <<<EOT42
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
@@ -230,11 +251,9 @@ $driver_code = generateJS4TinyMCEinit(2, 'newsContent,newsTeaser') . <<<EOT
 						form.submit();
 				}
 			});
-EOT;
+EOT42;
 
-$starter_code = generateJS4TinyMCEinit(1, 'newsContent,newsTeaser');
-
-echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code);
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
 </script>
 <script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>

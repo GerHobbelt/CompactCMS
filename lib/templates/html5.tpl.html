@@ -40,11 +40,9 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>{%title%}</title>
+<title>{%title!protect4attr%}</title>
 {%CSS.required_files!css_files(combine)%}
-<?php
-//<link rel="stylesheet" href="{%rootdir%}lib/templates/html5/style.css" />
-?>
+{%CSS.inline!implode('', '<style type="text/css">', '</style>')%}
 <link rel="shortcut icon" href="{%rootdir%}media/favicon.ico" />
 </head>
 
@@ -76,12 +74,13 @@ if(!defined("COMPACTCMS_CODE")) die('Illegal entry point!');
 </section>
 
 <footer>
-	<p>&copy; <?php echo date('Y'); ?> {%sitename%}</p>
+	{%footermenu%}
+
+	<p>&copy; <?php echo date('Y'); ?> {%sitename%} | Maintained with <a href="http://www.compactcms.nl">CompactCMS</a></p>
+
 	<!-- Support me by keeping this link (it's not visible to your visitors!). It will help my search engine ranking. -->
 	<div style="display: none;"><a href="http://www.compactcms.nl">Maintained with CompactCMS.nl</a></div>
 	<!-- That's it! Of course you're free to show off CompactCMS anywhere on your website -->
-
-	{%footermenu%}
 </footer>
 
 
@@ -98,13 +97,6 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 
 <script type="text/javascript" charset="utf-8">
 <?php
-
-// Mark the JS sourcefiles needed by this template itself:
-//if (IE)
-//{
-//  $ccms['JS.required_files']['http://html5shiv.googlecode.com/svn/trunk/html5.js'] = true;
-//}
-//$ccms['JS.required_files']['html5.js?only-when=%3d%3d+IE'] = 0; // the first to load!
 
 $js_files = <<<EOT42
 {%JS.required_files!js_files(combine)%}

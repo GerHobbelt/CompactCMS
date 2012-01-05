@@ -55,17 +55,20 @@ if (!defined('BASE_PATH'))
 
 // Include general configuration
 /*MARKER*/require_once(BASE_PATH . '/lib/sitemap.php');
-///*MARKER*/require_once(BASE_PATH . '/admin/includes/process.inc.php');
 
 
 
 
 /* make darn sure only authenticated users can get past this point in the code */
-if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !CheckAuth())
+if(empty($_SESSION['ccms_userID']) || empty($_SESSION['ccms_userName']) || !checkAuth())
 {
-	// this situation should've caught inside process.inc.php above! This is just a safety measure here.
-	die($ccms['lang']['auth']['featnotallowed']);
+	// this situation should've caught inside sitemap.php-->security.inc.php above! This is just a safety measure here.
+	die_with_forged_failure_msg(__FILE__, __LINE__); // $ccms['lang']['auth']['featnotallowed']
 }
+
+
+$status = getGETparam4IdOrNumber('status');
+$status_message = getGETparam4DisplayHTML('msg');
 
 
 
@@ -84,17 +87,17 @@ if ($db->ErrorNumber())
 <html id="admin_index_page" xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $cfg['language']; ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>CompactCMS Administration</title>
 	<meta name="description" content="CompactCMS administration. CompactCMS is a light-weight and SEO friendly Content Management System for developers and novice programmers alike." />
 	<link rel="icon" type="image/ico" href="../media/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="img/styles/base.css,layout.css,editor.css,sprite.css" />
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/base.css,layout.css,editor.css,sprite.css" />
 <!--
 	<link rel="stylesheet" type="text/css" href="../lib/includes/js/mochaui/Source/Themes/default/css/Window.css,Taskbar.css"/>
 -->
-	<link rel="stylesheet" type="text/css" href="img/styles/last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../admin/img/styles/last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../admin/img/styles/ie.css" />
 	<![endif]-->
 <?php
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
@@ -138,18 +141,8 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 		<p class="ss_has_sprite"><span class="ss_sprite_16 ss_world">&#160;</span><?php echo $cfg['sitename']; ?></p>
 	</div>
 	<div id="notify" class="span-12">
-		<div class="rounded-border">
-			<div class="header">
-				<?php
-				if($cfg['protect'])
-				{
-				?>
-					<a class="right span-6" href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_door_open">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
-				<?php
-				}
-				?>
-				<a id="clockLink" class="clock"><span class="ss_sprite_16 ss_clock">&#160;</span></a>
-			</div>
+		<div id="notify_box" class="rounded-border may-fade">
+			<div class="header">&#160;</div>
 			<div id="notify_icon">&#160;</div>
 			<div id="notify_res">
 				<?php
@@ -163,7 +156,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				else
 				{
-					$version = $ccms['lang']['backend']['outofdate']." <a href=\"http://www.compactcms.nl/changes.html\" class=\"external\" rel=\"external\">".$ccms['lang']['backend']['considerupdate']."</a>.";
+					$version = $ccms['lang']['backend']['outofdate'] . ' <a href="http://www.compactcms.nl/changes.html" class="external" rel="external">' . $ccms['lang']['backend']['considerupdate'] . '</a>.';
 				}
 
 				if(!empty($version_recent) && !empty($v) && $cfg['version'])
@@ -175,13 +168,104 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 				}
 				else
 				{
-					echo '<p>'.$ccms['lang']['system']['error_versioninfo'].'</p>';
+					echo '<p class="error">'.$ccms['lang']['system']['error_versioninfo'].'</p>';
+				}
+
+				/*
+				Show possibly incoming status messages:
+				*/
+				if (!empty($status_message))
+				{
+					echo '<p class="' . $status . '">'.$status_message.'</p>';
 				}
 				?>
 			</div>
 		</div>
+		<div id="extra_tools_box" class="rounded-border may-fade">
+			<!-- it's a bit 'unclean' to do this as a table but it's the fastest/easiest way to dimension each item dynamically without using JS -->
+			<table id="extra_toolbar">
+				<tr>
+				<td><a id="clockLink" title="<?php echo $ccms['lang']['backend']['show_clock']; ?>"><span class="ss_sprite_16 ss_time">&#160;</span></a></td>
+				<td><a id="clearCacheLink" title="<?php echo $ccms['lang']['backend']['clear_cache']; ?>"><span class="ss_sprite_16 ss_eraser">&#160;</span></a></td>
+				<?php
+				if($cfg['protect'])
+				{
+				?>
+					<td><a href="./includes/security.inc.php?do=logout"><span class="ss_sprite_16 ss_user_logout" title="<?php 
+						// check whether this is an SU session (doesn't care about security; that's what security.inc.php will take care of):
+						if ($_SESSION['ccms_isSwitchedUser'])
+						{
+							// return to be an admin
+							echo $ccms['lang']['backend']['logout_helpmsgA']; 
+						}
+						else
+						{
+							// really log out
+							echo $ccms['lang']['backend']['logout_helpmsgX']; 
+						}
+					?>">&#160;</span><?php echo $ccms['lang']['backend']['logout']; ?></a>
+				</td>
+				<?php
+					// you may only switch to another user when you're an admin:
+					if ($_SESSION['ccms_userLevel'] >= 4 && !$_SESSION['ccms_isSwitchedUser'])
+					{
+						// collect users viable for switching TO:
+						$values = array();
+						$values[] = 'userLevel < ' . MySQL::SQLValue($_SESSION['ccms_userLevel'], MySQL::SQLVALUE_NUMBER);
+						$values['userActive'] = MySQL::SQLValue(true, MySQL::SQLVALUE_BOOLEAN);
+						$rsCfg = $db->SelectArray($cfg['db_prefix'].'users', $values, null, array('userLast', 'userFirst', 'userName'));
+						
+						$values = array();
+						if (!empty($rsCfg))
+						{
+				?>
+				<td>
+					<form method="post" id="switchUserForm" action="./includes/process.inc.php">
+						<button type="submit" id="su_userbtn" name="submit">
+							<span class="ss_sprite_16 ss_group_go" title="<?php echo $ccms['lang']['backend']['switch_user']; ?>">&#160;</span>
+						</button>
+						<select class="text" name="su_userName" id="f_su_user" size="1" title="<?php echo $ccms['lang']['backend']['switch_user_helpmsg']; ?>">
+							<optgroup label="<?php echo $ccms['lang']['backend']['switch_user']; ?>">
+								<?php
+							foreach ($rsCfg as $row)
+							{
+								echo '<option value="' . $row['userID'] . '_' . $row['userName'] . '">' . $row['userFirst'] . ' ' . $row['userLast'] . ' [';
+								switch (intval($row['userLevel']))
+								{
+								case 1:
+									echo $ccms['lang']['permission']['level1'];
+									break;
+								case 2:
+									echo $ccms['lang']['permission']['level2'];
+									break;
+								case 3:
+									echo $ccms['lang']['permission']['level3'];
+									break;
+								case 4:
+									echo $ccms['lang']['permission']['level4'];
+									break;
+								default:
+									echo '???';
+									break;
+								}
+								echo "]</option>\n";
+							}
+								?>
+							</optgroup>
+						</select>
+						<input type="hidden" name="form" value="switch_user" />
+					</form>
+				</td>
+				<?php
+						}
+					}
+				}
+				?>
+				</tr>
+			</table>
+		</div>
 	</div>
-	<div id="advanced" class="prepend-1 span-6 last clear-right">
+	<div id="advanced" class="prepend-1 span-6 last clear-right may-fade">
 		<div class="rounded-border">
 			<div class="header"><span class="ss_sprite_16 ss_user_red">&#160;</span><?php echo $ccms['lang']['backend']['hello']; ?> <?php echo $_SESSION['ccms_userFirst']; ?></div>
 			<div id="advanced_res">
@@ -202,19 +286,19 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 					if($perm->is_level_okay('manageTemplate', $_SESSION['ccms_userLevel']))  // [i_a] template dialog would still appear when turned off in permissions --> error message in that window anyway.
 					{
 					?>
-						<li><a id="sys-tmp" href="./includes/modules/template-editor/backend.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
+						<li><a id="sys-tmp" href="./includes/modules/template-editor/template-editor.Manage.php" rel="<?php echo $ccms['lang']['backend']['templateeditor']; ?>" class="tabs"><span class="ss_sprite_16 ss_color_swatch">&#160;</span><?php echo $ccms['lang']['backend']['templateeditor']; ?></a></li>
 					<?php
 					}
 					// if($perm->get('manageUsers') > 0)    -- [i_a] we'll always be able to 'manage' ourselves; at least the users.manage page can cope with that scenario - plus it's in line with the rest of the admin behaviour IMHO
 					{
 					?>
-						<li><a id="sys-usr" href="./includes/modules/user-management/backend.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
+						<li><a id="sys-usr" href="./includes/modules/user-management/user-management.Manage.php" rel="<?php echo $ccms['lang']['backend']['usermanagement']; ?>" class="tabs"><span class="ss_sprite_16 ss_group">&#160;</span><?php echo $ccms['lang']['backend']['usermanagement']; ?></a></li>
 					<?php
 					}
 					if($perm->is_level_okay('manageModBackup', $_SESSION['ccms_userLevel']))
 					{
 					?>
-						<li><a id="sys-bck" href="./includes/modules/backup-restore/backend.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
+						<li><a id="sys-bck" href="./includes/modules/backup-restore/backup-restore.Manage.php" rel="<?php echo $ccms['lang']['backup']['createhd'];?>" class="tabs"><span class="ss_sprite_16 ss_drive_disk">&#160;</span><?php echo $ccms['lang']['backup']['createhd'];?></a></li>
 					<?php
 					}
 					if($perm->is_level_okay('manageModTranslate', $_SESSION['ccms_userLevel']) && $cfg['IN_DEVELOPMENT_ENVIRONMENT'])
@@ -242,7 +326,24 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</fieldset>
 	</div>
 
-	<div id="createnew" class="span-9 clear">
+	<?php
+	// yak when the install directory is still there, due to us being a 'smart Alec' by saving an empty override file in there (/_install/install_check_override.txt):
+	if ($cfg['install_dir_exists'])
+	{
+	?>
+	<div id="install_dir_notice" class="span-25 last clear">
+	<fieldset>
+		<legend><a rel="notice_wrapper"><span class="ss_sprite_16 ss_exclamation">&#160;</span><?php echo $ccms['lang']['backend']['warning']; ?></a></legend>
+		<div id="notice_wrapper">
+			<p class="center-text"><?php echo $ccms['lang']['backend']['install_dir_exists']; ?></p>
+		</div>
+	</fieldset>
+	</div>
+	<?php
+	}
+	?>
+	
+	<div id="createnew" class="span-9 clear may-fade">
 	<?php
 
 	// Start main management section
@@ -350,7 +451,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	?>
 	</div>
 
-	<div id="menudepth" class="span-16 last">
+	<div id="menudepth" class="span-16 last may-fade">
 	<?php
 
 	// Manage menu depths & languages
@@ -391,7 +492,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 
 
 	?>
-	<div id="manage" class="span-25 last clear">
+	<div id="manage" class="span-25 last clear may-fade">
 	<fieldset>
 		<legend><a class="toggle" rel="filelist_wrapper"><span class="ss_sprite_16 ss_folder_database">&#160;</span><?php echo $ccms['lang']['backend']['managefiles']; ?></a></legend>
 		<div id="filelist_wrapper">
@@ -439,7 +540,7 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 	</fieldset>
 	</div>
 
-	<div id='debugMsg' class="span-25 last clear">
+	<div id='debugMsg' class="span-25 last clear may-fade">
 
 <?php
 
@@ -450,10 +551,10 @@ if (0)
 
 if (0)
 {
-	require_once(BASE_PATH . '/lib/includes/browscap/Browscap.php');
+	require_once(BASE_PATH . '/lib/includes/browscap/browscap/Browscap.php');
 
 	$bc = new Browscap(BASE_PATH . '/lib/includes/cache');
-	$bc->localFile = BASE_PATH . '/lib/includes/browscap/browscap/php_browscap.ini';
+	$bc->localFile = BASE_PATH . '/lib/includes/browscap-data/php_browscap.ini';
 	$bc = $bc->getBrowser();
 
 	echo '<h1>$bc</h1>';
@@ -469,7 +570,7 @@ if (0)
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
-	<div id="democlock_collective" class="span-25 last clear"> </div>
+	<div id="democlock_collective" class="span-25 last clear may-fade"> </div>
 
 	<textarea id="jslog" class="log span-25 last" readonly="readonly">
 	</textarea>
@@ -524,16 +625,50 @@ $js_files[] = '../lib/includes/js/mootools-core.js,mootools-more.js';
 /*--MOCHAUI--*/
 if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
-	$js_files[] = '../lib/includes/js/mochaui/Source/dummy.js,Core/Core.js,Core/Canvas.js,Core/Content.js,Core/Desktop.js,Controls/column/Column.js,Controls/panel/Panel.js,Controls/taskbar/Taskbar.js,Controls/window/Window.js,Controls/window/Modal.js,Core/Themes.js';
+	$js_files[] = '../lib/includes/js/dummy.js,' .
+
+   'mochaui/Source/Core/Core.js,' .
+   'mochaui/Source/Core/Canvas.js,' .
+   'mochaui/Source/Core/Content.js,' .
+   'mochaui/Source/Core/persist.js,' .
+   'mochaui/Source/Core/themes.js,' .
+/*
+
+													'mochaui/Source/Core/core.js,' .
+													'mochaui/Source/Core/create.js,' .
+													'mochaui/Source/Core/require.js,' .
+													'mochaui/Source/Core/canvas.js,' .
+													'mochaui/Source/Core/content.js,' .
+													'mochaui/Source/Core/persist.js,' .
+													'mochaui/Source/Core/themes.js,' .
+*/
+													'mochaui/Source/Controls/desktop/desktop.js,' .
+													'mochaui/Source/Controls/panel/panel.js,' .
+													'mochaui/Source/Controls/column/column.js,' .
+													'mochaui/Source/Controls/taskbar/taskbar.js,' .
+													'mochaui/Source/Controls/window/window.js,' .
+													'mochaui/Source/Controls/window/modal.js';
 }
 else
 {
 	$js_files[] = '../lib/includes/js/mochaUI.js';
 }
 /* $js_files[] = '../lib/includes/js/mochaui/Source/Utility/window-from-html.js'; */
+$js_files[] = '../lib/includes/js/Fx.CmsAdminSlide.js';
 $js_files[] = '../lib/includes/js/common.js';
 
-$driver_code = 'lazyloading_commonJS_done("' . $cfg['rootdir'] . '");';
+$cfg_root_dir = $cfg['rootdir'];
+$driver_code = <<<EOT42
+	//if (typeof lazyloading_commonJS_done !== 'undefined')
+	try
+	{
+		lazyloading_commonJS_done("$cfg_root_dir");
+	}
+	catch(e)
+	{
+		alert('lazyload sequence b0rked, probably due to some broken JS being loaded in this sequence. Check the log.');
+	}
+EOT42;
 
 echo generateJS4lazyloadDriver($js_files, $driver_code);
 ?>

@@ -41,6 +41,8 @@ function randomPassword(len)
 	} while (score < 4);
 
 	target.value = pass;
+	target.type = 'text'; /* make sure the generated password is visible (readable on screen) */
+
 	return pass;
 }
 

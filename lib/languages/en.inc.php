@@ -2,7 +2,7 @@
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-    
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-    
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -39,7 +39,8 @@ $ccms['lang']['system']['error_dirwrite']       = "Directory has no write access
 $ccms['lang']['system']['error_chmod']          = "The current file could not be modified. Check permissions on the files in the /content directory (666).";
 $ccms['lang']['system']['error_value']          = "Error: incorrect value";
 $ccms['lang']['system']['error_default']        = "Default page cannot be deleted.";
-$ccms['lang']['system']['error_forged']         = "Value has been tampered with";
+$ccms['lang']['system']['error_forged']         = "You attempted to access site areas for which you are not authorized";
+$ccms['lang']['system']['error_session_expired'] = "Your session has expired or you are not logged in";
 $ccms['lang']['system']['error_filedots']       = "File name should not contain dots, e.g. '.html'.";
 $ccms['lang']['system']['error_filesize']       = "File name should be at least 3 characters long.";
 $ccms['lang']['system']['error_filesize_2']     = "File name should be at most 50 characters long.";
@@ -60,7 +61,7 @@ $ccms['lang']['system']['error_versioninfo']    = "No version information is ava
 $ccms['lang']['system']['error_misconfig']      = "<strong>There seems to be a misconfiguration.</strong><br/>Please make sure the .htaccess file is correctly configured to reflect your file structure. If you have<br/>installed CompactCMS in a subdirectory, then adjust the .htaccess file accordingly.";
 $ccms['lang']['system']['error_deleted']        = "<h1>The file you selected seems to be deleted</h1><p>Refresh the filelist to see the most recent list of available files to prevent this error from happening. If this doesn't solve this error, manually check the content folder for the file you're trying to open.</p>";
 $ccms['lang']['system']['error_404title']       = "File not found";
-$ccms['lang']['system']['error_404header']      = "A 404 error occurred, the requested file could not be found.";
+$ccms['lang']['system']['error_404header']      = "A 404 error occurred, the requested file <strong>{%pagereq%}.html</strong> could not be found.";
 $ccms['lang']['system']['error_404content']     = "The requested file <strong>{%pagereq%}.html</strong> could not be found.";
 $ccms['lang']['system']['error_403title']       = "Forbidden";
 $ccms['lang']['system']['error_403header']      = "A 403 error occurred: you don't have permission to access the requested file.";
@@ -69,11 +70,14 @@ $ccms['lang']['system']['error_sitemap']        = "An overview of all pages";
 $ccms['lang']['system']['error_tooshort']       = "One or multiple submitted values were either too short or incorrect";
 $ccms['lang']['system']['error_passshort']      = "A password should contain more than 6 characters";
 $ccms['lang']['system']['error_passnequal']     = "The entered passwords did not match";
-$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database.";
+$ccms['lang']['system']['error_rec_exists']     = "Entry already exists in the database";
+$ccms['lang']['system']['error_rename']         = "Failed to rename the file";
+$ccms['lang']['system']['error_rename_target_exists'] = "Cannot rename the file as a file with the new name already exists";
 $ccms['lang']['system']['noresults']            = "No results";
 $ccms['lang']['system']['tooriginal']           = "Back to original";
 $ccms['lang']['system']['message_rights']       = "All rights reserved";
 $ccms['lang']['system']['message_compatible']   = "Successfully tested on";
+$ccms['lang']['system']['home']                 = "Home";
 
 // Administration general messages
 $ccms['lang']['backend']['gethelp']             = "Got suggestions, feedback or having trouble? Visit <a href=\"http://community.compactcms.nl/forum/\" title=\"Visit the official forum\" class=\"external\" rel=\"external\">the forum</a>!";
@@ -89,6 +93,8 @@ $ccms['lang']['backend']['itemcreated']         = "Successfully processed the su
 $ccms['lang']['backend']['fullremoved']         = "Successfully deleted the selected item(s).";
 $ccms['lang']['backend']['fullregenerated']     = "Successfully regenerated the thumbnails.";
 $ccms['lang']['backend']['tooverview']          = "Back to overview";
+$ccms['lang']['backend']['tomainpage']          = "Back to main page";
+$ccms['lang']['backend']['tomainpage_helpmsg']  = "Do not apply pending changes";
 $ccms['lang']['backend']['permissions']         = "Set CCMS permissions";
 $ccms['lang']['backend']['contentowners']       = "Define content owners";
 $ccms['lang']['backend']['templateeditor']      = "Template editor";
@@ -135,10 +141,20 @@ $ccms['lang']['backend']['no']                  = "No";
 $ccms['lang']['backend']['translation']         = "Translations";
 $ccms['lang']['backend']['hello']               = "Hi";
 $ccms['lang']['backend']['logout']              = "Log-out";
+$ccms['lang']['backend']['logout_helpmsgX']     = "Terminate this session. You will return to the login page.";
+$ccms['lang']['backend']['logout_helpmsgA']     = "Terminate this 'switched to user' session. You will return to your regular (admin level) identity.";
 $ccms['lang']['backend']['see_forum']           = "See forum";
 $ccms['lang']['backend']['warning']             = "Warning";
 $ccms['lang']['backend']['js_loading']          = "The browser is still loading several files from the server; please refrain from any activity while this initial loading process completes, thank you.";
 $ccms['lang']['backend']['reordermenu_done']    = "The pages have been assigned new (renumbered) menu positions";
+$ccms['lang']['backend']['rename_file']         = "Rename file";
+$ccms['lang']['backend']['file_renamed_from_to'] = "Succesfully renamed file '%s' to '%s'";
+$ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
+$ccms['lang']['backend']['show_clock']          = "Show a clock (displaying the local time)";
+$ccms['lang']['backend']['clear_cache']         = "Clear all server-side caches";
+$ccms['lang']['backend']['cache_cleared']       = "All server-side caches have been cleared.";
+$ccms['lang']['backend']['switch_user']         = "Switch User";
+$ccms['lang']['backend']['switch_user_helpmsg'] = "Usage: select a user, then click the Switch User icon at left to switch.\nDescription: Temporarily act as if you were another user (until you log out); you can only switch to users who have fewer privileges and you can switch only when you are a site admin yourself.";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome']               = "<p>Use a valid username and password to gain access to the CompactCMS back-end. If you arrived here by mistake, return to the <a href='../../'>home page</a>.</p><p>Contact your webmaster for your details.</p>";
@@ -161,7 +177,7 @@ $ccms['lang']['menu']['4']                      = "Footer";
 $ccms['lang']['menu']['5']                      = "Extra";
 
 // Administration form related texts
-$ccms['lang']['forms']['filename']              = "File name"; 
+$ccms['lang']['forms']['filename']              = "File name";
 $ccms['lang']['forms']['pagetitle']             = "Page title";
 $ccms['lang']['forms']['subheader']             = "Subheader";
 $ccms['lang']['forms']['description']           = "Description";
@@ -225,6 +241,9 @@ $ccms['lang']['backup']['currenthd']            = "Available back-ups";
 $ccms['lang']['backup']['timestamp']            = "Back-up file name";
 $ccms['lang']['backup']['download']             = "Download archive";
 $ccms['lang']['backup']['wait4backup']          = "Please wait while the backup is being created...";
+$ccms['lang']['backup']['archiving']			= "Archiving";
+$ccms['lang']['backup']['scanning']				= "Scanning";
+$ccms['lang']['backup']['scanned']				= "Scanned";
 
 // User management messages
 $ccms['lang']['users']['createuser']            = "Create a user";
@@ -282,7 +301,7 @@ $ccms['lang']['owners']['explain']              = "Here you can appoint specific
 $ccms['lang']['owners']['pages']                = "Pages";
 $ccms['lang']['owners']['users']                = "Users";
 
-// Translation assistance page 
+// Translation assistance page
 $ccms['lang']['translation']['header']          = "Translate";
 $ccms['lang']['translation']['explain']         = "Shows the translation strings.";
 
@@ -306,6 +325,7 @@ $ccms['lang']['album']['noalbums']              = "No albums have been created y
 $ccms['lang']['album']['files']                 = "Files";
 $ccms['lang']['album']['nodir']                 = "Please make sure the directory <strong>albums</strong> exists in the ./media/ directory";
 $ccms['lang']['album']['lastmod']               = "Last modified";
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
 $ccms['lang']['album']['please_wait']           = "Please wait ...";
 
 // News messages
@@ -365,21 +385,21 @@ $ccms['lang']['guestbook']['configuration']     = "Configuration";
             a bug report regarding the ./collect_lang_items.sh script.
        
          ----------------------------------------------------------
-    
-    $ccms['lang']['album']['nodir']            
-    $ccms['lang']['backend']['fileexists']         
-    $ccms['lang']['backend']['startedittitle']     
-    $ccms['lang']['backend']['updatelist']        
-    $ccms['lang']['editor']['closeeditor']    
-    $ccms['lang']['guestbook']['reaction']    
-    $ccms['lang']['guestbook']['removed']     
-    $ccms['lang']['login']['falsetries']        
-    $ccms['lang']['login']['provide']            
-    $ccms['lang']['system']['error_default']    
-    $ccms['lang']['system']['error_sitemap']     
+	
+	$ccms['lang']['album']['nodir']                 
+	$ccms['lang']['backend']['file_renamed_from_to'] 
+	$ccms['lang']['backend']['fileexists']          
+	$ccms['lang']['backend']['startedittitle']      
+	$ccms['lang']['backend']['updatelist']          
+	$ccms['lang']['editor']['closeeditor']          
+	$ccms['lang']['guestbook']['removed']           
+	$ccms['lang']['login']['falsetries']            
+	$ccms['lang']['login']['provide']               
+	$ccms['lang']['system']['error_default']        
+	$ccms['lang']['system']['error_sitemap']        
        
          ----------------------------------------------------------
-    
+	
          ### MISSING ENTRIES ###
 
          The entries below have been found to be missing from this 
@@ -391,10 +411,10 @@ $ccms['lang']['guestbook']['configuration']     = "Configuration";
        
          ----------------------------------------------------------
       */
-      
+	  
        
       /*
          ----------------------------------------------------------
       */
-      
+	  
 ?>

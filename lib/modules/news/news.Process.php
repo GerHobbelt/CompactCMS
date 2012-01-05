@@ -130,7 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'add-edit-news' && chec
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['auth']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -197,7 +197,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'del-news' && checkAuth
 		}
 		else
 		{
-			throw new FbX($ccms['lang']['auth']['error_forged']);
+			throw new FbX($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 		}
 	}
 	catch (CcmsAjaxFbException $e)
@@ -265,6 +265,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && $do_action == 'cfg-news' && checkAuth
 }
 
 // when we get here, an illegal command was fed to us!
-die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
+die_with_forged_failure_msg(__FILE__, __LINE__);
 
 ?>

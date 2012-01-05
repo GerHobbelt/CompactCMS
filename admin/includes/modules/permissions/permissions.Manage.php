@@ -71,9 +71,9 @@ $status_message = getGETparam4DisplayHTML('msg');
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Permissions module</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
 	<![endif]-->
 </head>
 <body>
@@ -166,7 +166,13 @@ $status_message = getGETparam4DisplayHTML('msg');
 	}
 	else
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+	?>
+	<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+
+	<div class="right">
+		<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+	</div>
+	<?php
 	}
 	?>
 

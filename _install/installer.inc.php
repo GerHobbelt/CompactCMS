@@ -40,7 +40,8 @@ if (!defined('BASE_PATH'))
 
 
 // Start the current session
-session_start();
+if (!session_start()) die('session_start(INSTALLER_INC) failed');
+
 
 // Load installer-specific configuration bits
 /*MARKER*/require_once(BASE_PATH . '/_install/installer.cfg.php');
@@ -70,7 +71,7 @@ $do_upgrade = (!empty($_SESSION['variables']['do_upgrade']) && $_SESSION['variab
  **/
 
 // Step two
-if($nextstep == md5('2') && CheckAuth())
+if($nextstep == '2' && checkAuth())
 {
 	//
 	// Installation actions
@@ -83,7 +84,13 @@ if($nextstep == md5('2') && CheckAuth())
 
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$rootdir,$sitename,$language);
-	
+
+	if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
+	{
+		echo 'WRITE_CFG_FILES_TO_DISK: ' . (1*WRITE_CFG_FILES_TO_DISK) . '<br>';
+		echo 'EXECUTE_QUERIES: ' . (1*EXECUTE_QUERIES) . '<br>';
+		echo 'DUMP_QUERIES_N_STUFF_IN_DEVMODE: ' . (1*DUMP_QUERIES_N_STUFF_IN_DEVMODE) . '<br>';
+	}
 ?>
 	<legend class="installMsg">Step 2 - Setting your preferences</legend>
 		<label for="userPass"><span class="ss_sprite_16 ss_lock">&#160;</span>Administrator password
@@ -154,7 +161,7 @@ if($nextstep == md5('2') && CheckAuth())
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_lock_go">&#160;</span>Proceed</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('3'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo '3'; ?>" id="do" />
 		<script>
 function mkNewAuthCode()		
 {
@@ -196,7 +203,7 @@ if ($nextstep == 'mkNewAuthCode')
 }
 
 // Step three
-if($nextstep == md5('3') && CheckAuth()) 
+if($nextstep == '3' && checkAuth()) 
 {
 	//
 	// Installation actions
@@ -239,14 +246,14 @@ if($nextstep == md5('3') && CheckAuth())
 			<button name="submit" type="submit"><span class="ss_sprite_16 ss_information">&#160;</span>To confirmation</button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('4'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo '4'; ?>" id="do" />
 <?php
 
 	exit();
 } // Close step three
 
 // Step four
-if($nextstep == md5('4') && CheckAuth())
+if($nextstep == '4' && checkAuth())
 {
 	//
 	// Installation actions
@@ -261,6 +268,14 @@ if($nextstep == md5('4') && CheckAuth())
 	// Add new data to variable session
 	$_SESSION['variables'] = array_merge($_SESSION['variables'],$db_host,$db_user,$db_pass,$db_name,$db_prefix);
 
+	//
+	// make sure that these directories exist (previous manual efforts may have removed them):
+	//
+	@mkdir(BASE_PATH.'/media');
+	@mkdir(BASE_PATH.'/media/albums');
+	@mkdir(BASE_PATH.'/media/files');
+	@mkdir(BASE_PATH.'/lib/includes/cache');
+	
 	//
 	// Check for current chmod(); we only are interesting in whether these files and directories are readable and writeable:
 	// this also works out for Windows-based servers.
@@ -306,7 +321,7 @@ if($nextstep == md5('4') && CheckAuth())
 			<h2><span class="ss_sprite_16 ss_exclamation">&#160;</span>Warning</h2>
 			<p>It appears that it <abbr title="Based on current chmod() rights and/or safe mode restrictions">may not be possible</abbr> 
 			for the installer to chmod() various files. Please consider doing so manually <em>or</em> by using the 
-			<a href="index.php?do=<?php echo md5('ftp'); ?>">built-in FTP chmod function</a>.</p>
+			<a href="index.php?do=ftp">built-in FTP chmod function</a>.</p>
 			<span>&rarr; <em>Files that still require chmod():</em></span>
 			<ul>
 				<?php 
@@ -406,7 +421,7 @@ if($nextstep == md5('4') && CheckAuth())
 		</table>
 
 		<hr noshade="noshade" />
-		<p class="ss_has_sprite quiet">
+		<p class="ss_has_sprite alert">
 			<span class="ss_sprite_16 ss_exclamation">&#160;</span><strong>Please note</strong><br/>
 			Any data that is currently in <strong><?php echo $_SESSION['variables']['db_prefix']; ?>pages</strong> and <strong><?php echo $_SESSION['variables']['db_prefix']; ?>users</strong> might be overwritten, depending your server configuration.
 		</p>
@@ -415,7 +430,7 @@ if($nextstep == md5('4') && CheckAuth())
 			<button name="submit" id="installbtn" type="submit"><span class="ss_sprite_16 ss_accept">&#160;</span>Install <strong>CompactCMS</strong></button>
 			<a class="button" href="index.php" title="Back to step first step"><span class="ss_sprite_16 ss_cancel">&#160;</span>Cancel</a>
 		</div>
-		<input type="hidden" name="do" value="<?php echo md5('final'); ?>" id="do" />
+		<input type="hidden" name="do" value="<?php echo 'final'; ?>" id="do" />
 <?php
 
 	exit();
@@ -428,7 +443,7 @@ if($nextstep == md5('4') && CheckAuth())
  **/
 
 // Final step
-if($nextstep == md5('final') && CheckAuth())
+if($nextstep == 'final' && checkAuth())
 {
 	//
 	// Installation actions
@@ -545,9 +560,11 @@ if($nextstep == md5('final') && CheckAuth())
 		$sqldump = array();
 
 		$sql = file_get_contents(BASE_PATH.'/_docs/structure.sql');
+		$sql = preg_replace('/compactcms/', $_SESSION['variables']['db_name'], $sql);
 		$sql = preg_replace('/ccms_/', $_SESSION['variables']['db_prefix'], $sql);
 		$sql = preg_replace("/'admin', '[0-9a-f]{32}'/", "'admin', '".md5($_SESSION['variables']['userPass'].$_SESSION['variables']['authcode'])."'", $sql);
-		$sql = str_replace("\r\n", "\n", $sql);
+		// trim trailing whitespace for SQL command lines, so that the explode() below will work without a hitch:
+		$sql = preg_replace('/;[ \t\r]+\n/', ";\n", $sql);
 
 		// Execute per sql piece: 
 		$currently_in_sqltextdata = false;
@@ -598,7 +615,7 @@ if($nextstep == md5('final') && CheckAuth())
 
 		if ($err == 0 && $do_upgrade)
 		{
-			$err = perform_upgrade(&$db, &$log, &$errors, &$sqldump);
+			$err = perform_upgrade($db, $log, $errors, $sqldump);
 		}
 		
 		if ($err == 0)
@@ -640,7 +657,8 @@ if($nextstep == md5('final') && CheckAuth())
 		function setChmod($path, $value) 
 		{
 			// Check current chmod() status
-			if(substr(sprintf('%o', fileperms(BASE_PATH.$path)), -4) != $value) 
+			$perms = @fileperms(BASE_PATH.$path);
+			if ($perms === false || substr(sprintf('%o', $perms), -4) != $value) 
 			{
 				// If not set, set
 				if(@chmod(BASE_PATH.$path, $value)) 
@@ -652,6 +670,7 @@ if($nextstep == md5('final') && CheckAuth())
 			{
 				return true;
 			}
+			return false;
 		}
 
 		// Do chmod() per necessary folder and set status
@@ -674,14 +693,14 @@ if($nextstep == md5('final') && CheckAuth())
 		{
 			$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Confirmed correct chmod() on '.$chmod.' files/directories.</abbr>';
 		}
-		if($chmod==0 || count($errfile) > 0) 
+		if ($chmod == 0 || count($errfile) > 0) 
 		{
 			$errors[] = 'Warning: could not chmod() all files.';
 			foreach ($errfile as $key => $value) 
 			{
 				$errors[] = $value;
 			}
-			$errors[] = 'Either use the <a href="index.php?do=' . md5('ftp') . '">built-in FTP chmod function</a>, or manually perform chmod().';
+			$errors[] = 'Either use the <a href="index.php?do=ftp">built-in FTP chmod function</a>, or manually perform chmod().';
 		}
 	}
 
@@ -695,7 +714,7 @@ if($nextstep == md5('final') && CheckAuth())
 		if ($conn_id !== false)
 		{
 			// Try to login using provided details
-			if(@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
+			if (@ftp_login($conn_id, $_POST['ftp_user'], $_POST['ftp_pass'])) 
 			{
 				// trimPath function
 				function trimPath($path,$depth) 
@@ -714,9 +733,9 @@ if($nextstep == md5('final') && CheckAuth())
 				$path   = $_POST['ftp_path'];
 
 				// Set max tries to 15
-				for ($i=1; $i<15; $i++) 
+				for ($i = 1; $i < 15; $i++) 
 				{ 
-					if(@ftp_chdir($conn_id, trimPath($path,$i))) 
+					if (@ftp_chdir($conn_id, trimPath($path,$i))) 
 					{
 						$log[] = "Successfully connected to FTP server";
 						$i = 15;
@@ -739,17 +758,17 @@ if($nextstep == md5('final') && CheckAuth())
 			if(@ftp_chmod($conn_id, 0666, "./content/contact.php")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/contact.php';
 			if(@ftp_chmod($conn_id, 0666, "./lib/templates/ccms.tpl.html")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/templates/ccms.tpl.html';
 			// Directories under risk due to chmod(0777)
-			if(@ftp_chmod($conn_id, 0777, "./content/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
-			if(@ftp_chmod($conn_id, 0777, "./media/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
+			if(@ftp_chmod($conn_id, 0777, "./content")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /content/';
+			if(@ftp_chmod($conn_id, 0777, "./media")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/';
 			if(@ftp_chmod($conn_id, 0777, "./media/albums")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/albums/';
-			if(@ftp_chmod($conn_id, 0777, "./media/files/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
-			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache/")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
+			if(@ftp_chmod($conn_id, 0777, "./media/files")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /media/files/';
+			if(@ftp_chmod($conn_id, 0777, "./lib/includes/cache")) { $ftp_chmod++; } else $errfile[] = 'Could not chmod() /lib/includes/cache/';
 
-			if($ftp_chmod>0) 
+			if($ftp_chmod > 0) 
 			{
 				$log[] = '<abbr title=".htaccess, config.inc.php, ./content/, ./lib/includes/cache/, back-up folder &amp; 2 media folders">Successful chmod() on '.$chmod.' files/directories using FTP.</abbr>';
 			} 
-			if($ftp_chmod==0 || count($errfile) > 0) 
+			if($ftp_chmod == 0 || count($errfile) > 0) 
 			{
 				$errors[] = 'Fatal: could not FTP chmod() various files.';
 				foreach ($errfile as $key => $value) 
@@ -833,7 +852,7 @@ if($nextstep == md5('final') && CheckAuth())
 			else
 			{
 				$errors[] = 'Fatal: the configuration file is not writable.';
-				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+				$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 				$err++;
 			}
 		}
@@ -859,8 +878,8 @@ if($nextstep == md5('final') && CheckAuth())
 		$newpath    = $_SESSION['variables']['rootdir'];
 
 		// remove the <IfDefine> and </IfDefine> to turn on the rewrite rules, now that we have the site configured!
-		$htaccess = str_replace('<IfDefine CCMS_installed>', '# <IfDefine CCMS_installed>', $htaccess);
-		$htaccess = str_replace('</IfDefine> # CCMS_installed', '# </IfDefine> # CCMS_installed', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<IfDefine CCMS_installed>)/', '# \\2', $htaccess);
+		$htaccess = preg_replace('/([# \t]*)(<\/IfDefine>(\s*#\s*CCMS_installed)?)/', '# \\2', $htaccess);
 
 		// make sure the regexes tolerate ErrorDocument/RewriteBase lines which point at a subdirectory instead of the / root:
 		$htaccess = preg_replace('/(ErrorDocument\s+[0-9]+\s+)\/(.*)(index\.php\?page)/', '\\1' . $newpath . '\\3', $htaccess);
@@ -883,7 +902,7 @@ if($nextstep == md5('final') && CheckAuth())
 					else
 					{
 						$errors[] = "Fatal: Problem saving new .htaccess file.";
-						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 						$err++;
 					}
 					fclose($fp);
@@ -891,7 +910,7 @@ if($nextstep == md5('final') && CheckAuth())
 				else
 				{
 					$errors[] = 'Fatal: the .htaccess file is not writable.';
-					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+					$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 					$err++;
 				}
 			}
@@ -944,7 +963,7 @@ if($nextstep == md5('final') && CheckAuth())
 						else
 						{
 							$errors[] = "Fatal: Problem saving new robots.txt file.";
-							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+							$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 							$err++;
 						}
 						fclose($fp);
@@ -952,7 +971,7 @@ if($nextstep == md5('final') && CheckAuth())
 					else
 					{
 						$errors[] = 'Fatal: the robots.txt file is not writable.';
-						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ff104b2dfab9fe8c0676587292a636d3">do so now</a>.';
+						$errors[] = 'Make sure the file is writable, or <a href="index.php?do=ftp">do so now</a>.';
 						$err++;
 					}
 				}
@@ -1008,7 +1027,7 @@ if($nextstep == md5('final') && CheckAuth())
 		<p>The installation has been successful! You should now follow the steps below, to get you started.</p>
 		<ol>
 			<li>Delete the <em>./_install</em> directory</li>
-			<li><a href="../admin/">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
+			<li><a href="../lib/includes/auth.inc.php?logon_user=admin">Login</a> using username <span class="ss_sprite_16 ss_user_red">&#160;</span><strong>admin</strong></li>
 			<li>Change your password through the back-end</li>
 			<li><a href="http://www.compactcms.nl/contact.html" target="_blank">Let me know</a> how you like CompactCMS!</li>
 		</ol>

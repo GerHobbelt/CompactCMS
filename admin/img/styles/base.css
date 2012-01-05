@@ -131,8 +131,8 @@ body
 {
   /* font-size: 75%; */
   font-size:0.825em;
-  /* font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; */
-  font-family:'Palatino Linotype',Palatino, Baskerville, 'Book Antiqua', Georgia,serif;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; 
+  /* font-family:'Palatino Linotype',Palatino, Baskerville, 'Book Antiqua', Georgia,serif; */
   line-height:1.5; /* was: 1.6em in CCMS before */
 }
 
@@ -446,10 +446,36 @@ label,select,.pointer
 	cursor:pointer;
 }
 
-/* validation */
-.validation-failed {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
-.validation-passed {background:#E6EFC2;color:#264409;border-color:#C6D880;}
-.validation-advice {font-style:italic;color:#CC0000;margin-left:150px;padding-left:17px;font-size:0.825em;}
+/* 
+validation
+
+Classes added by mootools::FormValidator classes:
+
+... and make sure CSS precedence rules allow these through anyhow:
+
+add 
+  input.text, input.title, textarea, input, select
+*/
+input.text.validation-failed, input.title.validation-failed, textarea.validation-failed, input.validation-failed, select.validation-failed 
+{
+	background: #FBE3E4;
+	color: #8a1f11;
+	border-color: #FBC2C4;
+}
+input.text.validation-passed, input.title.validation-passed, textarea.validation-passed, input.validation-passed, select.validation-passed 
+{
+	background: #E6EFC2;
+	color: #264409;
+	border-color: #C6D880;
+}
+.validation-advice 
+{
+	font-style: italic;
+	color: #CC0000;
+	font-size: 0.825em;
+	/* margin-left: 150px;  -- not needed for the contact sample form anymore; also screws up the admin forms elsewhere --> removed */
+	/* padding-left: 17px; */
+}
 
 
 

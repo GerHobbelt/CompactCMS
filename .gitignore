@@ -7,7 +7,10 @@ BuildLog.htm
 _docs/*_files/*
 _install/sprites-src/*
 lib/includes/cache/*
+lib/includes/mootools-core/Specs/*
+lib/includes/mootools-more/Specs/*
 media/*
 content/doc-bits/*
 
+_install/install_check_override.txt
 
