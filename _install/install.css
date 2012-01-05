@@ -137,6 +137,14 @@ noscript h2, .noscript h2
 	font: 10pt Consolas, Monaco, fixed;
 	width: 100%;
 }
+.container-25
+{
+	width: 100%;
+}
+textarea.span-25
+{
+	width: 95%;
+}
 
 
 

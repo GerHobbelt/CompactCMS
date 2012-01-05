@@ -62,9 +62,6 @@ $do = getGETparam4IdOrNumber('do');
 $status = getGETparam4IdOrNumber('status');
 $status_message = getGETparam4DisplayHTML('msg');
 
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
 
 // Get all pages
 $pages = $db->SelectArray($cfg['db_prefix'].'pages', null, array('page_id', 'urlpage', 'user_ids'));
@@ -83,9 +80,9 @@ if (!is_array($users)) $db->Kill();
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Page-owners</title>
-	<link rel="stylesheet" type="text/css" href="../../../img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
+	<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 	<!--[if IE]>
-		<link rel="stylesheet" type="text/css" href="../../../img/styles/ie.css" />
+		<link rel="stylesheet" type="text/css" href="../../../../admin/img/styles/ie.css" />
 	<![endif]-->
 </head>
 <body>
@@ -102,8 +99,8 @@ if (!is_array($users)) $db->Kill();
 
 	<h2><span class="ss_sprite_16 ss_group_gear">&#160;</span><?php echo $ccms['lang']['owners']['header']; ?></h2>
 	<?php
-	if($perm['manageOwners']>0 && $_SESSION['ccms_userLevel']>=$perm['manageOwners']) 
-	{ 
+	if($perm->is_level_okay('manageOwners', $_SESSION['ccms_userLevel']))
+	{
 	?>
 	<p class="left-text"><?php echo $ccms['lang']['owners']['explain']; ?></p>
 	<form action="content-owners.Process.php" method="post" accept-charset="utf-8">
@@ -175,10 +172,16 @@ if (!is_array($users)) $db->Kill();
 	</div>
 	</form>
 	<?php
-	} 
-	else 
+	}
+	else
 	{
-		die($ccms['lang']['auth']['featnotallowed']);
+		?>
+	<p><?php echo $ccms['lang']['auth']['featnotallowed']; ?></p>
+
+	<div class="right">
+		<a href="../../../index.php" onClick="return confirmation();" title="<?php echo $ccms['lang']['backend']['tomainpage_helpmsg']; ?>"><span class="ss_sprite_16 ss_arrow_undo">&#160;</span><?php echo $ccms['lang']['backend']['tomainpage']; ?></a>
+	</div>
+		<?php
 	}
 	?>
 
@@ -187,20 +190,8 @@ if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
 {
 ?>
 	<hr class="clear" />
-	
-	<textarea id="jslog" class="log span-25" readonly="readonly">
-	</textarea>
 
-	<hr class="clear" />
-	
-	<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
-	<textarea id="elm1" name="elm1" rows="15" cols="80" class="span-25">
-		&lt;p&gt;
-			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
-		&lt;/p&gt;
-		&lt;p&gt;
-		Nam nisi elit, cursus in rhoncus sit amet, pulvinar laoreet leo. Nam sed lectus quam, ut sagittis tellus. Quisque dignissim mauris a augue rutrum tempor. Donec vitae purus nec massa vestibulum ornare sit amet id tellus. Nunc quam mauris, fermentum nec lacinia eget, sollicitudin nec ante. Aliquam molestie volutpat dapibus. Nunc interdum viverra sodales. Morbi laoreet pulvinar gravida. Quisque ut turpis sagittis nunc accumsan vehicula. Duis elementum congue ultrices. Cras faucibus feugiat arcu quis lacinia. In hac habitasse platea dictumst. Pellentesque fermentum magna sit amet tellus varius ullamcorper. Vestibulum at urna augue, eget varius neque. Fusce facilisis venenatis dapibus. Integer non sem at arcu euismod tempor nec sed nisl. Morbi ultricies, mauris ut ultricies adipiscing, felis odio condimentum massa, et luctus est nunc nec eros.
-		&lt;/p&gt;
+	<textarea id="jslog" class="log span-25" readonly="readonly">
 	</textarea>
 
 	<hr class="clear" />
@@ -221,88 +212,18 @@ function confirmation()
 }
 
 
-
-var jsLogEl = document.getElementById('jslog');
-var js = [
 <?php
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
+$js_files = array();
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
+
+$driver_code = null;
+$starter_code = null;
+$driver_code = null;
+$extra_functions_code = null;
+
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
 ?>
-	'../../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',   // tested with _dev (tweaked!), _src, _full, _ccms (combiner!)
-<?php
-}
-?>
-	'../../../../lib/includes/js/the_goto_guy.js'
-	];
-
-
-function jsComplete(user_obj, lazy_obj) 
-{
-    if (lazy_obj.todo_count) 
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
-	
-<?php
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-?>
-	// window.addEvent('domready',function()
-	//{
-	tinyMCE.init({
-		mode : "exact",
-		elements : "elm1",
-		theme : "advanced",
-		theme : "simple"
-	});
-	//});
-<?php
-}
-?>
-}
-
-
-function jslog(message) 
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-
-<?php
-if ($cfg['IN_DEVELOPMENT_ENVIRONMENT'])
-{
-?>
-	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-<?php
-}
-?>
-	
-	LazyLoad.js(js, jsComplete);
-}
 </script>
 <script type="text/javascript" src="../../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>

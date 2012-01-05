@@ -4,11 +4,11 @@ Last-minute CSS fixes: load after everything else CSS
 */
 
 /*
-cleaning up the input CSS (Combiner css mode 'remove') would destroy 
-the look of MochaUI windows as their (non-CSS-standard) opacity was 
+cleaning up the input CSS (Combiner css mode 'remove') would destroy
+the look of MochaUI windows as their (non-CSS-standard) opacity was
 removed and hence the red/green background showed through annoyingly.
 
-This was diagnosed finally through using the combiner dev dump 
+This was diagnosed finally through using the combiner dev dump
 (COMBINER_DEV_DUMP_OUTPUT = true) and comparing the looks of
 
 	lib/includes/js/mochaui/Demo/index.html
@@ -21,12 +21,12 @@ at the top of the .htaccess:
 	RewriteCond    %{REQUEST_FILENAME}  -f
 	RewriteRule    ^(.*\.css)$           $1  [L]
 */
-.mocha .handle 
-{ 
+.mocha .handle
+{
 	background: transparent;
 }
-.mocha .corner 
-{ 
+.mocha .corner
+{
 	background: transparent;
 }
 
@@ -49,4 +49,25 @@ and make those toolbars float so they reposition themselves when the space is wi
 }
 
 
+
+
+
+
+
+/*
+http://www.sohtanaka.com/web-design/styling-pre-tags-with-css-code-block/
+*/
+pre 
+{
+	/* font-family: “Consolas”,monospace; */
+
+	overflow-x: auto; /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */
+	white-space: normal; /* crucial for IE 6, maybe 7? */
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	/* width: 99%; */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
 

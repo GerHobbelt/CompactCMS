@@ -1,3 +1,36 @@
+/* -------------------------------------------------------------- 
+      
+   liquid.css
+   * Sets up an easy-to-use grid of 24 columns that stretch
+     to the window width or can also be fixed width.
+
+   Liquid grid work by:
+   * Ben Listwon
+   * David Bedingfield
+   * Andrei Michael Herasimchuk
+   Involution Studios, http://www.involutionstudios.com
+
+   -----
+
+   grid.css
+   * Sets up an easy-to-use grid of 24 columns.
+   
+   Based on work by:
+   * Nathan Borror     [playgroundblues.com]
+   * Jeff Croft        [jeffcroft.com]
+   * Christian Metts   [mintchaos.com]
+   * Khoi Vinh         [subtraction.com]
+
+   -----
+   
+   By default, the grid is 80% of window width, with 24 columns.
+
+   To make the grid fixed, simply change the .container width
+   property to a pixel value. e.g., 960px.
+   
+-------------------------------------------------------------- */
+
+/* A container should group your entire grid. */
 .container
 {
 	min-width: 950px;
@@ -11,9 +44,9 @@
 
 /* LIQUID === */
 /*
-The liquid design is based on a 99.8% (NOT 100%!) layout. 
+The liquid design is based on a 99.8% (NOT 100%!) layout.
 
-That way, we have a little bit of lee-way for border pixels being added to <div> later on.
+That way, we have a little bit of lee-way for border pixels being added to any <div> later on.
 */
 .column, .span-1, .span-2, .span-3, .span-4, .span-5, .span-6, .span-7, .span-8, .span-9, .span-10, .span-11, .span-12, .span-13, .span-14, .span-15, .span-16, .span-17, .span-18, .span-19, .span-20, .span-21, .span-22, .span-23, .span-24 {
   margin-right: 1%;
@@ -50,7 +83,7 @@ That way, we have a little bit of lee-way for border pixels being added to <div>
 .span-9>div, .span-10>div, .span-11>div, .span-12>div,
 .span-13>div, .span-14>div, .span-15>div, .span-16>div,
 .span-17>div, .span-18>div, .span-19>div, .span-20>div,
-.span-21>div, .span-22>div, .span-23>div, .span-24>div 
+.span-21>div, .span-22>div, .span-23>div, .span-24>div
 {
 	margin: 0 0.833em 0 0;
 	overflow: hidden;
@@ -138,25 +171,19 @@ input.span-25, textarea.span-25 { width: 98.8%; }
 
 
 
-.last
-{
-	margin-right: 0;
-	/* width: auto; */
-}
-
 
 /* EXTRA === */
-.border 
+.border
 {
 	border-right: 1px solid #eee;
 }
-.colborder 
+.colborder
 {
 	padding-right: 1.8%;
 	margin-right: 1.8%; /* account for the border pixels! 2% minus border */
 	border-right: 1px solid #eee;
 }
-.colborder>div 
+.colborder>div
 {
 	margin: 0;
 }

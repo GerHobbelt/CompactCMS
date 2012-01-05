@@ -11,7 +11,7 @@
 	border: 1px solid #C10;
 	-webkit-box-shadow: 0px 0px 20px #C10;
 	-moz-box-shadow: 0px 0px 20px #C10;
-	box-shadow: 0px 0px 20px #C10; 
+	box-shadow: 0px 0px 20px #C10;
 	margin: -5px;
 	padding: 8px;
 	z-index: 9999997;
@@ -22,7 +22,7 @@
 .imagezoom {
 	background-color: rgba(0,0,0,0.3);
 }
-	
+
 .imagezoom .loading {
 	width: 46px;
 	height: 11px;
@@ -58,7 +58,7 @@
 .imagezoom .close span {
 	display: none;
 }
-	
+
 .imagezoom .caption {
 	margin: 0px 0px;
 	margin-top: -30px;
@@ -74,7 +74,7 @@
 	position: relative;
 	z-index: 30;
 }
-	
+
 .imagezoom .caption p {
 	margin: 0px;
 	line-height: 22px;
@@ -184,18 +184,18 @@
 	left: -13px;
 	background-image: url(./shadow_left.png) !important;
 	background-image: none;
-	background-position: top left;		
+	background-position: top left;
 }
 
 .imagezoom .s_right {
 	right: -13px;
 	background-image: url(./shadow_right.png) !important;
 	background-image: none;
-	background-position: top right;		
+	background-position: top right;
 }
 
 /** front-end **/
-.album-item 
+.album-item
 {
 	float:left;
 	width:90px;

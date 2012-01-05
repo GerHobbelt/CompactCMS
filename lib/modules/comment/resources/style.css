@@ -1,5 +1,5 @@
 /* PREVIEW === */
-#preview-display 
+#preview-display
 {
 	float:right;
 	background-color: #e1e1e1;
@@ -7,7 +7,7 @@
 	border: 1px solid #C10;
 	-webkit-box-shadow: 0px 0px 20px #C10;
 	-moz-box-shadow: 0px 0px 20px #C10;
-	box-shadow: 0px 0px 20px #C10; 
+	box-shadow: 0px 0px 20px #C10;
 	width:300px;
 	margin: -5px;
 	margin-bottom:10px;
@@ -17,17 +17,17 @@
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
-#preview-display 
+#preview-display
 {
 	background-color: rgba(225,225,225,0.9);
 }
-#preview-display h2 
+#preview-display h2
 {
 	font-size:1.3em;
 	font-weight:bold;
 	color: #070;
 }
-#s-display 
+#s-display
 {
 	padding:10px;
 	margin:10px auto;
@@ -37,16 +37,16 @@
 	clear: right;
 	padding-bottom:20px;
 }
-#preview-avatar, #s-avatar 
+#preview-avatar, #s-avatar
 {
 	float:left;
 	width:100px;
 }
-#preview-avatar img, #s-avatar img 
+#preview-avatar img, #s-avatar img
 {
 	border: 3px solid #000;
 }
-#preview-name, #s-name 
+#preview-name, #s-name
 {
 	float:left;
 	font-weight:bold;
@@ -60,14 +60,14 @@
 {
 	margin-top:20px;
 }
-#s-comment p 
+#s-comment p
 {
 	line-height:1.3em;
 }
-#preview-rating 
+#preview-rating
 {
 	clear:both;
-	background:url('./3-star.gif') no-repeat;
+	background:url('./3-star.png') no-repeat;
 	margin-top:15px;
 	width:120px;
 	height:24px;
@@ -77,28 +77,28 @@
 	font-size:0.9em;
 	float:right;
 	text-align:right;
-	margin-top: -5px; 
+	margin-top: -5px;
 }
-#s-rating p 
+#s-rating p
 {
-	float: right;  
-	margin: -3px 20px 0 20px; 
+	float: right;
+	margin: -3px 20px 0 20px;
 	padding: 0;
 	font-size:0.9em;
 }
-#s-rating img 
+#s-rating img
 {
-	float: right; 
+	float: right;
 }
 
 /* COMMENTS === */
-.loading 
+.loading
 {
 	background:transparent url('../../../../admin/img/spinner.gif') 50% 50%;
 }
 
 /* PAGINATION === */
-div.pagination 
+div.pagination
 {
 	padding: 3px;
 	margin: 3px 3px 30px 3px;

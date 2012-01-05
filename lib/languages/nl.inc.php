@@ -1,4 +1,5 @@
 <?php
+
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
@@ -39,7 +40,6 @@ $ccms['lang']['system']['error_dirwrite'] = "Geen schrijfrechten tot deze map";
 $ccms['lang']['system']['error_chmod'] = "Het huidige bestand kon niet aangepast worden. Controleer de schrijfrechten op de bestanden in de /content map (666).";
 $ccms['lang']['system']['error_value'] = "Fout: waarde onjuist";
 $ccms['lang']['system']['error_default'] = "De standaardpagina kan niet verwijderd worden.";
-$ccms['lang']['system']['error_forged'] = "Waarde is verstoord";
 $ccms['lang']['system']['error_filedots'] = "De bestandsnaam kan geen punten bevatten, bijv. '.html'.";
 $ccms['lang']['system']['error_filesize'] = "De bestandsnaam moet minimaal 3 karakters lang zijn.";
 $ccms['lang']['system']['error_filesize_2'] = "De bestandsnaam dient ten hoogste 50 tekens lang te zijn.";
@@ -60,7 +60,7 @@ $ccms['lang']['system']['error_versioninfo'] = "Geen versie informatie beschikba
 $ccms['lang']['system']['error_misconfig'] = "<strong>Onjuiste configuratie aangetroffen.</strong><br/>Controleer of het .htaccess bestand correct is geconfigureerd aan de huidige mapstructuur. Als CompactCMS in<br/>een submap is geinstalleerd, dan dient het .htaccess bestand daarop aangepast te worden.";
 $ccms['lang']['system']['error_deleted'] = "<h1>Het geselecteerd bestand lijkt al verwijderd</h1><p>Vernieuw de pagina lijst om het meest recente overzicht te zien en zo deze foutmelding te voorkomen. Als dit het probleem niet oplost, controleer dan handmating of het desbetreffende bestand &uuml;berhaupt in de content map bestaat.</p>";
 $ccms['lang']['system']['error_404title'] = "Bestand niet gevonden";
-$ccms['lang']['system']['error_404header'] = "Er deed zich een 404 fout voor, de pagina werd niet gevonden.";
+$ccms['lang']['system']['error_404header'] = "Er deed zich een 404 fout voor, de pagina <strong>{%pagereq%}.html</strong> werd niet gevonden.";
 $ccms['lang']['system']['error_404content'] = "Het gevraagde bestand <strong>{%pagereq%}.html</strong> kon niet worden gevonden.";
 $ccms['lang']['system']['error_403title'] = "Verboden toegang";
 $ccms['lang']['system']['error_403header'] = "Er is een 403-fout opgetreden: U hebt geen toestemming om het gevraagde bestand te openen.";
@@ -69,6 +69,7 @@ $ccms['lang']['system']['error_sitemap'] = "Een overzicht van alle pagina's";
 $ccms['lang']['system']['error_tooshort'] = "Een of meerdere waardes waren te kort of onjuist";
 $ccms['lang']['system']['error_passshort'] = "Een wachtwoord dient uit minstens 6 karakters te bestaan";
 $ccms['lang']['system']['error_passnequal'] = "De opgegeven wachtwoorden kwamen niet overeen";
+$ccms['lang']['system']['error_rec_exists'] = "Dit record bestaat al in de database.";
 $ccms['lang']['system']['noresults'] = "Geen resultaten";
 $ccms['lang']['system']['tooriginal'] = "Terug naar origineel";
 $ccms['lang']['system']['message_rights'] = "Alle rechten voorbehouden";
@@ -83,6 +84,7 @@ $ccms['lang']['backend']['confirmdelete'] = "Bevestig het verwijderen van de aan
 $ccms['lang']['backend']['confirmthumbregen'] = "Bevestig a.u.b. dat u alle mini-afbeeldingen wilt regeneren. Dit kan even duren.";
 $ccms['lang']['backend']['settingssaved'] = "De gemaakte aanpassingen zijn opgeslagen.";
 $ccms['lang']['backend']['must_refresh'] = "Merk op dat het verstandig is om de admin pagina te herladen (functietoets F5) om <em>alle</em> wijzigingen in de rechten direct terug te zien!";
+$ccms['lang']['backend']['reload_admin_screen'] = "Ververs de beheer hoofdpagina";
 $ccms['lang']['backend']['itemcreated'] = "Succesvolle verwerking van item(s).";
 $ccms['lang']['backend']['fullremoved'] = "Succesvolle verwijdering van geselecteerde item(s).";
 $ccms['lang']['backend']['fullregenerated'] = "De mini-afbeeldingen zijn volledig geregenereerd.";
@@ -127,12 +129,16 @@ $ccms['lang']['backend']['menutitle'] = "Het menu";
 $ccms['lang']['backend']['linktitle'] = "Link";
 $ccms['lang']['backend']['item'] = "Item";
 $ccms['lang']['backend']['none'] = "Geen";
+$ccms['lang']['backend']['floatingtitle']       = "Anders";
 $ccms['lang']['backend']['yes'] = "Ja";
 $ccms['lang']['backend']['no'] = "Nee";
 $ccms['lang']['backend']['translation'] = "Vertalingen";
 $ccms['lang']['backend']['hello'] = "Hi";
 $ccms['lang']['backend']['logout'] = "Uitloggen";
 $ccms['lang']['backend']['see_forum'] = "Kijk ook op het forum";
+$ccms['lang']['backend']['warning'] = "Waarschuwing";
+$ccms['lang']['backend']['js_loading'] = "De browser is nog steeds bezig met het laden van meerdere bestanden vanaf de server. Onthoudt U a.u.b. van elke activiteit terwijl dit laadproces wordt voltooid, dank u wel!";
+$ccms['lang']['backend']['reordermenu_done']    = "De pagina's hebben nieuwe (gehernummerde) sequentiele menu posities toegewezen gekregen";
 
 // Texts for authentication screen
 $ccms['lang']['login']['welcome'] = "<p>Gebruik een geldige gebruikersnaam en wachtwoord om in te loggen op CompactCMS. Indien u hier per abuis belandde, keer dan terug naar de <a href='../../'>start pagina</a>.</p><p>E-mail de webmaster voor uw gegevens.</p>";
@@ -168,6 +174,7 @@ $ccms['lang']['forms']['iscoding'] = "Code";
 $ccms['lang']['forms']['createbutton'] = "Aanmaken!";
 $ccms['lang']['forms']['modifybutton'] = "Aanpassen";
 $ccms['lang']['forms']['savebutton'] = "Opslaan";
+$ccms['lang']['forms']['reorderbutton']         = "Hernummer";
 $ccms['lang']['forms']['setlocale'] = "Front-end taalvoorkeur";
 $ccms['lang']['forms']['filter_showing'] = "op dit moment worden alleen pagina's getoond die ten minste de volgende tekst in deze kolom hebben";
 $ccms['lang']['forms']['edit_remove'] = "Bewerk of verwijder het filter voor deze kolom";
@@ -188,6 +195,7 @@ $ccms['lang']['hints']['activelink'] = "Actieve link in menu? :: Niet alle items
 $ccms['lang']['hints']['menuid'] = "Menu categorie :: Kies in welk menu dit item opgenomen en getoond wordt. Standaard is dit main (1) waar ook de start pagina link onder hoort.";
 $ccms['lang']['hints']['iscoding'] = "Bevat programmeertaal :: Bevat dit bestand handmatig toegevoegde code zoals PHP of Javascript? Door 'Ja' te selecteren wordt toegang tot het bestand via de WYSIWYG editor stopgezet en schakelt de code editor in.";
 $ccms['lang']['hints']['filter'] = "<br><br>U kunt links van de koptitel het <span class='sprite livefilter livefilter_active'>&#160;filter ikoontje</span> aanklikken om tekens/woord (tekst) op te geven (danwel te wijzigen of te verwijderen) waarop de pagina lijst hieronder wordt gefilterd. Als U bijv. 'home' opgeeft in het edit veld dat verschijnt zodra U op het filter ikoontje hebt geklikt, en vervolgens op de Enter/Return toets drukt, dan zullen uitsluitend die pagina's in de lijst verschijnen, die in deze kolom de tekenvolgorde 'home' hebben staan. <br>Door opnieuw op het filter ikoontje te klikken en in het dan wederom verschenen edit veld alle tekst te verwijderen, wordt het filter op deze klom ongedaan gemaakt (uit gezet). <br>U kunt met de muis boven het filter ikoontje gaan staan (zonder te klikken; dit heet ook wel 'hoveren') om te zien of het filter op dit moment actief is, en zo ja, waarop het staat ingesteld.";
+$ccms['lang']['hints']['reordercmdhelp'] = "Alle menu-onderdelen wordt gehernummerd om ervoor te zorgen dat elk menu element een uniek top- + subniveau positie heeft en daarbij de posities sequentieel zijn.";
 
 // Editor messages
 $ccms['lang']['editor']['closeeditor'] = "Sluit de editor";
@@ -249,6 +257,12 @@ $ccms['lang']['permission']['level1'] = "Niveau 1 - Gebruiker";
 $ccms['lang']['permission']['level2'] = "Niveau 2 - Redacteur";
 $ccms['lang']['permission']['level3'] = "Niveau 3 - Manager";
 $ccms['lang']['permission']['level4'] = "Niveau 4 - Opperhoofd";
+
+$ccms['lang']['permitem']['manageMenu'] = /* BABELFISH */ "Van welke gebruiker niveau op kunnen gebruikers beheren menu voorkeuren";
+$ccms['lang']['permitem']['manageModules'] = /* BABELFISH */ "Van welke gebruiker niveau op kunnen gebruikers beheren modules";
+$ccms['lang']['permitem']['manageModNews'] = /* BABELFISH */ "Van welke gebruiker niveau op kunnen gebruikers beheren nieuwsberichten via de nieuws-module (toevoegen, wijzigen en verwijderen)";
+$ccms['lang']['permitem']['manageModLightbox'] = /* BABELFISH */ "Van welke gebruiker niveau op kunnen gebruikers beheren albums dacht dat de lightbox module (toevoegen, wijzigen en verwijderen)";
+$ccms['lang']['permitem']['managePageEditing'] = /* BABELFISH */ "Van welke gebruiker niveau op kunnen gebruikers pagina's bewerken (inhoud, titel, subtitel, trefwoorden, etc.)";
 
 // Content owners
 $ccms['lang']['owners']['header'] = "Content eigenaren";
@@ -322,6 +336,10 @@ $ccms['lang']['guestbook']['posted'] = "Je reactie is geplaatst!";
 $ccms['lang']['guestbook']['success'] = "Dank je wel";
 $ccms['lang']['guestbook']['error'] = "Fouten &amp; afwijzingen";
 $ccms['lang']['guestbook']['rejected'] = "Jouw bijdrage is helaas afgewezen.";
+$ccms['lang']['guestbook']['author'] = "Auteur";
+$ccms['lang']['guestbook']['date'] = "Datum";
+$ccms['lang']['guestbook']['host']              = "IP adres";
+$ccms['lang']['guestbook']['configuration'] = "Configuratie";
 
 
       /* ### OBSOLETED ENTRIES ### */
@@ -337,17 +355,17 @@ $ccms['lang']['guestbook']['rejected'] = "Jouw bijdrage is helaas afgewezen.";
        
          ----------------------------------------------------------
 	
-	$ccms['lang']['album']['nodir']			
-	$ccms['lang']['backend']['fileexists'] 		
-	$ccms['lang']['backend']['startedittitle'] 	
-	$ccms['lang']['backend']['updatelist']		
-	$ccms['lang']['editor']['closeeditor']	
-	$ccms['lang']['guestbook']['reaction']	
-	$ccms['lang']['guestbook']['removed'] 	
-	$ccms['lang']['login']['falsetries']		
-	$ccms['lang']['login']['provide']			
-	$ccms['lang']['system']['error_default']	
-	$ccms['lang']['system']['error_sitemap'] 	
+	$ccms['lang']['album']['nodir'] 
+	$ccms['lang']['backend']['fileexists'] 
+	$ccms['lang']['backend']['startedittitle'] 
+	$ccms['lang']['backend']['updatelist'] 
+	$ccms['lang']['editor']['closeeditor'] 
+	$ccms['lang']['guestbook']['delentry'] 
+	$ccms['lang']['guestbook']['removed'] 
+	$ccms['lang']['login']['falsetries'] 
+	$ccms['lang']['login']['provide'] 
+	$ccms['lang']['system']['error_default'] 
+	$ccms['lang']['system']['error_sitemap'] 
        
          ----------------------------------------------------------
 	
@@ -363,6 +381,24 @@ $ccms['lang']['guestbook']['rejected'] = "Jouw bijdrage is helaas afgewezen.";
          ----------------------------------------------------------
       */
 	  
+$ccms['lang']['album']['assigned_page']         = "Assigned to page";
+$ccms['lang']['backend']['install_dir_exists']  = "Be aware that the <em>./_install/</em> directory still exists; this is a security hazard of the first degree! Please remove the <em>_install</em> directory immediately!";
+$ccms['lang']['backend']['rename_file']         = "Rename file";
+$ccms['lang']['forms']['overwrite_imgs']        = "Overwrite existing files";
+$ccms['lang']['permitem']['manageModBackup']    = "From what user level on can users delete current back-up files";
+$ccms['lang']['permitem']['manageModComment']   = "The level of a user that is allowed to manage comments";
+$ccms['lang']['permitem']['manageModTranslate'] = "The level of a user that is allowed to use the (experimental) translation support utility";
+$ccms['lang']['permitem']['manageOwners']       = "To allow to appoint certain users to a specific page";
+$ccms['lang']['permitem']['managePageActivation']     = "From what user level on can users manage the activeness of pages (published vs. unpublished)";
+$ccms['lang']['permitem']['managePageCoding']    = "From what user level on can users set whether a page contains coding (wysiwyg vs. code editor)";
+$ccms['lang']['permitem']['managePages']        = "From what user level on can users manage pages (add, delete)";
+$ccms['lang']['permitem']['manageTemplate']     = "From what user level on can users manage and edit all of the available templates";
+$ccms['lang']['permitem']['manageUsers']        = "From what user level on can users manage user accounts (add, modify, delete)";
+$ccms['lang']['system']['error_forged']         = "You attempted to access site areas for which you are not authorized";
+$ccms['lang']['system']['error_rename']         = "Failed to rename the file";
+$ccms['lang']['system']['error_rename_target_exists'] = "Cannot rename the file as a file with the new name already exists";
+$ccms['lang']['system']['error_session_expired'] = "Your session has expired or you are not logged in";
+$ccms['lang']['system']['home']                 = "Home";
        
       /*
          ----------------------------------------------------------

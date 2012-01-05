@@ -1,8 +1,8 @@
-<?php 
+<?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
 Revision:   CompactCMS - v 1.4.2
-	
+
 This file is part of CompactCMS.
 
 CompactCMS is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ permission of the original copyright owner.
 
 You should have received a copy of the GNU General Public License
 along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
-	
+
 > Contact me for any inquiries.
 > E: Xander@CompactCMS.nl
 > W: http://community.CompactCMS.nl/forum
@@ -34,43 +34,46 @@ if(!defined("COMPACTCMS_CODE")) { die('Illegal entry point!'); } /*MARKER*/
 
 
 // Default albums location
-$album_path	= BASE_PATH.'/media/albums';
-$album_url	= $cfg['rootdir'].'media/albums';
+$album_path = BASE_PATH.'/media/albums';
+$album_url  = $cfg['rootdir'] . 'media/albums';
 
-$pageID	= getGETparam4Filename('page');
-$imgID	= getGETparam4Filename('id');
+$pageID = getGETparam4Filename('page');
+$imgID  = getGETparam4Filename('id');
 $is_printing = ($ccms['printing'] == 'Y');
 
 // Read through selected album, get first and count all
 function fileList($d)
 {
 	$l = array();
-	foreach(array_diff(scandir($d),array('.','..','index.html','info.txt','_thumbs')) as $f) 
+	if (is_dir($d))
 	{
-		if(is_file($d.'/'.$f)) 
+		foreach(array_diff(scandir($d),array('.','..','index.html','info.txt','_thumbs')) as $f)
 		{
-			$ext = strtolower(substr($f, strrpos($f, '.') + 1));
-			if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif") 
+			if(is_file($d.'/'.$f))
 			{
-				$l[] = $f;
+				$ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+				if ($ext=="jpg"||$ext=="jpeg"||$ext=="png"||$ext=="gif")
+				{
+					$l[] = $f;
+				}
 			}
-   		}
-   	} 
-	sort($l, SORT_STRING);
+		}
+		sort($l, SORT_STRING);
+	}
 	return $l;
-} 
+}
 
 // Get all the albums in the default media/albums location
 $albums = array();
-if($handle = opendir($album_path)) 
+if($handle = opendir($album_path))
 {
-	while (false !== ($file = readdir($handle))) 
+	while (false !== ($file = readdir($handle)))
 	{
-		if ($file != "." && $file != ".." && $file != "index.html" && $file != "info.txt" && is_dir($album_path . '/' . $file)) 
+		if ($file != "." && $file != ".." && $file != "index.html" && $file != "info.txt" && is_dir($album_path . '/' . $file))
 		{
 			$albums[] = $file;
-    		}
-	} 
+			}
+	}
 	closedir($handle);
 	sort($albums, SORT_STRING);
 }
@@ -78,12 +81,12 @@ if($handle = opendir($album_path))
 // Get specified album for current page
 $singleShow = false;
 $spec_album = array();
-if(count($albums)>0) 
+if(count($albums) > 0)
 {
-	foreach ($albums as $file) 
+	foreach ($albums as $file)
 	{
 		$lines = @file($album_path.'/'.$file.'/info.txt');
-		if($lines > 0 && @preg_match('/'.$pageID.'/',$lines[0])) 
+		if($lines > 0 && @preg_match('/'.$pageID.'/',$lines[0]))
 		{
 			$spec_album[] = $file;
 		}
@@ -91,19 +94,22 @@ if(count($albums)>0)
 	// Define single show
 	$singleShow = (count($spec_album) == 1 || count($albums) == 1 || !empty($imgID));
 }
-?>
 
-<!-- additional style and code -->
-<link rel="stylesheet" href="<?php echo $cfg['rootdir']; ?>lib/modules/lightbox/resources/style.css" type="text/css" media="screen" title="lightbox" charset="utf-8" />
-<script type="text/javascript" src="<?php echo $cfg['rootdir']; ?>lib/modules/lightbox/resources/script.js" charset="utf-8"></script>
-<script type="text/javascript" charset="utf-8">
-window.addEvent("domready", function() {
-		initImageZoom({loadImage: '<?php echo $cfg['rootdir']; ?>lib/modules/lightbox/resources/loading.gif'});
-	});
-</script>
 
-<!-- lay-out -->
-<?php 
+// code requires mootools: make sure we load it!
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/includes/js/mootools-core.js');
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/includes/js/mootools-more.js');
+// now register our own JS and make sure it ends up AFTER the mootools stuff has been loaded:
+tmpl_set_autoprio($ccms['JS.required_files'], $cfg['rootdir'] . 'lib/modules/lightbox/resources/script.js');
+
+
+tmpl_set_autoprio($ccms['CSS.required_files'], $cfg['rootdir'] . 'lib/modules/lightbox/resources/style.css > media="screen" title="lightbox"');
+
+// window.addEvent("domready", function() {
+$ccms['JS.done'][] = 'initImageZoom({loadImage: "' . $cfg['rootdir'] . 'lib/modules/lightbox/resources/loading.gif"});';
+
+
+
 
 function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $max_width = 80)
 {
@@ -111,7 +117,7 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	$height = null;
 	$width = null;
 	$aspect_ratio = null;
-	if(!empty($thumb_path) && file_exists($thumb_path))
+	if(!empty($thumb_path) && file_exists($thumb_path) && is_readable($thumb_path))
 	{
 		$imginfo = @getimagesize($thumb_path);
 		if (!empty($imginfo[0]))
@@ -119,14 +125,14 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 			$height = floatval($imginfo[1]);
 			$width = floatval($imginfo[0]);
 			$aspect_ratio = (floatval($height)/floatval($width));
-		
+
 			$show_thumb = 1;
 		}
 	}
 	if ($show_thumb != 1)
 	{
 		$thumb_path = $img_path;
-		if(file_exists($thumb_path)) 
+		if(file_exists($thumb_path) && is_readable($thumb_path))
 		{
 			$imginfo = @getimagesize($thumb_path);
 			if (!empty($imginfo[0]))
@@ -134,17 +140,17 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 				$height = floatval($imginfo[1]);
 				$width = floatval($imginfo[0]);
 				$aspect_ratio = (floatval($height)/floatval($width));
-				
+
 				$show_thumb = 2;
 			}
 		}
 	}
-	
+
 	if ($show_thumb == 0)
 	{
 		return null;
 	}
-	
+
 	// Resize thumbnail to approx 80 x 80
 	$newheight = $height;
 	$newwidth = $width;
@@ -158,11 +164,11 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 		$newheight = $max_height;
 		$newwidth = intval($newheight / $aspect_ratio);
 	}
-	
+
 	// calc padding to fill box up to max_h x max_w
 	$pad_height = $max_height - $newheight;
 	$pad_width = $max_width - $newwidth;
-	
+
 	$rv = array();
 	$rv['h'] = $newheight;
 	$rv['w'] = $newwidth;
@@ -173,39 +179,43 @@ function calc_thumb_padding($img_path, $thumb_path = null, $max_height = 80, $ma
 	$rv['pw1'] = intval($pad_width / 2);
 	$pad_width -= $rv['pw1'];
 	$rv['pw2'] = $pad_width;
-	
+
 	$rv['style'] = 'style="padding:' . $rv['ph1'] . 'px ' . $rv['pw2'] . 'px ' . $rv['ph2'] . 'px ' . $rv['pw1'] . 'px;"';
-	
+
 	return $rv;
 }
 
-if(count($albums)>1 && $singleShow==false) 
+
+
+//echo '<pre>count = ' . count($albums) . ', single = ' . (1 * $singleShow) . '</pre> ';
+
+if(count($albums) > 1 && $singleShow == false)
 {
-	if(!empty($albums)) 
+	if(!empty($albums))
 	{
-		foreach ($albums as $i => $album) 
+		foreach ($albums as $i => $album)
 		{
 			if (count($spec_album) > 0)
 			{
 				$show_this_one = false;
-				foreach ($spec_album as $spec) 
+				foreach ($spec_album as $spec)
 				{
 					if ($spec == $album)
 					{
 						$show_this_one = true;
 						break;
 					}
-				}		
+				}
 				if (!$show_this_one)
 					continue; // skip this entry
 			}
-			
+
 			// Get the images in an album
 			$images = fileList($album_path.'/'.$album);
-			
+
 			// If album is not empty and thumbnail is found
 			$show_thumb = 0;
-			if (count($images)>0)
+			if (count($images) > 0)
 			{
 				$thumb_path = $album_path.'/'.$album.'/_thumbs/'.$images[0];
 				$img_path = $album_path.'/'.$album.'/'.$images[0];
@@ -221,9 +231,9 @@ if(count($albums)>1 && $singleShow==false)
 				echo "\n<div class=\"album-item\">";
 				echo "<a href=\"".$cfg['rootdir'].$pageID."/".$album.".html\">";
 				echo "<img src=\"".$album_url."/".$album."/_thumbs/".$images[0]."\" " . $imginfo['style'] . " /><br/>";
-				echo ucfirst($album)." (".count($images).")</a></div>\n";	
+				echo ucfirst($album)." (".count($images).")</a></div>\n";
 				break;
-				
+
 			case 0:
 			default:
 				// If album does exist, but no contents (empty album)
@@ -233,7 +243,7 @@ if(count($albums)>1 && $singleShow==false)
 				echo "<img src=\"".$cfg['rootdir']."lib/modules/lightbox/resources/empty.png\" " . $imginfo['style'] . " /><br/>";
 				echo ucfirst($album)." (0)</div>\n";
 				break;
-				
+
 			case 2:
 				// Otherwise show the first image of non-empty album and scale it to 80x80
 				echo "\n<div class=\"album-item\">";
@@ -242,41 +252,44 @@ if(count($albums)>1 && $singleShow==false)
 				echo ucfirst($album)." (".count($images).")</a></div>\n";
 				break;
 			}
-		} 
-	} 
-	else 
+		}
+	}
+	else
+	{
 		echo $ccms['lang']['album']['noalbums'];
-} 
-elseif($singleShow==true) 
+	}
+}
+elseif($singleShow)
 {
 	$album = (!empty($imgID) ? $imgID : (count($spec_album) > 0 ? $spec_album[0] : $albums[0])); // [i_a] PHP evaluates nested ?: from RIGHT-TO-LEFT! Without the braces, you'ld get the wrong result.
-	
+
 	$desc = null;
 	$lines = @file($album_path.'/'.$album.'/info.txt');
-	for ($x = 1; $x < count($lines); $x++) 
+	for ($x = 1; $x < count($lines); $x++)
 	{
-    	$desc = trim($desc.' '.$lines[$x]); // [i_a] double invocation of htmlspecialchars, together with the form input (lightbox.Process.php)
-	} 
+		$desc .= ' ' . $lines[$x];
+	}
 
 	echo '<h3>'.$ccms['lang']['album']['album'].' '.ucfirst($album)."</h3>\n";
 
 	$back_to_overview_html = '';
-	if(!empty($imgID)) 
+	if(!empty($imgID))
 	{
 		if (!$is_printing)
 		{
 			$back_to_overview_html = '<div class="album-back-to-ov-top"><a href="'.$cfg['rootdir'].$pageID.'.html">'.$ccms['lang']['backend']['tooverview']."</a></div>\n";
 			echo $back_to_overview_html;
 		}
-		
-		// and augment the breadcrumb trail and other template variables:
-		$preview_checkcode = ($ccms['preview'] ? GenerateNewPreviewCode(null, $pageID) : false);
-		
-		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
-		$crumb_extend = ' &raquo; <a href="'.$cfg['rootdir'].$ccms['urlpage'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a></span>';
-		$ccms['breadcrumb'] = str_replace("</span>", $crumb_extend, $ccms['breadcrumb']);
 
-		$ccms['urlpage']   .= '/' . $album;
+		// and augment the breadcrumb trail and other template variables:
+		$preview_checkcode = ($ccms['preview'] == 'Y' ? GenerateNewPreviewCode(null, $pageID) : false);
+		$ccms['previewcode'] = $preview_checkcode;
+
+		$preview_qry = ($preview_checkcode ? '?preview=' . $preview_checkcode : '');
+		$ccms['breadcrumb'][] = '<a href="'.$cfg['rootdir'].$ccms['page_name'].'/'.$album.'.html'.$preview_qry.'" title="'.$ccms['lang']['album']['album'].' '.ucfirst($album).'">'.$ccms['lang']['album']['album'].' '.ucfirst($album).'</a>';
+
+		$ccms['urlpage']   = $ccms['page_name'] . '/' . $album;
+		$ccms['complete_page_url'] = $ccms['urlpage'] . '.html';
 		$ccms['pagetitle'] .= ' : ' . $ccms['lang']['album']['album'].' '.ucfirst($album);
 		//$ccms['subheader']  = $row->subheader;
 		$ccms['desc']       = $desc;
@@ -284,19 +297,19 @@ elseif($singleShow==true)
 		$ccms['title']      = ucfirst($ccms['pagetitle'])." - ".$ccms['sitename']." | ".$ccms['subheader'];
 	}
 
-	echo '<p>' . $desc . "</p>\n";
+	echo '<div class="lightbox-description">' . $desc . "</div>\n";
 
 	// Get the images in an album
 	$images = fileList($album_path.'/'.$album);
-	
+
 	// If album is not empty and thumbnail is found
-	if (count($images)>0)
+	if (count($images) > 0)
 	{
-		foreach($images as $content) 
+		foreach($images as $content)
 		{
-			$caption = substr($content, 0, strrpos($content, '.')); 
+			$caption = substr($content, 0, strrpos($content, '.'));
 			$caption = ucfirst(str_replace('_', ' ', $caption));
-			
+
 			// If album is not empty and thumbnail is found
 			$show_thumb = 0;
 			$thumb_path = $album_path.'/'.$album.'/_thumbs/'.$content;
@@ -312,9 +325,9 @@ elseif($singleShow==true)
 				echo "\n<div class=\"album-item\">";
 				echo "<a rel=\"imagezoom[$album]\" href=\"$album_url/$album/$content\" title=\"$caption\">";
 				echo "<img src=\"".$album_url."/".$album."/_thumbs/".$content."\" " . $imginfo['style'] . " />";
-				echo "</a></div>\n";	
+				echo "</a></div>\n";
 				break;
-				
+
 			case 0:
 			default:
 				// If album does exist, but no contents (empty album)
@@ -324,7 +337,7 @@ elseif($singleShow==true)
 				echo "<img src=\"".$cfg['rootdir']."lib/modules/lightbox/resources/empty.png\" " . $imginfo['style'] . " />";
 				echo "</div>\n";
 				break;
-				
+
 			case 2:
 				// Otherwise show the first image of non-empty album and scale it to 80x80
 				echo "\n<div class=\"album-item\">";
@@ -333,17 +346,17 @@ elseif($singleShow==true)
 				echo "</div>\n";
 				break;
 			}
-		} 
-	} 
-	else 
-	{
-		echo "<p>&#160;</p><p>".$ccms['lang']['system']['error_value']."</p>";
+		}
 	}
-	
+	else
+	{
+		echo '<p>&#160;</p><p>' . $ccms['lang']['system']['error_value'] . '</p>';
+	}
+
 	echo str_replace("album-back-to-ov-top", "album-back-to-ov-bottom", $back_to_overview_html);
-} 
-else 
+}
+else
 {
-	echo $ccms['lang']['system']['noresults']; 
+	echo $ccms['lang']['system']['noresults'];
 }
 ?>

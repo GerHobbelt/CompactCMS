@@ -5,8 +5,8 @@ correct content-type, so that IE will recognize it as a behavior.  Simply specif
 behavior property to fetch this .php file instead of the .htc directly:
 
 .myElement {
-    [ ...css3 properties... ]
-    behavior: url(PIE.php);
+	[ ...css3 properties... ]
+	behavior: url(PIE.php);
 }
 
 This is only necessary when the web server is not configured to serve .htc files with

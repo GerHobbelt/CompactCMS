@@ -1,7 +1,7 @@
 <?php
 /* ************************************************************
 Copyright (C) 2008 - 2010 by Xander Groesbeek (CompactCMS.nl)
-Revision:	CompactCMS - v 1.4.2
+Revision:   CompactCMS - v 1.4.2
 
 This file is part of CompactCMS.
 
@@ -50,39 +50,38 @@ if (!defined('BASE_PATH'))
 
 
 
-if (empty($cfg['fancyupload_language']) || empty($cfg['tinymce_language']))
+if (empty($cfg['MT_FileManager_language']) || empty($cfg['tinymce_language']))
 {
 	die("INTERNAL LANGUAGE INIT ERROR!");
 }
 
 
 
-$do	= getGETparam4IdOrNumber('do');
+$do = getGETparam4IdOrNumber('do');
 
 // Open recordset for specified user
 $newsID = getGETparam4Number('newsID');
-$pageID = getGETparam4IdOrNumber('pageID');
-
-// Get permissions
-$perm = $db->SelectSingleRowArray($cfg['db_prefix'].'cfgpermissions');
-if (!$perm) $db->Kill("INTERNAL ERROR: 1 permission record MUST exist!");
+$page_id = getGETparam4IdOrNumber('page_id');
 
 
-if (!(checkAuth() && $perm['manageModNews']>0 && $_SESSION['ccms_userLevel'] >= $perm['manageModNews']))
+
+if (!(checkAuth() && $perm->is_level_okay('manageModNews', $_SESSION['ccms_userLevel'])))
 {
 	die("No external access to file");
 }
-if (empty($pageID))
+if (!$page_id)
 {
-	die($ccms['lang']['system']['error_forged']);
+	die($ccms['lang']['system']['error_forged'] . ' (' . __FILE__ . ', ' . __LINE__ . ')' );
 }
 
-if($newsID != null)
+if($newsID && $page_id)
 {
-	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID=u.userID WHERE newsID = " . MySQL::SQLValue($newsID, MySQL::SQLVALUE_NUMBER) . " AND pageID=" . MySQL::SQLValue($pageID, MySQL::SQLVALUE_TEXT));
+	$news = $db->QuerySingleRow("SELECT * FROM `".$cfg['db_prefix']."modnews` m LEFT JOIN `".$cfg['db_prefix']."users` u ON m.userID = u.userID WHERE newsID = " . MySQL::SQLValue($newsID, MySQL::SQLVALUE_NUMBER) . " AND page_id = " . MySQL::SQLValue($page_id, MySQL::SQLVALUE_NUMBER));
 	if (!$news) $db->Kill();
 }
 
+$textarea4teaser_id = str2variablename('newstease_' . $page_id . (!empty($newsID) ? '_' . $newsID : ''));
+$textarea4article_id = str2variablename('newsarticle_' . $page_id . (!empty($newsID) ? '_' . $newsID : ''));
 
 
 ?>
@@ -95,7 +94,8 @@ if($newsID != null)
 	<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/base.css,liquid.css,layout.css,sprite.css,last_minute_fixes.css" />
 
 	<!-- File uploader styles -->
-	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/fancyupload/Css/FileManager.css,Additions.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/js/milkbox/css/milkbox.css" />
+	<link rel="stylesheet" media="all" type="text/css" href="../../../lib/includes/js/mootools-filemanager/Assets/Css/FileManager.css,Additions.css" />
 
 	<!--[if IE]>
 		<link rel="stylesheet" type="text/css" href="../../../admin/img/styles/ie.css" />
@@ -129,7 +129,7 @@ if($newsID != null)
 					</tr>
 					<tr>
 						<td>
-							<input type="text" class="minLength:3 text span-25" name="newsTitle" value="<?php echo (isset($news)?$news->newsTitle:null);?>" id="newsTitle"/>
+							<input type="text" class="minLength:3 text span-25" name="newsTitle" value="<?php echo (isset($news) ? $news->newsTitle : null); ?>" id="newsTitle"/>
 						</td>
 						<td>
 							<select name="newsAuthor" class="required text span-25" id="newsAuthor">
@@ -139,14 +139,14 @@ if($newsID != null)
 								foreach($userlist as $user)
 								{
 								?>
-									<option value="<?php echo rm0lead($user->userID); ?>" <?php echo (isset($news) && $user->userID==$news->userID ? 'selected="selected"' : null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
+									<option value="<?php echo rm0lead($user->userID); ?>" <?php echo (isset($news) && $user->userID == $news->userID ? 'selected="selected"' : null); ?>><?php echo $user->userFirst.' '.$user->userLast; ?></option>
 								<?php
 								}
 								?>
 							</select>
 						</td>
 						<td class="nowrap">
-							<input type="text" class="required text" name="newsModified" value="<?php echo (isset($news) ? date('Y-m-d G:i',strtotime($news->newsModified)) : date('Y-m-d G:i')); ?>" id="newsModified">
+							<input type="text" class="required text" name="newsModified" value="<?php echo (isset($news) ? date('Y-m-d G:i', strtotime($news->newsModified)) : date('Y-m-d G:i')); ?>" id="newsModified">
 						</td>
 						<td>
 							<input type="checkbox" name="newsPublished" <?php echo (isset($news) && $news->newsPublished ? 'checked="checked"' : null); ?>  value="1" id="newsPublished" />
@@ -154,18 +154,18 @@ if($newsID != null)
 					</tr>
 				</table>
 			</div>
-				<label class="clear" for="newsTeaser"><?php echo $ccms['lang']['news']['teaser']; ?></label>
-				<textarea name="newsTeaser" id="newsTeaser" class="minLength:3 text span-25" rows="4" cols="40"><?php
+				<label class="clear" for="<?php echo $textarea4teaser_id; ?>"><?php echo $ccms['lang']['news']['teaser']; ?></label>
+				<textarea name="newsTeaser" id="<?php echo $textarea4teaser_id; ?>" class="minLength:3 text" rows="4" cols="40" style="width: 100%"><?php
 					echo (isset($news) ? $news->newsTeaser : null);
 				?></textarea>
 
-				<label for="newsContent"><?php echo $ccms['lang']['news']['contents']; ?></label>
-				<textarea name="newsContent" id="newsContent" class="text span-25" rows="8" cols="40"><?php
+				<label for="<?php echo $textarea4article_id; ?>"><?php echo $ccms['lang']['news']['contents']; ?></label>
+				<textarea name="newsContent" id="<?php echo $textarea4article_id; ?>" class="text" rows="8" cols="40" style="width: 100%"><?php
 					echo (isset($news) ? $news->newsContent : null);
 				?></textarea>
 				<hr class="space"/>
 				<input type="hidden" name="newsID" value="<?php echo $newsID; ?>" id="newsID" />
-				<input type="hidden" name="pageID" value="<?php echo $pageID; ?>" id="pageID" />
+				<input type="hidden" name="page_id" value="<?php echo $page_id; ?>" id="page_id" />
 				<div class="right">
 					<button type="submit" name="submitNews" value="<?php echo $newsID; ?>">
 						<?php
@@ -182,7 +182,7 @@ if($newsID != null)
 						<?php
 						}
 						?>
-					<a class="button" href="./news.Manage.php?pageID=<?php echo $pageID; ?>" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
+					<a class="button" href="./news.Manage.php?page_id=<?php echo $page_id; ?>" onClick="return confirmation();" title="<?php echo $ccms['lang']['editor']['cancelbtn']; ?>"><span class="ss_sprite_16 ss_cross">&#160;</span><?php echo $ccms['lang']['editor']['cancelbtn']; ?></a>
 				</div>
 			</form>
 		</div>
@@ -211,129 +211,50 @@ function confirmation()
 }
 
 
+<?php
+$ccms['JS.required_files']['{%rootdir%}lib/includes/js/the_goto_guy.js'] = count($ccms['JS.required_files']); // make sure the value is a nicely unique sequence number: count() is good for that.
+$ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-core.js'] = count($ccms['JS.required_files']);
+$ccms['JS.required_files']['{%rootdir%}lib/includes/js/mootools-more.js'] = count($ccms['JS.required_files']);
 
-var jsLogEl = document.getElementById('jslog');
-var js = [
-	'../../includes/js/the_goto_guy.js',
-	'../../../lib/includes/js/tiny_mce/tiny_mce_dev.js',
-	'../../includes/js/mootools-core.js,mootools-more.js',
-	'../../../lib/includes/js/fancyupload/dummy.js,Source/FileManager.js,<?php
-	if ($cfg['fancyupload_language'] != 'en')
-	{
-		echo 'Language/Language.en.js,';
-	}
-	?>Language/Language.<?php echo $cfg['fancyupload_language']; ?>.js,Source/Additions.js,Source/Uploader/Fx.ProgressBar.js,Source/Uploader/Swiff.Uploader.js,Source/Uploader.js,Source/FileManager.TinyMCE.js'
-	];
+$js_files = array();
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/the_goto_guy.js';
+$js_files[] = $cfg['rootdir'] . 'lib/includes/js/mootools-core.js,mootools-more.js';
 
-function jsComplete(user_obj, lazy_obj)
-{
-    if (lazy_obj.todo_count)
-	{
-		/* nested invocation of LazyLoad added one or more sets to the load queue */
-		jslog('Another set of JS files is going to be loaded next! Todo count: ' + lazy_obj.todo_count + ', Next up: '+ lazy_obj.load_queue['js'][0].urls);
-		return;
-	}
-	else
-	{
-		jslog('All JS has been loaded!');
-	}
+$mce_options = array(
+	// [0] carries the generic settings:
+	array(
+		$textarea4teaser_id => array(
+			'theme' => 'simple'
+			)
+		)
+	);
+		
+$MCEcodegen = new tinyMCEcodeGen($textarea4teaser_id . ',' . $textarea4article_id, $mce_options);
 
-	// window.addEvent('domready',function()
-	//{
-		tinyMCE.init(
-			{
-				mode: 'exact',
-				elements: 'newsContent',
-				theme: 'advanced',
-				<?php echo 'language: "'.$cfg['tinymce_language'].'",'; ?>
-				skin: 'o2k7',
-				skin_variant: 'silver',
-				plugins: 'table,advlink,advimage,media,inlinepopups,print,fullscreen,paste,searchreplace,visualchars,spellchecker,tinyautosave',
-				theme_advanced_toolbar_location: 'top',
-				theme_advanced_buttons1: 'fullscreen,tinyautosave,print,formatselect,fontselect,fontsizeselect,|,justifyleft,justifycenter,justifyright,justifyfull,|,sub,sup,|,spellchecker,link,unlink,anchor,hr,image,media,|,charmap,code',
-				theme_advanced_buttons2: 'undo,redo,cleanup,|,bold,italic,underline,strikethrough,|,forecolor,backcolor,removeformat,|,cut,copy,paste,replace,|,bullist,numlist,outdent,indent,|,tablecontrols',
-				theme_advanced_buttons3: '',
-				theme_advanced_toolbar_align: 'left',
-				theme_advanced_statusbar_location: 'bottom',
-				dialog_type: 'modal',
-				paste_auto_cleanup_on_paste:true,
-				theme_advanced_resizing:true,
-				relative_urls:true,
-				convert_urls:false,
-				remove_script_host:true,
-				document_base_url: '<?php echo $cfg['rootdir']; ?>',
-				<?php
-				if($cfg['iframe'])
-				{
-				?>
-				extended_valid_elements: 'iframe[align<bottom?left?middle?right?top|class|frameborder|height|id|longdesc|marginheight|marginwidth|name|scrolling<auto?no?yes|src|style|title|width]',
-				<?php
-				}
-				?>
- 				spellchecker_languages: '+English=en,Dutch=nl,German=de,Spanish=es,French=fr,Italian=it,Russian=ru',
-				file_browser_callback:FileManager.TinyMCE(
-					function(type)
-					{
-						return { /* ! '{' MUST be on same line as 'return' otherwise JS will see the newline as end-of-statement! */
-							url: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/' + (type=='image' ? 'selectImage.php' : 'manager.php'),
-							baseURL: '<?php echo $cfg['rootdir']; ?>',
-							assetBasePath: '<?php echo $cfg['rootdir']; ?>lib/includes/js/fancyupload/Assets',
-							<?php echo 'language: "' . $cfg['fancyupload_language'] . '",'; ?>
-							selectable: true,
-							uploadAuthData:
-							{
-								session:'ccms_userLevel',
-								sid:'<?php echo session_id(); ?>'
-							}
-						};
-					})
-			});
-			
+$js_files = array_merge($js_files, $MCEcodegen->get_JSheaderfiles());
 
+$starter_code = $MCEcodegen->genStarterCode();
 
+$driver_code = $MCEcodegen->genDriverCode();
+
+$extra_functions_code = $MCEcodegen->genExtraFunctionsCode();
+
+$driver_code .= <<<EOT42
 
 		/* Check form and post */
 		new FormValidator($('newsForm'),
 			{
-				onFormValidate:function(passed,form,event)
+				onFormValidate: function(passed, form, event)
 				{
 					event.stop();
 					if(passed)
 						form.submit();
 				}
 			});
-	//});
-}
+EOT42;
 
-
-function jslog(message)
-{
-	if (jsLogEl)
-	{
-		jsLogEl.value += "[" + (new Date()).toTimeString() + "] " + message + "\r\n";
-	}
-}
-
-
-/* the magic function which will start it all, thanks to the augmented lazyload.js: */
-function ccms_lazyload_setup_GHO()
-{
-	jslog('loading JS (sequential calls)');
-
-
-	/*
-	when loading the flattened tinyMCE JS, this is (almost) identical to invoking the lazyload-done hook 'jsComplete()';
-	however, tinyMCE 'dev' sources (tiny_mce_dev.js) employs its own lazyload-similar system, so having loaded /that/
-	file does /NOT/ mean that the tinyMCE editor has been loaded completely, on the contrary!
-	*/
-	tinyMCEPreInit = {
-		  suffix: '_src' /* '_src' when you load the _src or _dev version, '' when you want to load the stripped+minified version of tinyMCE plugins */
-		, base: <?php echo '"' . $cfg['rootdir'] . 'lib/includes/js/tiny_mce"'; ?>
-		, query: 'load_callback=jsComplete' /* specify a URL query string, properly urlescaped, to pass special arguments to tinyMCE, e.g. 'api=jquery'; must have an 'adapter' for that one, 'debug=' to add tinyMCE firebug-lite debugging code */
-	};
-	
-	LazyLoad.js(js, jsComplete);
-}
+echo generateJS4lazyloadDriver($js_files, $driver_code, $starter_code, $extra_functions_code);
+?>
 </script>
 <script type="text/javascript" src="../../../lib/includes/js/lazyload/lazyload.js" charset="utf-8"></script>
 </body>
