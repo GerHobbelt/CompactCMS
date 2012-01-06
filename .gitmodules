@@ -17,3 +17,6 @@
 	path = lib/includes/rgrove-jsmin
 	url = git@github.com:GerHobbelt/jsmin-php.git
 
+[submodule "lib/styles/blueprint-css"]
+	path = lib/styles/blueprint-css
+	url = git@github.com:GerHobbelt/blueprint-css.git
