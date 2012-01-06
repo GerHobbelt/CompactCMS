@@ -37,7 +37,7 @@ along with CompactCMS. If not, see <http://www.gnu.org/licenses/>.
    for me.
 
    The current move, shifting the @import statements to the top of this
-   CSS file, circumvents the issue, but since I cannot the cause,
+   CSS file, circumvents the issue, but since I cannot find the cause,
    this certainly is no fix, just a hack. Start your prayer wheels...
 
    (What seems to 'help' produce this issue is having a completely
