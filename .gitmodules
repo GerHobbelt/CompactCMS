@@ -25,3 +25,15 @@
 [submodule "lib/includes/js/PIE"]
 	path = lib/includes/js/PIE
 	url = git://github.com/lojjic/PIE.git
+[submodule "lib/includes/js/edit_area"]
+	path = lib/includes/js/edit_area
+	url = git@github.com:GerHobbelt/EditArea.git
+[submodule "lib/includes/js/coolclock"]
+	path = lib/includes/js/coolclock
+	url = git@github.com:GerHobbelt/CoolClock.git
+[submodule "lib/includes/js/fancyupload"]
+	path = lib/includes/js/fancyupload
+	url = git@github.com:GerHobbelt/digitarald-fancyupload.git
+[submodule "lib/includes/js/filemanager"]
+	path = lib/includes/js/filemanager
+	url = git@github.com:GerHobbelt/mootools-filemanager.git
