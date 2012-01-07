@@ -37,3 +37,6 @@
 [submodule "lib/includes/js/filemanager"]
 	path = lib/includes/js/filemanager
 	url = git@github.com:GerHobbelt/mootools-filemanager.git
+[submodule "lib/includes/htmLawed"]
+	path = lib/includes/htmLawed
+	url = git@github.com:GerHobbelt/HTMLawed.git
