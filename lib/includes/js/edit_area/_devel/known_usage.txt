@@ -1,1 +1,0 @@
-Charismata - Web Based SQL workbench - http://code.google.com/p/charismata/
