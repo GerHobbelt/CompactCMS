@@ -6,8 +6,7 @@ CVS
 BuildLog.htm
 _docs/*_files/*
 lib/includes/cache/*
-lib/includes/mootools-core/Specs/*
-lib/includes/mootools-more/Specs/*
+
 media/*
 content/doc-bits/*
 
