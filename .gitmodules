@@ -40,3 +40,15 @@
 [submodule "lib/styles/blueprint-css"]
 	path = lib/styles/blueprint-css
 	url = git@github.com:GerHobbelt/blueprint-css.git
+[submodule "lib/includes/packager"]
+	path = lib/includes/packager
+	url = git@github.com:GerHobbelt/packager.git
+[submodule "lib/includes/lessphp"]
+	path = lib/includes/lessphp
+	url = git@github.com:GerHobbelt/lessphp.git
+[submodule "lib/includes/simpletest"]
+	path = lib/includes/simpletest
+	url = git@github.com:GerHobbelt/simpletest.git
+[submodule "lib/includes/browscap"]
+	path = lib/includes/browscap
+	url = git@github.com:GerHobbelt/phpbrowscap.git
