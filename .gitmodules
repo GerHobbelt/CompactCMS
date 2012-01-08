@@ -37,3 +37,6 @@
 [submodule "lib/includes/htmLawed"]
 	path = lib/includes/htmLawed
 	url = git@github.com:GerHobbelt/HTMLawed.git
+[submodule "lib/styles/blueprint-css"]
+	path = lib/styles/blueprint-css
+	url = git@github.com:GerHobbelt/blueprint-css.git
