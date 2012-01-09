@@ -19,7 +19,8 @@ checkout)
 	git pull --all
 	;;
 commit)	echo commit a.k.a. checkin
-	git commit
+	shift
+	git commit $@
 	;;
 fetch)	echo fetch remotes...
 	git fetch --all
