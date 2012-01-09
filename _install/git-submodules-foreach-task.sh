@@ -40,6 +40,7 @@ init) echo Initializing the submodules recursively...
 	;;
 *)
 	echo unsupported command parameter: $1
+	echo supported commands: foreach, checkout, commit, fetch, push, init
 	;;
 esac
 
