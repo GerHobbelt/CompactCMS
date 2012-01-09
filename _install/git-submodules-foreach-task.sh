@@ -5,6 +5,9 @@
 # have push access on that particular repo) do NOT abort the 'foreach' run
 # so that you can update all repo's in one single 'foreach' command...
 #
+# Example commandline to update all submodules and checkout their 'master' branch:
+#   _install/git-submodules-foreach-task.sh foreach checkout
+#
 
 pwd
 echo arguments: $0 $@
