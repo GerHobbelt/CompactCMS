@@ -21,7 +21,7 @@
 	url = git@github.com:GerHobbelt/excanvas.git
 [submodule "lib/includes/js/PIE"]
 	path = lib/includes/js/PIE
-	url = git://github.com/lojjic/PIE.git
+	url = git@github.com:GerHobbelt/PIE.git
 [submodule "lib/includes/js/edit_area"]
 	path = lib/includes/js/edit_area
 	url = git@github.com:GerHobbelt/EditArea.git
